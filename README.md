@@ -32,4 +32,11 @@ In a windows command prompt:
 Refer to
 https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
 
+## Database Migration Setup
+
+From command prompt
+X:\repos\dfe\manage-courses-api\src\ManageCourses.Domain>
+
+`dotnet ef --startup-project ../ManageCourses.Api migrations add [migration name]`
+
 

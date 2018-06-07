@@ -9,8 +9,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 using NJsonSchema;
 using NSwag.AspNetCore;
+
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+
 
 namespace GovUk.Education.ManageCourses.Api {
     public class Startup {
@@ -21,12 +25,27 @@ namespace GovUk.Education.ManageCourses.Api {
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices (IServiceCollection services) {
-            services.AddMvc ();
+        public void ConfigureServices (IServiceCollection services)
+        {
+            var connectionString = GetConnectionString();
+
+            services.AddEntityFrameworkNpgsql()
+                .AddDbContext<ManageCoursesDbContext>(
+                    options => options.UseNpgsql(
+                        connectionString, b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
+                        )
+                    );
+
+            services.AddScoped<IManageCoursesDbContext>(provider => provider.GetService<ManageCoursesDbContext>());
+
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure (IApplicationBuilder app, IHostingEnvironment env) {
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ManageCoursesDbContext dbContext)
+        {
+            dbContext.Database.Migrate();
+
             if (env.IsDevelopment ()) {
                 app.UseDeveloperExceptionPage ();
             }
@@ -44,7 +63,23 @@ namespace GovUk.Education.ManageCourses.Api {
 
             });
 
-            app.UseMvc ();
+            app.UseMvc();
+        }
+
+        private string GetConnectionString()
+        {
+
+            var server = Configuration["POSTGRESQL_SERVICE_HOST"];
+            var port = Configuration["POSTGRESQL_SERVICE_PORT"];
+            var user = Configuration["PG_USERNAME"];
+            var pword = Configuration["PG_PASSWORD"];
+            var dbase = Configuration["PG_DATABASE"];
+
+            var sslDefault = "SSL Mode=Prefer;Trust Server Certificate=true";
+            var ssl = Configuration["PG_SSL"] ?? sslDefault;
+
+            var connectionString = $"Server={server};Port={port};Database={dbase};User Id={user};Password={pword};{ssl}";
+            return connectionString;
         }
     }
 }
