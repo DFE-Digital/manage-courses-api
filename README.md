@@ -27,3 +27,9 @@ In a windows command prompt:
     cd src\api
     set ASPNETCORE_URLS=http://*:6001 && dotnet run
 
+## Config
+
+Refer to
+https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
+
+
