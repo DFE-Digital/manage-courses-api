@@ -43,7 +43,3 @@ From command prompt
 X:\repos\dfe\manage-courses-api\src\ManageCourses.Domain>
 
 `dotnet ef --startup-project ../ManageCourses.Api migrations add [migration name]`
-
-
-You can use the generators to generate client code from the API.
-See: https://github.com/RSuter/NSwag/wiki#ways-to-use-the-toolchain
