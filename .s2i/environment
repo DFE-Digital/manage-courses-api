@@ -1,1 +1,1 @@
-DOTNET_STARTUP_PROJECT=src/ManageCourses.Api.csproj
+DOTNET_STARTUP_PROJECT=src/ManageCourses.Api/ManageCourses.Api.csproj
