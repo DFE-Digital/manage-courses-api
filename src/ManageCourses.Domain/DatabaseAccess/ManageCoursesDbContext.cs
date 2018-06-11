@@ -10,7 +10,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
 
         public DbSet<Course> Courses { get; set; }
         public DbSet<Provider> Providers { get; set; }
-
+        public DbSet<ProviderMapper> ProviderMapper { get; set; }
         public IList<Course> GetAll () {
 
             return Courses.ToList();

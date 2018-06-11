@@ -29,6 +29,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers {
         /// Imports the data.
         /// </summary>
         [HttpPost]
-        public void Import ([FromBody] Payload payload) { }
+        public void Import([FromBody] Payload payload)
+        {
+
+        }
     }
 }
