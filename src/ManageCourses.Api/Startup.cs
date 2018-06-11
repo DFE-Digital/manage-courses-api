@@ -68,9 +68,9 @@ namespace GovUk.Education.ManageCourses.Api {
 
         private string GetConnectionString()
         {
+			var server = Configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
+            var port = Configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"];
 
-            var server = Configuration["POSTGRESQL_SERVICE_HOST"];
-            var port = Configuration["POSTGRESQL_SERVICE_PORT"];
             var user = Configuration["PG_USERNAME"];
             var pword = Configuration["PG_PASSWORD"];
             var dbase = Configuration["PG_DATABASE"];
