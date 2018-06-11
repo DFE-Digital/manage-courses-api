@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ManageCourses.Api.Controllers {
@@ -28,6 +29,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers {
         /// Imports the data.
         /// </summary>
         [HttpPost]
-        public void Import ([FromBody] IEnumerable<string> value) { }
+        public void Import([FromBody] Payload payload)
+        {
+
+        }
     }
 }
