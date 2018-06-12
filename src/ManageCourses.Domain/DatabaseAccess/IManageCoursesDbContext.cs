@@ -7,5 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
     public interface IManageCoursesDbContext {
         IList<Course> GetAll ();
+        void AddCourse(Course course);
+        void Save();
     }
 }
