@@ -1,21 +1,21 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Course = GovUk.Education.ManageCourses.Domain.Models.Course;
 
-namespace GovUk.Education.ManageCourses.Api.Controllers {
-
-    [Route ("api/[controller]")]
-    public class DataController : Controller {
+namespace GovUk.Education.ManageCourses.Api.Controllers
+{
+    [Route("api/[controller]")]
+    public class DataController : Controller
+    {
         private readonly IManageCoursesDbContext _context;
 
-        public DataController (IManageCoursesDbContext context) {
+        public DataController(IManageCoursesDbContext context)
+        {
             _context = context;
         }
 
@@ -24,8 +24,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers {
         /// </summary>
         /// <returns>The exported data</returns>
         [HttpGet]
-        public IActionResult Export () {
-            return Ok(new {data= _context.GetAll() });
+        public IEnumerable<Course> Export()
+        {
+            return _context.GetAll().Select(c => new Course { Title = c.Title, UcasCourseCode = c.UcasCode });
         }
 
         /// <summary>
