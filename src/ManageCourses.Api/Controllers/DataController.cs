@@ -1,9 +1,8 @@
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
-using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Course = GovUk.Education.ManageCourses.Domain.Models.Course;
 
@@ -26,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public IEnumerable<Course> Export()
         {
-            return _context.GetAll().Select(c => new Course { Title = c.Title, UcasCourseCode = c.UcasCode });
+            return _context.GetAll();
         }
 
         /// <summary>
