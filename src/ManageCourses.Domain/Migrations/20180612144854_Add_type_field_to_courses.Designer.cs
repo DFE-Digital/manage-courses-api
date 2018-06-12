@@ -11,9 +11,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180612144854_Add_type_field_to_courses")]
+    partial class Add_type_field_to_courses
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

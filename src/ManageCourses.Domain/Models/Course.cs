@@ -7,5 +7,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Title { get; set; }
 
         public string UcasCode { get; set; }
+        public string Type { get; set; }
     }
 }
