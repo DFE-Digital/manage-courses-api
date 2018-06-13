@@ -15,5 +15,14 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
 
             return Courses.ToList();
         }
+
+        public void AddCourse(Course course)
+        {
+            Courses.Add(course);
+        }
+        public void Save()
+        {
+            SaveChanges();
+        }
     }
 }
