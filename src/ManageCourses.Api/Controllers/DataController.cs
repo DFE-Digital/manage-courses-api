@@ -34,27 +34,25 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpPost]
         public void Import([FromBody] Payload payload)
         {
-            var result = ProcessPayload(payload);
+            ProcessPayload(payload);
             //TODO return Ok/Fail in action result
         }
 
-        private bool ProcessPayload(Payload payload)
+        private void ProcessPayload(Payload payload)
         {
-            try
+            foreach (var course in payload.Courses)
             {
-                foreach (var course in payload.Courses)
+                // copy props to prevent changing id
+                // todo: consider removing id from exposed API
+                _context.AddCourse(new Course
                 {
-                    _context.AddCourse(new Course {Title = course.Title});
-                }
+                    Title = course.Title,
+                    UcasCode = course.UcasCode,
+                    Type = course.Type,
+                });
+            }
 
-                _context.Save();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                //TODO create logger and log message
-                return false;
-            }
+            _context.Save();
         }
     }
 }
