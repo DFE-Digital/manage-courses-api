@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Mvc;
@@ -34,27 +32,34 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpPost]
         public void Import([FromBody] Payload payload)
         {
-            var result = ProcessPayload(payload);
+            ResetDatabase();
+
+            ProcessPayload(payload);
+
             //TODO return Ok/Fail in action result
         }
 
-        private bool ProcessPayload(Payload payload)
+        private void ResetDatabase()
         {
-            try
-            {
-                foreach (var course in payload.Courses)
-                {
-                    _context.AddCourse(new Course {Title = course.Title});
-                }
+            // clear out the existing data
+            _context.Courses.RemoveRange(_context.Courses);
+        }
 
-                _context.Save();
-                return true;
-            }
-            catch (Exception ex)
+        private void ProcessPayload(Payload payload)
+        {
+            foreach (var course in payload.Courses)
             {
-                //TODO create logger and log message
-                return false;
+                // copy props to prevent changing id
+                // todo: consider removing id from exposed API
+                _context.AddCourse(new Course
+                {
+                    Title = course.Title,
+                    UcasCode = course.UcasCode,
+                    Type = course.Type,
+                });
             }
+
+            _context.Save();
         }
     }
 }
