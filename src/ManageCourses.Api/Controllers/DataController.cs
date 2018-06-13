@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Mvc;
@@ -34,8 +32,17 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpPost]
         public void Import([FromBody] Payload payload)
         {
+            ResetDatabase();
+
             ProcessPayload(payload);
+
             //TODO return Ok/Fail in action result
+        }
+
+        private void ResetDatabase()
+        {
+            // clear out the existing data
+            _context.Courses.RemoveRange(_context.Courses);
         }
 
         private void ProcessPayload(Payload payload)
