@@ -11,5 +11,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string NoteNo { get; set; }
         public string NoteType { get; set; }
         public string LineText { get; set; }
+        public string YearCode { get; set; }
     }
 }

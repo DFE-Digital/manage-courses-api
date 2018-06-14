@@ -61,16 +61,16 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 // todo: consider removing id from exposed API
                 _context.AddUcasCourse(new UcasCourse
                 {
-                    Title = course.Title,
-                    CourseCode = course.CourseCode,
                     InstCode = course.InstCode,
-                    StudyMode = course.StudyMode,
-                    AgeGroup = course.AgeGroup,
+                    CrseCode = course.CrseCode,
+                    CrseTitle = course.CrseTitle,
+                    Studymode = course.Studymode,
+                    Age = course.Age,
                     CampusCode = course.CampusCode,
-                    ProfPostFlag = course.ProfPostFlag,
+                    ProfpostFlag = course.ProfpostFlag,
                     ProgramType = course.ProgramType,
-                    AcreditedProvider = course.AcreditedProvider,
-                    OpenDate = course.OpenDate
+                    AccreditingProvider = course.AccreditingProvider,
+                    CrseOpenDate = course.CrseOpenDate
                 });
             }
 
@@ -80,17 +80,21 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     new UcasInstitution
                     {
                         InstCode = institution.InstCode,
-                        FullName = institution.FullName,
+                        InstName = institution.InstName,
+                        InstBig = institution.InstBig,
+                        InstFull = institution.InstFull,
                         InstType = institution.InstType,
-                        Address1 = institution.Address1,
-                        Address2 = institution.Address2,
-                        Address3 = institution.Address3,
-                        Address4 = institution.Address4,
-                        PostCode = institution.PostCode,
+                        Addr1 = institution.Addr1,
+                        Addr2 = institution.Addr2,
+                        Addr3 = institution.Addr3,
+                        Addr4 = institution.Addr4,
+                        Postcode = institution.Postcode,
                         ContactName = institution.ContactName,
                         Url = institution.Url,
+                        YearCode = institution.YearCode,
                         Scitt = institution.Scitt,
-                        AcreditedProvider = institution.AcreditedProvider
+                        AccreditingProvider = institution.AccreditingProvider,
+                        SchemeMember = institution.SchemeMember
                     }
                 );
             }
@@ -101,8 +105,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     new UcasCourseSubject
                     {
                         InstCode = courseSubject.InstCode,
-                        CourseCode = courseSubject.CourseCode,
-                        SubjectCode = courseSubject.SubjectCode
+                        CrseCode = courseSubject.CrseCode,
+                        SubjectCode = courseSubject.SubjectCode,
+                        YearCode = courseSubject.YearCode
                     }
                 );
             }
@@ -126,12 +131,14 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     {
                         InstCode = campus.InstCode,
                         CampusCode = campus.CampusCode,
-                        Address1 = campus.Address1,
-                        Address2 = campus.Address2,
-                        Address3 = campus.Address3,
-                        Address4 = campus.Address4,
-                        PostCode = campus.PostCode,
+                        CampusName = campus.CampusName,
+                        Addr1 = campus.Addr1,
+                        Addr2 = campus.Addr2,
+                        Addr3 = campus.Addr3,
+                        Addr4 = campus.Addr4,
+                        Postcode = campus.Postcode,
                         TelNo = campus.TelNo,
+                        Email = campus.Email,
                         RegionCode = campus.RegionCode
                     }
                 );
@@ -142,10 +149,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 _context.AddUcasCourseNote(
                     new UcasCourseNote
                     {
-                        CourseCode = courseNote.CourseCode,
+                        CrseCode = courseNote.CrseCode,
                         InstCode = courseNote.InstCode,
                         NoteNo = courseNote.NoteNo,
                         NoteType = courseNote.NoteType,
+                        YearCode = courseNote.YearCode
                     }
                     );
             }
@@ -156,9 +164,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     new UcasNoteText
                     {
                         InstCode = noteText.InstCode,
-                        LineText = noteText.LineText,
                         NoteNo = noteText.NoteNo,
-                        NoteType = noteText.NoteType
+                        NoteType = noteText.NoteType,
+                        LineText = noteText.LineText,
+                        YearCode=noteText.YearCode
                     }
                 );
             }
