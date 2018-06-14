@@ -1,12 +1,41 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
-namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
-    public class ManageCoursesDbContext : DbContext, IManageCoursesDbContext {
-        public ManageCoursesDbContext (DbContextOptions<ManageCoursesDbContext> options) : base (options) { }
+namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
+{
+    public class ManageCoursesDbContext : DbContext, IManageCoursesDbContext
+    {
+        public ManageCoursesDbContext(DbContextOptions<ManageCoursesDbContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            foreach (var e in modelBuilder.Model.GetEntityTypes())
+            {
+                e.Relational().TableName = PascalToSnakeCase(e.DisplayName());
+                foreach (var p in e.GetProperties())
+                {
+                    p.Relational().ColumnName = PascalToSnakeCase(p.Name);
+                }
+            }
+
+            base.OnModelCreating(modelBuilder);
+        }
+
+        /// <summary>
+        /// Converts CamelCase to underscore_separated
+        /// To avoid having to quote everything when writing queries.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private string PascalToSnakeCase(string value)
+        {
+            return Regex.Replace(value, @"([a-z\d])([A-Z])", "$1_$2").ToLower();
+        }
 
         public DbSet<Course> Courses { get; set; }
         public DbSet<UcasCourse> UcasCourses { get; set; }
@@ -18,8 +47,9 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
         public DbSet<UcasNoteText> UcasNoteTexts { get; set; }
         public DbSet<Provider> Providers { get; set; }
         public DbSet<ProviderMapper> ProviderMapper { get; set; }
-       
-        public IList<Course> GetAll () {
+
+        public IList<Course> GetAll()
+        {
 
             return Courses.ToList();
         }
