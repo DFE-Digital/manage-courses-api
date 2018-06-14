@@ -4,11 +4,11 @@ using System.Text;
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
-    public class UcasSubject
+    public class UcasCourseSubject
     {
         public int Id { get; set; }
+        public string InstCode { get; set; }
+        public string CourseCode { get; set; }
         public string SubjectCode { get; set; }
-        public string SubjectDescription { get; set; }
-        public string TitleMatch { get; set; }
     }
 }

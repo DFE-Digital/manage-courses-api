@@ -11,6 +11,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
         public DbSet<Course> Courses { get; set; }
         public DbSet<UcasCourse> UcasCourses { get; set; }
         public DbSet<UcasInstitution> UcasInstitutions { get; set; }
+        public DbSet<UcasCourseSubject> UcasCourseSubjects { get; set; }
         public DbSet<UcasSubject> UcasSubjects { get; set; }
         public DbSet<UcasCampus> UcasCampuses { get; set; }
         public DbSet<UcasCourseNote> UcasCourseNotes { get; set; }
@@ -37,6 +38,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
             return UcasSubjects.ToList();
         }
 
+        public IList<UcasCourseSubject> GetAllUcasCourseSubjects()
+        {
+            return UcasCourseSubjects.ToList();
+        }
+
         public IList<UcasCampus> GetAllUcasCampuses()
         {
             return UcasCampuses.ToList();
@@ -60,6 +66,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess {
         public void AddUcasSubject(UcasSubject subject)
         {
             UcasSubjects.Add(subject);
+        }
+
+        public void AddUcasCourseSubject(UcasCourseSubject courseSubject)
+        {
+            UcasCourseSubjects.Add(courseSubject);
         }
 
         public void AddUcasCampus(UcasCampus campus)

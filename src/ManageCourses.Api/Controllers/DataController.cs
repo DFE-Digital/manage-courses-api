@@ -46,6 +46,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _context.UcasCourses.RemoveRange(_context.UcasCourses);
             _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
             _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
+            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
             _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
             _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
             _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
@@ -94,14 +95,26 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 );
             }
 
+            foreach (var courseSubject in payload.CourseSubjects)
+            {
+                _context.AddUcasCourseSubject(
+                    new UcasCourseSubject
+                    {
+                        InstCode = courseSubject.InstCode,
+                        CourseCode = courseSubject.CourseCode,
+                        SubjectCode = courseSubject.SubjectCode
+                    }
+                );
+            }
+
             foreach (var subject in payload.Subjects)
             {
                 _context.AddUcasSubject(
                     new UcasSubject
                     {
-                        InstCode = subject.InstCode,
-                        CourseCode = subject.CourseCode,
-                        SubjectCode = subject.SubjectCode
+                        SubjectCode = subject.SubjectCode,
+                        SubjectDescription = subject.SubjectDescription,
+                        TitleMatch = subject.TitleMatch
                     }
                 );
             }
