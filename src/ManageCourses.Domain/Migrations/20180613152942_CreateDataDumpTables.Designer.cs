@@ -11,9 +11,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180613152942_CreateDataDumpTables")]
+    partial class CreateDataDumpTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,22 +151,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("UcasCourseNotes");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourseSubject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("CourseCode");
-
-                    b.Property<string>("InstCode");
-
-                    b.Property<string>("SubjectCode");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UcasCourseSubjects");
-                });
-
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", b =>
                 {
                     b.Property<int>("Id")
@@ -223,11 +208,11 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("CourseCode");
+
+                    b.Property<string>("InstCode");
+
                     b.Property<string>("SubjectCode");
-
-                    b.Property<string>("SubjectDescription");
-
-                    b.Property<string>("TitleMatch");
 
                     b.HasKey("Id");
 
