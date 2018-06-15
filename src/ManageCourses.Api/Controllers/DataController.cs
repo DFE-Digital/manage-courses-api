@@ -24,7 +24,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public IEnumerable<Course> Export()
         {
-            return _context.GetAll();
+            var courses = _context.GetAll();
+            return courses;
         }
 
         /// <summary>
