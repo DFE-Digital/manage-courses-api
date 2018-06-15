@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -24,7 +25,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public IEnumerable<Course> Export()
         {
-            var courses = _context.GetAll();
+            var courses = _context.UcasCourses.Select(uc => new Course
+            {
+                UcasCode = uc.CrseCode,
+                Title = uc.CrseTitle,
+                Id = uc.Id,
+                Type = "todo-type", // todo: type
+            });
             return courses;
         }
 
@@ -168,7 +175,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                         NoteNo = noteText.NoteNo,
                         NoteType = noteText.NoteType,
                         LineText = noteText.LineText,
-                        YearCode=noteText.YearCode
+                        YearCode = noteText.YearCode
                     }
                 );
             }
