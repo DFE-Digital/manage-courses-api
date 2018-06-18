@@ -12,5 +12,9 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public IEnumerable<UcasCampus> Campuses { get; set; }
         public IEnumerable<UcasCourseNote> CourseNotes { get; set; }
         public IEnumerable<UcasNoteText> NoteTexts { get; set; }
+        public IEnumerable<McOrganisation> Organisations { get; set; }
+        public IEnumerable<McOrganisationInstitution> OrganisationInstitutions { get; set; }
+        public IEnumerable<McOrganisationUser> OrganisationUsers { get; set; }
+        public IEnumerable<McUser> Users { get; set; }
     }
 }
