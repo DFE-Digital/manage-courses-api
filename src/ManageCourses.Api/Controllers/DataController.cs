@@ -4,7 +4,6 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Remotion.Linq.Clauses;
 using Course = GovUk.Education.ManageCourses.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
