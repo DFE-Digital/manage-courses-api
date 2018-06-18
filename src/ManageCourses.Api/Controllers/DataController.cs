@@ -4,6 +4,7 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Remotion.Linq.Clauses;
 using Course = GovUk.Education.ManageCourses.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -25,13 +26,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public IEnumerable<Course> Export()
         {
-            var courses = _context.UcasCourses.Select(uc => new Course
-            {
-                UcasCode = uc.CrseCode,
-                Title = uc.CrseTitle,
-                Id = uc.Id,
-                Type = "todo-type", // todo: type
-            });
+            var email = "todo";//TODO wire this up when sign in is completed
+
+            var courses = GetCoursesForUser(email);
+
             return courses;
         }
 
@@ -65,6 +63,21 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _context.Save();
         }
 
+        private IEnumerable<Course> GetCoursesForUser(string email)
+        {
+            var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.NctlId);   
+            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.NctlId)).Select(x => x.UcasCode);
+            var mappedCourses = _context.UcasCourses.Where(c => mappedUcasCodes.Contains(c.InstCode));
+
+            var courses = mappedCourses.Select(uc => new Course
+            {
+                UcasCode = uc.CrseCode,
+                Title = uc.CrseTitle,
+                Id = uc.Id,
+                Type = "todo-type", // todo: type
+            });
+            return courses;
+        }
         private void ProcessPayload(Payload payload)
         {
             foreach (var course in payload.Courses)

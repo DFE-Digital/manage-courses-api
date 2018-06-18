@@ -50,7 +50,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         public DbSet<McUser> McUsers { get; set; }
         public DbSet<Provider> Providers { get; set; }
-        public DbSet<ProviderMapper> ProviderMapper { get; set; }
+        public DbSet<ProviderMapper> ProviderMappers { get; set; }
 
         public IList<Course> GetAll()
         {

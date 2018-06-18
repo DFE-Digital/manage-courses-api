@@ -6,6 +6,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 {
     public interface IManageCoursesDbContext
     {
+        DbSet<ProviderMapper> ProviderMappers { get; set; }
         DbSet<Course> Courses { get; set; }
         DbSet<UcasCourse> UcasCourses { get; set; }
         DbSet<UcasInstitution> UcasInstitutions { get; set; }
