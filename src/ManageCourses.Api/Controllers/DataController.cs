@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public IEnumerable<Course> Export()
         {
-            var email = "todo";//TODO wire this up when sign in is completed
+            var email = _context.McUsers.Select(u => u.Email).FirstOrDefault();//TODO wire this up when sign in is completed
 
             var courses = GetCoursesForUser(email);
 
