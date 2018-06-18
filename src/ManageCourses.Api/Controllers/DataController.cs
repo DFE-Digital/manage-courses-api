@@ -58,6 +58,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
             _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
             _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
+            _context.McOrganisations.RemoveRange(_context.McOrganisations);
+            _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
+            _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
+            _context.McUsers.RemoveRange(_context.McUsers);
             _context.Save();
         }
 
@@ -176,6 +180,48 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                         NoteType = noteText.NoteType,
                         LineText = noteText.LineText,
                         YearCode = noteText.YearCode
+                    }
+                );
+            }
+
+            foreach (var organisation in payload.Organisations)
+            {
+                _context.AddMcOrganisation(
+                    new McOrganisation
+                    {
+                        NctlId = organisation.NctlId,
+                        Name = organisation.Name
+                    }
+                    );
+            }
+            foreach (var organisatioInstitution in payload.OrganisationInstitutions)
+            {
+                _context.AddMcOrganisationInstitution(
+                    new McOrganisationInstitution
+                    {
+                        NctlId = organisatioInstitution.NctlId,
+                        InstitutionCode = organisatioInstitution.InstitutionCode
+                    }
+                );
+            }
+            foreach (var organisationUser in payload.OrganisationUsers)
+            {
+                _context.AddMcOrganisationUser(
+                    new McOrganisationUser
+                    {
+                        NctlId = organisationUser.NctlId,
+                        Email = organisationUser.Email
+                    }
+                );
+            }
+            foreach (var user in payload.Users)
+            {
+                _context.AddMcUser(
+                    new McUser
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email
                     }
                 );
             }

@@ -45,6 +45,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<UcasCampus> UcasCampuses { get; set; }
         public DbSet<UcasCourseNote> UcasCourseNotes { get; set; }
         public DbSet<UcasNoteText> UcasNoteTexts { get; set; }
+        public DbSet<McOrganisation> McOrganisations { get; set; }
+        public DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
+        public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
+        public DbSet<McUser> McUsers { get; set; }
         public DbSet<Provider> Providers { get; set; }
         public DbSet<ProviderMapper> ProviderMapper { get; set; }
 
@@ -88,6 +92,26 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return UcasNoteTexts.ToList();
         }
 
+        public IList<McOrganisation> GetAllMcOrganisations()
+        {
+            return McOrganisations.ToList();
+        }
+
+        public IList<McOrganisationInstitution> GetAllMcOrganisationsInstitutions()
+        {
+            return McOrganisationIntitutions.ToList();
+        }
+
+        public IList<McOrganisationUser> GetAllMcOrganisationsUsers()
+        {
+            return McOrganisationUsers.ToList();
+        }
+
+        public IList<McUser> GetAllMcUsers()
+        {
+            return McUsers.ToList();
+        }
+
         public void AddUcasInstitution(UcasInstitution institution)
         {
             UcasInstitutions.Add(institution);
@@ -116,6 +140,26 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public void AddUcasNoteText(UcasNoteText noteText)
         {
             UcasNoteTexts.Add(noteText);
+        }
+
+        public void AddMcOrganisation(McOrganisation organisation)
+        {
+            McOrganisations.Add(organisation);
+        }
+
+        public void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution)
+        {
+            McOrganisationIntitutions.Add(organisationInstitution);
+        }
+
+        public void AddMcOrganisationUser(McOrganisationUser organisationUser)
+        {
+            McOrganisationUsers.Add(organisationUser);
+        }
+
+        public void AddMcUser(McUser user)
+        {
+            McUsers.Add(user);
         }
 
         public void AddUcasCourse(UcasCourse course)

@@ -14,6 +14,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<UcasCampus> UcasCampuses { get; set; }
         DbSet<UcasCourseNote> UcasCourseNotes { get; set; }
         DbSet<UcasNoteText> UcasNoteTexts { get; set; }
+        DbSet<McOrganisation> McOrganisations { get; set; }
+        DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
+        DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
+        DbSet<McUser> McUsers { get; set; }
         IList<Course> GetAll();
         IList<UcasCourse> GetAllUcasCourses();
         IList<UcasInstitution> GetAllUcasInstitutions();
@@ -22,6 +26,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         IList<UcasCampus> GetAllUcasCampuses();
         IList<UcasCourseNote> GetAllUcasCourseNotes();
         IList<UcasNoteText> GetAllUcasNoteTexts();
+        IList<McOrganisation> GetAllMcOrganisations();
+        IList<McOrganisationInstitution> GetAllMcOrganisationsInstitutions();
+        IList<McOrganisationUser> GetAllMcOrganisationsUsers();
+        IList<McUser> GetAllMcUsers();
         void AddUcasCourse(UcasCourse course);
         void AddUcasInstitution(UcasInstitution institution);
         void AddUcasSubject(UcasSubject subject);
@@ -29,6 +37,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         void AddUcasCampus(UcasCampus campus);
         void AddUcasCourseNote(UcasCourseNote courseNote);
         void AddUcasNoteText(UcasNoteText noteText);
+        void AddMcOrganisation(McOrganisation organisation);
+        void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution);
+        void AddMcOrganisationUser(McOrganisationUser organisationUser);
+        void AddMcUser(McUser user);
         void Save();
     }
 }
