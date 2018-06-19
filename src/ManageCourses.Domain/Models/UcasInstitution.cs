@@ -22,6 +22,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string YearCode { get; set; }
         public string Scitt { get; set; }
         public string AccreditingProvider { get; set; }
-        public string SchemeMember { get; set; }        
+        public string SchemeMember { get; set; }
+
+        public ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
     }
 }
