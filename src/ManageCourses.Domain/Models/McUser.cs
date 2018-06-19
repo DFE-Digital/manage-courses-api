@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
@@ -10,5 +8,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-    }
+
+        public ICollection<McOrganisationUser> McOrganisationUser { get; set; }
+        }
 }

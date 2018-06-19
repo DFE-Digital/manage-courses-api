@@ -23,7 +23,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
 
-            modelBuilder.Entity<McUser>().HasIndex(e => e.Email).IsUnique();
+            modelBuilder.Entity<McOrganisationUser>()
+                .HasOne(ou => ou.McUser)
+                .WithMany(u => u.McOrganisationUser)
+                .HasForeignKey(ou => ou.Email)
+                .HasPrincipalKey(u => u.Email);
 
             base.OnModelCreating(modelBuilder);
         }
