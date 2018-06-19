@@ -38,7 +38,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasPrincipalKey(u => u.NctlId);
 
             modelBuilder.Entity<McOrganisationUser>()
-                .HasIndex(ou => new {ou.Email, ou.NctlId})
+                .HasIndex(ou => new { ou.Email, ou.NctlId })
+                .IsUnique();
+
+            modelBuilder.Entity<McOrganisationInstitution>()
+                .HasIndex(oi => new { oi.NctlId, oi.InstitutionCode })
                 .IsUnique();
 
             base.OnModelCreating(modelBuilder);
