@@ -16,5 +16,6 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public IEnumerable<McOrganisationInstitution> OrganisationInstitutions { get; set; }
         public IEnumerable<McOrganisationUser> OrganisationUsers { get; set; }
         public IEnumerable<McUser> Users { get; set; }
+        public IEnumerable<ProviderMapper> Mappers { get; set; }
     }
 }

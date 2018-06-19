@@ -112,6 +112,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return McUsers.ToList();
         }
 
+        public IList<ProviderMapper> GetAllProviderMappers()
+        {
+            return ProviderMappers.ToList();
+        }
+
         public void AddUcasInstitution(UcasInstitution institution)
         {
             UcasInstitutions.Add(institution);
@@ -160,6 +165,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public void AddMcUser(McUser user)
         {
             McUsers.Add(user);
+        }
+
+        public void AddProviderMapper(ProviderMapper provideMapper)
+        {
+            ProviderMappers.Add(provideMapper);
         }
 
         public void AddUcasCourse(UcasCourse course)
