@@ -23,6 +23,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
 
+            modelBuilder.Entity<McUser>().HasIndex(e => e.Email).IsUnique();
+
             base.OnModelCreating(modelBuilder);
         }
 
