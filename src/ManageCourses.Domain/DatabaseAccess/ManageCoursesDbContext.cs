@@ -25,9 +25,15 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McUser)
-                .WithMany(u => u.McOrganisationUser)
+                .WithMany(u => u.McOrganisationUsers)
                 .HasForeignKey(ou => ou.Email)
                 .HasPrincipalKey(u => u.Email);
+
+            modelBuilder.Entity<McOrganisationUser>()
+                .HasOne(ou => ou.McOrganisation)
+                .WithMany(u => u.McOrganisationUsers)
+                .HasForeignKey(ou => ou.NctlId)
+                .HasPrincipalKey(u => u.NctlId);
 
             base.OnModelCreating(modelBuilder);
         }

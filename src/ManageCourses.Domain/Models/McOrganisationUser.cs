@@ -9,5 +9,7 @@
         public string Email { get; set; }
 
         public McUser McUser { get; set; }
+
+        public McOrganisation McOrganisation { get; set; }
     }
 }
