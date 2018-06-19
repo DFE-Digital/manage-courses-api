@@ -31,6 +31,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         IList<McOrganisationInstitution> GetAllMcOrganisationsInstitutions();
         IList<McOrganisationUser> GetAllMcOrganisationsUsers();
         IList<McUser> GetAllMcUsers();
+        IList<ProviderMapper> GetAllProviderMappers();
         void AddUcasCourse(UcasCourse course);
         void AddUcasInstitution(UcasInstitution institution);
         void AddUcasSubject(UcasSubject subject);
@@ -42,6 +43,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution);
         void AddMcOrganisationUser(McOrganisationUser organisationUser);
         void AddMcUser(McUser user);
+        void AddProviderMapper(ProviderMapper provideMapper);
         void Save();
     }
 }

@@ -59,6 +59,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
             _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
             _context.McUsers.RemoveRange(_context.McUsers);
+            _context.ProviderMappers.RemoveRange(_context.ProviderMappers);
             _context.Save();
         }
 
@@ -234,6 +235,20 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Email = user.Email
+                    }
+                );
+            }
+
+            foreach (var mapper in payload.Mappers)
+            {
+                _context.AddProviderMapper(
+                    new ProviderMapper
+                    {
+                        InstitutionName = mapper.InstitutionName,
+                        NctlId = mapper.NctlId,
+                        Type = mapper.Type,
+                        UcasCode = mapper.UcasCode,
+                        Urn = mapper.Urn
                     }
                 );
             }
