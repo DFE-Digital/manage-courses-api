@@ -23,17 +23,23 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
 
+            // Fk from org-user join table to user
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McUser)
                 .WithMany(u => u.McOrganisationUsers)
                 .HasForeignKey(ou => ou.Email)
                 .HasPrincipalKey(u => u.Email);
 
+            // Fk from org-user join table to org
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McOrganisation)
                 .WithMany(u => u.McOrganisationUsers)
                 .HasForeignKey(ou => ou.NctlId)
                 .HasPrincipalKey(u => u.NctlId);
+
+            modelBuilder.Entity<McOrganisationUser>()
+                .HasIndex(ou => new {ou.Email, ou.NctlId})
+                .IsUnique();
 
             base.OnModelCreating(modelBuilder);
         }
