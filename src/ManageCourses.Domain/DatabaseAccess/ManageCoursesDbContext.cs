@@ -23,7 +23,45 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
 
-            modelBuilder.Entity<McUser>().HasIndex(e => e.Email).IsUnique();
+            // Fk from org-user join table to user
+            modelBuilder.Entity<McOrganisationUser>()
+                .HasOne(ou => ou.McUser)
+                .WithMany(u => u.McOrganisationUsers)
+                .HasForeignKey(ou => ou.Email)
+                .HasPrincipalKey(u => u.Email);
+
+            // Fk from org-user join table to org
+            modelBuilder.Entity<McOrganisationUser>()
+                .HasOne(ou => ou.McOrganisation)
+                .WithMany(u => u.McOrganisationUsers)
+                .HasForeignKey(ou => ou.NctlId)
+                .HasPrincipalKey(u => u.NctlId);
+
+            modelBuilder.Entity<McOrganisationUser>()
+                .HasIndex(ou => new { ou.Email, ou.NctlId })
+                .IsUnique();
+
+            modelBuilder.Entity<McOrganisationInstitution>()
+                .HasIndex(oi => new { oi.NctlId, oi.InstitutionCode })
+                .IsUnique();
+
+            modelBuilder.Entity<UcasInstitution>()
+                .HasIndex(ui => ui.InstCode)
+                .IsUnique();
+
+            // Fk from org-inst join table to org
+            modelBuilder.Entity<McOrganisationInstitution>()
+                .HasOne(ou => ou.McOrganisation)
+                .WithMany(u => u.McOrganisationInstitutions)
+                .HasForeignKey(ou => ou.NctlId)
+                .HasPrincipalKey(o => o.NctlId);
+
+            // Fk from org-inst join table to inst
+            modelBuilder.Entity<McOrganisationInstitution>()
+                .HasOne(ou => ou.UcasInstitution)
+                .WithMany(i => i.McOrganisationInstitutions)
+                .HasForeignKey(ou => ou.InstitutionCode)
+                .HasPrincipalKey(u => u.InstCode);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -11,9 +11,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180619142935_Fks3")]
+    partial class Fks3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,11 +78,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InstitutionCode");
-
-                    b.HasIndex("NctlId", "InstitutionCode")
-                        .IsUnique();
-
                     b.ToTable("mc_organisation_institution");
                 });
 
@@ -99,10 +95,9 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NctlId");
+                    b.HasIndex("Email");
 
-                    b.HasIndex("Email", "NctlId")
-                        .IsUnique();
+                    b.HasIndex("NctlId");
 
                     b.ToTable("mc_organisation_user");
                 });
@@ -330,7 +325,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("inst_big");
 
                     b.Property<string>("InstCode")
-                        .IsRequired()
                         .HasColumnName("inst_code");
 
                     b.Property<string>("InstFull")
@@ -358,9 +352,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("year_code");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("InstCode")
-                        .IsUnique();
 
                     b.ToTable("ucas_institution");
                 });
@@ -416,19 +407,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Provider")
                         .WithMany("Courses")
                         .HasForeignKey("ProviderId");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationInstitution", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("McOrganisationInstitutions")
-                        .HasForeignKey("InstitutionCode")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McOrganisation", "McOrganisation")
-                        .WithMany("McOrganisationInstitutions")
-                        .HasForeignKey("NctlId")
-                        .HasPrincipalKey("NctlId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationUser", b =>
