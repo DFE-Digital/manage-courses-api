@@ -40,6 +40,17 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddScoped<IManageCoursesDbContext>(provider => provider.GetService<ManageCoursesDbContext>());
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = BearerTokenDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = BearerTokenDefaults.AuthenticationScheme;
+            })
+                .AddBearerToken(
+                    options =>
+                    {
+                        options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
+                    });
+
             services.AddMvc();
         }
 
@@ -67,7 +78,7 @@ namespace GovUk.Education.ManageCourses.Api
                 };
 
             });
-            app.UseBearerTokenAuthorisation();
+
             app.UseAuthentication();
             app.UseMvc();
         }

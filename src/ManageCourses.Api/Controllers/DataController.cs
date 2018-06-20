@@ -4,6 +4,7 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Course = GovUk.Education.ManageCourses.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -22,9 +23,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Exports the data.
         /// </summary>
         /// <returns>The exported data</returns>
+        [Authorize]
         [HttpGet]
         public IEnumerable<Course> Export()
         {
+
             var email = _context.McUsers.Select(u => u.Email).FirstOrDefault();//TODO wire this up when sign in is completed
 
             var courses = GetCoursesForUser(email);
