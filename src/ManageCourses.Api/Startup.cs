@@ -44,12 +44,10 @@ namespace GovUk.Education.ManageCourses.Api
             {
                 options.DefaultAuthenticateScheme = BearerTokenDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = BearerTokenDefaults.AuthenticationScheme;
-            })
-                .AddBearerToken(
-                    options =>
-                    {
-                        options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
-                    });
+            }).AddBearerToken(options =>
+            {
+                options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
+            });
 
             services.AddMvc();
         }
