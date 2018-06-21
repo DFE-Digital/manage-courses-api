@@ -4,7 +4,7 @@
     {
         public int Id { get; set; }
 
-        public string NctlId { get; set; }
+        public string OrgId { get; set; }
 
         public string Email { get; set; }
 

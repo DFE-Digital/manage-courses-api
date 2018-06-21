@@ -34,15 +34,15 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McOrganisation)
                 .WithMany(u => u.McOrganisationUsers)
-                .HasForeignKey(ou => ou.NctlId)
-                .HasPrincipalKey(u => u.NctlId);
+                .HasForeignKey(ou => ou.OrgId)
+                .HasPrincipalKey(u => u.OrgId);
 
             modelBuilder.Entity<McOrganisationUser>()
-                .HasIndex(ou => new { ou.Email, ou.NctlId })
+                .HasIndex(ou => new { ou.Email, ou.OrgId })
                 .IsUnique();
 
             modelBuilder.Entity<McOrganisationInstitution>()
-                .HasIndex(oi => new { oi.NctlId, oi.InstitutionCode })
+                .HasIndex(oi => new { oi.OrgId, oi.InstitutionCode })
                 .IsUnique();
 
             modelBuilder.Entity<UcasInstitution>()
@@ -53,8 +53,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             modelBuilder.Entity<McOrganisationInstitution>()
                 .HasOne(ou => ou.McOrganisation)
                 .WithMany(u => u.McOrganisationInstitutions)
-                .HasForeignKey(ou => ou.NctlId)
-                .HasPrincipalKey(o => o.NctlId);
+                .HasForeignKey(ou => ou.OrgId)
+                .HasPrincipalKey(o => o.OrgId);
 
             // Fk from org-inst join table to inst
             modelBuilder.Entity<McOrganisationInstitution>()
