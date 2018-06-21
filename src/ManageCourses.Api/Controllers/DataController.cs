@@ -47,9 +47,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public IEnumerable<Course> Export()
         {
-            var email = _context.McUsers.FirstOrDefault(u => u.Id == 6221).Email;//TODO wire this up when sign in is completed
-
-            var courses = GetCoursesForUser(email);
+            var name = this.User.Identity.Name;
+            var courses = GetCoursesForUser(name);
 
             return courses;
         }
