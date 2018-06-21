@@ -13,9 +13,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     [Route("api/[controller]")]
     public class DataController : Controller
     {
-        private Dictionary<string, string> _dictProgramType = new Dictionary<string, string>();
-        private Dictionary<string, string> _dictProgramOutcome = new Dictionary<string, string>();
-        private Dictionary<string, string> _dictStudyMode = new Dictionary<string, string>();
+        //TODO put these dicts into a static class
+        private readonly Dictionary<string, string> _dictProgramType;
+        private readonly Dictionary<string, string> _dictProgramOutcome;
+        private readonly Dictionary<string, string> _dictStudyMode;
 
         private readonly IManageCoursesDbContext _context;
 
