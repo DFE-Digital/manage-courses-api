@@ -4,6 +4,7 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Course = GovUk.Education.ManageCourses.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -11,10 +12,28 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     [Route("api/[controller]")]
     public class DataController : Controller
     {
+        private Dictionary<string, string> _dictProgramType = new Dictionary<string, string>();
+        private Dictionary<string, string> _dictProgramOutcome = new Dictionary<string, string>();
+        private Dictionary<string, string> _dictStudyMode = new Dictionary<string, string>();
+
         private readonly IManageCoursesDbContext _context;
 
         public DataController(IManageCoursesDbContext context)
         {
+            _dictProgramType = new Dictionary<string, string>();
+            _dictProgramOutcome = new Dictionary<string, string>();
+            _dictStudyMode = new Dictionary<string, string>();
+            _dictProgramType.Add("HE", "Higher education programme");
+            _dictProgramType.Add("SD", "School Direct training programme");
+            _dictProgramType.Add("SS", "School Direct (salaried) training programme");
+            _dictProgramType.Add("SC", "SCITT programme ");
+            _dictProgramType.Add("TA", "PG Teaching Apprenticeship");
+            _dictProgramOutcome.Add("empty", "Recommendation for QTS");
+            _dictProgramOutcome.Add("PF", "Professional");
+            _dictProgramOutcome.Add("PG", "Postgraduate");
+            _dictProgramOutcome.Add("BO", "Professional/Postgraduate");
+            _dictStudyMode.Add("F", "Full time");
+            _dictStudyMode.Add("P", "Part time");
             _context = context;
         }
 
@@ -25,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public IEnumerable<Course> Export()
         {
-            var email = _context.McUsers.Select(u => u.Email).FirstOrDefault();//TODO wire this up when sign in is completed
+            var email = _context.McUsers.FirstOrDefault(u => u.Id == 6221).Email;//TODO wire this up when sign in is completed
 
             var courses = GetCoursesForUser(email);
 
@@ -65,19 +84,73 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         private IEnumerable<Course> GetCoursesForUser(string email)
         {
-            var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.NctlId);   
-            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.NctlId)).Select(x => x.UcasCode);
+            var coursesToReturn = new List<Course>();
+            var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.NctlId);
+            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.NctlId))
+                .Select(x => x.UcasCode);
             var mappedCourses = _context.UcasCourses.Where(c => mappedUcasCodes.Contains(c.InstCode));
 
-            var courses = mappedCourses.Select(uc => new Course
+            foreach (var instCode in mappedUcasCodes.Distinct().ToList())
             {
-                UcasCode = uc.CrseCode,
-                Title = uc.CrseTitle,
-                Id = uc.Id,
-                Type = "todo-type", // todo: type
-            });
-            return courses;
+                var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
+
+                foreach (var title in titles)
+                {
+                    var course = new Course
+                    {
+                        UcasCode = instCode,
+                        Title = title,
+                        //Id = uc.Id,
+                        Type = "todo-type", // todo: type
+                    };
+                    var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title)
+                        .Select(x => x.AccreditingProvider).Distinct().ToList();
+             
+                    var variants = new List<Variant>();
+                    foreach (var accProvider in accProviders)
+                    {
+                        var variant = new Variant {AccreditedProvider = accProvider};
+                        var tempRecords = mappedCourses.Where(c =>
+                                c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider)
+                            .ToList();
+                        var profPostFlags = GetDictionarValue(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList(), _dictProgramOutcome);//tempRecords.Select(x => x.ProfpostFlag).Distinct().ToArray();
+                        var programTypes = GetDictionarValue(tempRecords.Select(x => x.ProgramType).Distinct().ToList(), _dictProgramType);//tempRecords.Select(x => x.ProgramType).Distinct().ToArray();
+                        var studyModes = GetDictionarValue(tempRecords.Select(x => x.Studymode).Distinct().ToList(), _dictStudyMode);//tempRecords.Select(x => x.Studymode).Distinct().ToArray();
+                        variant.ProfpostFlags = profPostFlags;
+                        variant.ProgramTypes = programTypes;
+                        variant.StudyModes = studyModes;
+                        variants.Add(variant);
+                    }
+                    //TODO create a course model class with a collection of variants
+                    var json = JsonConvert.SerializeObject(variants);
+                    course.Type = json;//dont use type or this course class
+
+                    coursesToReturn.Add(course);
+                }
+            }
+
+            return coursesToReturn;
         }
+
+        private string GetDictionarValue(List<string> keys, Dictionary<string, string> dict)
+        {
+            var returnVal = string.Empty;
+            foreach (var key in keys)
+            {
+                var k = key;
+                if (string.IsNullOrWhiteSpace(key))
+                    k = "empty";
+
+                if (dict.ContainsKey(k))
+                {
+                    returnVal += dict[k] + ",";
+                }
+
+            }
+
+            return returnVal.TrimEnd(',');
+        }
+  
         private void ProcessPayload(Payload payload)
         {
             foreach (var course in payload.Courses)
