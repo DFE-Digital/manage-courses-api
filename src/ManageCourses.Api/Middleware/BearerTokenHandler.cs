@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                         new[] {
                             new Claim (ClaimTypes.NameIdentifier, userDetails.Subject),
                             new Claim (ClaimTypes.Email, userDetails.Email)
-                        }, BearerTokenDefaults.AuthenticationScheme);
+                        }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
                     
                     var princical = new ClaimsPrincipal(identity);
                     
