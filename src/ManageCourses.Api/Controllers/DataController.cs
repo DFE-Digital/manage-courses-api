@@ -43,7 +43,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Exports the data.
         /// </summary>
         /// <returns>The exported data</returns>
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         public IEnumerable<Course> Export()
         {
