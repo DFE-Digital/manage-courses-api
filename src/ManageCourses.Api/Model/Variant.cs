@@ -8,6 +8,7 @@ namespace GovUk.Education.ManageCourses.Api.Model
     public class Variant
     {
         public string AccreditedProvider { get; set; }
+        public string CourseCode { get; set; }
         public string ProfpostFlags { get; set; }
         public string ProgramTypes { get; set; }
         public string StudyModes { get; set; }
