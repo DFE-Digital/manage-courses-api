@@ -26,11 +26,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Exports the data.
         /// </summary>
         /// <returns>The exported data</returns>
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public IEnumerable<Model.Course> Export()
         {
-            var name = this.User.Identity.Name;            
+            var name = "martin.bentley@digital.education.gov.uk";//this.User.Identity.Name;            
             var courses = GetCoursesForUser(name);
 
             return courses;
@@ -71,13 +71,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         {
             var coursesToReturn = new List<Model.Course>();
             var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.OrgId);
-            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.OrgId))
-                .Select(x => x.UcasCode);
+            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.OrgId)).Select(x => x.UcasCode);
             var mappedCourses = _context.UcasCourses.Where(c => mappedUcasCodes.Contains(c.InstCode));
 
             foreach (var instCode in mappedUcasCodes.Distinct().ToList())
             {
                 var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
+                var orgId = _context.ProviderMappers.FirstOrDefault(m => m.UcasCode == instCode)?.OrgId;
 
                 foreach (var title in titles)
                 {
@@ -85,26 +85,33 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     {
                         UcasCode = instCode,
                         Title = title,
-     
+                        OrganisationName = _context.McOrganisations.FirstOrDefault(o => o.OrgId == orgId)?.Name
                     };
-                    var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title)
-                        .Select(x => x.AccreditingProvider).Distinct().ToList();
+
+                    var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
              
                     var variants = new List<Variant>();
                     foreach (var accProvider in accProviders)
                     {
-                        var variant = new Variant {AccreditedProvider = accProvider};
-                        var tempRecords = mappedCourses.Where(c =>
-                                c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider)
-                            .ToList();
+                        var variant = new Variant { ProviderCode = accProvider };
+                        var tempRecords = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider).ToList();
+                        var institution = _context.UcasInstitutions.FirstOrDefault(i => i.InstCode == accProvider);
+                        
+                        if (institution != null)
+                        {
+                            variant.ProviderName = institution.InstFull;
+                            variant.Address1 = institution.Addr1;
+                            variant.Address2 = institution.Addr2;
+                            variant.Address3 = institution.Addr3;
+                            variant.Address4 = institution.Addr4;
+                            variant.Postcode = institution.Postcode;
+                        }                        
                         variant.CourseCode = tempRecords.FirstOrDefault()?.CrseCode;
+                        //TODO make these List<string>
+                        variant.ProfpostFlags = ConcatDataValues(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList());
+                        variant.ProgramTypes = ConcatDataValues(tempRecords.Select(x => x.ProgramType).Distinct().ToList());
+                        variant.StudyModes = ConcatDataValues(tempRecords.Select(x => x.Studymode).Distinct().ToList());
 
-                        var profPostFlags = ConcatDataValues(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList());
-                        var programTypes = ConcatDataValues(tempRecords.Select(x => x.ProgramType).Distinct().ToList());
-                        var studyModes = ConcatDataValues(tempRecords.Select(x => x.Studymode).Distinct().ToList());
-                        variant.ProfpostFlags = profPostFlags;
-                        variant.ProgramTypes = programTypes;
-                        variant.StudyModes = studyModes;                        
                         variants.Add(variant);
                     }
 
