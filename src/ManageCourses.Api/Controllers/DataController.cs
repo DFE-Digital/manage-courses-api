@@ -87,8 +87,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         private IEnumerable<Course> GetCoursesForUser(string email)
         {
             var coursesToReturn = new List<Course>();
-            var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.NctlId);
-            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.NctlId))
+            var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.OrgId);
+            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.OrgId))
                 .Select(x => x.UcasCode);
             var mappedCourses = _context.UcasCourses.Where(c => mappedUcasCodes.Contains(c.InstCode));
 
@@ -277,7 +277,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 _context.AddMcOrganisation(
                     new McOrganisation
                     {
-                        NctlId = organisation.NctlId,
+                        OrgId = organisation.OrgId,
                         Name = organisation.Name
                     }
                     );
@@ -287,7 +287,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 _context.AddMcOrganisationInstitution(
                     new McOrganisationInstitution
                     {
-                        NctlId = organisatioInstitution.NctlId,
+                        OrgId = organisatioInstitution.OrgId,
                         InstitutionCode = organisatioInstitution.InstitutionCode
                     }
                 );
@@ -297,7 +297,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 _context.AddMcOrganisationUser(
                     new McOrganisationUser
                     {
-                        NctlId = organisationUser.NctlId,
+                        OrgId = organisationUser.OrgId,
                         Email = organisationUser.Email
                     }
                 );
@@ -320,7 +320,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     new ProviderMapper
                     {
                         InstitutionName = mapper.InstitutionName,
-                        NctlId = mapper.NctlId,
+                        OrgId = mapper.OrgId,
                         Type = mapper.Type,
                         UcasCode = mapper.UcasCode,
                         Urn = mapper.Urn
