@@ -90,14 +90,14 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     };
 
                     var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
-             
+
                     var variants = new List<Variant>();
                     foreach (var accProvider in accProviders)
                     {
                         var variant = new Variant { ProviderCode = accProvider };
                         var tempRecords = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider).ToList();
                         var institution = _context.UcasInstitutions.FirstOrDefault(i => i.InstCode == accProvider);
-                        
+
                         if (institution != null)
                         {
                             variant.ProviderName = institution.InstFull;
@@ -106,12 +106,31 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                             variant.Address3 = institution.Addr3;
                             variant.Address4 = institution.Addr4;
                             variant.Postcode = institution.Postcode;
-                        }                        
+                        }
                         variant.CourseCode = tempRecords.FirstOrDefault()?.CrseCode;
-                        
+                        var campusCodes = tempRecords.Select(c => c.CampusCode).Distinct().ToList();
+
                         variant.ProfpostFlags = ListDataValues(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList());
                         variant.ProgramTypes = ListDataValues(tempRecords.Select(x => x.ProgramType).Distinct().ToList());
                         variant.StudyModes = ListDataValues(tempRecords.Select(x => x.Studymode).Distinct().ToList());
+                        //add campuses
+                        variant.Campuses = new List<Campus>();
+                        foreach (var campusCode in campusCodes)
+                        {
+                            var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == instCode && c.CampusCode == campusCode);
+                            if (campus != null)
+                            {
+                                variant.Campuses.Add(new Campus
+                                {
+                                    Name = campus.CampusName,
+                                    Address1 = campus.Addr1,
+                                    Address2 = campus.Addr2,
+                                    Address3 = campus.Addr3,
+                                    Address4 = campus.Addr4,
+                                    PostCode = campus.Postcode
+                                });
+                            }
+                        }
 
                         variants.Add(variant);
                     }
@@ -132,7 +151,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         private List<string> ListDataValues(List<string> keys)
         {
             var returnList = new List<string>();
-            
+
             foreach (var key in keys)
             {
                 returnList.Add(DataMapper.GetStringData(key));
@@ -140,7 +159,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             return returnList;
         }
-  
+
         private void ProcessPayload(Payload payload)
         {
             foreach (var course in payload.Courses)

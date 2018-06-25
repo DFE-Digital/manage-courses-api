@@ -15,8 +15,9 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public List<string> StudyModes { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
-        public string Address3{ get; set; }
+        public string Address3 { get; set; }
         public string Address4 { get; set; }
         public string Postcode { get; set; }
+        public List<Campus> Campuses { get; set; }
     }
 }
