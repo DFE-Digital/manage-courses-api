@@ -26,11 +26,12 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Exports the data.
         /// </summary>
         /// <returns>The exported data</returns>
-        //[Authorize]
+        [Authorize]
         [HttpGet]
         public IEnumerable<Model.Course> Export()
         {
-            var name = "martin.bentley@digital.education.gov.uk";//this.User.Identity.Name;            
+            var name = this.User.Identity.Name;
+                        
             var courses = GetCoursesForUser(name);
 
             return courses;
