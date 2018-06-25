@@ -31,8 +31,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public IEnumerable<Model.Course> Export()
         {
             var name = this.User.Identity.Name;
-                        
-            var courses = GetCoursesForUser(name);
+             var courses = GetCoursesForUser(name);
 
             return courses;
         }
@@ -108,7 +107,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                             variant.Postcode = institution.Postcode;
                         }                        
                         variant.CourseCode = tempRecords.FirstOrDefault()?.CrseCode;
-                        //TODO make these List<string>
+                        
                         variant.ProfpostFlags = ConcatDataValues(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList());
                         variant.ProgramTypes = ConcatDataValues(tempRecords.Select(x => x.ProgramType).Distinct().ToList());
                         variant.StudyModes = ConcatDataValues(tempRecords.Select(x => x.Studymode).Distinct().ToList());
@@ -124,16 +123,17 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             return coursesToReturn;
         }
-        private string ConcatDataValues(List<string> keys)
+        private List<string> ConcatDataValues(List<string> keys)
         {
-            //returns a comma separated list of data from the list of keys
+            var returnList = new List<string>();
+            //returns a list of data from the list of keys
             var returnVal = string.Empty;
             foreach (var key in keys)
             {
-                returnVal += DataMapper.GetStringData(key) + ",";
+                returnList.Add(DataMapper.GetStringData(key));
             }
 
-            return returnVal.TrimEnd(',');
+            return returnList;
         }
   
         private void ProcessPayload(Payload payload)
