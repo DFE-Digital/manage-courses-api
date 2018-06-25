@@ -31,7 +31,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public IEnumerable<Model.Course> Export()
         {
             var name = this.User.Identity.Name;
-             var courses = GetCoursesForUser(name);
+            
+            var courses = GetCoursesForUser(name);
 
             return courses;
         }
@@ -108,9 +109,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                         }                        
                         variant.CourseCode = tempRecords.FirstOrDefault()?.CrseCode;
                         
-                        variant.ProfpostFlags = ConcatDataValues(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList());
-                        variant.ProgramTypes = ConcatDataValues(tempRecords.Select(x => x.ProgramType).Distinct().ToList());
-                        variant.StudyModes = ConcatDataValues(tempRecords.Select(x => x.Studymode).Distinct().ToList());
+                        variant.ProfpostFlags = ListDataValues(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList());
+                        variant.ProgramTypes = ListDataValues(tempRecords.Select(x => x.ProgramType).Distinct().ToList());
+                        variant.StudyModes = ListDataValues(tempRecords.Select(x => x.Studymode).Distinct().ToList());
 
                         variants.Add(variant);
                     }
@@ -123,11 +124,15 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             return coursesToReturn;
         }
-        private List<string> ConcatDataValues(List<string> keys)
+        /// <summary>
+        /// //returns a list of data from the list of keys
+        /// </summary>
+        /// <param name="keys"></param>
+        /// <returns></returns>
+        private List<string> ListDataValues(List<string> keys)
         {
             var returnList = new List<string>();
-            //returns a list of data from the list of keys
-            var returnVal = string.Empty;
+            
             foreach (var key in keys)
             {
                 returnList.Add(DataMapper.GetStringData(key));
