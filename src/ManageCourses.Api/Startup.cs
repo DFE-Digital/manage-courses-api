@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = GetConnectionString();
+            var connectionString = GetConnectionString(Configuration);
 
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<ManageCoursesDbContext>(
@@ -85,17 +85,17 @@ namespace GovUk.Education.ManageCourses.Api
             app.UseMvc();
         }
 
-        private string GetConnectionString()
+        public static string GetConnectionString(IConfiguration config)
         {
-            var server = Configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
-            var port = Configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"];
+            var server = config["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
+            var port = config["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"];
 
-            var user = Configuration["PG_USERNAME"];
-            var pword = Configuration["PG_PASSWORD"];
-            var dbase = Configuration["PG_DATABASE"];
+            var user = config["PG_USERNAME"];
+            var pword = config["PG_PASSWORD"];
+            var dbase = config["PG_DATABASE"];
 
             var sslDefault = "SSL Mode=Prefer;Trust Server Certificate=true";
-            var ssl = Configuration["PG_SSL"] ?? sslDefault;
+            var ssl = config["PG_SSL"] ?? sslDefault;
 
             var connectionString = $"Server={server};Port={port};Database={dbase};User Id={user};Password={pword};{ssl}";
             return connectionString;
