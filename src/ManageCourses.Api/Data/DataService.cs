@@ -233,11 +233,11 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
                     foreach (var title in titles)
                     {
-                        if (title != "Biology")//test code
-                        {
-                            continue;
-                        }
-                        //end test code
+                        //if (title != "Biology")//test code
+                        //{
+                        //    continue;
+                        //}
+                        ////end test code
 
                         var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
                         foreach (var accProvider in accProviders)
