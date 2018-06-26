@@ -17,6 +17,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         {
             _context = context;
         }
+        #region Import
         public void ResetDatabase()
         {
             // clear out the existing data
@@ -210,8 +211,95 @@ namespace GovUk.Education.ManageCourses.Api.Data
             }
             _context.Save();
         }
+        #endregion
+        #region Export
 
-        public IEnumerable<Model.Course> GetCoursesForUser(string email)
+        public OrganisationCourses GetCoursesForUser(string email)
+        {
+            var returnCourses = new OrganisationCourses();
+            var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.OrgId);
+            var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.OrgId)).Select(x => x.UcasCode);
+            var mappedCourses = _context.UcasCourses.Where(c => mappedUcasCodes.Contains(c.InstCode));
+
+            foreach (var instCode in mappedUcasCodes.Distinct().ToList())//should only be one atm
+            {
+                var org = _context.ProviderMappers.SingleOrDefault(m => m.UcasCode == instCode);
+
+                if (org != null)
+                {
+                    returnCourses.OrganisationId = org.OrgId;
+                    returnCourses.OrganisationName = org.InstitutionName;
+                    returnCourses.ProviderCourses = new List<ProviderCourse>();
+                    var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
+                    foreach (var title in titles)
+                    {
+                        if (title != "Biology")//test code
+                        {
+                            continue;
+                        }
+                        //end test code
+
+                        var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
+                        foreach (var accProvider in accProviders)
+                        {
+                            var tempRecords = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider).ToList();
+                            var courseCodes = tempRecords.Select(x => x.CrseCode).Distinct().ToList();
+
+                            var accProviderName = _context.ProviderMappers.FirstOrDefault(m => m.UcasCode == accProvider)?.InstitutionName;
+                            var course = new ProviderCourse
+                            {
+                                AccreditingProviderId = accProvider,
+                                AccreditingProviderName = accProviderName,
+                                CourseDetails = new List<CourseDetail>()
+                            };
+                            var courseDetail = new CourseDetail
+                            {
+                                CourseTitle = title,
+                                Variants = new List<CourseVariant>()
+                            };
+                            foreach (var courseCode in courseCodes)
+                            {
+                                var variant = new CourseVariant
+                                {    
+                                    Name = title,
+                                    UcasCode = courseCode,
+                                    ProfPostFlag = DataMapper.GetStringData(tempRecords.FirstOrDefault(r => r.CrseCode == courseCode)?.ProfpostFlag),
+                                    ProgramType = DataMapper.GetStringData(tempRecords.FirstOrDefault(r => r.CrseCode == courseCode)?.ProgramType),
+                                    StudyMode = DataMapper.GetStringData(tempRecords.FirstOrDefault(r => r.CrseCode == courseCode)?.Studymode),
+                                    Campuses = new List<Campus>()
+                                };
+                                var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).Select(c => c.CampusCode).Distinct().ToList();
+                                foreach (var campusCode in campusCodes)
+                                {
+                                    var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == instCode && c.CampusCode == campusCode);
+                                    if (campus != null)
+                                    {
+                                        variant.Campuses.Add(new Campus
+                                        {
+                                            Name = campus.CampusName,
+                                            Address1 = campus.Addr1,
+                                            Address2 = campus.Addr2,
+                                            Address3 = campus.Addr3,
+                                            Address4 = campus.Addr4,
+                                            PostCode = campus.Postcode,
+                                            Code = campusCode,
+                                            CourseOpenDate = tempRecords.FirstOrDefault(c => c.CrseCode == courseCode && c.CampusCode == campusCode)?.CrseOpenDate
+                                        });
+                                    }
+                                }
+
+                                courseDetail.Variants.Add(variant);
+                            }
+                            course.CourseDetails.Add(courseDetail);
+                            returnCourses.ProviderCourses.Add(course);
+                        }
+                    }
+                }
+            }
+
+            return returnCourses;
+        }
+        public IEnumerable<Model.Course> GetCoursesForUserOld(string email)
         {
             var coursesToReturn = new List<Model.Course>();
             var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.OrgId);
@@ -302,6 +390,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             return returnList;
         }
-
+      
+        #endregion
     }
 }
