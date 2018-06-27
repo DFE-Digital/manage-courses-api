@@ -233,12 +233,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
                     foreach (var title in titles)
                     {
-                        //if (title != "Biology")//test code
-                        //{
-                        //    continue;
-                        //}
-                        ////end test code
-
                         var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
                         foreach (var accProvider in accProviders)
                         {
@@ -255,18 +249,20 @@ namespace GovUk.Education.ManageCourses.Api.Data
                             var courseDetail = new CourseDetail
                             {
                                 CourseTitle = title,
-                                Variants = new List<CourseVariant>()
+                                Variants = new List<CourseVariant>(),
+                                AgeRange = tempRecords.FirstOrDefault()?.Age
                             };
                             foreach (var courseCode in courseCodes)
                             {
+                                var currentCourse = tempRecords.FirstOrDefault(r => r.CrseCode == courseCode);
                                 var variant = new CourseVariant
                                 {    
                                     Name = title,
                                     UcasCode = courseCode,
-                                    ProfPostFlag = DataMapper.GetStringData(tempRecords.FirstOrDefault(r => r.CrseCode == courseCode)?.ProfpostFlag),
-                                    ProgramType = DataMapper.GetStringData(tempRecords.FirstOrDefault(r => r.CrseCode == courseCode)?.ProgramType),
-                                    StudyMode = DataMapper.GetStringData(tempRecords.FirstOrDefault(r => r.CrseCode == courseCode)?.Studymode),
-                                    Campuses = new List<Campus>()
+                                    ProfPostFlag = DataMapper.GetStringData(currentCourse?.ProfpostFlag),
+                                    ProgramType = DataMapper.GetStringData(currentCourse?.ProgramType),
+                                    StudyMode = DataMapper.GetStringData(currentCourse?.Studymode),
+                                    Campuses = new List<Campus>(),
                                 };
                                 var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).Select(c => c.CampusCode).Distinct().ToList();
                                 foreach (var campusCode in campusCodes)
