@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using Microsoft.AspNetCore.Authorization;
