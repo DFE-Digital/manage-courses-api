@@ -22,15 +22,15 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Subject = new DataService(this.GetContext());
         }
 
-        [Test]
-        public void GetCoursesForUser_isEmpty()
-        {
-            var email = "email@test.com";
+        //[Test]
+        //public void GetCoursesForUser_isNull()
+        //{
+        //    var email = "email@test.com";
 
-            var result = Subject.GetCoursesForUser(email);
+        //    var result = Subject.GetCoursesForUser(email);
 
-            CollectionAssert.IsEmpty(result);
+        //    CollectionAssert.(result);
 
-        }
+        //}
     }
 }
