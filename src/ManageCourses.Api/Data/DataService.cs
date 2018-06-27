@@ -230,22 +230,27 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     returnCourses.OrganisationId = org.OrgId;
                     returnCourses.OrganisationName = org.InstitutionName;
                     returnCourses.ProviderCourses = new List<ProviderCourse>();
-                    var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
-                    foreach (var title in titles)
+                    var accProviders = mappedCourses.Where(c => c.InstCode == instCode)
+                        .Select(x => x.AccreditingProvider).Distinct().Select(accProvider =>
+                            _context.ProviderMappers.FirstOrDefault(m => m.UcasCode == accProvider))
+                        .OrderBy(x => x.InstitutionName).ToList();
+                    foreach (var accProvider in accProviders)
                     {
-                        var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
-                        foreach (var accProvider in accProviders)
+                        var course = new ProviderCourse
                         {
-                            var tempRecords = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider).ToList();
-                            var courseCodes = tempRecords.Select(x => x.CrseCode).Distinct().ToList();
+                            AccreditingProviderId = accProvider.UcasCode,
+                            AccreditingProviderName = accProvider.InstitutionName,
+                            CourseDetails = new List<CourseDetail>()
+                        };
+                        var titles = mappedCourses
+                            .Where(c => c.InstCode == instCode && c.AccreditingProvider == accProvider.UcasCode)
+                            .OrderBy(x => x.CrseCode).Select(x => x.CrseTitle).Distinct().ToList();
 
-                            var accProviderName = _context.ProviderMappers.FirstOrDefault(m => m.UcasCode == accProvider)?.InstitutionName;
-                            var course = new ProviderCourse
-                            {
-                                AccreditingProviderId = accProvider,
-                                AccreditingProviderName = accProviderName,
-                                CourseDetails = new List<CourseDetail>()
-                            };
+                        foreach (var title in titles)
+                        {
+                            var tempRecords = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider.UcasCode).ToList();
+                            var courseCodes = tempRecords.Select(x => x.CrseCode).Distinct().ToList();
+                            
                             var courseDetail = new CourseDetail
                             {
                                 CourseTitle = title,
@@ -256,7 +261,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                             {
                                 var currentCourse = tempRecords.FirstOrDefault(r => r.CrseCode == courseCode);
                                 var variant = new CourseVariant
-                                {    
+                                {
                                     Name = title,
                                     UcasCode = courseCode,
                                     ProfPostFlag = DataMapper.GetStringData(currentCourse?.ProfpostFlag),
@@ -286,33 +291,15 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
                                 courseDetail.Variants.Add(variant);
                             }
-                            course.CourseDetails.Add(courseDetail);
-                            returnCourses.ProviderCourses.Add(course);
+                            course.CourseDetails.Add(courseDetail);                            
                         }
+                        returnCourses.ProviderCourses.Add(course);
                     }
                 }
             }
 
             return returnCourses;
         }
-
-        /// <summary>
-        /// //returns a list of data from the list of keys
-        /// </summary>
-        /// <param name="keys"></param>
-        /// <returns></returns>
-        private List<string> ListDataValues(List<string> keys)
-        {
-            var returnList = new List<string>();
-
-            foreach (var key in keys)
-            {
-                returnList.Add(DataMapper.GetStringData(key));
-            }
-
-            return returnList;
-        }
-      
         #endregion
     }
 }
