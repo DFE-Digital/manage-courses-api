@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -22,10 +21,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>The exported data</returns>
         [Authorize]
         [HttpGet]
-        public IEnumerable<Model.Course> Export()
+        public OrganisationCourses Export()
         {
             var name = this.User.Identity.Name;
-
             var courses = _dataService.GetCoursesForUser(name);
 
             return courses;

@@ -10,6 +10,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
     {
         void ResetDatabase();
         void ProcessPayload(Payload payload);
-        IEnumerable<Model.Course> GetCoursesForUser(string email);
+        OrganisationCourses GetCoursesForUser(string email);
     }
 }

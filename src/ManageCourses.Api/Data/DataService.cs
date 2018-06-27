@@ -17,6 +17,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         {
             _context = context;
         }
+        #region Import
         public void ResetDatabase()
         {
             // clear out the existing data
@@ -210,82 +211,91 @@ namespace GovUk.Education.ManageCourses.Api.Data
             }
             _context.Save();
         }
+        #endregion
+        #region Export
 
-        public IEnumerable<Model.Course> GetCoursesForUser(string email)
+        public OrganisationCourses GetCoursesForUser(string email)
         {
-            var coursesToReturn = new List<Model.Course>();
+            var returnCourses = new OrganisationCourses();
             var userOrganisationNctls = _context.McOrganisationUsers.Where(o => o.Email == email).Select(x => x.OrgId);
             var mappedUcasCodes = _context.ProviderMappers.Where(uo => userOrganisationNctls.Contains(uo.OrgId)).Select(x => x.UcasCode);
             var mappedCourses = _context.UcasCourses.Where(c => mappedUcasCodes.Contains(c.InstCode));
 
-            foreach (var instCode in mappedUcasCodes.Distinct().ToList())
+            foreach (var instCode in mappedUcasCodes.Distinct().ToList())//should only be one atm
             {
-                var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
-                var orgId = _context.ProviderMappers.FirstOrDefault(m => m.UcasCode == instCode)?.OrgId;
+                var org = _context.ProviderMappers.SingleOrDefault(m => m.UcasCode == instCode);
 
-                foreach (var title in titles)
+                if (org != null)
                 {
-                    var course = new Model.Course
+                    returnCourses.OrganisationId = org.OrgId;
+                    returnCourses.OrganisationName = org.InstitutionName;
+                    returnCourses.ProviderCourses = new List<ProviderCourse>();
+                    var titles = mappedCourses.Where(c => c.InstCode == instCode).Select(x => x.CrseTitle).Distinct().ToList();
+                    foreach (var title in titles)
                     {
-                        UcasCode = instCode,
-                        Title = title,
-                        OrganisationName = _context.McOrganisations.FirstOrDefault(o => o.OrgId == orgId)?.Name
-                    };
-
-                    var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
-
-                    var variants = new List<Variant>();
-                    foreach (var accProvider in accProviders)
-                    {
-                        var variant = new Variant { ProviderCode = accProvider };
-                        var tempRecords = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider).ToList();
-                        var institution = _context.UcasInstitutions.FirstOrDefault(i => i.InstCode == accProvider);
-
-                        if (institution != null)
+                        var accProviders = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title).Select(x => x.AccreditingProvider).Distinct().ToList();
+                        foreach (var accProvider in accProviders)
                         {
-                            variant.ProviderName = institution.InstFull;
-                            variant.Address1 = institution.Addr1;
-                            variant.Address2 = institution.Addr2;
-                            variant.Address3 = institution.Addr3;
-                            variant.Address4 = institution.Addr4;
-                            variant.Postcode = institution.Postcode;
-                        }
-                        variant.CourseCode = tempRecords.FirstOrDefault()?.CrseCode;
-                        var campusCodes = tempRecords.Select(c => c.CampusCode).Distinct().ToList();
+                            var tempRecords = mappedCourses.Where(c => c.InstCode == instCode && c.CrseTitle == title && c.AccreditingProvider == accProvider).ToList();
+                            var courseCodes = tempRecords.Select(x => x.CrseCode).Distinct().ToList();
 
-                        variant.ProfpostFlags = ListDataValues(tempRecords.Select(x => x.ProfpostFlag).Distinct().ToList());
-                        variant.ProgramTypes = ListDataValues(tempRecords.Select(x => x.ProgramType).Distinct().ToList());
-                        variant.StudyModes = ListDataValues(tempRecords.Select(x => x.Studymode).Distinct().ToList());
-                        //add campuses
-                        variant.Campuses = new List<Campus>();
-                        foreach (var campusCode in campusCodes)
-                        {
-                            var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == instCode && c.CampusCode == campusCode);
-                            if (campus != null)
+                            var accProviderName = _context.ProviderMappers.FirstOrDefault(m => m.UcasCode == accProvider)?.InstitutionName;
+                            var course = new ProviderCourse
                             {
-                                variant.Campuses.Add(new Campus
+                                AccreditingProviderId = accProvider,
+                                AccreditingProviderName = accProviderName,
+                                CourseDetails = new List<CourseDetail>()
+                            };
+                            var courseDetail = new CourseDetail
+                            {
+                                CourseTitle = title,
+                                Variants = new List<CourseVariant>(),
+                                AgeRange = tempRecords.FirstOrDefault()?.Age
+                            };
+                            foreach (var courseCode in courseCodes)
+                            {
+                                var currentCourse = tempRecords.FirstOrDefault(r => r.CrseCode == courseCode);
+                                var variant = new CourseVariant
+                                {    
+                                    Name = title,
+                                    UcasCode = courseCode,
+                                    ProfPostFlag = DataMapper.GetStringData(currentCourse?.ProfpostFlag),
+                                    ProgramType = DataMapper.GetStringData(currentCourse?.ProgramType),
+                                    StudyMode = DataMapper.GetStringData(currentCourse?.Studymode),
+                                    Campuses = new List<Campus>(),
+                                };
+                                var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).Select(c => c.CampusCode).Distinct().ToList();
+                                foreach (var campusCode in campusCodes)
                                 {
-                                    Name = campus.CampusName,
-                                    Address1 = campus.Addr1,
-                                    Address2 = campus.Addr2,
-                                    Address3 = campus.Addr3,
-                                    Address4 = campus.Addr4,
-                                    PostCode = campus.Postcode
-                                });
+                                    var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == instCode && c.CampusCode == campusCode);
+                                    if (campus != null)
+                                    {
+                                        variant.Campuses.Add(new Campus
+                                        {
+                                            Name = campus.CampusName,
+                                            Address1 = campus.Addr1,
+                                            Address2 = campus.Addr2,
+                                            Address3 = campus.Addr3,
+                                            Address4 = campus.Addr4,
+                                            PostCode = campus.Postcode,
+                                            Code = campusCode,
+                                            CourseOpenDate = tempRecords.FirstOrDefault(c => c.CrseCode == courseCode && c.CampusCode == campusCode)?.CrseOpenDate
+                                        });
+                                    }
+                                }
+
+                                courseDetail.Variants.Add(variant);
                             }
+                            course.CourseDetails.Add(courseDetail);
+                            returnCourses.ProviderCourses.Add(course);
                         }
-
-                        variants.Add(variant);
                     }
-
-                    course.Variants = variants;
-
-                    coursesToReturn.Add(course);
                 }
             }
 
-            return coursesToReturn;
+            return returnCourses;
         }
+
         /// <summary>
         /// //returns a list of data from the list of keys
         /// </summary>
@@ -302,6 +312,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             return returnList;
         }
-
+      
+        #endregion
     }
 }
