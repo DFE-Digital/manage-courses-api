@@ -271,14 +271,20 @@ namespace GovUk.Education.ManageCourses.Api.Data
                                 {
                                     Name = title,
                                     UcasCode = courseCode,
-                                    ProfPostFlag = DataMapper.GetStringData(currentCourse?.ProfpostFlag),
-                                    ProgramType = DataMapper.GetStringData(currentCourse?.ProgramType),
-                                    StudyMode = DataMapper.GetStringData(currentCourse?.Studymode),
+                                    ProfPostFlag = currentCourse?.ProfpostFlag,
+                                    ProgramType = currentCourse?.ProgramType,
+                                    StudyMode = currentCourse?.Studymode,
                                     Campuses = new List<Campus>(),
                                     Subjects = subjects
                                 };
-                                var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).Select(c => c.CampusCode).Distinct().ToList();
-                                foreach (var campusCode in campusCodes.OrderBy(x => x))
+                                var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).OrderBy( x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
+                                //look for dash and put add the top of the list
+                                if (campusCodes.Contains("-"))
+                                {
+                                    campusCodes.Remove("-");
+                                    campusCodes.Insert(0, "-");
+                                }
+                                foreach (var campusCode in campusCodes)
                                 {
                                     var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == instCode && c.CampusCode == campusCode);
                                     if (campus != null)
