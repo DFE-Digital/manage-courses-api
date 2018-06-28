@@ -228,6 +228,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 if (org != null)
                 {
                     returnCourses.OrganisationId = org.OrgId;
+                    returnCourses.UcasCode = instCode;
                     returnCourses.OrganisationName = org.InstitutionName;
                     returnCourses.ProviderCourses = new List<ProviderCourse>();
                     var accProviders = mappedCourses.Where(c => c.InstCode == instCode)
@@ -259,17 +260,30 @@ namespace GovUk.Education.ManageCourses.Api.Data
                             };
                             foreach (var courseCode in courseCodes)
                             {
+                                var subjects = _context.UcasSubjects
+                                    .Join(_context.UcasCourseSubjects, s => s.SubjectCode, cs => cs.SubjectCode,
+                                        (s, cs) => new {s.SubjectDescription, cs.CrseCode, cs.InstCode})
+                                    .Where(x => x.CrseCode == courseCode && x.InstCode == instCode)
+                                    .Select(x => x.SubjectDescription).ToList();
+                               
                                 var currentCourse = tempRecords.FirstOrDefault(r => r.CrseCode == courseCode);
                                 var variant = new CourseVariant
                                 {
                                     Name = title,
                                     UcasCode = courseCode,
-                                    ProfPostFlag = DataMapper.GetStringData(currentCourse?.ProfpostFlag),
-                                    ProgramType = DataMapper.GetStringData(currentCourse?.ProgramType),
-                                    StudyMode = DataMapper.GetStringData(currentCourse?.Studymode),
+                                    ProfPostFlag = currentCourse?.ProfpostFlag,
+                                    ProgramType = currentCourse?.ProgramType,
+                                    StudyMode = currentCourse?.Studymode,
                                     Campuses = new List<Campus>(),
+                                    Subjects = subjects
                                 };
-                                var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).Select(c => c.CampusCode).Distinct().ToList();
+                                var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).OrderBy( x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
+                                //look for dash and put add the top of the list
+                                if (campusCodes.Contains("-"))
+                                {
+                                    campusCodes.Remove("-");
+                                    campusCodes.Insert(0, "-");
+                                }
                                 foreach (var campusCode in campusCodes)
                                 {
                                     var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == instCode && c.CampusCode == campusCode);

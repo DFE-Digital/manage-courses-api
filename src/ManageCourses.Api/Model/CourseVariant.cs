@@ -13,5 +13,6 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string ProgramType { get; set; }
         public string StudyMode { get; set; }
         public List<Campus> Campuses { get; set; }
+        public List<string> Subjects { get; set; }
     }
 }
