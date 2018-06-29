@@ -233,21 +233,18 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     .Select(accProvider => _context.UcasInstitutions.FirstOrDefault(o => o.InstCode == accProvider))
                     .OrderBy(x => x.InstFull).ToList();
 
-                foreach (var accProvider in accProviders)
+                if (accProviders.Count == 0 || (accProviders.Count == 1 && accProviders[0] == null))//TODO refactor this as providers list should be empty
                 {
                     var course = new ProviderCourse
                     {
-                        AccreditingProviderId = accProvider.InstCode,
-                        AccreditingProviderName = accProvider.InstFull,
                         CourseDetails = new List<CourseDetail>()
                     };
                     var titles = mappedCourses
-                        .Where(c => c.InstCode == org.UcasCode && c.AccreditingProvider == accProvider.InstCode)
+                        .Where(c => c.InstCode == org.UcasCode)
                         .OrderBy(x => x.CrseCode).Select(x => x.CrseTitle).Distinct().ToList();
-
                     foreach (var title in titles)
                     {
-                        var tempRecords = mappedCourses.Where(c => c.InstCode == org.UcasCode && c.CrseTitle == title && c.AccreditingProvider == accProvider.InstCode).ToList();
+                        var tempRecords = mappedCourses.Where(c => c.InstCode == org.UcasCode && c.CrseTitle == title).ToList();
                         var courseCodes = tempRecords.Select(x => x.CrseCode).Distinct().ToList();
 
                         var courseDetail = new CourseDetail
@@ -306,6 +303,83 @@ namespace GovUk.Education.ManageCourses.Api.Data
                         course.CourseDetails.Add(courseDetail);
                     }
                     returnCourses.ProviderCourses.Add(course);
+                }
+                else
+                {
+                    foreach (var accProvider in accProviders)
+                    {
+                        var course = new ProviderCourse
+                        {
+                            AccreditingProviderId = accProvider.InstCode,
+                            AccreditingProviderName = accProvider.InstFull,
+                            CourseDetails = new List<CourseDetail>()
+                        };
+                        var titles = mappedCourses
+                            .Where(c => c.InstCode == org.UcasCode && c.AccreditingProvider == accProvider.InstCode)
+                            .OrderBy(x => x.CrseCode).Select(x => x.CrseTitle).Distinct().ToList();
+
+                        foreach (var title in titles)
+                        {
+                            var tempRecords = mappedCourses.Where(c => c.InstCode == org.UcasCode && c.CrseTitle == title && c.AccreditingProvider == accProvider.InstCode).ToList();
+                            var courseCodes = tempRecords.Select(x => x.CrseCode).Distinct().ToList();
+
+                            var courseDetail = new CourseDetail
+                            {
+                                CourseTitle = title,
+                                Variants = new List<CourseVariant>(),
+                                AgeRange = tempRecords.FirstOrDefault()?.Age
+                            };
+                            foreach (var courseCode in courseCodes)
+                            {
+                                var subjects = _context.UcasSubjects
+                                    .Join(_context.UcasCourseSubjects, s => s.SubjectCode, cs => cs.SubjectCode,
+                                        (s, cs) => new { s.SubjectDescription, cs.CrseCode, cs.InstCode })
+                                    .Where(x => x.CrseCode == courseCode && x.InstCode == org.UcasCode)
+                                    .Select(x => x.SubjectDescription).ToList();
+
+                                var currentCourse = tempRecords.FirstOrDefault(r => r.CrseCode == courseCode);
+                                var variant = new CourseVariant
+                                {
+                                    Name = title,
+                                    UcasCode = courseCode,
+                                    ProfPostFlag = currentCourse?.ProfpostFlag,
+                                    ProgramType = currentCourse?.ProgramType,
+                                    StudyMode = currentCourse?.Studymode,
+                                    Campuses = new List<Campus>(),
+                                    Subjects = subjects
+                                };
+                                var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
+                                //look for dash and put add the top of the list
+                                if (campusCodes.Contains("-"))
+                                {
+                                    campusCodes.Remove("-");
+                                    campusCodes.Insert(0, "-");
+                                }
+                                foreach (var campusCode in campusCodes)
+                                {
+                                    var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == org.UcasCode && c.CampusCode == campusCode);
+                                    if (campus != null)
+                                    {
+                                        variant.Campuses.Add(new Campus
+                                        {
+                                            Name = campus.CampusName,
+                                            Address1 = campus.Addr1,
+                                            Address2 = campus.Addr2,
+                                            Address3 = campus.Addr3,
+                                            Address4 = campus.Addr4,
+                                            PostCode = campus.Postcode,
+                                            Code = campusCode,
+                                            CourseOpenDate = tempRecords.FirstOrDefault(c => c.CrseCode == courseCode && c.CampusCode == campusCode)?.CrseOpenDate
+                                        });
+                                    }
+                                }
+
+                                courseDetail.Variants.Add(variant);
+                            }
+                            course.CourseDetails.Add(courseDetail);
+                        }
+                        returnCourses.ProviderCourses.Add(course);
+                    }
                 }
             }
 
