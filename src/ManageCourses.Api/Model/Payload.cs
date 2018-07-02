@@ -5,6 +5,21 @@ namespace GovUk.Education.ManageCourses.Api.Model
 {
     public class Payload
     {
+        public Payload()
+        {
+            this.Courses = new List<UcasCourse>();
+            this.Institutions = new List<UcasInstitution>();
+            this.Subjects = new List<UcasSubject>();
+            this.CourseSubjects = new List<UcasCourseSubject>();
+            this.Campuses = new List<UcasCampus>();
+            this.CourseNotes = new List<UcasCourseNote>();
+            this.NoteTexts = new List<UcasNoteText>();
+            this.Organisations = new List<McOrganisation>();
+            this.OrganisationInstitutions = new List<McOrganisationInstitution>();
+            this.OrganisationUsers = new List<McOrganisationUser>();
+            this.Users = new List<McUser>();
+            this.Mappers = new List<ProviderMapper>();
+        }
         public IEnumerable<UcasCourse> Courses { get; set; }
         public IEnumerable<UcasInstitution> Institutions { get; set; }
         public IEnumerable<UcasSubject> Subjects { get; set; }

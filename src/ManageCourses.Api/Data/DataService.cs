@@ -266,6 +266,8 @@ namespace GovUk.Education.ManageCourses.Api.Data
             Organisation returnOrg = null;
             var userOrg = _context.McOrganisationUsers.SingleOrDefault(o => o.Email == email);//should only be one organisation link
 
+            if (userOrg == null) return null;
+
             var org = _context.McOrganisations.SingleOrDefault(o => o.OrgId == userOrg.OrgId);
             if (org == null) return null;
 
