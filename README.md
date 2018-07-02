@@ -1,10 +1,10 @@
-# Search and Compare API project
+# Manage Courses API project
 
 ## About
 
 This repo provides a dotnet core solution containing:
 
-* An API for managing course data.
+* An API for managing courses data.
 * A Domain to describe the managing course data.
 * Regression tests.
 
@@ -16,7 +16,7 @@ The main client for this API and library is
 
 It can be worked on in either VSCode or Visual Studio 2017 as preferred.
 
-The domain project follows https://semver.org/ version numbering.
+The project follows https://semver.org/ version numbering.
 
 ## Running the API locally
 
@@ -27,7 +27,11 @@ In a windows command prompt:
 
 ## Config
 
-Refer to
+An example of the config keys that are required for Secret Manager are available from:
+
+	src\ManageCourses.Api\appsettings.SecretManager_Example.json
+
+For additional details, refer to
 https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
 
 # Using the API
