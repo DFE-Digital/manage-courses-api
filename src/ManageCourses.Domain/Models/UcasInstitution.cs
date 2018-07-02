@@ -24,6 +24,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string AccreditingProvider { get; set; }
         public string SchemeMember { get; set; }
 
-        public ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
+        public virtual ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public string NctlId { get; set; }
 
-        public IList<Course> Courses { get; set; }
+        public virtual ICollection<Course> Courses { get; set; }
     }
 }
