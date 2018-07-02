@@ -50,10 +50,9 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             }
 
-            //GetCoursesForUser_isNull(TestUserEmail_1);
-            //GetCoursesForUser_isNull(TestUserEmail_2);
-            //GetCoursesForUser_isNull(TestUserEmail_3);
-
+            GetCoursesForUser_isNull(TestUserEmail_1);
+            GetCoursesForUser_isNull(TestUserEmail_2);
+            GetCoursesForUser_isNull(TestUserEmail_3);
         }
 
         public Payload GetPayload()
@@ -135,14 +134,14 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             return result;
         }
 
-        //[TestCase("nothing@nowhere.com")]
-        //public void GetCoursesForUser_isNull(string email)
-        //{         
-        //    var result = Subject.GetCoursesForUser(email);
+        [TestCase("nothing@nowhere.com")]
+        public void GetCoursesForUser_isNull(string email)
+        {
+            var result = Subject.GetCoursesForUser(email);
 
-        //    Assert.IsNull(result.OrganisationId);
-        //    Assert.IsNull(result.OrganisationName);
+            Assert.IsNull(result.OrganisationId);
+            Assert.IsNull(result.OrganisationName);
 
-        //}
+        }
     }
 }
