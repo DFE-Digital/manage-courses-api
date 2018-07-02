@@ -34,6 +34,8 @@ An example of the config keys that are required for Secret Manager are available
 For additional details, refer to
 https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
 
+https://dfedigital.atlassian.net/wiki/spaces/BaT/pages/389349377/Manage+Courses+API
+
 # Using the API
 
 The API exposes swagger at `/swagger` thanks to [NSwag](https://github.com/RSuter/NSwag)
