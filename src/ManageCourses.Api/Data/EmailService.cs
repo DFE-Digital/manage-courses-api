@@ -37,9 +37,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 Subject = subject,
                 Body = message
             };
-            {
-                _smtpClient.Send(mailMessage);
-            }
+            _smtpClient.Send(mailMessage);
         }
     }
 }

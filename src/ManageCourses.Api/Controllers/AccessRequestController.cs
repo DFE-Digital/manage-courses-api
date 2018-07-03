@@ -55,7 +55,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     _context.Save();
 
                     string requestedBody;
-                    bool requestedAlreadyExistsAsUser = requestedIfExists == null;
+                    bool requestedAlreadyExistsAsUser = requestedIfExists != null;
                     if (requestedAlreadyExistsAsUser) 
                     {                        
                         requestedBody = 
