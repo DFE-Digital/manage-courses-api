@@ -8,8 +8,8 @@
 
         public string Email { get; set; }
 
-        public virtual McUser McUser { get; set; }
+        public McUser McUser { get; set; }
 
-        public virtual McOrganisation McOrganisation { get; set; }
+        public McOrganisation McOrganisation { get; set; }
     }
 }
