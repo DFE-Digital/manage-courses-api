@@ -11,13 +11,16 @@ namespace GovUk.Education.ManageCourses.Api.Data
         private SmtpClient _smtpClient;
         private string _user;
 
+        // This class only supports the RFC-compliant port 587
+        private const int SupportedSmtpPort = 587;
+
         public EmailService(string host, string user, string password)
         {
             _user = user;
             _smtpClient = new SmtpClient
             {
-                Host = host, // set your SMTP server name here
-                Port = 587, // Port 
+                Host = host,
+                Port = SupportedSmtpPort,
                 EnableSsl = true,
                 UseDefaultCredentials = false,
                 DeliveryMethod = SmtpDeliveryMethod.Network,

@@ -24,11 +24,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _emailService = emailService;
         }
 
-        //[Authorize]
+        [Authorize]
         [HttpPost]
         public async Task<StatusCodeResult> Index([FromForm] Api.Model.AccessRequest request) 
         {
-            var requesterEmail = "daniel@eigencode.io"; //this.User.Identity.Name;
+            var requesterEmail = this.User.Identity.Name;
             using (var transaction = ((DbContext)_context).Database.BeginTransaction()) 
             {
                 try
@@ -54,8 +54,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     }); 
                     _context.Save();
 
-                    var requestedBody = "The recipient is not yet on the system.\n\n";
-                    if (requestedIfExists != null) {
+                    string requestedBody;
+                    bool requestedAlreadyExistsAsUser = requestedIfExists == null;
+                    if (requestedAlreadyExistsAsUser) 
+                    {                        
                         requestedBody = 
                             $"The recipient is already on the system as:\n"+
                             $"First name: {requestedIfExists.FirstName}\n"+
@@ -63,7 +65,12 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                             $"With organisations:\n"+
                             string.Join("\n", requestedIfExists.McOrganisationUsers.Select(x => $"- {x.McOrganisation.Name}"))
                             +"\n\n";
+                    }
+                    else
+                    {
+                        requestedBody = "The recipient is not yet on the system.\n\n";
                     } 
+
                     var emailBody = $"{requesterEmail} requested access for {request.FirstName} {request.LastName}\n\n" +
                         
                         $"Request ID: {entity.Entity.Id}\n\n"+
@@ -85,7 +92,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                         $"The recipient would gain access to the following organisation(s):\n" +
                         string.Join("\n", orgs.Select(x => $"- {x}\n").ToArray());
 
-                    System.Console.WriteLine(emailBody);
                     _emailService.SendEmailToSupport($"New access request from {requesterEmail}", emailBody);
                     
                     transaction.Commit();
