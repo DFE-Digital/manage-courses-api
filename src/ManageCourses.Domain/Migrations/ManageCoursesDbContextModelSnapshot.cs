@@ -469,9 +469,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SignInUserId")
-                        .IsUnique();
-
                     b.HasIndex("UserId");
 
                     b.ToTable("user_log");

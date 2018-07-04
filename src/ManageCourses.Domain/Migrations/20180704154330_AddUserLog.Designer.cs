@@ -12,7 +12,7 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    [Migration("20180704150745_AddUserLog")]
+    [Migration("20180704154330_AddUserLog")]
     partial class AddUserLog
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -469,9 +469,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SignInUserId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 

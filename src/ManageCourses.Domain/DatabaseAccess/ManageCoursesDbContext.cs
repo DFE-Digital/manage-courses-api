@@ -23,10 +23,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
 
-            modelBuilder.Entity<UserLog>()
-                .HasIndex(oi => new { oi.SignInUserId })
-                .IsUnique();
-
             // Fk from org-user join table to user
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McUser)
