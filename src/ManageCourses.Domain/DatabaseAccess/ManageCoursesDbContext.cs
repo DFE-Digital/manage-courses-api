@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -23,45 +22,89 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
 
-            // Fk from org-user join table to user
+            modelBuilder.Entity<McOrganisationUser>()
+                .HasIndex(ou => new { ou.Email, ou.OrgId })
+                .IsUnique();
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McUser)
                 .WithMany(u => u.McOrganisationUsers)
                 .HasForeignKey(ou => ou.Email)
                 .HasPrincipalKey(u => u.Email);
-
-            // Fk from org-user join table to org
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McOrganisation)
                 .WithMany(u => u.McOrganisationUsers)
                 .HasForeignKey(ou => ou.OrgId)
                 .HasPrincipalKey(u => u.OrgId);
 
-            modelBuilder.Entity<McOrganisationUser>()
-                .HasIndex(ou => new { ou.Email, ou.OrgId })
-                .IsUnique();
-
-            modelBuilder.Entity<McOrganisationInstitution>()
-                .HasIndex(oi => new { oi.OrgId, oi.InstitutionCode })
-                .IsUnique();
-
             modelBuilder.Entity<UcasInstitution>()
                 .HasIndex(ui => ui.InstCode)
                 .IsUnique();
 
-            // Fk from org-inst join table to org
-            modelBuilder.Entity<McOrganisationInstitution>()
-                .HasOne(ou => ou.McOrganisation)
-                .WithMany(u => u.McOrganisationInstitutions)
-                .HasForeignKey(ou => ou.OrgId)
-                .HasPrincipalKey(o => o.OrgId);
+            modelBuilder.Entity<UcasCampus>()
+                .HasOne(uc => uc.UcasInstitution)
+                .WithMany(ui => ui.UcasCampuses)
+                .HasForeignKey(uc => uc.InstCode)
+                .HasPrincipalKey(ui => ui.InstCode);
 
-            // Fk from org-inst join table to inst
             modelBuilder.Entity<McOrganisationInstitution>()
-                .HasOne(ou => ou.UcasInstitution)
-                .WithMany(i => i.McOrganisationInstitutions)
-                .HasForeignKey(ou => ou.InstitutionCode)
-                .HasPrincipalKey(u => u.InstCode);
+                .HasIndex(oi => new { oi.OrgId, oi.InstitutionCode })
+                .IsUnique();
+            modelBuilder.Entity<McOrganisationInstitution>()
+                .HasOne(oi => oi.McOrganisation)
+                .WithMany(o => o.McOrganisationInstitutions)
+                .HasForeignKey(oi => oi.OrgId)
+                .HasPrincipalKey(o => o.OrgId);
+            modelBuilder.Entity<McOrganisationInstitution>()
+                .HasOne(oi => oi.UcasInstitution)
+                .WithMany(ui => ui.McOrganisationInstitutions)
+                .HasForeignKey(oi => oi.InstitutionCode)
+                .HasPrincipalKey(ui => ui.InstCode);
+
+            modelBuilder.Entity<UcasCourse>()
+                .HasIndex(oi => new { oi.InstCode, oi.CrseCode, oi.CampusCode })
+                .IsUnique();
+            modelBuilder.Entity<UcasCourse>()
+                .HasOne(uc => uc.UcasInstitution)
+                .WithMany(ui => ui.UcasCourses)
+                .HasForeignKey(uc => uc.InstCode)
+                .HasPrincipalKey(ui => ui.InstCode);
+            modelBuilder.Entity<UcasCourse>()
+                .HasOne(uc => uc.CourseCode)
+                .WithMany(cc => cc.UcasCourses)
+                .HasForeignKey(uc => new { uc.InstCode, uc.CrseCode })
+                .HasPrincipalKey(cc => new { cc.InstCode, cc.CrseCode });
+            modelBuilder.Entity<UcasCourse>()
+                .HasOne(uc => uc.AccreditingProviderInstitution)
+                .WithMany(ui => ui.AccreditedUcasCourses)
+                .HasForeignKey(uc => uc.AccreditingProvider)
+                .HasPrincipalKey(ui => ui.InstCode);
+            modelBuilder.Entity<UcasCourse>()
+                .HasOne(uc => uc.UcasCampus)
+                .WithMany(ui => ui.UcasCourses)
+                .HasForeignKey(ucs => new { ucs.InstCode, ucs.CampusCode })
+                .HasPrincipalKey(ui => new { ui.InstCode, ui.CampusCode });
+
+            modelBuilder.Entity<CourseCode>()
+                .HasOne(cc => cc.UcasInstitution)
+                .WithMany(ui => ui.CourseCodes)
+                .HasForeignKey(oi => oi.InstCode)
+                .HasPrincipalKey(ui => ui.InstCode);
+
+            modelBuilder.Entity<UcasCourseSubject>()
+                .HasOne(ucs => ucs.UcasInstitution)
+                .WithMany(ui => ui.UcasCourseSubjects)
+                .HasForeignKey(ucs => ucs.InstCode)
+                .HasPrincipalKey(ui => ui.InstCode);
+            modelBuilder.Entity<UcasCourseSubject>()
+                .HasOne(ucs => ucs.UcasSubject)
+                .WithMany(us => us.UcasCourseSubjects)
+                .HasForeignKey(ucs => ucs.SubjectCode)
+                .HasPrincipalKey(ui => ui.SubjectCode);
+            modelBuilder.Entity<UcasCourseSubject>()
+                .HasOne(ucs => ucs.CourseCode)
+                .WithMany(cc => cc.UcasCourseSubjects)
+                .HasForeignKey(ucs => new { ucs.InstCode, ucs.CrseCode })
+                .HasPrincipalKey(cc => new { cc.InstCode, cc.CrseCode });
 
             base.OnModelCreating(modelBuilder);
         }
@@ -79,6 +122,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
         public DbSet<Course> Courses { get; set; }
         public DbSet<UcasCourse> UcasCourses { get; set; }
+        public DbSet<CourseCode> CourseCodes { get; set; }
         public DbSet<UcasInstitution> UcasInstitutions { get; set; }
         public DbSet<UcasCourseSubject> UcasCourseSubjects { get; set; }
         public DbSet<UcasSubject> UcasSubjects { get; set; }

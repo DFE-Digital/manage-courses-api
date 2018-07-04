@@ -9,6 +9,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<ProviderMapper> ProviderMappers { get; set; }
         DbSet<Course> Courses { get; set; }
         DbSet<UcasCourse> UcasCourses { get; set; }
+        DbSet<CourseCode> CourseCodes { get; set; }
         DbSet<UcasInstitution> UcasInstitutions { get; set; }
         DbSet<UcasCourseSubject> UcasCourseSubjects { get; set; }
         DbSet<UcasSubject> UcasSubjects { get; set; }

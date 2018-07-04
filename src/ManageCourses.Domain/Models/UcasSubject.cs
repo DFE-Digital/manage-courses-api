@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
@@ -10,5 +8,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string SubjectCode { get; set; }
         public string SubjectDescription { get; set; }
         public string TitleMatch { get; set; }
+
+        public ICollection<UcasCourseSubject> UcasCourseSubjects { get; set; }
     }
 }
