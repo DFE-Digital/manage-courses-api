@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180702114020_AddAccessRequests")]
+    partial class AddAccessRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,6 +44,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("reason");
 
                     b.Property<DateTime>("RequestDateUtc")
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnName("request_date_utc");
 
                     b.Property<int?>("RequesterId")

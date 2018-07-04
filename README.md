@@ -22,7 +22,7 @@ The project follows https://semver.org/ version numbering.
 
 In a windows command prompt:
 
-    cd src\api
+    cd src/ManageCourses.Api
     set ASPNETCORE_URLS=http://*:6001 && dotnet run
 
 ## Config
