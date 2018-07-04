@@ -23,6 +23,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
 
+            modelBuilder.Entity<UserLog>()
+                .HasIndex(oi => new { oi.SignInUserId })
+                .IsUnique();
+
             // Fk from org-user join table to user
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McUser)
@@ -92,6 +96,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<Provider> Providers { get; set; }
         public DbSet<ProviderMapper> ProviderMappers { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
+        public DbSet<UserLog> UserLogs { get; set; }
 
         public IList<Course> GetAll()
         {
