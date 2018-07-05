@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
                     var userLog = _context.UserLogs
                         .Include(x => x.User)
-                        .SingleOrDefault(x => x.SignInUserId == signInUserId && x.User.Email == email);
+                        .SingleOrDefault(x => (user != null ? x.User == user : true) && x.SignInUserId == signInUserId);
 
                     var add = userLog == null;
                     if (add)

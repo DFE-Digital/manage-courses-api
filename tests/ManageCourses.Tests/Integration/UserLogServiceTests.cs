@@ -86,11 +86,30 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             Assert.AreEqual(1, Context.UserLogs.Count());
 
-            var result2 = Subject.CreateOrUpdateUserLog(signInUserId, TestUserEmail_2);
+            var result2 = Subject.CreateOrUpdateUserLog(signInUserId + 2, TestUserEmail_2);
 
             Assert.IsTrue(result2);
 
             Assert.AreEqual(2, Context.UserLogs.Count());
+        }
+
+
+        [Test]
+        public void CreateOrUpdateUserLog()
+        {
+            var email = TestUserEmail_1;
+            var signInUserId = "signInUserId";
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, email);
+
+            Assert.IsTrue(result);
+
+            Assert.AreEqual(1, Context.UserLogs.Count());
+
+            var result2 = Subject.CreateOrUpdateUserLog(signInUserId, TestUserEmail_2);
+
+            Assert.IsTrue(result2);
+
+            Assert.AreEqual(1, Context.UserLogs.Count());
         }
     }
 }
