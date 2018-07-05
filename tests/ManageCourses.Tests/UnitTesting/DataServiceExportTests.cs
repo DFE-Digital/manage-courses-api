@@ -15,17 +15,21 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         private readonly string _orgWithProviderEmail = "someuser@somewhere.com";
         private readonly string _orgWithNoProviderEmail = "someotheruser@somewhereelse.com";
         private ManageCoursesDbContext _dbContext;
+        private DataService _sut;
 
         [OneTimeSetUp]
         public void Setup()
         {
+            var optionsBuilder = new DbContextOptionsBuilder<ManageCoursesDbContext>();
+            optionsBuilder.UseInMemoryDatabase("dbInMemory");
+            _dbContext = new ManageCoursesDbContext(optionsBuilder.Options);
             BuildFakeData();
+            _sut = new DataService(_dbContext);
         }
         [Test]
         public void GetCoursesForUser_with_email_should_return_loaded_object()
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithProviderEmail);
+            var result = _sut.GetCoursesForUser(_orgWithProviderEmail);
             
             Assert.True(result.ProviderCourses.Count == 3);
         }
@@ -37,32 +41,28 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase("idontexist@nowhere.com")]
         public void GetCoursesForUser_should_return_empty_object(string email)
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(null);
+            var result = _sut.GetCoursesForUser(null);
 
             Assert.True(result.ProviderCourses.Count == 0);
         }
         [Test]
         public void GetCoursesForUser_should_return_providers()
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithProviderEmail);
+            var result = _sut.GetCoursesForUser(_orgWithProviderEmail);
 
             Assert.True(result.ProviderCourses.All(x => !string.IsNullOrWhiteSpace(x.AccreditingProviderId)));
         }
         [Test]
         public void GetCoursesForUser_should_return_course_details()
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithProviderEmail);
+            var result = _sut.GetCoursesForUser(_orgWithProviderEmail);
 
             Assert.True(result.ProviderCourses.Select(CheckCourseDetails).All(y => y));
         }
         [Test]
         public void GetCoursesForUser_should_return_course_variants()
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithProviderEmail);
+            var result = _sut.GetCoursesForUser(_orgWithProviderEmail);
 
             //Assert.True(result.ProviderCourses.SelectMany(x => x.CourseDetails.Select(CheckVariants)).All(y => y));
             
@@ -74,8 +74,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void GetCoursesForUser_should_return_campuses()
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithProviderEmail);
+            var result = _sut.GetCoursesForUser(_orgWithProviderEmail);
 
             Assert.True(CheckCampuses(result.ProviderCourses[0].CourseDetails[0].Variants[0]));
             Assert.True(CheckCampuses(result.ProviderCourses[1].CourseDetails[0].Variants[0]));
@@ -83,9 +82,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         }
         [Test]
         public void GetCoursesForUser_should_not_return_providers()
-        {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithNoProviderEmail);
+        {            
+            var result = _sut.GetCoursesForUser(_orgWithNoProviderEmail);
 
             Assert.True(result.ProviderCourses.Count == 1);
             Assert.True(string.IsNullOrWhiteSpace(result.ProviderCourses[0].AccreditingProviderId));
@@ -94,16 +92,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void GetCoursesForUser_with_no_providers_should_return_course_variants()
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithNoProviderEmail);
+            var result = _sut.GetCoursesForUser(_orgWithNoProviderEmail);
 
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
         }
         [Test]
         public void GetCoursesForUser_with_no_providers_should_not_return_campuses()
         {
-            var sut = new DataService(_dbContext);
-            var result = sut.GetCoursesForUser(_orgWithNoProviderEmail);
+            var result = _sut.GetCoursesForUser(_orgWithNoProviderEmail);
 
             Assert.False(CheckCampuses(result.ProviderCourses[0].CourseDetails[0].Variants[0]));
         }
@@ -111,20 +107,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         #region Fake Data
         private void BuildFakeData()
         {
-            var optionsBuilder = new DbContextOptionsBuilder<ManageCoursesDbContext>();
-            optionsBuilder.UseInMemoryDatabase("dbInMemory");
-            _dbContext = new ManageCoursesDbContext(optionsBuilder.Options);
-
             var dataParameters = SetupDataParameters();
 
-            var idCounter = 0;//ensures a unique id
             foreach (var parameters in dataParameters)
             {
-                idCounter++;
-                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Id = idCounter, Email = parameters.Email, OrgId = parameters.OrgId });
-                _dbContext.AddMcOrganisation(new McOrganisation { Id = idCounter, Name = parameters.OrgName, OrgId = parameters.OrgId });
-                _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { Id = idCounter, InstitutionCode = parameters.InstitutionCode, OrgId = parameters.OrgId });
-                _dbContext.AddUcasInstitution(new UcasInstitution { Id = idCounter + 981, InstCode = parameters.InstitutionCode, InstFull = parameters.InstitutionName });
+                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = parameters.Email, OrgId = parameters.OrgId });
+                _dbContext.AddMcOrganisation(new McOrganisation { Name = parameters.OrgName, OrgId = parameters.OrgId });
+                _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = parameters.InstitutionCode, OrgId = parameters.OrgId });
+                _dbContext.AddUcasInstitution(new UcasInstitution {InstCode = parameters.InstitutionCode, InstFull = parameters.InstitutionName });
 
                 AddProviders(parameters.ProviderCodes, parameters.InstitutionName);
 
@@ -271,50 +261,22 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         #region Data Checks
         private bool CheckCourseDetails(ProviderCourse course)
         {
-            var returnBool = false;
-            foreach (var details in course.CourseDetails)
-            {
-                returnBool = ((!string.IsNullOrEmpty(details.CourseTitle)) &&
-                              (!string.IsNullOrEmpty(details.AgeRange)));
-                if (!returnBool) { break; }
-            }
+            var returnBool = course.CourseDetails.Any(x => (! string.IsNullOrWhiteSpace(x.CourseTitle)) && (! string.IsNullOrWhiteSpace(x.AgeRange)));
 
             return returnBool;
         }
         private bool CheckVariants(CourseDetail courseDetail)
         {
-            var returnBool = false;
-            foreach (var variant in courseDetail.Variants)
-            {
-                returnBool = ((!string.IsNullOrEmpty(variant.UcasCode)) &&
-                              (!string.IsNullOrEmpty(variant.CourseCode)) &&
-                              (!string.IsNullOrEmpty(variant.Name)));
-                if (!returnBool) { break; }
-            }
+            var returnBool = courseDetail.Variants.Any(x =>
+                (!string.IsNullOrWhiteSpace(x.UcasCode)) && (!string.IsNullOrWhiteSpace(x.CourseCode)) &&
+                (!string.IsNullOrWhiteSpace(x.Name)));
 
             return returnBool;
         }
         private bool CheckCampuses(CourseVariant variant)
         {
-            var returnBool = false;
-            foreach (var campus in variant.Campuses)
-            {
-                returnBool = ((!string.IsNullOrEmpty(campus.Name)) &&
-                              (!string.IsNullOrEmpty(campus.Code)));
-                if (!returnBool) { break; }
-            }
-
-            return returnBool;
-        }
-        private bool CheckCourses(OrganisationCourses organisationCourses)
-        {
-            var returnBool = false;
-            foreach (var course in organisationCourses.ProviderCourses)
-            {
-                returnBool = (!string.IsNullOrEmpty(course.AccreditingProviderName));
-
-                if(!returnBool) { break;}
-            }
+            var returnBool = variant.Campuses.Any(x =>
+                (!string.IsNullOrWhiteSpace(x.Name)) && (!string.IsNullOrWhiteSpace(x.Code)));
 
             return returnBool;
         }
