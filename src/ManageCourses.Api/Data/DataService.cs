@@ -340,7 +340,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 Subjects = subjects
             };
 
-            var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
+            var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode) && !string.IsNullOrWhiteSpace(c.CampusCode)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
          
             //look for dash and put add the top of the list
             if (campusCodes.Contains("-"))
