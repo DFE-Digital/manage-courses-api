@@ -28,8 +28,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
                         .Include(x => x.User)
                         .SingleOrDefault(x => x.SignInUserId == signInUserId && x.User.Email == email);
 
-                    var isNew = userLog == null;
-                    if (isNew)
+                    var add = userLog == null;
+                    if (add)
                     {
                         userLog = new UserLog
                         {
@@ -41,11 +41,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     userLog.User = user;
                     userLog.LastLoginDateUtc = DateTime.UtcNow;
 
-                    if (isNew)
+                    if (add)
                     {
                         _context.UserLogs.Add(userLog);
                     }
-                    else {
+                    else
+                    {
                         _context.UserLogs.Update(userLog);
                     }
                     
@@ -57,7 +58,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 {
                     transaction.Rollback();
                 }
-
 
                 return result;
             }
