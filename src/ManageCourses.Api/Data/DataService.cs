@@ -6,6 +6,7 @@ using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
@@ -212,17 +213,18 @@ namespace GovUk.Education.ManageCourses.Api.Data
             _context.Save();
         }
         #endregion
+
         #region Export
         /// <summary>
         /// This method return an object containing a list of course for an organisation mapped to an email
         /// </summary>
-        /// <param name="email"></param>
-        /// <returns></returns>
+        /// <param name="email">The user email address.</param>
+        /// <returns>The user's organisation courses.</returns>
         public OrganisationCourses GetCoursesForUser(string email)
         {
-            var returnCourses = new OrganisationCourses();
-
             var org = GetOrganisation(email);
+
+            var returnCourses = new OrganisationCourses();
 
             if (org == null) return returnCourses;
 
@@ -232,6 +234,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             var providersCourses = GetProviderCourses(org);
             returnCourses.ProviderCourses = providersCourses;
+
             return returnCourses;
         }
 
@@ -258,32 +261,32 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// <summary>
         /// Gets an organisation that is linked to the users email
         /// </summary>
-        /// <param name="email"></param>
-        /// <returns></returns>
+        /// <param name="email">The user email address.</param>
+        /// <returns>The organisation of the user.</returns>
         private Organisation GetOrganisation(string email)
         {
-            //TODO work out why this organisation is not mapping
-            Organisation returnOrg = null;
-            var userOrg = _context.McOrganisationUsers.SingleOrDefault(o => o.Email == email);//should only be one organisation link
+            var mcOrgUser = _context.McOrganisationUsers
+                .Include(x => x.McOrganisation)
+                .ThenInclude(x => x.McOrganisationInstitutions)
+                .SingleOrDefault(o =>
+                 o.Email == email && o.McOrganisation != null && o.McOrganisation.McOrganisationInstitutions.FirstOrDefault() != null
+                );
 
-            if (userOrg == null) return null;
-
-            var org = _context.McOrganisations.SingleOrDefault(o => o.OrgId == userOrg.OrgId);
-            if (org == null) return null;
-
-            var inst = _context.McOrganisationIntitutions.FirstOrDefault(oi => oi.OrgId == userOrg.OrgId);
-
-            if (inst == null) return null;
-
-            var organisationName = _context.UcasInstitutions.Where(i => i.InstCode == inst.InstitutionCode).Select(i => i.InstFull).FirstOrDefault();
-            returnOrg = new Organisation
+            if (mcOrgUser != null)
             {
-                Name = organisationName,
-                OrgId = org.OrgId,
-                UcasCode = inst.InstitutionCode
-            };
 
-            return returnOrg;
+                var ucaseInstitution = _context.UcasInstitutions.First(x => x.InstCode == mcOrgUser.McOrganisation.McOrganisationInstitutions
+                    .First().InstitutionCode);
+
+                return new Organisation
+                {
+                    Name = ucaseInstitution.InstFull,
+                    OrgId = mcOrgUser.OrgId,
+                    UcasCode = ucaseInstitution.InstCode
+                };
+            }
+
+            return null;
         }
 
         private List<UcasInstitution> GetProviders(IQueryable<UcasCourse> mappedCourses)
@@ -291,6 +294,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
             var accProviders = mappedCourses.Where(mc => (!string.IsNullOrWhiteSpace(mc.AccreditingProvider))).Select(mc => mc.AccreditingProvider).Distinct()
                 .Select(accProvider => _context.UcasInstitutions.FirstOrDefault(o => o.InstCode == accProvider))
                 .OrderBy(x => x.InstFull).ToList();
+
             return accProviders;
         }
         private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode="", string providerName="")
@@ -337,12 +341,14 @@ namespace GovUk.Education.ManageCourses.Api.Data
             };
 
             var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode) && !string.IsNullOrWhiteSpace(c.CampusCode)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
+         
             //look for dash and put add the top of the list
             if (campusCodes.Contains("-"))
             {
                 campusCodes.Remove("-");
                 campusCodes.Insert(0, "-");
             }
+
             variant.Campuses = campusCodes.Select(x => GetCampus(x, organisationCode, tempRecords.FirstOrDefault(c => c.CrseCode == courseCode && c.CampusCode == x)?.CrseOpenDate)).ToList();
 
             return variant;

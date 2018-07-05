@@ -91,6 +91,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McUser> McUsers { get; set; }
         public DbSet<Provider> Providers { get; set; }
         public DbSet<ProviderMapper> ProviderMappers { get; set; }
+        public DbSet<AccessRequest> AccessRequests { get; set; }
 
         public IList<Course> GetAll()
         {

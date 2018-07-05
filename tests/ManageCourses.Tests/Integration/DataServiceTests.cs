@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         private const string TestUserEmail_1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail_2 = "email_2@test-manage-courses.gov.uk";
         private const string TestUserEmail_3 = "email_3@test-manage-courses.gov.uk";
-        
+
 
         [SetUp]
         public void Setup()
@@ -42,12 +42,31 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             foreach (var item in Context.McUsers)
             {
-                Assert.IsTrue(payload.Users.Any(
+                var payloadUser = payload.Users.FirstOrDefault(
                     x => x.FirstName == item.FirstName &&
                     x.LastName == item.LastName &&
-                    x.Email == item.Email));
+                    x.Email == item.Email);
 
+                Assert.IsNotNull(payloadUser);
 
+                var payloadOrgUser = payload.OrganisationUsers.FirstOrDefault(x => x.Email == payloadUser.Email);
+
+                if (payloadOrgUser != null)
+                {
+                    if (!string.IsNullOrEmpty(payloadOrgUser.OrgId))
+                    {
+                        Assert.AreEqual(payloadUser.Email, TestUserEmail_3);
+                        Assert.AreEqual(item.McOrganisationUsers.First().McOrganisation.OrgId, payloadOrgUser.OrgId);
+                    }
+                    else
+                    {
+                        Assert.AreEqual(payloadUser.Email, TestUserEmail_2);
+                    }
+                }
+                else
+                {
+                    Assert.AreEqual(payloadUser.Email, TestUserEmail_1);
+                }
             }
 
             GetCoursesForUser_isNull(TestUserEmail_1);
