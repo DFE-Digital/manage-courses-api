@@ -12,7 +12,7 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    [Migration("20180704154330_AddUserLog")]
+    [Migration("20180704155403_AddUserLog")]
     partial class AddUserLog
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
