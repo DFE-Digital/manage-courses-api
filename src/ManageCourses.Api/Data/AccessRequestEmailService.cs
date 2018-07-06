@@ -12,18 +12,31 @@ namespace GovUk.Education.ManageCourses.Api.Data
 {
     public class AccessRequestEmailService : IAccessRequestEmailService
     {
-        private NotificationClient _notificationClient;
+        private readonly NotificationClient _notificationClient;
 
-        private string _user;
+        private readonly string _user;
 
-        private string _templateId;
+        private readonly string _templateId;
 
         // This class only supports the RFC-compliant port 587
         private const int SupportedSmtpPort = 587;
 
         public AccessRequestEmailService(string apiKey, string templateId, string user)
         {
-            _notificationClient = String.IsNullOrWhiteSpace(apiKey) ? null : new NotificationClient(apiKey);
+            if (String.IsNullOrWhiteSpace(apiKey)) 
+            {
+                throw new ArgumentNullException(nameof(apiKey));
+            }
+            if (String.IsNullOrWhiteSpace(templateId)) 
+            {
+                throw new ArgumentNullException(nameof(templateId));
+            }
+            if (String.IsNullOrWhiteSpace(user)) 
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            _notificationClient = new NotificationClient(apiKey);
             _templateId = templateId;
             _user = user;
         }

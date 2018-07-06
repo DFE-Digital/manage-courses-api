@@ -4,7 +4,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 {
     public class EmailServiceFactory
     {
-        private string _apiKey;
+        private readonly string _apiKey;
 
         public EmailServiceFactory(string apiKey) 
         {
