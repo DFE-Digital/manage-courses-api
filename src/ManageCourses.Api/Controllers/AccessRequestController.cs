@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
-using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ManageCourses.Api.Model;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<StatusCodeResult> Index([FromForm] Api.Model.AccessRequest request) 
+        public async Task<StatusCodeResult> Index([FromBody] AccessRequest request) 
         {
             var requesterEmail = this.User.Identity.Name;
             using (var transaction = ((DbContext)_context).Database.BeginTransaction()) 
