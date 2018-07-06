@@ -20,6 +20,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         DbSet<McUser> McUsers { get; set; }
         DbSet<AccessRequest> AccessRequests { get; set; }
+        DbSet<UserLog> UserLogs { get; set; }
         IList<Course> GetAll();
         IList<UcasCourse> GetAllUcasCourses();
         IList<UcasInstitution> GetAllUcasInstitutions();
@@ -33,6 +34,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         IList<McOrganisationUser> GetAllMcOrganisationsUsers();
         IList<McUser> GetAllMcUsers();
         IList<ProviderMapper> GetAllProviderMappers();
+
         void AddUcasCourse(UcasCourse course);
         void AddUcasInstitution(UcasInstitution institution);
         void AddUcasSubject(UcasSubject subject);

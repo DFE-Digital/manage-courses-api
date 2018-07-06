@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Builder;
@@ -52,6 +53,7 @@ namespace GovUk.Education.ManageCourses.Api
             });
 
             services.AddScoped<IDataService, DataService>();
+            services.AddScoped<IUserLogService, UserLogService>();
 
             services.AddSingleton<IEmailService>(provider => new EmailService(
                 Configuration["email:host"],
