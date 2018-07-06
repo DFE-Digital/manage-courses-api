@@ -132,7 +132,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         public DbSet<McUser> McUsers { get; set; }
-        public DbSet<ProviderMapper> ProviderMappers { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
         public DbSet<UserLog> UserLogs { get; set; }
 
@@ -190,11 +189,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return McUsers.ToList();
         }
 
-        public IList<ProviderMapper> GetAllProviderMappers()
-        {
-            return ProviderMappers.ToList();
-        }
-
         public void AddUcasInstitution(UcasInstitution institution)
         {
             UcasInstitutions.Add(institution);
@@ -243,11 +237,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public void AddMcUser(McUser user)
         {
             McUsers.Add(user);
-        }
-
-        public void AddProviderMapper(ProviderMapper provideMapper)
-        {
-            ProviderMappers.Add(provideMapper);
         }
 
         public void AddUcasCourse(UcasCourse course)
