@@ -116,12 +116,6 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                     InstCode = "InstCode_2"
                 }
             };
-            var mappers = new List<ProviderMapper> {
-                new ProviderMapper () {
-                    OrgId = organisations[1].OrgId,
-                    UcasCode = "UcasCode_1" 
-                }
-            };
 
             var organisationInstitutions = new List<McOrganisationInstitution>
             {
@@ -147,7 +141,6 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 OrganisationUsers = organisationUsers,
                 Organisations = organisations,
                 Institutions = institutions,
-                Mappers = mappers
             };
 
             return result;

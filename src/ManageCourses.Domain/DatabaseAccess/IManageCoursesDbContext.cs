@@ -6,8 +6,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 {
     public interface IManageCoursesDbContext
     {
-        DbSet<ProviderMapper> ProviderMappers { get; set; }
-        DbSet<Course> Courses { get; set; }
         DbSet<UcasCourse> UcasCourses { get; set; }
         DbSet<CourseCode> CourseCodes { get; set; }
         DbSet<UcasInstitution> UcasInstitutions { get; set; }
@@ -22,7 +20,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<McUser> McUsers { get; set; }
         DbSet<AccessRequest> AccessRequests { get; set; }
         DbSet<UserLog> UserLogs { get; set; }
-        IList<Course> GetAll();
         IList<UcasCourse> GetAllUcasCourses();
         IList<UcasInstitution> GetAllUcasInstitutions();
         IList<UcasSubject> GetAllUcasSubjects();
@@ -34,7 +31,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         IList<McOrganisationInstitution> GetAllMcOrganisationsInstitutions();
         IList<McOrganisationUser> GetAllMcOrganisationsUsers();
         IList<McUser> GetAllMcUsers();
-        IList<ProviderMapper> GetAllProviderMappers();
 
         void AddUcasCourse(UcasCourse course);
         void AddUcasInstitution(UcasInstitution institution);
@@ -47,7 +43,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution);
         void AddMcOrganisationUser(McOrganisationUser organisationUser);
         void AddMcUser(McUser user);
-        void AddProviderMapper(ProviderMapper provideMapper);
         void Save();
     }
 }

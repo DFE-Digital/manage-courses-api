@@ -18,7 +18,6 @@ namespace GovUk.Education.ManageCourses.Api.Model
             this.OrganisationInstitutions = new List<McOrganisationInstitution>();
             this.OrganisationUsers = new List<McOrganisationUser>();
             this.Users = new List<McUser>();
-            this.Mappers = new List<ProviderMapper>();
         }
         public IEnumerable<UcasCourse> Courses { get; set; }
         public IEnumerable<UcasInstitution> Institutions { get; set; }
@@ -31,6 +30,5 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public IEnumerable<McOrganisationInstitution> OrganisationInstitutions { get; set; }
         public IEnumerable<McOrganisationUser> OrganisationUsers { get; set; }
         public IEnumerable<McUser> Users { get; set; }
-        public IEnumerable<ProviderMapper> Mappers { get; set; }
     }
 }
