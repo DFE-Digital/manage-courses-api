@@ -120,7 +120,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return Regex.Replace(value, @"([a-z\d])([A-Z])", "$1_$2").ToLower();
         }
 
-        public DbSet<Course> Courses { get; set; }
         public DbSet<UcasCourse> UcasCourses { get; set; }
         public DbSet<CourseCode> CourseCodes { get; set; }
         public DbSet<UcasInstitution> UcasInstitutions { get; set; }
@@ -133,16 +132,9 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         public DbSet<McUser> McUsers { get; set; }
-        public DbSet<Provider> Providers { get; set; }
         public DbSet<ProviderMapper> ProviderMappers { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
         public DbSet<UserLog> UserLogs { get; set; }
-
-        public IList<Course> GetAll()
-        {
-
-            return Courses.ToList();
-        }
 
         public IList<UcasCourse> GetAllUcasCourses()
         {
@@ -263,10 +255,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             UcasCourses.Add(course);
         }
 
-        public void AddCourse(Course course)
-        {
-            Courses.Add(course);
-        }
         public void Save()
         {
             SaveChanges();
