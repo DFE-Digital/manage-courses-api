@@ -15,10 +15,6 @@ using GovUk.Education.ManageCourses.Api.Services;
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
 {
-    /// <summary>
-    /// The bearer token handler.
-    /// </summary>
-    /// <seealso cref="Microsoft.AspNetCore.Authentication.AuthenticationHandler{GovUk.Education.ManageCourses.Api.Middleware.BearerTokenOptions}" />
     public class BearerTokenHandler : AuthenticationHandler<BearerTokenOptions>
     {
 
@@ -29,15 +25,6 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         private readonly IUserLogService _userLogService;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BearerTokenHandler"/> class.
-        /// </summary>
-        /// <param name="options">The options.</param>
-        /// <param name="manageCoursesDbContext">The manage courses database context.</param>
-        /// <param name="userLogService">The user log service.</param>
-        /// <param name="logger">The logger.</param>
-        /// <param name="encoder">The encoder.</param>
-        /// <param name="clock">The clock.</param>
         public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserLogService userLogService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
             this._manageCoursesDbContext = manageCoursesDbContext;
