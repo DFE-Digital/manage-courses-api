@@ -238,6 +238,40 @@ namespace GovUk.Education.ManageCourses.Api.Data
             return returnCourses;
         }
 
+        /// <summary>
+        /// This method return an object containing a list of course for an organisation mapped to an email
+        /// </summary>
+        /// <param name="email">The user email address.</param>
+        /// <param name="orgId"></param>
+        /// <returns>The user's organisation courses.</returns>
+        public OrganisationCourses GetCoursesForUserOrganisation(string email, string orgId)
+        {
+            var org = GetOrganisation(email, orgId);
+
+            var returnCourses = new OrganisationCourses();
+
+            if (org == null) return returnCourses;
+
+            returnCourses.OrganisationId = org.OrgId;
+            returnCourses.UcasCode = org.UcasCode;
+            returnCourses.OrganisationName = org.Name;
+
+            var providersCourses = GetProviderCourses(org);
+            returnCourses.ProviderCourses = providersCourses;
+
+            return returnCourses;
+        }
+        /// <summary>
+        /// Gets a list of organisation the user in linked to
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public IEnumerable<UserOrganisation> GetOrganisationsForUser(string email)
+        {
+            var orgs = GetOrganisations(email);
+            return orgs;
+        }
+
         private List<ProviderCourse> GetProviderCourses(Organisation org)
         {
             var mappedCourses = _context.UcasCourses.Where(c => c.InstCode == org.UcasCode);
@@ -259,7 +293,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
         #endregion
         /// <summary>
-        /// Gets an organisation that is linked to the users email
+        /// Gets a single (or the first) organisation that is linked to the users email
         /// </summary>
         /// <param name="email">The user email address.</param>
         /// <returns>The organisation of the user.</returns>
@@ -287,6 +321,54 @@ namespace GovUk.Education.ManageCourses.Api.Data
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Gets a specific organisation that is linked to the users email
+        /// </summary>
+        /// <param name="email">The user email address.</param>
+        /// <param name="orgId"></param>
+        /// <returns>The organisation of the user.</returns>
+        private Organisation GetOrganisation(string email, string orgId)
+        {
+            var mcOrgUser = _context.McOrganisationUsers
+                .Include(x => x.McOrganisation)
+                .ThenInclude(x => x.McOrganisationInstitutions)
+                .SingleOrDefault(o =>
+                    o.Email == email && o.OrgId == orgId && o.McOrganisation != null && o.McOrganisation.McOrganisationInstitutions.FirstOrDefault() != null
+                );
+
+            if (mcOrgUser == null) return null;
+            {
+                var ucaseInstitution = _context.UcasInstitutions.First(x => x.InstCode == mcOrgUser.McOrganisation.McOrganisationInstitutions
+                                                                                .First().InstitutionCode);
+
+                return new Organisation
+                {
+                    Name = ucaseInstitution.InstFull,
+                    OrgId = mcOrgUser.OrgId,
+                    UcasCode = ucaseInstitution.InstCode
+                };
+            }
+        }
+
+        private IEnumerable<UserOrganisation> GetOrganisations(string email)
+        {
+            var mcOrgUsers = _context.McOrganisationUsers
+                .Join(_context.McOrganisationIntitutions, ou => ou.OrgId, oi => oi.OrgId,
+                    (ou, oi) => new {ou.Email, ou.OrgId, oi.UcasInstitution.InstCode, oi.UcasInstitution.InstFull})
+                .Where(x => x.Email == email)
+                .Select(o => new Organisation {Name = o.InstFull, OrgId = o.OrgId, UcasCode = o.InstCode}).ToList();
+
+            var userOrganisations = mcOrgUsers.Select(x => new UserOrganisation
+            {
+                OrganisationId = x.OrgId,
+                OrganisationName = x.Name,
+                UcasCode = x.UcasCode,
+                TotalCourses = GetProviderCourses(x).SelectMany(y => y.CourseDetails).Count()
+            }).ToList();
+
+            return userOrganisations;
         }
 
         private List<UcasInstitution> GetProviders(IQueryable<UcasCourse> mappedCourses)

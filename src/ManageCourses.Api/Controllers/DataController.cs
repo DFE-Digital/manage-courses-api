@@ -23,8 +23,22 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpGet]
         public OrganisationCourses Export()
         {
-            var name = this.User.Identity.Name;
+            var name = this.User.Identity.Name;            
             var courses = _dataService.GetCoursesForUser(name);
+
+            return courses;
+        }
+        /// <summary>
+        /// Exports the data.
+        /// </summary>
+        /// <returns>The exported data</returns>
+        [Authorize]
+        [HttpGet]
+        [Route("{organisationId}")]
+        public OrganisationCourses ExportByOrganisation(string organisationId)
+        {
+            var name = this.User.Identity.Name;            
+            var courses = _dataService.GetCoursesForUserOrganisation(name, organisationId);
 
             return courses;
         }

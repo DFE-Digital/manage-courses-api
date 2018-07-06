@@ -11,5 +11,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         void ResetDatabase();
         void ProcessPayload(Payload payload);
         OrganisationCourses GetCoursesForUser(string email);
+        OrganisationCourses GetCoursesForUserOrganisation(string email, string organisationId); 
+        IEnumerable<UserOrganisation> GetOrganisationsForUser(string email);
     }
 }
