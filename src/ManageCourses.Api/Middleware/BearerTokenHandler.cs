@@ -42,7 +42,12 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 {
                     var userDetails = GetJsonUserDetails(accessToken);
 
-                    var mcuser = _manageCoursesDbContext.McUsers.First(x => x.Email == userDetails.Email);
+                    var mcuser = _manageCoursesDbContext.McUsers.FirstOrDefault(x => x.Email == userDetails.Email);
+                    if (mcuser == null)
+                    {
+                        Logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
+                        return AuthenticateResult.NoResult();
+                    }
 
                     var identity = new ClaimsIdentity( 
                         new[] {
@@ -62,10 +67,8 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     return AuthenticateResult.Fail(ex);
                 }
             }
-            else
-            {
-                return AuthenticateResult.NoResult();
-            }
+
+            return AuthenticateResult.NoResult();
         }
 
         private string GetAccessToken()
