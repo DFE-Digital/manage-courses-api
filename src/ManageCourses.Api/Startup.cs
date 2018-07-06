@@ -53,11 +53,11 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddScoped<IDataService, DataService>();
 
-            services.AddSingleton<IEmailService>(provider => new EmailService(
-                Configuration["email:api_key"],
-                Configuration["email:template_id"],
-                Configuration["email:user"]
-            ));
+            services.AddSingleton<IAccessRequestEmailService>(provider => new EmailServiceFactory(Configuration["email:api_key"])
+                .MakeAccessRequestEmailService(
+                    Configuration["email:template_id"],
+                    Configuration["email:user"]
+                ));
 
             services.AddMvc();
         }

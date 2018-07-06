@@ -1,4 +1,4 @@
-
+﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using Notify.Client;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
-    public class EmailService : IEmailService
+    public class AccessRequestEmailService : IAccessRequestEmailService
     {
         private NotificationClient _notificationClient;
 
@@ -21,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         // This class only supports the RFC-compliant port 587
         private const int SupportedSmtpPort = 587;
 
-        public EmailService(string apiKey, string templateId, string user)
+        public AccessRequestEmailService(string apiKey, string templateId, string user)
         {
             _notificationClient = String.IsNullOrWhiteSpace(apiKey) ? null : new NotificationClient(apiKey);
             _templateId = templateId;
@@ -51,9 +51,5 @@ namespace GovUk.Education.ManageCourses.Api.Data
             _notificationClient.SendEmail(_user,  _templateId, templateValues);
         }
 
-        public bool ShouldBeAbleToSend() 
-        {
-            return _notificationClient != null;
-        }
     }
 }

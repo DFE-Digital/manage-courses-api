@@ -16,9 +16,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class AccessRequestController : Controller
     {
         private readonly IManageCoursesDbContext _context;
-        private readonly IEmailService _emailService;
+        private readonly IAccessRequestEmailService _emailService;
 
-        public AccessRequestController(IManageCoursesDbContext context, IEmailService emailService)
+        public AccessRequestController(IManageCoursesDbContext context, IAccessRequestEmailService emailService)
         {
             _context = context;
             _emailService = emailService;
@@ -54,11 +54,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     }); 
                     _context.Save();
 
-                    if (_emailService.ShouldBeAbleToSend()) 
-                    {
-                        _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
-                    }
-                    
+                    _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
+                                        
                     transaction.Commit();
                 }
                 catch (Exception e)
