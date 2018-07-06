@@ -23,6 +23,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         {
             // clear out the existing data
             _context.UcasCourses.RemoveRange(_context.UcasCourses);
+            _context.CourseCodes.RemoveRange(_context.CourseCodes);
             _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
             _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
             _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
@@ -38,6 +39,14 @@ namespace GovUk.Education.ManageCourses.Api.Data
         }
         public void ProcessPayload(Payload payload)
         {
+            var uniqueCourses = payload.Courses.Select(course => new CourseCode
+            {
+                InstCode = course.InstCode,
+                CrseCode = course.CrseCode
+            }).Distinct(new CourseComparer());
+
+            _context.CourseCodes.AddRange(uniqueCourses);
+
             foreach (var course in payload.Courses)
             {
                 // copy props to prevent changing id
@@ -212,6 +221,20 @@ namespace GovUk.Education.ManageCourses.Api.Data
             }
             _context.Save();
         }
+
+        public class CourseComparer : IEqualityComparer<CourseCode>
+        {
+            public bool Equals(CourseCode x, CourseCode y)
+            {
+                return x.InstCode == y.InstCode && x.CrseCode == y.CrseCode;
+            }
+
+            public int GetHashCode(CourseCode cc)
+            {
+                return ($"{cc.InstCode}_{cc.CrseCode}").GetHashCode();
+            }
+        }
+
         #endregion
 
         #region Export
@@ -297,7 +320,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             return accProviders;
         }
-        private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode="", string providerName="")
+        private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode = "", string providerName = "")
         {
             var course = new ProviderCourse
             {
