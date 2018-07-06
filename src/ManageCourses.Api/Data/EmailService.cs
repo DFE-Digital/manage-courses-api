@@ -1,43 +1,59 @@
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Domain.Models;
+using Notify.Client;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
     public class EmailService : IEmailService
     {
+        private NotificationClient _notificationClient;
 
-        private SmtpClient _smtpClient;
         private string _user;
+
+        private string _templateId;
 
         // This class only supports the RFC-compliant port 587
         private const int SupportedSmtpPort = 587;
 
-        public EmailService(string host, string user, string password)
+        public EmailService(string apiKey, string templateId, string user)
         {
+            _notificationClient = String.IsNullOrWhiteSpace(apiKey) ? null : new NotificationClient(apiKey);
+            _templateId = templateId;
             _user = user;
-            _smtpClient = new SmtpClient
-            {
-                Host = host,
-                Port = SupportedSmtpPort,
-                EnableSsl = true,
-                UseDefaultCredentials = false,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(user,password)
-            };
-
         }
 
-        public void SendEmailToSupport(string subject, string message)
+        public void SendAccessRequestEmailToSupport(AccessRequest accessRequest, McUser requester, McUser requestedOrNull)
         {
+            var templateValues = new Dictionary<string, dynamic>() {
+                {"request_id", accessRequest.Id},
 
-            var mailMessage = new MailMessage(_user, _user)
-            {
-                Subject = subject,
-                Body = message
+                {"requester_firstname", requester.FirstName},
+                {"requester_lastname", requester.LastName},
+                {"requester_email", requester.Email},
+                {"requester_existingorgs", String.Join(", ", requester.McOrganisationUsers.Select(x => x.McOrganisation.Name))},
+
+                {"requested_firstname", accessRequest.FirstName},
+                {"requested_lastname", accessRequest.LastName},
+                {"requested_email", accessRequest.EmailAddress},
+                {"requested_organisation", accessRequest.Organisation},
+                {"requested_reason", accessRequest.Reason},
+
+                {"requested_existingorgs", requestedOrNull == null ? "" : String.Join(", ", requestedOrNull.McOrganisationUsers.Select(x => x.McOrganisation.Name))}
+
             };
-            _smtpClient.Send(mailMessage);
+
+            _notificationClient.SendEmail(_user,  _templateId, templateValues);
+        }
+
+        public bool ShouldBeAbleToSend() 
+        {
+            return _notificationClient != null;
         }
     }
 }

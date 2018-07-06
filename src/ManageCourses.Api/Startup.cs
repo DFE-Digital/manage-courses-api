@@ -54,9 +54,9 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IDataService, DataService>();
 
             services.AddSingleton<IEmailService>(provider => new EmailService(
-                Configuration["email:host"],
-                Configuration["email:user"],
-                Configuration["email:password"]
+                Configuration["email:api_key"],
+                Configuration["email:template_id"],
+                Configuration["email:user"]
             ));
 
             services.AddMvc();
