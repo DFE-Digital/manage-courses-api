@@ -75,7 +75,7 @@ namespace GovUk.Education.ManageCourses.Api
             }
 
             // Enable the Swagger UI middleware and the Swagger generator
-            app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly, settings =>
+            app.UseSwaggerUi3(typeof(Startup).GetTypeInfo().Assembly, settings =>
             {
                 settings.GeneratorSettings.DefaultPropertyNameHandling =
                     PropertyNameHandling.CamelCase;
