@@ -306,7 +306,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             return accProviders;
         }
-        private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode = "", string providerName = "")
+        private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode = null, string providerName = null)
         {
             var course = new ProviderCourse
             {
