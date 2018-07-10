@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -18,26 +15,12 @@ namespace GovUk.Education.ManageCourses.Api.Data
         {
             _context = context;
         }
+
         #region Import
-        public void ResetDatabase()
-        {
-            // clear out the existing data
-            _context.UcasCourses.RemoveRange(_context.UcasCourses);
-            _context.CourseCodes.RemoveRange(_context.CourseCodes);
-            _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
-            _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
-            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
-            _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
-            _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
-            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
-            _context.McOrganisations.RemoveRange(_context.McOrganisations);
-            _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
-            _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
-            _context.McUsers.RemoveRange(_context.McUsers);
-            _context.Save();
-        }
         public void ProcessPayload(Payload payload)
         {
+            ResetDatabase();
+
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
                 InstCode = course.InstCode,
@@ -205,6 +188,24 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 );
             }
 
+            _context.Save();
+        }
+
+        private void ResetDatabase()
+        {
+            // clear out the existing data
+            _context.UcasCourses.RemoveRange(_context.UcasCourses);
+            _context.CourseCodes.RemoveRange(_context.CourseCodes);
+            _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
+            _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
+            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
+            _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
+            _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
+            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
+            _context.McOrganisations.RemoveRange(_context.McOrganisations);
+            _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
+            _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
+            _context.McUsers.RemoveRange(_context.McUsers);
             _context.Save();
         }
 
