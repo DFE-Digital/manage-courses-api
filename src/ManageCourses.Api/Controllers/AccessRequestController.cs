@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
-using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ManageCourses.Api.Model;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -16,9 +16,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class AccessRequestController : Controller
     {
         private readonly IManageCoursesDbContext _context;
-        private readonly IEmailService _emailService;
+        private readonly IAccessRequestEmailService _emailService;
 
-        public AccessRequestController(IManageCoursesDbContext context, IEmailService emailService)
+        public AccessRequestController(IManageCoursesDbContext context, IAccessRequestEmailService emailService)
         {
             _context = context;
             _emailService = emailService;
@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<StatusCodeResult> Index([FromForm] Api.Model.AccessRequest request) 
+        public async Task<StatusCodeResult> Index([FromBody] AccessRequest request) 
         {
             var requesterEmail = this.User.Identity.Name;
             using (var transaction = ((DbContext)_context).Database.BeginTransaction()) 
@@ -54,49 +54,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     }); 
                     _context.Save();
 
-                    string requestedBody;
-                    bool requestedAlreadyExistsAsUser = requestedIfExists != null;
-                    if (requestedAlreadyExistsAsUser) 
-                    {                        
-                        requestedBody = 
-                            $"The recipient is already on the system as:\n"+
-                            $"First name: {requestedIfExists.FirstName}\n"+
-                            $"Last name: {requestedIfExists.LastName}\n"+
-                            $"With organisations:\n"+
-                            string.Join("\n", requestedIfExists.McOrganisationUsers.Select(x => $"- {x.McOrganisation.Name}"))
-                            +"\n\n";
-                    }
-                    else
-                    {
-                        requestedBody = "The recipient is not yet on the system.\n\n";
-                    } 
-
-                    var emailBody = $"{requesterEmail} requested access for {request.FirstName} {request.LastName}\n\n" +
-                        
-                        $"Request ID: {entity.Entity.Id}\n\n"+
-
-                        $"REQUESTER\n"+
-                        $"First name: {requester.FirstName}\n"+
-                        $"Last name: {requester.LastName}\n"+
-                        $"Email name: {requester.Email}\n\n"+
-
-                        $"REQUESTED\n" +
-                        $"First name: {request.FirstName}\n" +
-                        $"Last name: {request.LastName}\n" +
-                        $"Email address: {request.EmailAddress}\n" +
-                        $"Organisation address: {request.Organisation}\n" +
-                        $"Reason: {request.Reason}\n\n" +
-
-                        requestedBody +
-
-                        $"The recipient would gain access to the following organisation(s):\n" +
-                        string.Join("\n", orgs.Select(x => $"- {x}\n").ToArray());
-
-                    _emailService.SendEmailToSupport($"New access request from {requesterEmail}", emailBody);
-                    
+                    _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
+                                        
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     transaction.Rollback();
                     return StatusCode(500);

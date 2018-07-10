@@ -20,6 +20,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         {
             // clear out the existing data
             _context.UcasCourses.RemoveRange(_context.UcasCourses);
+            _context.CourseCodes.RemoveRange(_context.CourseCodes);
             _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
             _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
             _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
@@ -30,11 +31,18 @@ namespace GovUk.Education.ManageCourses.Api.Data
             _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
             _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
             _context.McUsers.RemoveRange(_context.McUsers);
-            _context.ProviderMappers.RemoveRange(_context.ProviderMappers);
             _context.Save();
         }
         public void ProcessPayload(Payload payload)
         {
+            var uniqueCourses = payload.Courses.Select(course => new CourseCode
+            {
+                InstCode = course.InstCode,
+                CrseCode = course.CrseCode
+            }).Distinct(new CourseComparer());
+
+            _context.CourseCodes.AddRange(uniqueCourses);
+
             foreach (var course in payload.Courses)
             {
                 // copy props to prevent changing id
@@ -194,21 +202,22 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 );
             }
 
-            foreach (var mapper in payload.Mappers)
-            {
-                _context.AddProviderMapper(
-                    new ProviderMapper
-                    {
-                        InstitutionName = mapper.InstitutionName,
-                        OrgId = mapper.OrgId,
-                        Type = mapper.Type,
-                        UcasCode = mapper.UcasCode,
-                        Urn = mapper.Urn
-                    }
-                );
-            }
             _context.Save();
         }
+
+        public class CourseComparer : IEqualityComparer<CourseCode>
+        {
+            public bool Equals(CourseCode x, CourseCode y)
+            {
+                return x.InstCode == y.InstCode && x.CrseCode == y.CrseCode;
+            }
+
+            public int GetHashCode(CourseCode cc)
+            {
+                return ($"{cc.InstCode}_{cc.CrseCode}").GetHashCode();
+            }
+        }
+
         #endregion
 
         #region Export
@@ -376,7 +385,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             return accProviders;
         }
-        private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode="", string providerName="")
+        private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode = null, string providerName = null)
         {
             var course = new ProviderCourse
             {

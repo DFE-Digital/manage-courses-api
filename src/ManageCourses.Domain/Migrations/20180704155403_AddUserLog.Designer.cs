@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180704155403_AddUserLog")]
+    partial class AddUserLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,23 +59,29 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("access_request");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseCode", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Course", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
-                    b.Property<string>("CrseCode")
-                        .IsRequired()
-                        .HasColumnName("crse_code");
+                    b.Property<int?>("ProviderId")
+                        .HasColumnName("provider_id");
 
-                    b.Property<string>("InstCode")
-                        .IsRequired()
-                        .HasColumnName("inst_code");
+                    b.Property<string>("Title")
+                        .HasColumnName("title");
+
+                    b.Property<string>("Type")
+                        .HasColumnName("type");
+
+                    b.Property<string>("UcasCode")
+                        .HasColumnName("ucas_code");
 
                     b.HasKey("Id");
 
-                    b.ToTable("course_code");
+                    b.HasIndex("ProviderId");
+
+                    b.ToTable("course");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisation", b =>
@@ -160,6 +167,46 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("mc_user");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Provider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("NctlId")
+                        .HasColumnName("nctl_id");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("provider");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.ProviderMapper", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("InstitutionName")
+                        .HasColumnName("institution_name");
+
+                    b.Property<string>("OrgId")
+                        .HasColumnName("org_id");
+
+                    b.Property<string>("Type")
+                        .HasColumnName("type");
+
+                    b.Property<string>("UcasCode")
+                        .HasColumnName("ucas_code");
+
+                    b.Property<int>("Urn")
+                        .HasColumnName("urn");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("provider_mapper");
+                });
+
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", b =>
                 {
                     b.Property<int>("Id")
@@ -179,7 +226,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("addr4");
 
                     b.Property<string>("CampusCode")
-                        .IsRequired()
                         .HasColumnName("campus_code");
 
                     b.Property<string>("CampusName")
@@ -189,7 +235,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("email");
 
                     b.Property<string>("InstCode")
-                        .IsRequired()
                         .HasColumnName("inst_code");
 
                     b.Property<string>("Postcode")
@@ -244,13 +289,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccreditingProvider");
-
-                    b.HasIndex("InstCode", "CampusCode");
-
-                    b.HasIndex("InstCode", "CrseCode", "CampusCode")
-                        .IsUnique();
-
                     b.ToTable("ucas_course");
                 });
 
@@ -299,10 +337,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("year_code");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("SubjectCode");
-
-                    b.HasIndex("InstCode", "CrseCode");
 
                     b.ToTable("ucas_course_subject");
                 });
@@ -403,7 +437,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("SubjectCode")
-                        .IsRequired()
                         .HasColumnName("subject_code");
 
                     b.Property<string>("SubjectDescription")
@@ -449,13 +482,11 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasForeignKey("RequesterId");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseCode", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Course", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("CourseCodes")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Provider")
+                        .WithMany("Courses")
+                        .HasForeignKey("ProviderId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationInstitution", b =>
@@ -482,56 +513,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .WithMany("McOrganisationUsers")
                         .HasForeignKey("OrgId")
                         .HasPrincipalKey("OrgId");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("UcasCampuses")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourse", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "AccreditingProviderInstitution")
-                        .WithMany("AccreditedUcasCourses")
-                        .HasForeignKey("AccreditingProvider")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("UcasCourses")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", "UcasCampus")
-                        .WithMany("UcasCourses")
-                        .HasForeignKey("InstCode", "CampusCode")
-                        .HasPrincipalKey("InstCode", "CampusCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.CourseCode", "CourseCode")
-                        .WithMany("UcasCourses")
-                        .HasForeignKey("InstCode", "CrseCode")
-                        .HasPrincipalKey("InstCode", "CrseCode");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourseSubject", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("UcasCourseSubjects")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasSubject", "UcasSubject")
-                        .WithMany("UcasCourseSubjects")
-                        .HasForeignKey("SubjectCode")
-                        .HasPrincipalKey("SubjectCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.CourseCode", "CourseCode")
-                        .WithMany("UcasCourseSubjects")
-                        .HasForeignKey("InstCode", "CrseCode")
-                        .HasPrincipalKey("InstCode", "CrseCode");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UserLog", b =>

@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using GovUk.Education.ManageCourses.Api.Services;
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
 {
@@ -22,10 +23,13 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
         private readonly HttpClient _backChannel;
         private readonly IManageCoursesDbContext _manageCoursesDbContext;
 
-        public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        private readonly IUserLogService _userLogService;
+
+        public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserLogService userLogService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
             this._manageCoursesDbContext = manageCoursesDbContext;
             this._backChannel = new HttpClient();
+            this._userLogService = userLogService;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -38,7 +42,12 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 {
                     var userDetails = GetJsonUserDetails(accessToken);
 
-                    var mcuser = _manageCoursesDbContext.McUsers.First(x => x.Email == userDetails.Email);
+                    var mcuser = _manageCoursesDbContext.McUsers.FirstOrDefault(x => x.Email == userDetails.Email);
+                    if (mcuser == null)
+                    {
+                        Logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
+                        return AuthenticateResult.NoResult();
+                    }
 
                     var identity = new ClaimsIdentity( 
                         new[] {
@@ -47,7 +56,8 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                         }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
                     
                     var princical = new ClaimsPrincipal(identity);
-                    
+
+                    _userLogService.CreateOrUpdateUserLog(userDetails.Subject, userDetails.Email);
                     var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
 
                     return AuthenticateResult.Success(ticket);
@@ -57,10 +67,8 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     return AuthenticateResult.Fail(ex);
                 }
             }
-            else
-            {
-                return AuthenticateResult.NoResult();
-            }
+
+            return AuthenticateResult.NoResult();
         }
 
         private string GetAccessToken()

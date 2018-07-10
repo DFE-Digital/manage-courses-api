@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Builder;
@@ -16,6 +17,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NJsonSchema;
 using NSwag.AspNetCore;
+using NSwag.SwaggerGeneration.Processors.Security;
+using NSwag;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -52,12 +55,13 @@ namespace GovUk.Education.ManageCourses.Api
             });
 
             services.AddScoped<IDataService, DataService>();
+            services.AddScoped<IUserLogService, UserLogService>();
 
-            services.AddSingleton<IEmailService>(provider => new EmailService(
-                Configuration["email:host"],
-                Configuration["email:user"],
-                Configuration["email:password"]
-            ));
+            services.AddSingleton<IAccessRequestEmailService>(provider => new EmailServiceFactory(Configuration["email:api_key"])
+                .MakeAccessRequestEmailService(
+                    Configuration["email:template_id"],
+                    Configuration["email:user"]
+                ));
 
             services.AddMvc();
         }
@@ -73,7 +77,7 @@ namespace GovUk.Education.ManageCourses.Api
             }
 
             // Enable the Swagger UI middleware and the Swagger generator
-            app.UseSwaggerUi(typeof(Startup).GetTypeInfo().Assembly, settings =>
+            app.UseSwaggerUi3(typeof(Startup).GetTypeInfo().Assembly, settings =>
             {
                 settings.GeneratorSettings.DefaultPropertyNameHandling =
                     PropertyNameHandling.CamelCase;
@@ -84,7 +88,15 @@ namespace GovUk.Education.ManageCourses.Api
                     document.Info.Title = "Manage courses API";
                     document.Info.Description = "An API for managing course data";
                 };
+                settings.GeneratorSettings.DocumentProcessors.Add(new SecurityDefinitionAppender(BearerTokenDefaults.AuthenticationScheme, new SwaggerSecurityScheme
+                {
+                    Type = SwaggerSecuritySchemeType.ApiKey,
+                    Description = "In order to interactive with the api please input `Bearer {code}`",
+                    In = SwaggerSecurityApiKeyLocation.Header, 
+                    Name = "Authorization"
+                }));
 
+                settings.GeneratorSettings.OperationProcessors.Add(new OperationSecurityScopeProcessor(BearerTokenDefaults.AuthenticationScheme));
             });
 
             app.UseAuthentication();

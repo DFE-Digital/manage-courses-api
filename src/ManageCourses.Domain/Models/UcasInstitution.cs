@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
@@ -25,5 +23,10 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string SchemeMember { get; set; }
 
         public ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
+        public ICollection<UcasCourse> UcasCourses { get; set; }
+        public ICollection<UcasCourse> AccreditedUcasCourses { get; set; }
+        public ICollection<UcasCourseSubject> UcasCourseSubjects { get; set; }
+        public ICollection<UcasCampus> UcasCampuses { get; set; }
+        public ICollection<CourseCode> CourseCodes { get; set; }
     }
 }
