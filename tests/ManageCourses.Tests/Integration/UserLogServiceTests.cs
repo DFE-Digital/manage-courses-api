@@ -111,5 +111,27 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             Assert.AreEqual(1, Context.UserLogs.Count());
         }
+
+        [Test]
+        public void CreateOrUpdateUserLog_Deleted_MCuser()
+        {
+            var email = TestUserEmail_1;
+            var signInUserId = "signInUserId";
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, email);
+
+            Assert.IsTrue(result);
+
+            Assert.AreEqual(1, Context.UserLogs.Count());
+
+            Assert.IsNotNull(Context.UserLogs.Include(x => x.User).First().User);
+            var firstUser = Context.McUsers.First(x => x.Email == email);
+            Context.McUsers.Remove(firstUser);
+            Context.Save();
+
+            Assert.AreEqual(1, Context.UserLogs.Count());
+            Assert.AreEqual(TestUserEmail_1, Context.UserLogs.First().UserEmail);
+
+            Assert.IsNull(Context.UserLogs.Include(x => x.User).First().User);
+        }
     }
 }

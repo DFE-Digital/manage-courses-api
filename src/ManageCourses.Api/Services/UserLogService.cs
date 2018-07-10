@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
                     var userLog = _context.UserLogs
                         .Include(x => x.User)
-                        .SingleOrDefault(x => (user != null ? x.User == user : true) && x.SignInUserId == signInUserId);
+                        .SingleOrDefault(x => (user != null ? x.User == user : true || string.Equals(x.UserEmail, email, StringComparison.InvariantCultureIgnoreCase) ) && x.SignInUserId == signInUserId);
 
                     var add = userLog == null;
                     if (add)
@@ -39,6 +39,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     }
 
                     userLog.User = user;
+                    userLog.UserEmail = user.Email;
                     userLog.LastLoginDateUtc = DateTime.UtcNow;
 
                     if (add)
