@@ -274,28 +274,24 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// <returns>The organisation of the user.</returns>
         private Organisation GetOrganisation(string email)
         {
-            var mcOrgUser = _context.McOrganisationUsers
-                .Include(x => x.McOrganisation)
-                .ThenInclude(x => x.McOrganisationInstitutions)
-                .SingleOrDefault(o =>
-                 o.Email == email && o.McOrganisation != null && o.McOrganisation.McOrganisationInstitutions.FirstOrDefault() != null
-                );
+            var mcOrganisationUser = _context.McUsers.ByEmail(email)
+                .Include("McOrganisationUsers.McOrganisation.McOrganisationInstitutions.UcasInstitution")
+                .SingleOrDefault()
+                ?.McOrganisationUsers.FirstOrDefault();
 
-            if (mcOrgUser != null)
+            var ucasInstitution = mcOrganisationUser?.McOrganisation.McOrganisationInstitutions.FirstOrDefault()?.UcasInstitution;
+
+            if (ucasInstitution == null)
             {
-
-                var ucaseInstitution = _context.UcasInstitutions.First(x => x.InstCode == mcOrgUser.McOrganisation.McOrganisationInstitutions
-                    .First().InstitutionCode);
-
-                return new Organisation
-                {
-                    Name = ucaseInstitution.InstFull,
-                    OrgId = mcOrgUser.OrgId,
-                    UcasCode = ucaseInstitution.InstCode
-                };
+                return null;
             }
 
-            return null;
+            return new Organisation
+            {
+                Name = ucasInstitution.InstFull,
+                OrgId = mcOrganisationUser.OrgId,
+                UcasCode = ucasInstitution.InstCode
+            };
         }
 
         private List<UcasInstitution> GetProviders(IQueryable<UcasCourse> mappedCourses)
@@ -350,7 +346,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
             };
 
             var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode) && !string.IsNullOrWhiteSpace(c.CampusCode)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
-         
+
             //look for dash and put add the top of the list
             if (campusCodes.Contains("-"))
             {

@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             {
                 try
                 {
-                    var user = _context.McUsers.SingleOrDefault(x => x.Email == email);
+                    var user = _context.McUsers.ByEmail(email).SingleOrDefault();
 
                     var userLog = _context.UserLogs
                         .Include(x => x.User)
