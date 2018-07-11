@@ -15,18 +15,15 @@ namespace GovUk.Education.ManageCourses.Api.Services
             _context = context;
         }
 
-        public bool CreateOrUpdateUserLog(string signInUserId, string email) 
+        public bool CreateOrUpdateUserLog(string signInUserId, McUser user) 
         {
             var result = false;
             using (var transaction = ((DbContext)_context).Database.BeginTransaction()) 
             {
                 try
                 {
-                    var user = _context.McUsers.ByEmail(email).SingleOrDefault();
-
                     var userLog = _context.UserLogs
-                        .Include(x => x.User)
-                        .SingleOrDefault(x => (user != null ? x.User == user : true) && x.SignInUserId == signInUserId);
+                        .SingleOrDefault(x => x.SignInUserId == signInUserId);
 
                     var add = userLog == null;
                     if (add)
@@ -39,6 +36,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     }
 
                     userLog.User = user;
+                    userLog.UserEmail = user.Email;
                     userLog.LastLoginDateUtc = DateTime.UtcNow;
 
                     if (add)
