@@ -111,7 +111,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             foreach (var parameters in dataParameters)
             {
-                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = parameters.Email, OrgId = parameters.OrgId });
+                var mcUser = new McUser { Email = parameters.Email };
+                _dbContext.McUsers.Add(mcUser);
+                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = parameters.Email, OrgId = parameters.OrgId, McUser = mcUser });
                 _dbContext.AddMcOrganisation(new McOrganisation { Name = parameters.OrgName, OrgId = parameters.OrgId });
                 _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = parameters.InstitutionCode, OrgId = parameters.OrgId });
                 _dbContext.AddUcasInstitution(new UcasInstitution {InstCode = parameters.InstitutionCode, InstFull = parameters.InstitutionName });
