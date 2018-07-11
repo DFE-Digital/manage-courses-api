@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180710110236_AddRequesterEmailColumn")]
+    partial class AddRequesterEmailColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -434,9 +435,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.Property<string>("SignInUserId")
                         .HasColumnName("sign_in_user_id");
-
-                    b.Property<string>("UserEmail")
-                        .HasColumnName("user_email");
 
                     b.Property<int?>("UserId")
                         .HasColumnName("user_id");

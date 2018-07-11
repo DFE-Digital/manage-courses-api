@@ -7,7 +7,9 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     {
         public int Id { get; set; }
         public DateTime RequestDateUtc { get; set; }
+        public int? RequesterId {get;set;}
         public McUser Requester { get; set; }
+        public string RequesterEmail { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string EmailAddress { get; set; }
