@@ -346,13 +346,20 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 Subjects = subjects
             };
 
-            var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode) && !string.IsNullOrWhiteSpace(c.CampusCode)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
+            var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode) && (c.CampusCode != null)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
 
             //look for dash and put add the top of the list
             if (campusCodes.Contains("-"))
             {
                 campusCodes.Remove("-");
                 campusCodes.Insert(0, "-");
+            }
+
+            //look for empty string and put add the top of the list
+            if (campusCodes.Contains(""))
+            {
+                campusCodes.Remove("");
+                campusCodes.Insert(0, "");
             }
 
             variant.Campuses = campusCodes.Select(x => GetCampus(x, organisationCode, tempRecords.FirstOrDefault(c => c.CrseCode == courseCode && c.CampusCode == x)?.CrseOpenDate)).ToList();
