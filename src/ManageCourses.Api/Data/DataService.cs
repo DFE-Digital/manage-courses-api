@@ -279,7 +279,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 .SingleOrDefault()
                 ?.McOrganisationUsers.FirstOrDefault();
 
-            var ucasInstitution = mcOrganisationUser?.McOrganisation.McOrganisationInstitutions.FirstOrDefault()?.UcasInstitution;
+            var ucasInstitution = mcOrganisationUser?.McOrganisation?.McOrganisationInstitutions.FirstOrDefault()?.UcasInstitution;
 
             if (ucasInstitution == null)
             {
