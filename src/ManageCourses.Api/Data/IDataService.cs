@@ -10,3 +10,4 @@ namespace GovUk.Education.ManageCourses.Api.Data
         IEnumerable<UserOrganisation> GetOrganisationsForUser(string email);
     }
 }
+    

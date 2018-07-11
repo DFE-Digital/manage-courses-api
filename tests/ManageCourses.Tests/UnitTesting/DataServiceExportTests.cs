@@ -57,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var result = _sut.GetOrganisationsForUser(email);
 
             Assert.IsTrue(!result.Any());
-        }        
+        }
         [Test]
         public void GetCoursesForUserOrganisation_with_email_should_return_loaded_object()
         {
@@ -135,38 +135,19 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             Assert.False(CheckCampuses(result.ProviderCourses[0].CourseDetails[0].Variants[0]));
         }
-    
+
         #region Fake Data
         private void BuildFakeData()
         {
-            var dataParameters = SetupDataParameters();
-
-            foreach (var parameters in dataParameters)
+            _dbContext.McUsers.AddRange(new List<McUser>
             {
-                var mcUser = new McUser { Email = parameters.Email };
-                _dbContext.McUsers.Add(mcUser);
-                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = parameters.Email, OrgId = parameters.OrgId, McUser = mcUser });
-                _dbContext.AddMcOrganisation(new McOrganisation { Name = parameters.OrgName, OrgId = parameters.OrgId });
-                _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = parameters.InstitutionCode, OrgId = parameters.OrgId });
-                _dbContext.AddUcasInstitution(new UcasInstitution { InstCode = parameters.InstitutionCode, InstFull = parameters.InstitutionName });
+                new McUser { Email = _orgWithNoProviderEmail },
+                new McUser { Email = _orgWithProviderEmail },
+                new McUser { Email = _userWithMultipleOrganisationsEmail },
+            });
+            _dbContext.Save(); // for some reason McUsers isn't populated for reading until this is run. ¯\_(ツ)_/¯
 
-                AddProviders(parameters.ProviderCodes, parameters.InstitutionName);
-
-            }
-            AddProviderCourses();
-            AddNonProviderCourses();
-            AddCampuses();
-
-            _dbContext.Save();
-
-        }
-        /// <summary>
-        /// Sets up data parameters representing organisation with and without providers
-        /// </summary>
-        /// <returns></returns>
-        private List<FakeDataParameters> SetupDataParameters()
-        {
-            var dataParameters = new List<FakeDataParameters>//two types of organisations
+            var testDataVariations = new List<FakeDataParameters>//two types of organisations
             {
                 new FakeDataParameters//organisation with providers
                 {
@@ -184,7 +165,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     OrgName = "Bath Spa University",
                     InstitutionName = "Bath Spa University",
                     InstitutionCode = "B20",
-                    ProviderCodes = new List<string>()
                 },
                 new FakeDataParameters//user with multiple organisations
                 {
@@ -193,7 +173,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     OrgName = "Attleborough Academy Norfolk NR17 2AJ",
                     InstitutionName = "Attleborougn Academy Pertnership",
                     InstitutionCode = "2GG",
-                    ProviderCodes = new List<string>()
                 },
                 new FakeDataParameters//user with multiple organisations
                 {
@@ -202,7 +181,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     OrgName = "Fakenham Academy Norfolk NR21 9QT",
                     InstitutionName = "Fakenham Academy Partnership",
                     InstitutionCode = "2G8",
-                    ProviderCodes = new List<string>()
                 },
                 new FakeDataParameters//user with multiple organisations
                 {
@@ -211,10 +189,27 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     OrgName = "Norfolk Teacher Training Centre",
                     InstitutionName = "Norfolk Teacher Training Centre",
                     InstitutionCode = "N43",
-                    ProviderCodes = new List<string>()
                 }
             };
-            return dataParameters;
+
+            foreach (var testDataEntry in testDataVariations)
+            {
+                var mcUser = _dbContext.McUsers.ByEmail(testDataEntry.Email).Single();
+
+                _dbContext.AddMcOrganisation(new McOrganisation { Name = testDataEntry.OrgName, OrgId = testDataEntry.OrgId });
+                _dbContext.AddUcasInstitution(new UcasInstitution { InstCode = testDataEntry.InstitutionCode, InstFull = testDataEntry.InstitutionName });
+                _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = testDataEntry.InstitutionCode, OrgId = testDataEntry.OrgId });
+                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = testDataEntry.Email, OrgId = testDataEntry.OrgId, McUser = mcUser });
+
+                AddProviders(testDataEntry.ProviderCodes, testDataEntry.InstitutionName);
+            }
+
+            AddProviderCourses();
+            AddNonProviderCourses();
+            AddCampuses();
+
+            _dbContext.Save();
+
         }
 
         private void AddProviders(List<string> providerCodes, string institutionName)
@@ -356,14 +351,19 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             _dbContext.AddUcasCourseSubject(new UcasCourseSubject { YearCode = "2019", InstCode = institutionCode, SubjectCode = "F0", CrseCode = "2H5B" });
             _dbContext.AddUcasCourseSubject(new UcasCourseSubject { YearCode = "2019", InstCode = institutionCode, SubjectCode = "C1", CrseCode = "2H5B" });
         }
-        private struct FakeDataParameters
+
+        private class FakeDataParameters
         {
+            public FakeDataParameters()
+            {
+                ProviderCodes = new List<string>();
+            }
+
             public string Email { get; set; }
             public string OrgId { get; set; }
             public string OrgName { get; set; }
             public string InstitutionCode { get; set; }
             public string InstitutionName { get; set; }
-            //public List<string> CourseTitles { get; set; }
             public List<string> ProviderCodes { get; set; }
         }
         #endregion
