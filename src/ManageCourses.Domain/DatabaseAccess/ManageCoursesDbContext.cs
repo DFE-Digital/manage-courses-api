@@ -106,6 +106,18 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasForeignKey(ucs => new { ucs.InstCode, ucs.CrseCode })
                 .HasPrincipalKey(cc => new { cc.InstCode, cc.CrseCode });
 
+            modelBuilder.Entity<AccessRequest>()
+                .HasOne(ar => ar.Requester)
+                .WithMany(u => u.AccessRequests)
+                .HasForeignKey(ar => ar.RequesterId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<UserLog>()
+                .HasOne(ul => ul.User)
+                .WithMany(u => u.UserLogs)
+                .HasForeignKey(ul => ul.UserId)
+                .OnDelete(DeleteBehavior.SetNull);                
+
             base.OnModelCreating(modelBuilder);
         }
 
