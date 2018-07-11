@@ -221,28 +221,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
         #endregion
 
         #region Export
-        /// <summary>
-        /// This method return an object containing a list of course for an organisation mapped to an email
-        /// </summary>
-        /// <param name="email">The user email address.</param>
-        /// <returns>The user's organisation courses.</returns>
-        public OrganisationCourses GetCoursesForUser(string email)
-        {
-            var org = GetOrganisation(email);
-
-            var returnCourses = new OrganisationCourses();
-
-            if (org == null) return returnCourses;
-
-            returnCourses.OrganisationId = org.OrgId;
-            returnCourses.UcasCode = org.UcasCode;
-            returnCourses.OrganisationName = org.Name;
-
-            var providersCourses = GetProviderCourses(org);
-            returnCourses.ProviderCourses = providersCourses;
-
-            return returnCourses;
-        }
 
         /// <summary>
         /// This method return an object containing a list of course for an organisation mapped to an email
@@ -298,37 +276,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         }
 
         #endregion
-        /// <summary>
-        /// Gets a single (or the first) organisation that is linked to the users email
-        /// </summary>
-        /// <param name="email">The user email address.</param>
-        /// <returns>The organisation of the user.</returns>
-        private Organisation GetOrganisation(string email)
-        {
-            var mcOrgUser = _context.McOrganisationUsers
-                .Include(x => x.McOrganisation)
-                .ThenInclude(x => x.McOrganisationInstitutions)
-                .SingleOrDefault(o =>
-                 o.Email == email && o.McOrganisation != null && o.McOrganisation.McOrganisationInstitutions.FirstOrDefault() != null
-                );
-
-            if (mcOrgUser != null)
-            {
-
-                var ucaseInstitution = _context.UcasInstitutions.First(x => x.InstCode == mcOrgUser.McOrganisation.McOrganisationInstitutions
-                    .First().InstitutionCode);
-
-                return new Organisation
-                {
-                    Name = ucaseInstitution.InstFull,
-                    OrgId = mcOrgUser.OrgId,
-                    UcasCode = ucaseInstitution.InstCode
-                };
-            }
-
-            return null;
-        }
-
+    
         /// <summary>
         /// Gets a specific organisation that is linked to the users email
         /// </summary>

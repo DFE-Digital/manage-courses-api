@@ -69,9 +69,9 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 }
             }
 
-            GetCoursesForUser_isNull(TestUserEmail_1);
-            GetCoursesForUser_isNull(TestUserEmail_2);
-            GetCoursesForUser_isNull(TestUserEmail_3);
+            GetCoursesForUser_isNull(TestUserEmail_1, null);
+            GetCoursesForUser_isNull(TestUserEmail_2, null);
+            GetCoursesForUser_isNull(TestUserEmail_3, "OrgId_1"); 
         }
 
         public Payload GetPayload()
@@ -147,9 +147,9 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         }
 
         [TestCase("nothing@nowhere.com")]
-        public void GetCoursesForUser_isNull(string email)
+        public void GetCoursesForUser_isNull(string email, string orgId)
         {
-            var result = Subject.GetCoursesForUser(email);
+            var result = Subject.GetCoursesForUserOrganisation(email, orgId);
 
             Assert.IsNull(result.OrganisationId);
             Assert.IsNull(result.OrganisationName);
