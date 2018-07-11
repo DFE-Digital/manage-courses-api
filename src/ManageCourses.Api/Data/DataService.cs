@@ -15,26 +15,12 @@ namespace GovUk.Education.ManageCourses.Api.Data
         {
             _context = context;
         }
+
         #region Import
-        public void ResetDatabase()
-        {
-            // clear out the existing data
-            _context.UcasCourses.RemoveRange(_context.UcasCourses);
-            _context.CourseCodes.RemoveRange(_context.CourseCodes);
-            _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
-            _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
-            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
-            _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
-            _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
-            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
-            _context.McOrganisations.RemoveRange(_context.McOrganisations);
-            _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
-            _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
-            _context.McUsers.RemoveRange(_context.McUsers);
-            _context.Save();
-        }
         public void ProcessPayload(Payload payload)
         {
+            ResetDatabase();
+
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
                 InstCode = course.InstCode,
@@ -205,6 +191,24 @@ namespace GovUk.Education.ManageCourses.Api.Data
             _context.Save();
         }
 
+        private void ResetDatabase()
+        {
+            // clear out the existing data
+            _context.UcasCourses.RemoveRange(_context.UcasCourses);
+            _context.CourseCodes.RemoveRange(_context.CourseCodes);
+            _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
+            _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
+            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
+            _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
+            _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
+            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
+            _context.McOrganisations.RemoveRange(_context.McOrganisations);
+            _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
+            _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
+            _context.McUsers.RemoveRange(_context.McUsers);
+            _context.Save();
+        }
+
         public class CourseComparer : IEqualityComparer<CourseCode>
         {
             public bool Equals(CourseCode x, CourseCode y)
@@ -285,25 +289,24 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// <returns>The organisation of the user.</returns>
         private Organisation GetOrganisation(string email, string orgId)
         {
-            var mcOrgUser = _context.McOrganisationUsers
-                .Include(x => x.McOrganisation)
-                .ThenInclude(x => x.McOrganisationInstitutions)
-                .SingleOrDefault(o =>
-                    o.Email == email && o.OrgId == orgId && o.McOrganisation != null && o.McOrganisation.McOrganisationInstitutions.FirstOrDefault() != null
-                );
+            var mcOrganisationUser = _context.McUsers.ByEmail(email)
+                .Include("McOrganisationUsers.McOrganisation.McOrganisationInstitutions.UcasInstitution")
+                .SingleOrDefault()
+                ?.McOrganisationUsers.Where(ou => ou.OrgId == orgId).FirstOrDefault();
 
-            if (mcOrgUser == null) return null;
+            var ucasInstitution = mcOrganisationUser?.McOrganisation?.McOrganisationInstitutions.FirstOrDefault()?.UcasInstitution;
+
+            if (ucasInstitution == null)
             {
-                var ucaseInstitution = _context.UcasInstitutions.First(x => x.InstCode == mcOrgUser.McOrganisation.McOrganisationInstitutions
-                                                                                .First().InstitutionCode);
-
-                return new Organisation
-                {
-                    Name = ucaseInstitution.InstFull,
-                    OrgId = mcOrgUser.OrgId,
-                    UcasCode = ucaseInstitution.InstCode
-                };
+                return null;
             }
+
+            return new Organisation
+            {
+                Name = ucasInstitution.InstFull,
+                OrgId = mcOrganisationUser.OrgId,
+                UcasCode = ucasInstitution.InstCode
+            };
         }
 
         private IEnumerable<UserOrganisation> GetOrganisations(string email)
@@ -377,7 +380,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
             };
 
             var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode) && !string.IsNullOrWhiteSpace(c.CampusCode)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
-         
+
             //look for dash and put add the top of the list
             if (campusCodes.Contains("-"))
             {

@@ -66,11 +66,5 @@ namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
             context = GetContext();
             context.Database.EnsureDeleted();
         }
-
-        [Test]
-        public void EnsureCreated()
-        {
-            Assert.False(context.Database.EnsureCreated());
-        }
     }
 }

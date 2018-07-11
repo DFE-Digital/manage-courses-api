@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180710162624_AddUserEmailColumn")]
+    partial class AddUserEmailColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,9 +45,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.Property<DateTime>("RequestDateUtc")
                         .HasColumnName("request_date_utc");
-
-                    b.Property<string>("RequesterEmail")
-                        .HasColumnName("requester_email");
 
                     b.Property<int?>("RequesterId")
                         .HasColumnName("requester_id");

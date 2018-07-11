@@ -42,7 +42,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 {
                     var userDetails = GetJsonUserDetails(accessToken);
 
-                    var mcuser = _manageCoursesDbContext.McUsers.FirstOrDefault(x => x.Email == userDetails.Email);
+                    var mcuser = _manageCoursesDbContext.McUsers.ByEmail(userDetails.Email).SingleOrDefault();
                     if (mcuser == null)
                     {
                         Logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
@@ -57,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     
                     var princical = new ClaimsPrincipal(identity);
 
-                    _userLogService.CreateOrUpdateUserLog(userDetails.Subject, userDetails.Email);
+                    _userLogService.CreateOrUpdateUserLog(userDetails.Subject, mcuser);
                     var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
 
                     return AuthenticateResult.Success(ticket);
