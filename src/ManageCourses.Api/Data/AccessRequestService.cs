@@ -3,6 +3,7 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ManageCourses.Domain.DatabaseAccess.McUserQueryableExtensions;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
@@ -26,13 +27,16 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 try
                 {
                     var requester = _context.McUsers
+                        .ByEmail(requesterEmail)
                         .Include(x=>x.McOrganisationUsers)
                         .ThenInclude(x=>x.McOrganisation)
-                        .Single(x => String.Equals(x.Email, requesterEmail, StringComparison.InvariantCultureIgnoreCase));
+                        .Single();
 
                     var requestedIfExists = _context.McUsers
+                        .ByEmail(request.EmailAddress)
                         .Include(x=>x.McOrganisationUsers)
-                        .ThenInclude(x=>x.McOrganisation).SingleOrDefault(x =>String.Equals(x.Email, request.EmailAddress, StringComparison.InvariantCultureIgnoreCase));
+                        .ThenInclude(x=>x.McOrganisation)
+                        .SingleOrDefault();
 
                     var orgs = requester.McOrganisationUsers.Select(x => x.McOrganisation.Name);
                     var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest() {
