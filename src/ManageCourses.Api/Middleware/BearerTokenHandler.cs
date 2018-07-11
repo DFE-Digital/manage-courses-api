@@ -57,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     
                     var princical = new ClaimsPrincipal(identity);
 
-                    _userLogService.CreateOrUpdateUserLog(userDetails.Subject, userDetails.Email);
+                    _userLogService.CreateOrUpdateUserLog(userDetails.Subject, mcuser);
                     var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
 
                     return AuthenticateResult.Success(ticket);

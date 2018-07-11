@@ -21,17 +21,27 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         private const string TestUserEmail_1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail_2 = "email_2@test-manage-courses.gov.uk";
 
+        private static McUser User1 = new McUser
+        {
+            FirstName = "FirstName_1",
+            LastName = "LastName_1",
+            Email = TestUserEmail_1
+        };
+
+        private static McUser User2 = new McUser
+        {
+            FirstName = "FirstName_2",
+            LastName = "LastName_2",
+            Email = TestUserEmail_2
+        };
+
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
             Context = this.GetContext();
 
-            Context.AddMcUser(new McUser
-            {
-                FirstName = "FirstName_1",
-                LastName = "LastName_1",
-                Email = TestUserEmail_1
-            });
+            Context.AddMcUser(User1);
+            Context.AddMcUser(User2);
 
             Context.Save();
 
@@ -63,7 +73,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Context.Save();
             var email = TestUserEmail_1;
             
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, email);
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
 
             Assert.IsTrue(result);
 
@@ -80,13 +90,13 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         {
             var email = TestUserEmail_1;
             var signInUserId = "signInUserId";
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, email);
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
 
             Assert.IsTrue(result);
 
             Assert.AreEqual(1, Context.UserLogs.Count());
 
-            var result2 = Subject.CreateOrUpdateUserLog(signInUserId + 2, TestUserEmail_2);
+            var result2 = Subject.CreateOrUpdateUserLog(signInUserId + 2, User2);
 
             Assert.IsTrue(result2);
 
@@ -99,13 +109,13 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         {
             var email = TestUserEmail_1;
             var signInUserId = "signInUserId";
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, email);
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
 
             Assert.IsTrue(result);
 
             Assert.AreEqual(1, Context.UserLogs.Count());
 
-            var result2 = Subject.CreateOrUpdateUserLog(signInUserId, TestUserEmail_2);
+            var result2 = Subject.CreateOrUpdateUserLog(signInUserId, User2);
 
             Assert.IsTrue(result2);
 
@@ -117,7 +127,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         {
             var email = TestUserEmail_1;
             var signInUserId = "signInUserId";
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, email);
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
 
             Assert.IsTrue(result);
 
