@@ -34,8 +34,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpPost]
         public void Import([FromBody] Payload payload)
         {
-            _dataService.ResetDatabase();
-
             _dataService.ProcessPayload(payload);
 
             //TODO return Ok/Fail in action result

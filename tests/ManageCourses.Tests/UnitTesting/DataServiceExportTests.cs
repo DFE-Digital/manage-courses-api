@@ -30,7 +30,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void GetCoursesForUser_with_email_should_return_loaded_object()
         {
             var result = _sut.GetCoursesForUser(_orgWithProviderEmail);
-            
+
             Assert.True(result.ProviderCourses.Count == 3);
         }
         [Test]
@@ -65,7 +65,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var result = _sut.GetCoursesForUser(_orgWithProviderEmail);
 
             //Assert.True(result.ProviderCourses.SelectMany(x => x.CourseDetails.Select(CheckVariants)).All(y => y));
-            
+
             //use multiple asserts rather then the flattened assert above as this is easier to debug
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
             Assert.True(CheckVariants(result.ProviderCourses[1].CourseDetails[0]));
@@ -82,7 +82,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         }
         [Test]
         public void GetCoursesForUser_should_not_return_providers()
-        {            
+        {
             var result = _sut.GetCoursesForUser(_orgWithNoProviderEmail);
 
             Assert.True(result.ProviderCourses.Count == 1);
@@ -111,10 +111,12 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             foreach (var parameters in dataParameters)
             {
-                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = parameters.Email, OrgId = parameters.OrgId });
+                var mcUser = new McUser { Email = parameters.Email };
+                _dbContext.McUsers.Add(mcUser);
+                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = parameters.Email, OrgId = parameters.OrgId, McUser = mcUser });
                 _dbContext.AddMcOrganisation(new McOrganisation { Name = parameters.OrgName, OrgId = parameters.OrgId });
                 _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = parameters.InstitutionCode, OrgId = parameters.OrgId });
-                _dbContext.AddUcasInstitution(new UcasInstitution {InstCode = parameters.InstitutionCode, InstFull = parameters.InstitutionName });
+                _dbContext.AddUcasInstitution(new UcasInstitution { InstCode = parameters.InstitutionCode, InstFull = parameters.InstitutionName });
 
                 AddProviders(parameters.ProviderCodes, parameters.InstitutionName);
 
@@ -259,7 +261,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         #region Data Checks
         private bool CheckCourseDetails(ProviderCourse course)
         {
-            var returnBool = course.CourseDetails.Any(x => (! string.IsNullOrWhiteSpace(x.CourseTitle)) && (! string.IsNullOrWhiteSpace(x.AgeRange)));
+            var returnBool = course.CourseDetails.Any(x => (!string.IsNullOrWhiteSpace(x.CourseTitle)) && (!string.IsNullOrWhiteSpace(x.AgeRange)));
 
             return returnBool;
         }
