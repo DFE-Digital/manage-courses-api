@@ -35,11 +35,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 {
                     var requester = _context.McUsers
                         .Include(x=>x.McOrganisationUsers)
-                        .ThenInclude(x=>x.McOrganisation).Single(x => x.Email == requesterEmail);
+                        .ThenInclude(x=>x.McOrganisation).ByEmail(requesterEmail).SingleOrDefault();
 
                     var requestedIfExists = _context.McUsers
                         .Include(x=>x.McOrganisationUsers)
-                        .ThenInclude(x=>x.McOrganisation).SingleOrDefault(x => x.Email == request.EmailAddress);
+                        .ThenInclude(x=>x.McOrganisation).ByEmail(request.EmailAddress).SingleOrDefault();
 
                     var orgs = requester.McOrganisationUsers.Select(x => x.McOrganisation.Name);
                     var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest() {
