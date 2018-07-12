@@ -146,7 +146,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             return result;
         }
 
-        [TestCase("nothing@nowhere.com")]
+        [TestCase("nothing@nowhere.com", null)]
         public void GetCoursesForUser_isNull(string email, string orgId)
         {
             var result = Subject.GetCoursesForUserOrganisation(email, orgId);
