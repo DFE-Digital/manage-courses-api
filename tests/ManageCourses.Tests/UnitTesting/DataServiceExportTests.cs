@@ -96,14 +96,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
         }
-        [Test]
-        public void GetCoursesForUser_with_no_providers_should_not_return_campuses()
-        {
-            var result = _sut.GetCoursesForUser(_orgWithNoProviderEmail);
-
-            Assert.False(CheckCampuses(result.ProviderCourses[0].CourseDetails[0].Variants[0]));
-        }
-
+        
         #region Fake Data
         private void BuildFakeData()
         {
