@@ -249,11 +249,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             return returnCourses;
         }
-        /// <summary>
-        /// Gets a list of organisation the user in linked to
-        /// </summary>
-        /// <param name="email"></param>
-        /// <returns></returns>
         public IEnumerable<UserOrganisation> GetOrganisationsForUser(string email)
         {
             var orgs = GetOrganisations(email);
@@ -308,26 +303,29 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 UcasCode = ucasInstitution.InstCode
             };
         }
-
         private IEnumerable<UserOrganisation> GetOrganisations(string email)
         {
-            var mcOrgUsers = _context.McOrganisationUsers
-                .Join(_context.McOrganisationIntitutions, ou => ou.OrgId, oi => oi.OrgId,
-                    (ou, oi) => new {ou.Email, ou.OrgId, oi.UcasInstitution.InstCode, oi.UcasInstitution.InstFull})
-                .Where(x => x.Email == email)
-                .Select(o => new Organisation {Name = o.InstFull, OrgId = o.OrgId, UcasCode = o.InstCode}).ToList();
+            var userOrgs = _context.McUsers.ByEmail(email)
+                .Join(_context.McOrganisationUsers, u => u.Email, ou => ou.Email,
+                    (user, organisationUser) => organisationUser)
+                .Join(_context.McOrganisationIntitutions, oi => oi.OrgId, i => i.OrgId,
+                    (user, institution) => new
+                    {
+                        institution.OrgId,
+                        institution.InstitutionCode,
+                        institution.UcasInstitution.InstFull
+                    })
+                .Select(arg => new Organisation { Name = arg.InstFull, OrgId = arg.OrgId, UcasCode = arg.InstitutionCode }).ToList();
 
-            var userOrganisations = mcOrgUsers.Select(x => new UserOrganisation
+            var userOrganisations = userOrgs?.Select(organisation => new UserOrganisation
             {
-                OrganisationId = x.OrgId,
-                OrganisationName = x.Name,
-                UcasCode = x.UcasCode,
-                TotalCourses = GetProviderCourses(x).SelectMany(y => y.CourseDetails).Count()
-            }).ToList();
-
+                OrganisationId = organisation.OrgId,
+                OrganisationName = organisation.Name,
+                UcasCode = organisation.UcasCode,
+                TotalCourses = GetProviderCourses(organisation).SelectMany(y => y.CourseDetails).Count()
+            });
             return userOrganisations;
         }
-
         private List<UcasInstitution> GetProviders(IQueryable<UcasCourse> mappedCourses)
         {
             var accProviders = mappedCourses.Where(mc => (!string.IsNullOrWhiteSpace(mc.AccreditingProvider))).Select(mc => mc.AccreditingProvider).Distinct()
