@@ -21,7 +21,6 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         private const string TestUserEmail_1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail_2 = "email_2@test-manage-courses.gov.uk";
 
-
         public McUser GetUser(string email, bool fromDb = true)
         {
             if (fromDb)
@@ -38,8 +37,6 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 };
             }
         }
-
-
 
         [SetUp]
         public void Setup()
@@ -90,6 +87,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Assert.IsNotNull(saved.User);
             Assert.AreEqual(firstLoginDateUtc, saved.FirstLoginDateUtc);
             Assert.AreNotEqual(firstLoginDateUtc, saved.LastLoginDateUtc);
+            Assert.IsNull(saved.WelcomeEmailDateUtc);
 
             mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Never);
         }
@@ -109,6 +107,12 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Assert.IsTrue(result2);
 
             Assert.AreEqual(2, context.UserLogs.Count());
+
+            foreach (var userLog in context.UserLogs)
+            {
+                Assert.IsNotNull(userLog.WelcomeEmailDateUtc);
+            }
+            
             mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_1, true)), Times.Once);
             mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Once);
             mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Exactly(2));
@@ -124,6 +128,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Assert.IsTrue(result);
 
             Assert.AreEqual(1, context.UserLogs.Count());
+            Assert.IsNotNull(context.UserLogs.First().WelcomeEmailDateUtc);
 
             var result2 = Subject.CreateOrUpdateUserLog(signInUserId, GetUser(TestUserEmail_2));
 
@@ -148,6 +153,8 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Assert.AreEqual(1, context.UserLogs.Count());
 
             Assert.IsNotNull(context.UserLogs.Include(x => x.User).First().User);
+            Assert.IsNotNull(context.UserLogs.First().WelcomeEmailDateUtc);
+
             var firstUser = context.McUsers.First(x => x.Email == TestUserEmail_1);
             context.McUsers.Remove(firstUser);
             context.Save();
@@ -161,6 +168,8 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             mockWelcomeEmailService.Verify(x => x.Send(firstUser), Times.Once);
             mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Never);
+
+            Assert.IsNotNull(context.UserLogs.First().WelcomeEmailDateUtc);
         }
     }
 }

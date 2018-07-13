@@ -28,23 +28,25 @@ namespace GovUk.Education.ManageCourses.Api.Services
                         .SingleOrDefault(x => x.SignInUserId == signInUserId);
 
                     var add = userLog == null;
+                    var now = DateTime.UtcNow;
                     if (add)
                     {
                         userLog = new UserLog
                         {
-                            FirstLoginDateUtc = DateTime.UtcNow,
-                            SignInUserId = signInUserId
+                            FirstLoginDateUtc = now,
+                            SignInUserId = signInUserId,
+                            WelcomeEmailDateUtc = now
                         };
                     }
 
                     userLog.User = user;
                     userLog.UserEmail = user.Email;
-                    userLog.LastLoginDateUtc = DateTime.UtcNow;
+                    userLog.LastLoginDateUtc = now;
 
                     if (add)
                     {
-                        _context.UserLogs.Add(userLog);
                         _welcomeEmailService.Send(user);
+                        _context.UserLogs.Add(userLog);
                     }
                     else
                     {
@@ -55,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     transaction.Commit();
                     result = true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     transaction.Rollback();
                 }

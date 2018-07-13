@@ -12,5 +12,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string UserEmail { get; set; }
         public DateTime LastLoginDateUtc { get; set; }
         public string SignInUserId { get; set; }
+        public DateTime? WelcomeEmailDateUtc { get; set; }
     }
 }
