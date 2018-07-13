@@ -30,7 +30,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
         public void Send(McUser user)
         {
-            var personalisation = new Dictionary<string, dynamic>() { { "first_name", user.FirstName } };
+            var personalisation = new Dictionary<string, dynamic>() { { "first_name", user.FirstName?.Trim() } };
             _notificationClient.SendEmail(user.Email, _templateId, personalisation);
         }
     }
