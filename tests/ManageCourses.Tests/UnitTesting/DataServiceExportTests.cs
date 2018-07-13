@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
@@ -25,6 +26,13 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var result = _sut.GetOrganisationsForUser(TestHelper.UserWithMultipleOrganisationsEmail);
 
             Assert.IsTrue(result.Count() > 1);
+        }
+        [Test]
+        public void GetOrganisationsForUses_should_return_multiple_organisations_with_different_data()
+        {
+            var results = _sut.GetOrganisationsForUser(TestHelper.UserWithMultipleOrganisationsEmail).ToList();
+            Assert.False(CheckForDuplicateOrganisations(results));
+
         }
         [Test]
         [TestCase("someuser@somewhere.com")]
@@ -141,6 +149,23 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             return returnBool;
         }
 
+        private bool CheckForDuplicateOrganisations(IEnumerable<UserOrganisation> organisations)
+        {
+            var returnBool = false;
+            var userOrganisations = organisations.ToList();
+            foreach (var organisation in userOrganisations)
+            {
+                var duplicateOrgs = userOrganisations.Where(o =>
+                    o.OrganisationId == organisation.OrganisationId ||
+                    o.OrganisationName == organisation.OrganisationName).ToList();
+                if (duplicateOrgs.Count <= 1) continue;
+
+                returnBool = true;
+                break;
+            }
+
+            return returnBool;
+        }
         #endregion
     }
 }
