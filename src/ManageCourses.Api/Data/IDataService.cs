@@ -6,7 +6,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
     public interface IDataService
     {
         void ProcessPayload(Payload payload);
-        OrganisationCourses GetCoursesForUserOrganisation(string email, string organisationId); 
+        OrganisationCourses GetCoursesForUserOrganisation(string email, string ucasCode); 
         IEnumerable<UserOrganisation> GetOrganisationsForUser(string email);
     }
 }
