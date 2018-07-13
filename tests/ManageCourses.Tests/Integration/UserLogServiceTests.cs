@@ -6,7 +6,7 @@ using GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
-
+using Moq;
 namespace GovUk.Education.ManageCourses.Tests.Integration
 {
     [TestFixture]
@@ -16,48 +16,56 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
     public class UserLogServiceTests : ManageCoursesDbContextIntegrationBase
     {
         public IUserLogService Subject = null;
-        public IManageCoursesDbContext Context = null;
 
+        public Mock<IWelcomeEmailService> mockWelcomeEmailService = null;
         private const string TestUserEmail_1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail_2 = "email_2@test-manage-courses.gov.uk";
 
-        private static McUser User1 = new McUser
+
+        public McUser GetUser(string email, bool fromDb = true)
         {
-            FirstName = "FirstName_1",
-            LastName = "LastName_1",
-            Email = TestUserEmail_1
-        };
-
-        private static McUser User2 = new McUser
-        {
-            FirstName = "FirstName_2",
-            LastName = "LastName_2",
-            Email = TestUserEmail_2
-        };
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            Context = this.GetContext();
-
-            Context.AddMcUser(User1);
-            Context.AddMcUser(User2);
-
-            Context.Save();
-
+            if (fromDb)
+            {
+                return context.McUsers.Single(x => x.Email == email);
+            }
+            else
+            {
+                return new McUser
+                {
+                    FirstName = "FirstName_" + email,
+                    LastName = "LastName_" + email,
+                    Email = email,
+                };
+            }
         }
+
+
+
         [SetUp]
         public void Setup()
         {
-            Subject = new UserLogService(this.Context);
+            context.AddMcUser(GetUser(TestUserEmail_1, false));
+            context.AddMcUser(GetUser(TestUserEmail_2, false));
+
+            context.SaveChanges();
+            mockWelcomeEmailService = new Mock<IWelcomeEmailService>();
+
+            Subject = new UserLogService(this.context, mockWelcomeEmailService.Object);
         }
 
         [TearDown]
         public void TearDown()
         {
-            foreach (var item in Context.UserLogs)
+
+            foreach (var item in context.McUsers)
             {
-                var x = ((DbContext)Context).Entry(item);
+                var x = ((DbContext)context).Entry(item);
+                this.entitiesToCleanUp.Add(x);
+            }
+
+            foreach (var item in context.UserLogs)
+            {
+                var x = ((DbContext)context).Entry(item);
                 this.entitiesToCleanUp.Add(x);
             }
         }
@@ -68,80 +76,91 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             var signInUserId = "signInUserId";
             var firstLoginDateUtc = DateTime.UtcNow.AddDays(-10);
 
-            var existing = Context.UserLogs.Add(new UserLog { SignInUserId = "signInUserId", FirstLoginDateUtc = firstLoginDateUtc, LastLoginDateUtc = firstLoginDateUtc, User = Context.McUsers.First()  });
+            var existing = context.UserLogs.Add(new UserLog { SignInUserId = "signInUserId", FirstLoginDateUtc = firstLoginDateUtc, LastLoginDateUtc = firstLoginDateUtc, User = context.McUsers.First() });
 
-            Context.Save();
-            var email = TestUserEmail_1;
-            
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
+            context.SaveChanges();
+
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, GetUser(TestUserEmail_1));
 
             Assert.IsTrue(result);
 
-            Assert.AreEqual(1, Context.UserLogs.Count());
+            Assert.AreEqual(1, context.UserLogs.Count());
 
-            var saved = Context.UserLogs.First();
+            var saved = context.UserLogs.First();
             Assert.IsNotNull(saved.User);
             Assert.AreEqual(firstLoginDateUtc, saved.FirstLoginDateUtc);
             Assert.AreNotEqual(firstLoginDateUtc, saved.LastLoginDateUtc);
+
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Never);
         }
 
         [Test]
         public void CreateUserLog()
         {
-            var email = TestUserEmail_1;
             var signInUserId = "signInUserId";
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, GetUser(TestUserEmail_1));
 
             Assert.IsTrue(result);
 
-            Assert.AreEqual(1, Context.UserLogs.Count());
+            Assert.AreEqual(1, context.UserLogs.Count());
 
-            var result2 = Subject.CreateOrUpdateUserLog(signInUserId + 2, User2);
+            var result2 = Subject.CreateOrUpdateUserLog(signInUserId + 2, GetUser(TestUserEmail_2));
 
             Assert.IsTrue(result2);
 
-            Assert.AreEqual(2, Context.UserLogs.Count());
+            Assert.AreEqual(2, context.UserLogs.Count());
+            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_1, true)), Times.Once);
+            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Once);
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Exactly(2));
         }
 
 
         [Test]
         public void CreateOrUpdateUserLog()
         {
-            var email = TestUserEmail_1;
             var signInUserId = "signInUserId";
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, GetUser(TestUserEmail_1));
 
             Assert.IsTrue(result);
 
-            Assert.AreEqual(1, Context.UserLogs.Count());
+            Assert.AreEqual(1, context.UserLogs.Count());
 
-            var result2 = Subject.CreateOrUpdateUserLog(signInUserId, User2);
+            var result2 = Subject.CreateOrUpdateUserLog(signInUserId, GetUser(TestUserEmail_2));
 
             Assert.IsTrue(result2);
 
-            Assert.AreEqual(1, Context.UserLogs.Count());
+            Assert.AreEqual(1, context.UserLogs.Count());
+
+            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_1, true)), Times.Once);
+            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Never);
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Once);
         }
 
         [Test]
         public void CreateOrUpdateUserLog_Deleted_MCuser()
         {
-            var email = TestUserEmail_1;
+            Assert.AreEqual(0, context.UserLogs.Count());
             var signInUserId = "signInUserId";
-            var result = Subject.CreateOrUpdateUserLog(signInUserId, User1);
+            var result = Subject.CreateOrUpdateUserLog(signInUserId, GetUser(TestUserEmail_1));
 
             Assert.IsTrue(result);
 
-            Assert.AreEqual(1, Context.UserLogs.Count());
+            Assert.AreEqual(1, context.UserLogs.Count());
 
-            Assert.IsNotNull(Context.UserLogs.Include(x => x.User).First().User);
-            var firstUser = Context.McUsers.First(x => x.Email == email);
-            Context.McUsers.Remove(firstUser);
-            Context.Save();
+            Assert.IsNotNull(context.UserLogs.Include(x => x.User).First().User);
+            var firstUser = context.McUsers.First(x => x.Email == TestUserEmail_1);
+            context.McUsers.Remove(firstUser);
+            context.Save();
 
-            Assert.AreEqual(1, Context.UserLogs.Count());
-            Assert.AreEqual(TestUserEmail_1, Context.UserLogs.First().UserEmail);
+            Assert.AreEqual(1, context.UserLogs.Count());
+            Assert.AreEqual(TestUserEmail_1, context.UserLogs.First().UserEmail);
 
-            Assert.IsNull(Context.UserLogs.Include(x => x.User).First().User);
+            Assert.IsNull(context.UserLogs.Include(x => x.User).First().User);
+
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Once);
+
+            mockWelcomeEmailService.Verify(x => x.Send(firstUser), Times.Once);
+            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Never);
         }
     }
 }

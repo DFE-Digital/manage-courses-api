@@ -64,6 +64,8 @@ namespace GovUk.Education.ManageCourses.Api
                     Configuration["email:user"]
                 )));
 
+            services.AddScoped<IWelcomeEmailService>(provider => new WelcomeEmailService(Configuration["email:api_key"], Configuration["email:welcome_template_id"]));
+
             services.AddMvc();
         }
 

@@ -9,10 +9,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
     public class UserLogService : IUserLogService
     { 
         private readonly IManageCoursesDbContext _context;
+        private readonly IWelcomeEmailService _welcomeEmailService;
 
-        public UserLogService(IManageCoursesDbContext context)
+        public UserLogService(IManageCoursesDbContext context, IWelcomeEmailService welcomeEmailService)
         {
             _context = context;
+            _welcomeEmailService = welcomeEmailService;
         }
 
         public bool CreateOrUpdateUserLog(string signInUserId, McUser user) 
@@ -42,6 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     if (add)
                     {
                         _context.UserLogs.Add(userLog);
+                        _welcomeEmailService.Send(user);
                     }
                     else
                     {
