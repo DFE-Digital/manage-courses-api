@@ -260,7 +260,5 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 lastRequested = requestedOrNull;
             }
         }
-
-
     }
 }

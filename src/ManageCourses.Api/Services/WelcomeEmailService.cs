@@ -1,30 +1,21 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ManageCourses.Domain.Models;
-using Notify.Client;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
     public class WelcomeEmailService: IWelcomeEmailService
     {
-        private readonly NotificationClient _notificationClient;
+        private readonly INotificationClientWrapper _notificationClient;
 
         private readonly string _templateId;
 
-        public WelcomeEmailService(string apiKey, string templateId)
+        public WelcomeEmailService(INotificationClientWrapper noticationClientWrapper, IConfiguration config) : this(noticationClientWrapper, config["email:welcome_template_id"])
         {
-            if (String.IsNullOrWhiteSpace(apiKey))
-            {
-                throw new ArgumentNullException(nameof(apiKey));
-            }
-
-            if (String.IsNullOrWhiteSpace(templateId))
-            {
-                throw new ArgumentNullException(nameof(templateId));
-            }
-
-            _notificationClient = new NotificationClient(apiKey);
+        }
+        private WelcomeEmailService(INotificationClientWrapper noticationClientWrapper, string templateId)
+        {
+            _notificationClient = noticationClientWrapper;
             _templateId = templateId;
         }
 
