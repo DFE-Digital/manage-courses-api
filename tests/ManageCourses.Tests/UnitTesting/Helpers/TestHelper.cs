@@ -17,10 +17,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
         public static string OrgWithNoProviderEmail { get; } = "someotheruser@somewhereelse.com";
 
         public static string UserWithMultipleOrganisationsEmail { get; } = "userwithmultipleorgs@somewhere.com";
+        public static string UserWithMultipleOrganisationUcasCodesEmail { get; } = "userwithmultipleucascodess@somewhere.com";
 
-        public static string OrgIdProviders { get; } = "10970";
+        public static string OrgUcasCodeWithProviders { get; } = "134";
 
-        public static string OrgIdNoProviders { get; } = "1502";
+        public static string OrgUcasCodeNoProviders { get; } = "B20";
 
         public static ManageCoursesDbContext GetFakeData()
         {
@@ -38,6 +39,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
                 new McUser { Email = OrgWithNoProviderEmail },
                 new McUser { Email = OrgWithProviderEmail },
                 new McUser { Email = UserWithMultipleOrganisationsEmail },
+                new McUser { Email = UserWithMultipleOrganisationUcasCodesEmail }
             });
             _dbContext.Save(); // for some reason McUsers isn't populated for reading until this is run. ¯\_(ツ)_/¯
 
@@ -46,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
                 new FakeDataParameters//organisation with providers
                 {
                     Email = OrgWithProviderEmail,
-                    OrgId = OrgIdProviders,
+                    OrgId = "1234",
                     OrgName = "St Michael's Catholic College",
                     InstitutionName = "Catholic Teaching Alliance (South East London)",
                     InstitutionCode = "134",
@@ -55,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
                 new FakeDataParameters//organisation with no providers
                 {
                     Email = OrgWithNoProviderEmail,
-                    OrgId = OrgIdNoProviders,
+                    OrgId = "5678",
                     OrgName = "Bath Spa University",
                     InstitutionName = "Bath Spa University",
                     InstitutionCode = "B20",
@@ -83,19 +85,44 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
                     OrgName = "Norfolk Teacher Training Centre",
                     InstitutionName = "Norfolk Teacher Training Centre",
                     InstitutionCode = "N43",
+                },
+                new FakeDataParameters//user with multiple organisations
+                {
+                    Email = UserWithMultipleOrganisationUcasCodesEmail,
+                    OrgId = "2345",
+                    OrgName = "TestOrg",
+                    InstitutionName = "Test Institution",
+                    InstitutionCode = "ABC",
+                },
+                new FakeDataParameters//user with multiple organisations
+                {
+                    Email = UserWithMultipleOrganisationUcasCodesEmail,
+                    OrgId = "2345",
+                    OrgName = "TestOrg",
+                    InstitutionName = "Test Institution2",
+                    InstitutionCode = "DEF",
                 }
             };
 
             foreach (var testDataEntry in testDataVariations)
             {
                 var mcUser = _dbContext.McUsers.ByEmail(testDataEntry.Email).Single();
+                
+                if (_dbContext.McOrganisations.FirstOrDefault(o => o.OrgId == testDataEntry.OrgId) == null)
+                {
+                    _dbContext.AddMcOrganisation(new McOrganisation { Name = testDataEntry.OrgName, OrgId = testDataEntry.OrgId });
+                }
 
-                _dbContext.AddMcOrganisation(new McOrganisation { Name = testDataEntry.OrgName, OrgId = testDataEntry.OrgId });
-                _dbContext.AddUcasInstitution(new UcasInstitution { InstCode = testDataEntry.InstitutionCode, InstFull = testDataEntry.InstitutionName });
+                if (_dbContext.UcasInstitutions.FirstOrDefault(i => i.InstCode == testDataEntry.InstitutionCode) == null)
+                {
+                    _dbContext.AddUcasInstitution(new UcasInstitution { InstCode = testDataEntry.InstitutionCode, InstFull = testDataEntry.InstitutionName });
+                }
+                
                 _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = testDataEntry.InstitutionCode, OrgId = testDataEntry.OrgId });
                 _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = testDataEntry.Email, OrgId = testDataEntry.OrgId, McUser = mcUser });
 
                 AddProviders(testDataEntry.ProviderCodes, testDataEntry.InstitutionName);
+                _dbContext.Save();
             }
 
             AddProviderCourses();
