@@ -284,6 +284,8 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// <returns>The organisation of the user.</returns>
         private Organisation GetOrganisation(string email, string ucasCode)
         {
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(ucasCode)) return null;
+
             var mcOrganisationUsers = _context.McUsers.ByEmail(email)
                 .Include("McOrganisationUsers.McOrganisation.McOrganisationInstitutions.UcasInstitution").ToList();
 
