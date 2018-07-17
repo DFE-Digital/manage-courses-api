@@ -9,10 +9,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
     public class UserLogService : IUserLogService
     { 
         private readonly IManageCoursesDbContext _context;
+        private readonly IWelcomeEmailService _welcomeEmailService;
 
-        public UserLogService(IManageCoursesDbContext context)
+        public UserLogService(IManageCoursesDbContext context, IWelcomeEmailService welcomeEmailService)
         {
             _context = context;
+            _welcomeEmailService = welcomeEmailService;
         }
 
         public bool CreateOrUpdateUserLog(string signInUserId, McUser user) 
@@ -26,21 +28,24 @@ namespace GovUk.Education.ManageCourses.Api.Services
                         .SingleOrDefault(x => x.SignInUserId == signInUserId);
 
                     var add = userLog == null;
+                    var now = DateTime.UtcNow;
                     if (add)
                     {
                         userLog = new UserLog
                         {
-                            FirstLoginDateUtc = DateTime.UtcNow,
-                            SignInUserId = signInUserId
+                            FirstLoginDateUtc = now,
+                            SignInUserId = signInUserId,
+                            WelcomeEmailDateUtc = now
                         };
                     }
 
                     userLog.User = user;
                     userLog.UserEmail = user.Email;
-                    userLog.LastLoginDateUtc = DateTime.UtcNow;
+                    userLog.LastLoginDateUtc = now;
 
                     if (add)
                     {
+                        _welcomeEmailService.Send(user);
                         _context.UserLogs.Add(userLog);
                     }
                     else
@@ -52,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     transaction.Commit();
                     result = true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     transaction.Rollback();
                 }
