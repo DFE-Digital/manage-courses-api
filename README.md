@@ -36,6 +36,25 @@ https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcor
 
 https://dfedigital.atlassian.net/wiki/spaces/BaT/pages/389349377/Manage+Courses+API
 
+## Logging
+
+Logging is configured in `appsettings.json`, and values in there can be overridden with environment variables.
+
+Powershell:
+
+    $env:Serilog:MinimumLevel="Debug"
+    dotnet run
+
+Command prompt
+
+    set Serilog:MinimumLevel=Debug
+    dotnet run
+
+For more information see:
+
+* https://github.com/serilog/serilog-settings-configuration
+* https://nblumhardt.com/2016/07/serilog-2-minimumlevel-override/
+
 # Using the API
 
 The API exposes swagger at `/swagger` thanks to [NSwag](https://github.com/RSuter/NSwag)

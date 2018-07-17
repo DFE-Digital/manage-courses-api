@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Events;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -10,13 +10,18 @@ namespace GovUk.Education.ManageCourses.Api
     {
         public static int Main(string[] args)
         {
-            // this template Main definition is as directed by https://github.com/serilog/serilog-aspnetcore
+            // Logging setup based on https://github.com/serilog/serilog-aspnetcore
+            // and https://github.com/serilog/serilog-settings-configuration
+
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
+                .WriteTo.Console() // todo: This should be respecting the value in appsettings, not sure why that's not working
                 .CreateLogger();
 
             try
