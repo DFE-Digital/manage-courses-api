@@ -1,10 +1,13 @@
-﻿using GovUk.Education.ManageCourses.Api.Model;
+﻿using System.Collections.Generic;
+using GovUk.Education.ManageCourses.Api.Model;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
     public interface IDataService
     {
         void ProcessPayload(Payload payload);
-        OrganisationCourses GetCoursesForUser(string email);
+        OrganisationCourses GetCoursesForUserOrganisation(string email, string ucasCode); 
+        IEnumerable<UserOrganisation> GetOrganisationsForUser(string email);
     }
 }
+    

@@ -21,10 +21,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>The exported data</returns>
         [Authorize]
         [HttpGet]
-        public OrganisationCourses Export()
+        [Route("{ucasCode}")]
+        public OrganisationCourses ExportByOrganisation(string ucasCode)
         {
             var name = this.User.Identity.Name;
-            var courses = _dataService.GetCoursesForUser(name);
+            var courses = _dataService.GetCoursesForUserOrganisation(name, ucasCode);
 
             return courses;
         }
