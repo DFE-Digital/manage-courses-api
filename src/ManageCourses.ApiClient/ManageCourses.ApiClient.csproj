@@ -7,12 +7,8 @@
     <Description>Client library to access the "Manage Courses" api</Description>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Pre-release</PackageReleaseNotes>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
-      <PropertyGroup>
-      <VersionPrefix>1.2.3</VersionPrefix>
-      <VersionSuffix>sausau</VersionSuffix>
-      </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>GovUk.Education.ManageCourses.ApiClient</RootNamespace>
@@ -36,16 +32,10 @@
     <None Update="ManageCourses.Api.runtimeconfig.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
   <Target Name="SemanticVersioning" DependsOnTargets="GitInfo" AfterTargets="GitInfo" Outputs="$(OutputSwaggerGeneration)">
-    <Message Text="==VERSION==: $(VersionPrefix) $(VersionSuffix)" Importance="high" />
-    
     <PropertyGroup>
-      <VersionPrefix>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</VersionPrefix>
-      <VersionSuffix>$(GitBranch)+$(GitCommit)</VersionSuffix>
-      <PackageVersionPrefix>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</PackageVersionPrefix>
-      <PackageVersionSuffix>$(GitBranch)+$(GitCommit)</PackageVersionSuffix>
-    </PropertyGroup>
-    <Message Text="==VERSION==: $(VersionPrefix) $(VersionSuffix)" Importance="high" />
-    
+      <Version>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</Version>
+      <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
+    </PropertyGroup>    
   </Target>
   <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="GitInfo;ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup>
