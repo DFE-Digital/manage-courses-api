@@ -55,6 +55,48 @@ For more information see:
 * https://github.com/serilog/serilog-settings-configuration
 * https://nblumhardt.com/2016/07/serilog-2-minimumlevel-override/
 
+# Running tests
+
+## Unit tests
+
+```
+cd tests\ManageCourses.Tests\
+dotnet test
+```
+
+## Integration tests
+
+You will need to provide a postgresql server. A default localhost installation works. For everything else you can set the following overrides as user secrets:
+
+- MANAGE_COURSES_POSTGRESQL_SERVICE_HOST (the host of the PostgreSQL server)
+- MANAGE_COURSES_POSTGRESQL_SERVICE_PORT (its port)
+- PG_USERNAME (the log in user)
+- PG_PASSWORD (...and corresponding password)
+- PG_DATABASE (the database to use)
+
+You can set these by going to `tests\ManageCourses.Tests` and running `dotnet user-secrets add <key> <value>`.
+
+Then run 
+```
+cd tests\ManageCourses.Tests
+dotnet test --filter TestCategory=Integration
+```
+
+## Smoke tests
+
+These need internet access and the following additional user secrets
+
+- credentials:dfesignin:clientid (Client ID for the dfe signin test oauth server)
+- credentials:dfesignin:clientsecret (...and corresponding secret)
+- credentials:dfesignin:username (User name of an existing account on the Dfe Sign in test server)
+- credentials:dfesignin:password (...and corresponding password)
+
+Then run
+```
+cd tests\ManageCourses.Tests
+dotnet test --filter TestCategory=Smoke
+```
+
 # Using the API
 
 The API exposes swagger at `/swagger` thanks to [NSwag](https://github.com/RSuter/NSwag)

@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="packages\GitInfo.2.0.3\build\GitInfo.targets" Condition="Exists('packages\GitInfo.2.0.3\build\GitInfo.targets')" />
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <PackageId>GovUk.Education.ManageCourses.ApiClient</PackageId>
+    <Authors>Department for Education</Authors>
+    <Description>Client library to access the "Manage Courses" api</Description>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>Pre-release</PackageReleaseNotes>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+      <PropertyGroup>
+      <VersionPrefix>1.2.3</VersionPrefix>
+      <VersionSuffix>sausau</VersionSuffix>
+      </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <RootNamespace>GovUk.Education.ManageCourses.ApiClient</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutputSwaggerGeneration Condition="$(OutputSwaggerGeneration) == ''">Generated\ManageCoursesApiClient.cs</OutputSwaggerGeneration>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="$(OutputSwaggerGeneration)" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="GitInfo" Version="2.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.2" />
+    <PackageReference Include="NSwag.MSBuild" Version="11.17.13" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="integration-tests.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="ManageCourses.Api.runtimeconfig.json" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+  <Target Name="SemanticVersioning" DependsOnTargets="GitInfo" AfterTargets="GitInfo" Outputs="$(OutputSwaggerGeneration)">
+    <Message Text="==VERSION==: $(VersionPrefix) $(VersionSuffix)" Importance="high" />
+    
+    <PropertyGroup>
+      <VersionPrefix>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</VersionPrefix>
+      <VersionSuffix>$(GitBranch)+$(GitCommit)</VersionSuffix>
+      <PackageVersionPrefix>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</PackageVersionPrefix>
+      <PackageVersionSuffix>$(GitBranch)+$(GitCommit)</PackageVersionSuffix>
+    </PropertyGroup>
+    <Message Text="==VERSION==: $(VersionPrefix) $(VersionSuffix)" Importance="high" />
+    
+  </Target>
+  <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="GitInfo;ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
+    <PropertyGroup>
+      <classname>ManageCoursesApiClient</classname>
+      <namespace>$(RootNamespace)</namespace>
+      <clientBaseClass>$(namespace).ManageCoursesApiClientBase</clientBaseClass>
+      <configurationClass>$(namespace).IManageCoursesApiClientConfiguration</configurationClass>
+    </PropertyGroup>
+    <Exec Command="$(NSwagExe_Core20) webapi2swagger /ReferencePaths:%UserProfile%\.nuget\packages /assembly:..\ManageCourses.Api\bin\Debug\netcoreapp2.0\ManageCourses.Api.dll /controller:GovUk.Education.ManageCourses.Api.Controllers.* /output:$(OutDir)swagger.json" />
+    <Exec Command="$(NSwagExe_Core20) swagger2csclient /input:$(OutDir)swagger.json /output:$(OutputSwaggerGeneration) /classname:$(classname) /namespace:$(namespace) /clientBaseClass:$(clientBaseClass) /configurationClass:$(configurationClass) /OperationGenerationMode:SingleClientFromOperationId " />
+    <ItemGroup>
+      <Compile Include="$(OutputSwaggerGeneration)" />
+    </ItemGroup>
+  </Target>
+</Project>
