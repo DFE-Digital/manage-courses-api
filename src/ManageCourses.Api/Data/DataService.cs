@@ -322,7 +322,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 OrganisationId = organisation.OrgId,
                 OrganisationName = organisation.Name,
                 UcasCode = organisation.UcasCode,
-                TotalCourses = GetProviderCourses(organisation).SelectMany(y => y.CourseDetails).Count()
+                TotalCourses = GetProviderCourses(organisation).SelectMany(x => x.CourseDetails).SelectMany(v => v.Variants).Count()
             });
             return userOrganisations;
         }
