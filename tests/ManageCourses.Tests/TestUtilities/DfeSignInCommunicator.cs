@@ -57,6 +57,10 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
             try 
             {
                 string accessToken = JObject.Parse(json)["access_token"].Value<string>();
+                if (string.IsNullOrEmpty(accessToken))
+                {
+                    throw new Exception($"could not get access_token with settings: {clientId}, {username}, {clientSecret.Substring(0,3)}, {password.Substring(0,3)}");
+                }
                 return accessToken;
             }
             catch (JsonReaderException e)
