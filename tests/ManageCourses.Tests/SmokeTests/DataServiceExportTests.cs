@@ -34,6 +34,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("integration-tests.json")
                 .AddUserSecrets<DataServiceExportTests>()
+                .AddEnvironmentVariables()
                 .Build();
 
             var dfeSignInConfig = config.GetSection("credentials").GetSection("dfesignin");

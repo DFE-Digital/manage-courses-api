@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace GovUk.Education.ManageCourses.Tests.TestUtilities
@@ -53,8 +54,15 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
             var json = await acHttpClient.Content.ReadAsStringAsync();
             
-            string accessToken = JObject.Parse(json)["access_token"].Value<string>();
-            return accessToken;
+            try 
+            {
+                string accessToken = JObject.Parse(json)["access_token"].Value<string>();
+                return accessToken;
+            }
+            catch (JsonReaderException e)
+            {
+                throw new Exception($"could not get access_token with settings: {clientId}, {username}, {clientSecret.Substring(0,3)}, {password.Substring(0,3)}");
+            }
         }
 
          private class NavigationResult 
