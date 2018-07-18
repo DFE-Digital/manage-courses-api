@@ -29,7 +29,9 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
             {
                 StartInfo = startInfo
             };
-            
+
+            process.OutputDataReceived += (sender, args) => Console.WriteLine("api process: {0}", args.Data);
+
             process.Start();
             Thread.Sleep(10000); // :(
             return new DisposableProcess(process);
