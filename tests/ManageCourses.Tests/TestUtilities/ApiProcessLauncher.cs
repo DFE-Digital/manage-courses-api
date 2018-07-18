@@ -9,10 +9,12 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
     {
         public DisposableProcess LaunchApiLocally(IConfiguration config)
         {
+            var dirSep = System.IO.Path.DirectorySeparatorChar;
+            
             var startInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                Arguments = $"run -p ..\\..\\..\\..\\..\\src\\ManageCourses.Api",
+                Arguments = $"run -p ..{dirSep}..{dirSep}..{dirSep}..{dirSep}..{dirSep}src{dirSep}ManageCourses.Api",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true  
