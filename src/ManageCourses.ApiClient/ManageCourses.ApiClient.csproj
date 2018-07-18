@@ -14,7 +14,7 @@
     <RootNamespace>GovUk.Education.ManageCourses.ApiClient</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <OutputSwaggerGeneration Condition="$(OutputSwaggerGeneration) == ''">Generated\ManageCoursesApiClient.cs</OutputSwaggerGeneration>
+    <OutputSwaggerGeneration Condition="$(OutputSwaggerGeneration) == ''">Generated/ManageCoursesApiClient.cs</OutputSwaggerGeneration>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="$(OutputSwaggerGeneration)" />
