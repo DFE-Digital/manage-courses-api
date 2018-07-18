@@ -41,7 +41,7 @@
       <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>    
   </Target>
-  <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="ResolveReferences" Outputs="$(OutputSwaggerGeneration)">
+  <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup>
       <classname>ManageCoursesApiClient</classname>
       <namespace>$(RootNamespace)</namespace>
