@@ -4,25 +4,19 @@ using GovUk.Education.ManageCourses.Api.Services;
 
 using GovUk.Education.ManageCourses.Domain.Models;
 using Moq;
-using Microsoft.Extensions.Configuration;
 
-namespace GovUk.Education.ManageCourses.Tests.Integration
+namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
     public class WelcomeEmailServiceTests
     {
         private IWelcomeEmailService Subject = null;
-        private Mock<INotificationClientWrapper> mock = null;
-        private string templateId = "templateId";
-        private Mock<IConfiguration> configMock = null;
+        private Mock<ITemplateEmailService> mock = null;
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            mock = new Mock<INotificationClientWrapper>();
-            configMock = new Mock<IConfiguration>();
-            configMock.Setup(x => x["email:welcome_template_id"]).Returns(templateId);
-
-            Subject = new WelcomeEmailService(mock.Object, configMock.Object);
+            mock = new Mock<ITemplateEmailService>();
+            Subject = new WelcomeEmailService(mock.Object);
         }
 
         [Test]
@@ -39,8 +33,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             Subject.Send(user);
 
-            mock.Verify(x => x.SendEmail(user.Email, templateId, personalisation, null, null), Times.Once);
-            configMock.Verify(x => x["email:welcome_template_id"], Times.Once);
+            mock.Verify(x => x.Send(user.Email, personalisation), Times.Once);
         }
     }
 }
