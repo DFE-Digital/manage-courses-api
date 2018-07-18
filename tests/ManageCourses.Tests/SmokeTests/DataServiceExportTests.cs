@@ -45,17 +45,17 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Await();
                 
                 var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken));
-                client.BaseUrl = "http://localhost:60699";                
+                client.BaseUrl = "http://localhost:6001";                
 
                 client.Data_ImportAsync(TestData.SimplePayload).Await();
 
-                export = client.Data_ExportAsync().Await();
+                export = client.Data_ExportByOrganisationAsync("ABC").Await();
             }
 
             Assert.IsNotNull(export, "Test could not complete");
 
             Assert.AreEqual("123", export.OrganisationId);
-            //Assert.AreEqual("Joe's school", export.OrganisationName);
+            Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName);
             Assert.AreEqual("ABC", export.UcasCode);
 
             Assert.AreEqual(1, export.ProviderCourses.Count);
@@ -111,7 +111,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 }),
 
                 Institutions = ListOfOne(new UcasInstitution { 
-                    InstName = "Joe's school @ UCAS",
+                    InstFull = "Joe's school @ UCAS",
                     InstCode = "ABC"
                 }),
 
