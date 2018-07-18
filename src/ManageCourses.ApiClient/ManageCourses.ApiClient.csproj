@@ -41,14 +41,14 @@
       <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>    
   </Target>
-  <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
+  <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="ResolveReferences" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup>
       <classname>ManageCoursesApiClient</classname>
       <namespace>$(RootNamespace)</namespace>
       <clientBaseClass>$(namespace).ManageCoursesApiClientBase</clientBaseClass>
       <configurationClass>$(namespace).IManageCoursesApiClientConfiguration</configurationClass>
     </PropertyGroup>
-    <Exec Command="$(NSwagExe_Core20) webapi2swagger /ReferencePaths:%UserProfile%/.nuget/packages /assembly:@(_ResolvedProjectReferencePaths, ',') /controller:GovUk.Education.ManageCourses.Api.Controllers.* /output:$(OutDir)swagger.json" />
+    <Exec Command="$(NSwagExe_Core20) webapi2swagger /ReferencePaths:$(NugetPackageRoot) /assembly:@(_ResolvedProjectReferencePaths, ',') /controller:GovUk.Education.ManageCourses.Api.Controllers.* /output:$(OutDir)swagger.json" />
     <Exec Command="$(NSwagExe_Core20) swagger2csclient /input:$(OutDir)swagger.json /output:$(OutputSwaggerGeneration) /classname:$(classname) /namespace:$(namespace) /clientBaseClass:$(clientBaseClass) /configurationClass:$(configurationClass) /OperationGenerationMode:SingleClientFromOperationId " />
     <ItemGroup>
       <Compile Include="$(OutputSwaggerGeneration)" />
