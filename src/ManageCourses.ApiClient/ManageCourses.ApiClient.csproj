@@ -32,7 +32,11 @@
     <None Update="ManageCourses.Api.runtimeconfig.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
   <Target Name="SemanticVersioning" DependsOnTargets="GitInfo" AfterTargets="GitInfo" Outputs="$(OutputSwaggerGeneration)">
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(GitBranch)'=='master'">
+      <Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</Version>
+      <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</PackageVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(GitBranch)'!='master'">
       <Version>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</Version>
       <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>    
