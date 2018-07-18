@@ -44,12 +44,15 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {                
                 var communicator = new DfeSignInCommunicator("signin-test-oidc-as.azurewebsites.net", "localhost:44364", dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
                 var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Await();
-                
+                                
                 var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken));
                 client.BaseUrl = "http://localhost:6001";                
 
-                client.Data_ImportAsync(TestData.SimplePayload).Await();
+                client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Await();
 
+                Console.WriteLine($"Username: {dfeSignInConfig["username"]}");
+                Console.WriteLine($"Access token: {accessToken}");
+                
                 export = client.Data_ExportByOrganisationAsync("ABC").Await();
             }
 
@@ -75,7 +78,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var campus = variant.Campuses.Single();
 
             Assert.AreEqual("", campus.Code);                
-            Assert.AreEqual("Main campus site", campus.Name); 
+            Assert.AreEqual("Main campus site", campus.Name);
         }
 
         private class MockApiClientConfiguration : IManageCoursesApiClientConfiguration
@@ -93,12 +96,12 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             }
         }
         private static class TestData {
-            public static Payload SimplePayload = new Payload {
+            public static Payload MakeSimplePayload(string username) => new Payload {
                    
                 Users = ListOfOne(new McUser{
                     FirstName = "Joe",
                     LastName = "Bloggs",
-                    Email = "tim.abell+4@digital.education.gov.uk"
+                    Email = username
                 }),
 
                 Organisations = ListOfOne(new McOrganisation {
@@ -107,7 +110,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 }),
 
                 OrganisationUsers = ListOfOne(new McOrganisationUser {
-                    Email = "tim.abell+4@digital.education.gov.uk",
+                    Email = username,
                     OrgId = "123"
                 }),
 
