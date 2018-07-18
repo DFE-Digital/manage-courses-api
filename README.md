@@ -88,6 +88,9 @@ These need internet access and the following additional user secrets
 
 - credentials:dfesignin:clientid (Client ID for the dfe signin test oauth server)
 - credentials:dfesignin:clientsecret (...and corresponding secret)
+- credentials:dfesignin:host (... and domain name of the test oath server)
+- credentials:dfesignin:redirect_host (... and domain name:port of the server to be redirected to - needs to be whitelisted by the test oauth server!)
+- auth:oidc:userinfo_endpoint (the user_info endpoint of the dfe signin test oauth server, e.g. https://signin-test-oidc-as.azurewebsites.net/me)
 - credentials:dfesignin:username (User name of an existing account on the Dfe Sign in test server)
 - credentials:dfesignin:password (...and corresponding password)
 

@@ -1,57 +1,48 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 {
     public class ApiProcessLauncher
     {
-        public DisposableProcess LaunchApiLocally(IConfiguration config)
-        {
-            var dirSep = System.IO.Path.DirectorySeparatorChar;
-            
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = "dotnet",
-                Arguments = $"run -p ..{dirSep}..{dirSep}..{dirSep}..{dirSep}..{dirSep}src{dirSep}ManageCourses.Api",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true  
-            };
+        public DisposableWebHost LaunchApiLocally(IConfiguration config)
+        {            
+            var webHost = WebHost.CreateDefaultBuilder()
+                .UseStartup<ManageCourses.Api.Startup>()
+                .UseConfiguration(config)
+                .Build(); 
+                
 
-            foreach(var foo in config.AsEnumerable())
-            {
-                startInfo.EnvironmentVariables[foo.Key.Replace(":","__")] = foo.Value;
-            }
-            
-            var process = new Process()
-            {
-                StartInfo = startInfo
-            };
+            webHost.RunAsync();
+            Thread.Sleep(5000); //:( 
 
-            process.OutputDataReceived += (sender, args) => Console.WriteLine("api process: {0}", args.Data);
-            process.ErrorDataReceived += (sender, args) => Console.WriteLine("api process error: {0}", args.Data);
-
-            process.Start();
-            Thread.Sleep(10000); // :(
-            return new DisposableProcess(process);
+            return new DisposableWebHost(webHost);
         }
 
-        public class DisposableProcess : IDisposable
+        public class DisposableWebHost : IDisposable
         {
-            private Process theProcess = null;
+            private IWebHost theHost = null;
 
-            public DisposableProcess(Process process)
+            public DisposableWebHost(IWebHost webHost)
             {
-                theProcess = process;
+                theHost = webHost;
             }
 
+            public string Address => (theHost.ServerFeatures.First(x => x.Value is IServerAddressesFeature).Value as IServerAddressesFeature).Addresses.FirstOrDefault();
+            
             public void Dispose()
             {
-                if (theProcess != null && !theProcess.HasExited) {
-                    theProcess.Kill();
-                }    
+                if (theHost != null)
+                {
+                    theHost.StopAsync().Await();
+                    theHost = null;
+                }
             }
         }
 

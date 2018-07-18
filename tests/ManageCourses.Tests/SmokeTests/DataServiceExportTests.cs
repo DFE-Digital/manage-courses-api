@@ -13,8 +13,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
     
@@ -23,62 +27,72 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     [TestFixture]
     public class DataServiceExportTests
     {
-        private ApiProcessLauncher launcher = new ApiProcessLauncher();
+        private ApiProcessLauncher.DisposableWebHost localWebHost = null;
 
-        [Test]        
-        [Category("Smoke")]
-        [Explicit]
-        public void DataExportWithEmptyCampus()
+        private IConfiguration config = null;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            var config = new ConfigurationBuilder()
+            config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("integration-tests.json")
                 .AddUserSecrets<DataServiceExportTests>()
                 .AddEnvironmentVariables()
                 .Build();
 
-            var dfeSignInConfig = config.GetSection("credentials").GetSection("dfesignin");
-            
-            OrganisationCourses export = null;
-            using (launcher.LaunchApiLocally(config))
-            {                
-                var communicator = new DfeSignInCommunicator("signin-test-oidc-as.azurewebsites.net", "localhost:44364", dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
-                var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Await();
-                                
-                var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken));
-                client.BaseUrl = "http://localhost:6001";                
+            localWebHost = new ApiProcessLauncher().LaunchApiLocally(config);
+        }
 
-                client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Await();
-
-                Console.WriteLine($"Username: {dfeSignInConfig["username"]}");
-                Console.WriteLine($"Access token: {accessToken}");
-                
-                export = client.Data_ExportByOrganisationAsync("ABC").Await();
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            if (localWebHost != null)
+            {
+                localWebHost.Dispose();
             }
+        }
+
+
+        [Test]        
+        [Category("Smoke")]
+        [Explicit]
+        public void DataExportWithEmptyCampus()
+        {
+            var dfeSignInConfig = config.GetSection("credentials").GetSection("dfesignin");
+                                
+            var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"], dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
+            var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Await();
+                            
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken));
+            client.BaseUrl = localWebHost.Address;             
+
+            client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Await();
+            var export = client.Data_ExportByOrganisationAsync("ABC").Await();
 
             Assert.IsNotNull(export, "Test could not complete");
 
-            Assert.AreEqual("123", export.OrganisationId);
-            Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName);
-            Assert.AreEqual("ABC", export.UcasCode);
+            Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
+            Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName, "OrganisationName should be retrieved");
+            Assert.AreEqual("ABC", export.UcasCode, "UcasCode should be retrieved");
 
-            Assert.AreEqual(1, export.ProviderCourses.Count);
+            Assert.AreEqual(1, export.ProviderCourses.Count, "Expecting only one in ProviderCourses");
             var course = export.ProviderCourses.Single();
-            Assert.AreEqual(1, course.CourseDetails.Count);
+            Assert.AreEqual(1, course.CourseDetails.Count, "Expecting only one in ProviderCourses.CourseDetails");
             var details = course.CourseDetails.Single();
 
-            Assert.AreEqual("Joe's course for Primary teachers", details.CourseTitle);
+            Assert.AreEqual("Joe's course for Primary teachers", details.CourseTitle, "ProviderCourses.CourseDetails.CourseTitle should be retrieved");
                         
-            Assert.AreEqual(1, details.Variants.Count);
+            Assert.AreEqual(1, details.Variants.Count, "Expecting only one in ProviderCourses.CourseDetails.Variants");
             var variant = details.Variants.Single();
 
-            Assert.AreEqual("XYZ", variant.UcasCode);
+            Assert.AreEqual("XYZ", variant.UcasCode, "ProviderCourses.CourseDetails.Variants.UcasCode should be retrieved");
 
-            Assert.AreEqual(1, variant.Campuses.Count);
+            Assert.AreEqual(1, variant.Campuses.Count, "Expecting only one in ProviderCourses.CourseDetails.Variants.Campuses");
             var campus = variant.Campuses.Single();
 
-            Assert.AreEqual("", campus.Code);                
-            Assert.AreEqual("Main campus site", campus.Name);
+            Assert.AreEqual("", campus.Code, "ProviderCourses.CourseDetails.Variants.Campuses.Code should be retrieved");                
+            Assert.AreEqual("Main campus site", campus.Name, "ProviderCourses.CourseDetails.Variants.Campuses.Name should be retrieved");
         }
 
         private class MockApiClientConfiguration : IManageCoursesApiClientConfiguration
