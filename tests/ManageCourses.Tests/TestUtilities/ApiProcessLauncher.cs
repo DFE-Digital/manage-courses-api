@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
             foreach(var foo in config.AsEnumerable())
             {
-                startInfo.EnvironmentVariables[foo.Key] = foo.Value;
+                startInfo.EnvironmentVariables[foo.Key.Replace(":","__")] = foo.Value;
             }
             
             var process = new Process()
@@ -31,6 +31,7 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
             };
 
             process.OutputDataReceived += (sender, args) => Console.WriteLine("api process: {0}", args.Data);
+            process.ErrorDataReceived += (sender, args) => Console.WriteLine("api process error: {0}", args.Data);
 
             process.Start();
             Thread.Sleep(10000); // :(
