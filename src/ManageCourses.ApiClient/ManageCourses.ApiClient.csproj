@@ -31,7 +31,7 @@
     <None Update="integration-tests.json" CopyToOutputDirectory="PreserveNewest" />
     <None Update="ManageCourses.Api.runtimeconfig.json" CopyToOutputDirectory="Always" />
   </ItemGroup>
-  <Target Name="SemanticVersioning" DependsOnTargets="GitInfo" AfterTargets="GitInfo" Outputs="$(OutputSwaggerGeneration)">
+  <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup Condition="'$(GitBranch)'=='master'">
       <Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</Version>
       <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</PackageVersion>
@@ -41,14 +41,14 @@
       <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>    
   </Target>
-  <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="GitInfo;ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
+  <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup>
       <classname>ManageCoursesApiClient</classname>
       <namespace>$(RootNamespace)</namespace>
       <clientBaseClass>$(namespace).ManageCoursesApiClientBase</clientBaseClass>
       <configurationClass>$(namespace).IManageCoursesApiClientConfiguration</configurationClass>
     </PropertyGroup>
-    <Exec Command="$(NSwagExe_Core20) webapi2swagger /ReferencePaths:%UserProfile%\.nuget\packages /assembly:..\ManageCourses.Api\bin\Debug\netcoreapp2.0\ManageCourses.Api.dll /controller:GovUk.Education.ManageCourses.Api.Controllers.* /output:$(OutDir)swagger.json" />
+    <Exec Command="$(NSwagExe_Core20) webapi2swagger /ReferencePaths:%UserProfile%\.nuget\packages /assembly:@(_ResolvedProjectReferencePaths, ',') /controller:GovUk.Education.ManageCourses.Api.Controllers.* /output:$(OutDir)swagger.json" />
     <Exec Command="$(NSwagExe_Core20) swagger2csclient /input:$(OutDir)swagger.json /output:$(OutputSwaggerGeneration) /classname:$(classname) /namespace:$(namespace) /clientBaseClass:$(clientBaseClass) /configurationClass:$(configurationClass) /OperationGenerationMode:SingleClientFromOperationId " />
     <ItemGroup>
       <Compile Include="$(OutputSwaggerGeneration)" />
