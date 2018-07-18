@@ -8,6 +8,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageReleaseNotes>Pre-release</PackageReleaseNotes>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <GitInfoReportImportance>high</GitInfoReportImportance>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
