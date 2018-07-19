@@ -39,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient());
             client.BaseUrl = localWebHost.Address;             
 
-            client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Result;
+            client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Wait();
 
             var export = client.Data_ExportByOrganisationAsync("ABC").Result;
 
