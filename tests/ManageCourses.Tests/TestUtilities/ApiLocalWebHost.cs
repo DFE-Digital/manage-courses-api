@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
             bool shouldStop = 1 == Interlocked.Exchange(ref hasLaunched, 0);
             if (shouldStop)
             {                
-                theHost.StopAsync().Await();
+                theHost.StopAsync().Result;
             }
         }
 
