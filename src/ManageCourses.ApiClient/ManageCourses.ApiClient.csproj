@@ -35,12 +35,12 @@
   </ItemGroup>
   <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup Condition="'$(GitBranch)'=='master'">
-      <Version>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</Version>
-      <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor).$(GitSemVerPatch)</PackageVersion>
+      <Version>$(GitBaseVersion).$(GitSemVerPatch)</Version>
+      <PackageVersion>$(GitBaseVersion).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>
     <PropertyGroup Condition="'$(GitBranch)'!='master'">
-      <Version>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</Version>
-      <PackageVersion>$(GitSemVerMajor).$(GitSemVerMinor)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
+      <Version>$(GitBaseVersion)-$(GitBranch).$(GitSemVerPatch)</Version>
+      <PackageVersion>$(GitBaseVersion)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>    
   </Target>
   <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
