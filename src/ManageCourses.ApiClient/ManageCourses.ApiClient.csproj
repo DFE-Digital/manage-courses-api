@@ -22,12 +22,15 @@
     <Compile Remove="$(OutputSwaggerGeneration)" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GitInfo" Version="2.0.11" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.2" />
-    <PackageReference Include="NSwag.MSBuild" Version="11.17.13" />
+    <PackageReference Include="GitInfo" Version="2.0.11">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="NSwag.MSBuild" Version="11.17.13">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" />
+    <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" Private="false" PrivateAssets="all" />
   </ItemGroup>
   <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup Condition="'$(GitBranch)'=='master'">
