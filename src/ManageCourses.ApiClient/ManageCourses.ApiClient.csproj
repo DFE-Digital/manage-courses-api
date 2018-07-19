@@ -29,10 +29,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Update="integration-tests.json" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="ManageCourses.Api.runtimeconfig.json" CopyToOutputDirectory="Always" />
-  </ItemGroup>
   <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion" Outputs="$(OutputSwaggerGeneration)">
     <PropertyGroup Condition="'$(GitBranch)'=='master'">
       <Version>$(GitBaseVersion).$(GitSemVerPatch)</Version>
