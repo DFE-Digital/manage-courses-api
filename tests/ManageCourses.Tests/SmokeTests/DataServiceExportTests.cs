@@ -34,14 +34,14 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var dfeSignInConfig = config.GetSection("credentials").GetSection("dfesignin");
                                 
             var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"], dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
-            var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Await();
+            var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
                             
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient());
             client.BaseUrl = localWebHost.Address;             
 
-            client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Await();
+            client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Result;
 
-            var export = client.Data_ExportByOrganisationAsync("ABC").Await();
+            var export = client.Data_ExportByOrganisationAsync("ABC").Result;
 
             Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
             Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName, "OrganisationName should be retrieved");
