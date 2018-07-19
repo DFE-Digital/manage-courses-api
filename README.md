@@ -38,9 +38,9 @@ An example of the config keys that are required for Secret Manager are available
 E.g.
 
     dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST localhost
-    dotnet user-secrets set PG_DATABASE manage
-    dotnet user-secrets set PG_USERNAME manageusr
-    dotnet user-secrets set PG_PASSWORD manageusr
+    dotnet user-secrets set PG_DATABASE the-database (will be created if missing and sufficient rights, e.g. 'manage')
+    dotnet user-secrets set PG_USERNAME the-user-you-created
+    dotnet user-secrets set PG_PASSWORD the-password-you-set
 
 
 For additional details, refer to
