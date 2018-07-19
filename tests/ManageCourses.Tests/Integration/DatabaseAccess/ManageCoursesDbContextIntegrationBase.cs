@@ -47,7 +47,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
         }
 
         [TearDown]
-        public void TearDown()
+        public virtual void TearDown()
         {
             if (entitiesToCleanUp.Any())
             {

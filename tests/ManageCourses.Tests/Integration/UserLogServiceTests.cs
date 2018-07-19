@@ -51,7 +51,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         }
 
         [TearDown]
-        public void TearDown()
+        override public void TearDown()
         {
 
             foreach (var item in context.McUsers)
@@ -65,6 +65,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 var x = ((DbContext)context).Entry(item);
                 this.entitiesToCleanUp.Add(x);
             }
+            base.TearDown();
         }
 
         [Test]
