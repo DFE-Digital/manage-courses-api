@@ -9,6 +9,7 @@
     <PackageReleaseNotes>Pre-release</PackageReleaseNotes>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GitInfoReportImportance>high</GitInfoReportImportance>
+    <GitVersionFile>$(ProjectDir)GitVersion.txt</GitVersionFile>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
