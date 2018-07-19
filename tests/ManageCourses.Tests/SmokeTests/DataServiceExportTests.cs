@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     [TestFixture]
     public class DataServiceExportTests
     {
-        private ApiProcessLauncher.DisposableWebHost localWebHost = null;
+        private ApiLocalWebHost localWebHost = null;
 
         private IConfiguration config = null;
 
@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 .AddEnvironmentVariables()
                 .Build();
 
-            localWebHost = new ApiProcessLauncher().LaunchApiLocally(config);
+            localWebHost = new ApiLocalWebHost(config).Launch();
         }
 
         [OneTimeTearDown]
@@ -49,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             if (localWebHost != null)
             {
-                localWebHost.Dispose();
+                localWebHost.Stop();
             }
         }
 
@@ -70,25 +70,23 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Await();
             var export = client.Data_ExportByOrganisationAsync("ABC").Await();
 
-            Assert.IsNotNull(export, "Test could not complete");
-
             Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
             Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName, "OrganisationName should be retrieved");
             Assert.AreEqual("ABC", export.UcasCode, "UcasCode should be retrieved");
 
-            Assert.AreEqual(1, export.ProviderCourses.Count, "Expecting only one in ProviderCourses");
+            Assert.AreEqual(1, export.ProviderCourses.Count, "Expecting exactly one in ProviderCourses");
             var course = export.ProviderCourses.Single();
-            Assert.AreEqual(1, course.CourseDetails.Count, "Expecting only one in ProviderCourses.CourseDetails");
+            Assert.AreEqual(1, course.CourseDetails.Count, "Expecting exactly one in ProviderCourses.CourseDetails");
             var details = course.CourseDetails.Single();
 
             Assert.AreEqual("Joe's course for Primary teachers", details.CourseTitle, "ProviderCourses.CourseDetails.CourseTitle should be retrieved");
                         
-            Assert.AreEqual(1, details.Variants.Count, "Expecting only one in ProviderCourses.CourseDetails.Variants");
+            Assert.AreEqual(1, details.Variants.Count, "Expecting exactly one in ProviderCourses.CourseDetails.Variants");
             var variant = details.Variants.Single();
 
             Assert.AreEqual("XYZ", variant.UcasCode, "ProviderCourses.CourseDetails.Variants.UcasCode should be retrieved");
 
-            Assert.AreEqual(1, variant.Campuses.Count, "Expecting only one in ProviderCourses.CourseDetails.Variants.Campuses");
+            Assert.AreEqual(1, variant.Campuses.Count, "Expecting exactly one in ProviderCourses.CourseDetails.Variants.Campuses");
             var campus = variant.Campuses.Single();
 
             Assert.AreEqual("", campus.Code, "ProviderCourses.CourseDetails.Variants.Campuses.Code should be retrieved");                
