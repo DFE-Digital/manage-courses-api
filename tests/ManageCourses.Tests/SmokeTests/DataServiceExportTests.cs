@@ -36,7 +36,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"], dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
             var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Await();
                             
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken));
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient());
             client.BaseUrl = localWebHost.Address;             
 
             client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Await();
