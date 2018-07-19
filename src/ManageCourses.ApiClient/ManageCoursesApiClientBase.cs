@@ -2,7 +2,7 @@
 {
     public class ManageCoursesApiClientBase
     {
-        protected readonly IManageCoursesApiClientConfiguration ApiClientConfiguration;
+        protected IManageCoursesApiClientConfiguration ApiClientConfiguration {get; private set;}
 
         public ManageCoursesApiClientBase(IManageCoursesApiClientConfiguration apiClientConfiguration)
         {

@@ -51,7 +51,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         }
 
         [TearDown]
-        new public void TearDown()
+        override public void TearDown()
         {
 
             foreach (var item in context.McUsers)

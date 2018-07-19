@@ -29,7 +29,11 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
             if (shouldLaunch)
             {
                 theHost.RunAsync();
-                Thread.Sleep(5000); //:( 
+
+                // HACK!
+                // The Web Host needs a bit of time to warm up befor it serves requests
+                // Rather than polling for readiness, we'll just wait for a few seconds
+                Thread.Sleep(5000);
             }
 
             return this;

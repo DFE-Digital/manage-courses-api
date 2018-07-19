@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -16,44 +15,17 @@ using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-    
+
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
+
     [TestFixture]
-    public class DataServiceExportTests
+    public class DataServiceExportTests : ApiSmokeTestBase
     {
-        private ApiLocalWebHost localWebHost = null;
-
-        private IConfiguration config = null;
-
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("integration-tests.json")
-                .AddUserSecrets<DataServiceExportTests>()
-                .AddEnvironmentVariables()
-                .Build();
-
-            localWebHost = new ApiLocalWebHost(config).Launch();
-        }
-
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-            if (localWebHost != null)
-            {
-                localWebHost.Stop();
-            }
-        }
-
-
         [Test]        
         [Category("Smoke")]
         [Explicit]
@@ -68,6 +40,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             client.BaseUrl = localWebHost.Address;             
 
             client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Await();
+
             var export = client.Data_ExportByOrganisationAsync("ABC").Await();
 
             Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
