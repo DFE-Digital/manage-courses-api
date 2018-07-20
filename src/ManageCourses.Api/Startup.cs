@@ -52,6 +52,9 @@ namespace GovUk.Education.ManageCourses.Api
             }).AddBearerToken(options =>
             {
                 options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
+            }).AddBearerTokenApiKey(options =>
+            {
+                options.ApiKey = Configuration["api:key"];
             });
 
             services.AddScoped<IDataService, DataService>();

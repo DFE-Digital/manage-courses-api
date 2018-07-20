@@ -22,14 +22,13 @@ using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
-
     [TestFixture]
-    public class DataServiceExportTests : ApiSmokeTestBase
+    [Category("Smoke")]
+    [Explicit]
+    public class SystemUnderTest : ApiSmokeTestBase
     {
         [Test]        
-        [Category("Smoke")]
-        [Explicit]
-        public void DataExportWithEmptyCampus()
+        public void DataExport_WithEmptyCampus()
         {
             var dfeSignInConfig = config.GetSection("credentials").GetSection("dfesignin");
                                 
@@ -64,6 +63,72 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             Assert.AreEqual("", campus.Code, "ProviderCourses.CourseDetails.Variants.Campuses.Code should be retrieved");                
             Assert.AreEqual("Main campus site", campus.Name, "ProviderCourses.CourseDetails.Variants.Campuses.Name should be retrieved");
+        }
+
+        [Test]
+        public async Task DataExport_badAccesCode_404()
+        {
+            var accessToken = "badAccesCode";
+
+            var httpClient = new HttpClient();
+
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
+            client.BaseUrl = localWebHost.Address;
+
+
+            Assert.That(() => client.Data_ExportByOrganisationAsync("ABC"),
+                Throws.TypeOf<SwaggerException>()
+                    .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+        }
+
+        [Test]
+        public async Task Invite()
+        {
+            var accessToken = config["api:key"];
+
+            var httpClient = new HttpClient();
+
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
+            client.BaseUrl = localWebHost.Address;
+
+            var result = await client.Invite_IndexAsync();
+
+            Assert.AreEqual(200, result.StatusCode);
+
+            var client2 = new ManageCoursesApiClient(new MockApiClientConfiguration("accessToken"), httpClient);
+            client2.BaseUrl = localWebHost.Address;
+        }
+
+        [Test]
+        public async Task Invite_badAccesCode_404()
+        {
+            var accessToken = "badAccesCode";
+
+            var httpClient = new HttpClient();
+
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
+            client.BaseUrl = localWebHost.Address;
+
+
+            Assert.That(() => client.Invite_IndexAsync(),
+                Throws.TypeOf<SwaggerException>()
+                    .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+        }
+
+        [Test]
+        public async Task Invite_noAccesCode_401()
+        {
+            var accessToken = "";
+
+            var httpClient = new HttpClient();
+
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
+            client.BaseUrl = localWebHost.Address;
+
+
+            Assert.That(() => client.Invite_IndexAsync(),
+                Throws.TypeOf<SwaggerException>()
+                    .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
         }
 
         private class MockApiClientConfiguration : IManageCoursesApiClientConfiguration
