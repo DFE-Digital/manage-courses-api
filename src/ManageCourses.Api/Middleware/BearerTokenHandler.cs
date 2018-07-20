@@ -34,7 +34,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            var accessToken = GetAccessToken();
+            var accessToken = Request.GetAccessToken();
 
             if (!string.IsNullOrEmpty(accessToken))
             {
@@ -69,17 +69,6 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
 
             return AuthenticateResult.NoResult();
-        }
-
-        private string GetAccessToken()
-        {
-            var authorizationHeaderValues = Request.Headers.ContainsKey("Authorization") ?
-                ((string)Request.Headers["Authorization"]).Split(' ') : new[] { "", "" };
-
-            var accessToken = authorizationHeaderValues.Length == 2 && authorizationHeaderValues[0].ToLowerInvariant().Equals("bearer") ?
-                authorizationHeaderValues[1] : "";
-
-            return accessToken;
         }
 
         private JsonUserDetails GetJsonUserDetails(string accessToken)
