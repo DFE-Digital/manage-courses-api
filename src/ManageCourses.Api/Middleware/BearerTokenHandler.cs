@@ -20,49 +20,49 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
         private readonly HttpClient _backChannel;
         private readonly IManageCoursesDbContext _manageCoursesDbContext;
 
-        private readonly IUserLogService _userLogService;
+        private readonly IUserService _userService;
 
-        public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserLogService userLogService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserService userService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
             this._manageCoursesDbContext = manageCoursesDbContext;
             this._backChannel = new HttpClient();
-            this._userLogService = userLogService;
+            this._userService = userService;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var accessToken = Request.GetAccessToken();
 
-            if (!string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(accessToken))
             {
+                return AuthenticateResult.NoResult();
+            }
+
+            try
+            {
+                var userDetails = GetJsonUserDetails(accessToken);
                 try
                 {
-                    var userDetails = GetJsonUserDetails(accessToken);
-
-                    var mcuser = _manageCoursesDbContext.McUsers.ByEmail(userDetails.Email).SingleOrDefault();
-                    if (mcuser == null)
-                    {
-                        Logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
-                        return AuthenticateResult.NoResult();
-                    }
-
-                    var identity = new ClaimsIdentity( 
-                        new[] {
-                            new Claim (ClaimTypes.NameIdentifier, userDetails.Subject),
-                            new Claim (ClaimTypes.Email, userDetails.Email)
-                        }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
-                    
-                    var princical = new ClaimsPrincipal(identity);
-
-                    _userLogService.CreateOrUpdateUserLog(userDetails.Subject, mcuser);
-                    var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
-
-                    return AuthenticateResult.Success(ticket);
+                    await _userService.UserSignedInAsync(userDetails);
                 }
-                catch (Exception ex)
+                catch (UnknownMcUserException)
                 {
-                    return AuthenticateResult.Fail(ex);
+                    Logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
                 }
+
+                var identity = new ClaimsIdentity(
+                    new[] {
+                        new Claim (ClaimTypes.NameIdentifier, userDetails.Subject),
+                        new Claim (ClaimTypes.Email, userDetails.Email)
+                    }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
+
+                var princical = new ClaimsPrincipal(identity);
+                var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
+                return AuthenticateResult.Success(ticket);
+            }
+            catch (Exception ex)
+            {
+                return AuthenticateResult.Fail(ex);
             }
 
             return AuthenticateResult.NoResult();
