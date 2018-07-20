@@ -113,6 +113,13 @@ cd tests\ManageCourses.Tests
 dotnet test --filter TestCategory=Smoke
 ```
 
+## Notes
+
+An example of the config keys that are required for Secret Manager are available from:
+
+	src\ManageCourses.Tests\appsettings.SecretManager_Example.json
+
+
 # Using the API
 
 The API exposes swagger at `/swagger` thanks to [NSwag](https://github.com/RSuter/NSwag)
