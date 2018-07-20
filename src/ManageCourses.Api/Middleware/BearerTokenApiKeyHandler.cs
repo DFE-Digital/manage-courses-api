@@ -1,29 +1,17 @@
 using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using GovUk.Education.ManageCourses.Api.Services;
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
 {
     public class BearerTokenApiKeyHandler : AuthenticationHandler<BearerTokenApiKeyOptions>
     {
-
-        private readonly RequestDelegate _next;
-
-        private readonly HttpClient _backChannel;
-        private readonly IManageCoursesDbContext _manageCoursesDbContext;
-
-        private readonly IUserLogService _userLogService;
-
-        public BearerTokenApiKeyHandler(IOptionsMonitor<BearerTokenApiKeyOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserLogService userLogService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        public BearerTokenApiKeyHandler(IOptionsMonitor<BearerTokenApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
-            this._manageCoursesDbContext = manageCoursesDbContext;
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -67,4 +55,3 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
         }
     }
 }
-

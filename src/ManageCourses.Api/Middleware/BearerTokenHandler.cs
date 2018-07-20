@@ -17,9 +17,6 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 {
     public class BearerTokenHandler : AuthenticationHandler<BearerTokenOptions>
     {
-
-        private readonly RequestDelegate _next;
-
         private readonly HttpClient _backChannel;
         private readonly IManageCoursesDbContext _manageCoursesDbContext;
 
@@ -112,4 +109,3 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
         }
     }
 }
-

@@ -66,7 +66,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         }
 
         [Test]
-        public async Task DataExport_badAccesCode_404()
+        public void DataExport_badAccesCode_404()
         {
             var accessToken = "badAccesCode";
 
@@ -100,7 +100,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         }
 
         [Test]
-        public async Task Invite_badAccesCode_404()
+        public void Invite_badAccesCode_404()
         {
             var accessToken = "badAccesCode";
 
@@ -116,7 +116,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         }
 
         [Test]
-        public async Task Invite_noAccesCode_401()
+        public void Invite_noAccesCode_401()
         {
             var accessToken = "";
 
@@ -124,7 +124,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
             client.BaseUrl = localWebHost.Address;
-
 
             Assert.That(() => client.Invite_IndexAsync(),
                 Throws.TypeOf<SwaggerException>()
