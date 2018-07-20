@@ -25,11 +25,23 @@ In a windows command prompt:
     cd src/ManageCourses.Api
     dotnet run
 
+## Database
+
+There's a script for setting up a postgres user and database: `setup-pg-user.sh`
+
 ## Config
 
 An example of the config keys that are required for Secret Manager are available from:
 
 	src\ManageCourses.Api\appsettings.SecretManager_Example.json
+
+E.g.
+
+    dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST localhost
+    dotnet user-secrets set PG_DATABASE the-database (will be created if missing and sufficient rights, e.g. 'manage')
+    dotnet user-secrets set PG_USERNAME the-user-you-created
+    dotnet user-secrets set PG_PASSWORD the-password-you-set
+
 
 For additional details, refer to
 https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
