@@ -25,6 +25,10 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Email { get; set; }
 
         /// <summary>
+        /// When the user was sent the invite email
+        /// </summary>
+        public DateTime? InviteDateUtc { get; set; }
+
         /// GUID from DfE Sign-in uniquely identifying this user.
         /// We capture this the first time a user signs and then use
         /// it to match up the currently signed in user from then on.
