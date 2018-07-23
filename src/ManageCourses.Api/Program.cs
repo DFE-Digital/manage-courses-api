@@ -22,15 +22,17 @@ namespace GovUk.Education.ManageCourses.Api
                 .ReadFrom.Configuration(Configuration)
                 .CreateLogger();
 
+            var programLogger = Log.ForContext<Program>();
+
             try
             {
-                Log.Information("Starting web host");
+                programLogger.Information("Starting web host");
                 BuildWebHost(args).Run();
                 return 0;
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Host terminated unexpectedly");
+                programLogger.Fatal(ex, "Host terminated unexpectedly");
                 return 1;
             }
             finally
