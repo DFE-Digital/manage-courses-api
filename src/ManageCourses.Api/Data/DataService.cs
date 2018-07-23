@@ -4,6 +4,7 @@ using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ManageCourses.Api.Data
@@ -18,6 +19,10 @@ namespace GovUk.Education.ManageCourses.Api.Data
         }
 
         #region Import
+        /// <summary>
+        /// Processes data in the payload object into the database as an upsert/delta
+        /// </summary>
+        /// <param name="payload"></param>
         public void ProcessPayload(Payload payload)
         {
             //ResetDatabase();
@@ -28,180 +33,191 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 CrseCode = course.CrseCode
             }).Distinct(new CourseCodeComparer());
 
-            var courseCodesMapper = GetDataMapper(uniqueCourseCodes);
-            var coursesMapper = GetDataMapper(payload.Courses.ToList());
-
-            _context.CourseCodes.AddRange((IEnumerable<CourseCode>) courseCodesMapper.Additions);
-            _context.UcasCourses.AddRange((IEnumerable<UcasCourse>) coursesMapper.Additions);
+            var userDatahelper = new UserDataHelper(_context, payload.Users.Where(u => ! string.IsNullOrWhiteSpace(u.Email)).ToList());
+            if (! userDatahelper.Upsert())
+            {
+                //do something
+            }
 
             #region Old Code
-            //foreach (var course in payload.Courses)
-            //{
-            //    // copy props to prevent changing id
-            //    _context.AddUcasCourse(new UcasCourse
-            //    {
-            //        InstCode = course.InstCode,
-            //        CrseCode = course.CrseCode,
-            //        CrseTitle = course.CrseTitle,
-            //        Studymode = course.Studymode,
-            //        Age = course.Age,
-            //        CampusCode = course.CampusCode,
-            //        ProfpostFlag = course.ProfpostFlag,
-            //        ProgramType = course.ProgramType,
-            //        AccreditingProvider = course.AccreditingProvider,
-            //        CrseOpenDate = course.CrseOpenDate
-            //    });
-            //}
 
-            //foreach (var institution in payload.Institutions)
-            //{
-            //    _context.AddUcasInstitution(
-            //        new UcasInstitution
-            //        {
-            //            InstCode = institution.InstCode,
-            //            InstName = institution.InstName,
-            //            InstBig = institution.InstBig,
-            //            InstFull = institution.InstFull,
-            //            InstType = institution.InstType,
-            //            Addr1 = institution.Addr1,
-            //            Addr2 = institution.Addr2,
-            //            Addr3 = institution.Addr3,
-            //            Addr4 = institution.Addr4,
-            //            Postcode = institution.Postcode,
-            //            ContactName = institution.ContactName,
-            //            Url = institution.Url,
-            //            YearCode = institution.YearCode,
-            //            Scitt = institution.Scitt,
-            //            AccreditingProvider = institution.AccreditingProvider,
-            //            SchemeMember = institution.SchemeMember
-            //        }
-            //    );
-            //}
+            foreach (var course in payload.Courses)
+            {
+                // copy props to prevent changing id
+                _context.AddUcasCourse(new UcasCourse
+                {
+                    InstCode = course.InstCode,
+                    CrseCode = course.CrseCode,
+                    CrseTitle = course.CrseTitle,
+                    Studymode = course.Studymode,
+                    Age = course.Age,
+                    CampusCode = course.CampusCode,
+                    ProfpostFlag = course.ProfpostFlag,
+                    ProgramType = course.ProgramType,
+                    AccreditingProvider = course.AccreditingProvider,
+                    CrseOpenDate = course.CrseOpenDate
+                });
+            }
 
-            //foreach (var courseSubject in payload.CourseSubjects)
-            //{
-            //    _context.AddUcasCourseSubject(
-            //        new UcasCourseSubject
-            //        {
-            //            InstCode = courseSubject.InstCode,
-            //            CrseCode = courseSubject.CrseCode,
-            //            SubjectCode = courseSubject.SubjectCode,
-            //            YearCode = courseSubject.YearCode
-            //        }
-            //    );
-            //}
+            foreach (var institution in payload.Institutions)
+            {
+                _context.AddUcasInstitution(
+                    new UcasInstitution
+                    {
+                        InstCode = institution.InstCode,
+                        InstName = institution.InstName,
+                        InstBig = institution.InstBig,
+                        InstFull = institution.InstFull,
+                        InstType = institution.InstType,
+                        Addr1 = institution.Addr1,
+                        Addr2 = institution.Addr2,
+                        Addr3 = institution.Addr3,
+                        Addr4 = institution.Addr4,
+                        Postcode = institution.Postcode,
+                        ContactName = institution.ContactName,
+                        Url = institution.Url,
+                        YearCode = institution.YearCode,
+                        Scitt = institution.Scitt,
+                        AccreditingProvider = institution.AccreditingProvider,
+                        SchemeMember = institution.SchemeMember
+                    }
+                );
+            }
 
-            //foreach (var subject in payload.Subjects)
-            //{
-            //    _context.AddUcasSubject(
-            //        new UcasSubject
-            //        {
-            //            SubjectCode = subject.SubjectCode,
-            //            SubjectDescription = subject.SubjectDescription,
-            //            TitleMatch = subject.TitleMatch
-            //        }
-            //    );
-            //}
+            foreach (var courseSubject in payload.CourseSubjects)
+            {
+                _context.AddUcasCourseSubject(
+                    new UcasCourseSubject
+                    {
+                        InstCode = courseSubject.InstCode,
+                        CrseCode = courseSubject.CrseCode,
+                        SubjectCode = courseSubject.SubjectCode,
+                        YearCode = courseSubject.YearCode
+                    }
+                );
+            }
 
-            //foreach (var campus in payload.Campuses)
-            //{
-            //    _context.AddUcasCampus(
-            //        new UcasCampus
-            //        {
-            //            InstCode = campus.InstCode,
-            //            CampusCode = campus.CampusCode,
-            //            CampusName = campus.CampusName,
-            //            Addr1 = campus.Addr1,
-            //            Addr2 = campus.Addr2,
-            //            Addr3 = campus.Addr3,
-            //            Addr4 = campus.Addr4,
-            //            Postcode = campus.Postcode,
-            //            TelNo = campus.TelNo,
-            //            Email = campus.Email,
-            //            RegionCode = campus.RegionCode
-            //        }
-            //    );
-            //}
+            foreach (var subject in payload.Subjects)
+            {
+                _context.AddUcasSubject(
+                    new UcasSubject
+                    {
+                        SubjectCode = subject.SubjectCode,
+                        SubjectDescription = subject.SubjectDescription,
+                        TitleMatch = subject.TitleMatch
+                    }
+                );
+            }
 
-            //foreach (var courseNote in payload.CourseNotes)
-            //{
-            //    _context.AddUcasCourseNote(
-            //        new UcasCourseNote
-            //        {
-            //            CrseCode = courseNote.CrseCode,
-            //            InstCode = courseNote.InstCode,
-            //            NoteNo = courseNote.NoteNo,
-            //            NoteType = courseNote.NoteType,
-            //            YearCode = courseNote.YearCode
-            //        }
-            //        );
-            //}
+            foreach (var campus in payload.Campuses)
+            {
+                _context.AddUcasCampus(
+                    new UcasCampus
+                    {
+                        InstCode = campus.InstCode,
+                        CampusCode = campus.CampusCode,
+                        CampusName = campus.CampusName,
+                        Addr1 = campus.Addr1,
+                        Addr2 = campus.Addr2,
+                        Addr3 = campus.Addr3,
+                        Addr4 = campus.Addr4,
+                        Postcode = campus.Postcode,
+                        TelNo = campus.TelNo,
+                        Email = campus.Email,
+                        RegionCode = campus.RegionCode
+                    }
+                );
+            }
 
-            //foreach (var noteText in payload.NoteTexts)
-            //{
-            //    _context.AddUcasNoteText(
-            //        new UcasNoteText
-            //        {
-            //            InstCode = noteText.InstCode,
-            //            NoteNo = noteText.NoteNo,
-            //            NoteType = noteText.NoteType,
-            //            LineText = noteText.LineText,
-            //            YearCode = noteText.YearCode
-            //        }
-            //    );
-            //}
+            foreach (var courseNote in payload.CourseNotes)
+            {
+                _context.AddUcasCourseNote(
+                    new UcasCourseNote
+                    {
+                        CrseCode = courseNote.CrseCode,
+                        InstCode = courseNote.InstCode,
+                        NoteNo = courseNote.NoteNo,
+                        NoteType = courseNote.NoteType,
+                        YearCode = courseNote.YearCode
+                    }
+                    );
+            }
 
-            //foreach (var organisation in payload.Organisations)
-            //{
-            //    _context.AddMcOrganisation(
-            //        new McOrganisation
-            //        {
-            //            OrgId = organisation.OrgId,
-            //            Name = organisation.Name
-            //        }
-            //        );
-            //}
-            //foreach (var organisatioInstitution in payload.OrganisationInstitutions)
-            //{
-            //    _context.AddMcOrganisationInstitution(
-            //        new McOrganisationInstitution
-            //        {
-            //            OrgId = organisatioInstitution.OrgId,
-            //            InstitutionCode = organisatioInstitution.InstitutionCode
-            //        }
-            //    );
-            //}
-            //foreach (var organisationUser in payload.OrganisationUsers)
-            //{
-            //    _context.AddMcOrganisationUser(
-            //        new McOrganisationUser
-            //        {
-            //            OrgId = organisationUser.OrgId,
-            //            Email = organisationUser.Email
-            //        }
-            //    );
-            //}
-            //foreach (var user in payload.Users)
-            //{
-            //    _context.AddMcUser(
-            //        new McUser
-            //        {
-            //            FirstName = user.FirstName,
-            //            LastName = user.LastName,
-            //            Email = user.Email
-            //        }
-            //    );
-            //}
+            foreach (var noteText in payload.NoteTexts)
+            {
+                _context.AddUcasNoteText(
+                    new UcasNoteText
+                    {
+                        InstCode = noteText.InstCode,
+                        NoteNo = noteText.NoteNo,
+                        NoteType = noteText.NoteType,
+                        LineText = noteText.LineText,
+                        YearCode = noteText.YearCode
+                    }
+                );
+            }
 
-            //_context.Save();
-#endregion
+            foreach (var organisation in payload.Organisations)
+            {
+                _context.AddMcOrganisation(
+                    new McOrganisation
+                    {
+                        OrgId = organisation.OrgId,
+                        Name = organisation.Name
+                    }
+                    );
+            }
+            foreach (var organisatioInstitution in payload.OrganisationInstitutions)
+            {
+                _context.AddMcOrganisationInstitution(
+                    new McOrganisationInstitution
+                    {
+                        OrgId = organisatioInstitution.OrgId,
+                        InstitutionCode = organisatioInstitution.InstitutionCode
+                    }
+                );
+            }
+            foreach (var organisationUser in payload.OrganisationUsers)
+            {
+                _context.AddMcOrganisationUser(
+                    new McOrganisationUser
+                    {
+                        OrgId = organisationUser.OrgId,
+                        Email = organisationUser.Email
+                    }
+                );
+            }
+  
+            _context.Save();
+
+            #endregion
+
         }
+        private void ResetDatabase()
+        {
+            // clear out the existing data
+            _context.UcasCourses.RemoveRange(_context.UcasCourses);
+            _context.CourseCodes.RemoveRange(_context.CourseCodes);
+            _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
+            _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
+            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
+            _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
+            _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
+            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
+            _context.McOrganisations.RemoveRange(_context.McOrganisations);
+            _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
+            _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
+            //_context.McUsers.RemoveRange(_context.McUsers);
+            _context.Save();
+        }
+
+        /*
         /// <summary>
         /// Returns a list of course code that DO NOT exist in the database
         /// </summary>
         /// <param name="courseCodes"></param>
         /// <returns>list of new course codes to add</returns>
-        private ImportMapper GetDataMapper(IEnumerable<CourseCode> courseCodes)
+        private ImportMapper GetDataMapper(IReadOnlyCollection<CourseCode> courseCodes)
         {
             var mapperToReturn = new ImportMapper();
             var additions = new List<CourseCode>();
@@ -236,16 +252,15 @@ namespace GovUk.Education.ManageCourses.Api.Data
             return mapperToReturn;
         }
         /// <summary>
-        /// Returns a list of course code that DO NOT exist in the database
+        /// Returns an ImportMapper class thats holds list for all additions/updates and deletions
         /// </summary>
         /// <param name="courses"></param>
         /// <returns>list of new course codes to add</returns>
-        private ImportMapper GetDataMapper(List<UcasCourse> courses)
+        private ImportMapper GetDataMapper(IReadOnlyCollection<UcasCourse> courses)
         {
             var mapperToReturn = new ImportMapper();
             var additions = new List<UcasCourse>();
             var updates = new List<UcasCourse>();
-            var deletes = new List<UcasCourse>();
 
             foreach (var course in courses)
             {
@@ -262,13 +277,78 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     }
                 }
             }
-            foreach (var dbRecord in _context.UcasCourses)
+
+            var deletes = _context.UcasCourses.Where(dbRecord => !courses.Any(c => c.CrseCode == dbRecord.CrseCode && c.InstCode == dbRecord.InstCode && dbRecord.CampusCode == c.CampusCode)).ToList();
+
+            mapperToReturn.Additions = additions;
+            mapperToReturn.Updates = updates;
+            mapperToReturn.Deletes = deletes;
+
+            return mapperToReturn;
+        }
+        /// <summary>
+        /// Returns an ImportMapper class thats holds list for all additions/updates and deletions
+        /// </summary>
+        /// <param name="institutions"></param>
+        /// <returns>list of new course codes to add</returns>
+        private ImportMapper GetDataMapper(IReadOnlyCollection<UcasInstitution> institutions)
+        {
+            var mapperToReturn = new ImportMapper();
+            var additions = new List<UcasInstitution>();
+            var updates = new List<UcasInstitution>();
+
+            foreach (var institution in institutions)
             {
-                if (!courses.Any(c => c.CrseCode == dbRecord.CrseCode && c.InstCode == dbRecord.InstCode && dbRecord.CampusCode == c.CampusCode))
+                var dbRecord = GetDbRecord(institution);
+                if (dbRecord == null)
                 {
-                    deletes.Add(dbRecord);
+                    additions.Add(institution);
+                }
+                else
+                {
+                    if (IsUpdated(dbRecord, institution))
+                    {
+                        updates.Add(institution);
+                    }
                 }
             }
+           
+            var deletes = _context.UcasInstitutions.Where(dbRecord => institutions.All(x => x.InstCode != dbRecord.InstCode)).ToList();
+
+            mapperToReturn.Additions = additions;
+            mapperToReturn.Updates = updates;
+            mapperToReturn.Deletes = deletes;
+
+            return mapperToReturn;
+        }
+        /// <summary>
+        /// Returns an ImportMapper class thats holds list for all additions/updates and deletions
+        /// </summary>
+        /// <param name="subjects"></param>
+        /// <returns>list of new course codes to add</returns>
+        private ImportMapper GetDataMapper(IReadOnlyCollection<UcasSubject> subjects)
+        {
+            var mapperToReturn = new ImportMapper();
+            var additions = new List<UcasSubject>();
+            var updates = new List<UcasSubject>();
+
+            foreach (var subject in subjects)
+            {
+                var dbRecord = GetDbRecord(subject);
+                if (dbRecord == null)
+                {
+                    additions.Add(subject);
+                }
+                else
+                {
+                    if (IsUpdated(dbRecord, subject))
+                    {
+                        updates.Add(subject);
+                    }
+                }
+            }
+
+            var deletes = _context.UcasSubjects.Where(dbRecord => !subjects.Any(c => c.SubjectCode == dbRecord.SubjectCode)).ToList();
 
             mapperToReturn.Additions = additions;
             mapperToReturn.Updates = updates;
@@ -277,23 +357,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
             return mapperToReturn;
         }
 
-        private bool IsUpdated(CourseCode dbRecord, CourseCode importRecord)
-        {
-            bool returnBool;
-            returnBool = (dbRecord.CrseCode != importRecord.CrseCode || dbRecord.InstCode != importRecord.InstCode);
-
-            //returnBool = (dbRecord.UcasInstitution.AccreditingProvider != importRecord.UcasInstitution.AccreditingProvider ||
-            //              dbRecord.UcasInstitution.ContactName != importRecord.UcasInstitution.ContactName ||
-            //              dbRecord.UcasInstitution.InstBig != importRecord.UcasInstitution.InstBig ||
-            //              dbRecord.UcasInstitution.InstFull != importRecord.UcasInstitution. ||
-            //              dbRecord.UcasInstitution.Addr1 != importRecord.UcasInstitution.Addr1 ||
-            //              dbRecord.UcasInstitution.Addr2 != importRecord.UcasInstitution.Addr2 ||
-            //              dbRecord.UcasInstitution.Addr3 != importRecord.UcasInstitution.Addr3 ||
-            //              dbRecord.UcasInstitution.Addr4 != importRecord.UcasInstitution.Addr4 ||
-            //              dbRecord.UcasInstitution.Postcode != importRecord.UcasInstitution.Postcode
-            //    );
-            return returnBool;
-        }
         private bool IsUpdated(UcasCourse dbRecord, UcasCourse importRecord)
         {
             bool returnBool;
@@ -310,36 +373,54 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
             return returnBool;
         }
+        private bool IsUpdated(UcasInstitution dbRecord, UcasInstitution importRecord)
+        {
+            bool returnBool;
+            returnBool = (dbRecord.AccreditingProvider != importRecord.AccreditingProvider ||
+                          dbRecord.ContactName != importRecord.ContactName ||
+                          dbRecord.InstFull != importRecord.InstFull ||
+                          dbRecord.InstName != importRecord.InstName ||
+                          dbRecord.InstBig != importRecord.InstBig ||
+                          dbRecord.InstType != importRecord.InstType ||
+                          dbRecord.YearCode != importRecord.YearCode ||
+                          dbRecord.Scitt != importRecord.Scitt ||
+                          dbRecord.SchemeMember != importRecord.SchemeMember ||
+                          dbRecord.Addr1 != importRecord.Addr1 ||
+                          dbRecord.Addr2 != importRecord.Addr2 ||
+                          dbRecord.Addr3 != importRecord.Addr3 ||
+                          dbRecord.Addr4 != importRecord.Addr4 ||
+                          dbRecord.Postcode != importRecord.Postcode);                          
+
+            return returnBool;
+        }
+        private bool IsUpdated(UcasSubject dbRecord, UcasSubject importRecord)
+        {
+            bool returnBool;
+            returnBool = (dbRecord.SubjectDescription != importRecord.SubjectDescription ||
+                          dbRecord.TitleMatch != importRecord.TitleMatch);
+
+            return returnBool;
+        }
         private UcasCourse GetDbRecord(UcasCourse course)
         {
-            return _context.UcasCourses.FirstOrDefault(c =>
-                c.CrseCode == course.CrseCode && c.InstCode == course.InstCode && c.CampusCode == course.CampusCode);          
+            return _context.UcasCourses.FirstOrDefault(x =>
+                x.CrseCode == course.CrseCode && x.InstCode == course.InstCode && x.CampusCode == course.CampusCode);          
         }
-
         private CourseCode GetDbRecord(CourseCode courseCode)
         {
-            return _context.CourseCodes.FirstOrDefault(c =>
-                c.InstCode == courseCode.InstCode && c.CrseCode == courseCode.CrseCode);
+            return _context.CourseCodes.FirstOrDefault(x =>
+                x.InstCode == courseCode.InstCode && x.CrseCode == courseCode.CrseCode);
         }
-
-        //private void ResetDatabase()
-        //{
-        //    // clear out the existing data
-        //    _context.UcasCourses.RemoveRange(_context.UcasCourses);
-        //    _context.CourseCodes.RemoveRange(_context.CourseCodes);
-        //    _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
-        //    _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
-        //    _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
-        //    _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
-        //    _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
-        //    _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
-        //    _context.McOrganisations.RemoveRange(_context.McOrganisations);
-        //    _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
-        //    _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
-        //    _context.McUsers.RemoveRange(_context.McUsers);
-        //    _context.Save();
-        //}
-
+        private UcasInstitution GetDbRecord(UcasInstitution institution)
+        {
+            return _context.UcasInstitutions.FirstOrDefault(x => x.InstCode == institution.InstCode);
+        }
+        private UcasSubject GetDbRecord(UcasSubject subject)
+        {
+            return _context.UcasSubjects.FirstOrDefault(x =>
+                x.SubjectCode == subject.SubjectCode);
+        }
+*/
         public class CourseCodeComparer : IEqualityComparer<CourseCode>
         {
             public bool Equals(CourseCode x, CourseCode y)
