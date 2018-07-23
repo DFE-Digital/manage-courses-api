@@ -19,7 +19,13 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            migrationBuilder.Sql(@"
+                insert into user_log (first_login_date_utc, last_login_date_utc,
+                    welcome_email_date_utc, sign_in_user_id, user_email, user_id)
+                select first_login_date_utc, last_login_date_utc,
+                    welcome_email_date_utc, sign_in_user_id, email, id
+                from mc_user
+                where first_login_date_utc is not null and last_login_date_utc is not null;");
         }
     }
 }
