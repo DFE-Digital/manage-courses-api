@@ -28,11 +28,6 @@ before_script:
 script:
 - "./travis-build.sh --quiet verify"
 deploy:
-- provider: script
-  skip_cleanup: true
-  script: chmod +x ./travis-nuget-deploy.sh && ./travis-nuget-deploy.sh $NUGET_API_KEY $NUGET_SOURCE
-  on:
-    all_branches: true
 - provider: azure_web_apps
   username: govuk-dfe-bat-deployment-user
   site: bat-dev-manage-courses-api-app	
@@ -45,5 +40,10 @@ deploy:
   username: govuk-dfe-bat-deployment-user
   site: bat-prod-manage-courses-api-app	
   on: production
+- provider: script
+  skip_cleanup: true
+  script: chmod +x ./travis-nuget-deploy.sh && ./travis-nuget-deploy.sh $NUGET_API_KEY $NUGET_SOURCE
+  on:
+    all_branches: true
 services:
 - postgresql: '9.6'
