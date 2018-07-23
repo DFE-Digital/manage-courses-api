@@ -19,7 +19,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
     {
         private IUserService _userService;
         private Mock<IWelcomeEmailService> _mockWelcomeEmailService;
-        private DateTime _mockTime;
+        private DateTime _mockTime = new DateTime(1978,1,2,3,4,5,7);
         private McUser _testUserBob;
         private McUser _userTestUserFrank;
 
@@ -45,7 +45,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             _mockWelcomeEmailService = new Mock<IWelcomeEmailService>();
 
             var mockClock = new Mock<IClock>();
-            mockClock.SetupGet(c => c.UtcNow).Returns(_mockTime);
+            mockClock.SetupGet(c => c.UtcNow).Returns(() => _mockTime);
 
             _userService = new UserService(context, _mockWelcomeEmailService.Object, mockClock.Object);
         }
