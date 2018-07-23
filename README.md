@@ -105,12 +105,20 @@ These need internet access and the following additional user secrets
 - auth:oidc:userinfo_endpoint (the user_info endpoint of the dfe signin test oauth server, e.g. https://signin-test-oidc-as.azurewebsites.net/me)
 - credentials:dfesignin:username (User name of an existing account on the Dfe Sign in test server)
 - credentials:dfesignin:password (...and corresponding password)
+- api:key (The api key)
 
 Then run
 ```
 cd tests\ManageCourses.Tests
 dotnet test --filter TestCategory=Smoke
 ```
+
+## Notes
+
+An example of the config keys that are required for Secret Manager are available from:
+
+	src\ManageCourses.Tests\appsettings.SecretManager_Example.json
+
 
 # Using the API
 
