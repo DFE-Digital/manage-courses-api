@@ -26,10 +26,31 @@ before_script:
 script:
 - "./travis-build.sh --quiet verify"
 deploy:
+- provider: script
   skip_cleanup: true
-  provider: script
-  script: chmod +x ./travis-deploy.sh && ./travis-deploy.sh $NUGET_API_KEY $NUGET_SOURCE
+  script: chmod +x ./travis-nuget-deploy.sh && ./travis-nuget-deploy.sh $NUGET_API_KEY $NUGET_SOURCE
   on:
     all_branches: true
+- provider: azure_web_apps
+  username: govuk-dfe-bat-deployment-user
+  password: 
+    secure: "rTkCAwevPFsv0qm6VzpPjWpmluqsTim4T5E8Z0C/h4mUd//syfMH1crewQEToOz341ShB1Nt/zlDL2BJJVAqOuGFJP+W2osiWr5NeodI2s8ZCvhMgDwD6Yfn4Bex9IrGaMbadcijUqo2gbQcTTNxzZ+aY6dB0oo5hjson0Bo9jdTphlHuBNRmXgPcIvCSnpOQrDGXbrpNy/9Chk68Q0BjZ6MJ+qoGA3fmed1esOjpqwpGdQ54VdU9T04f1fx+iyPSEOVCzwcbWks2sTm3taI8NMXc1qMsbD46UR7DeFq0CxOIxzSdr58TvA0EHO110mhTWTqMJ0TxwMOcG5gzaszvCXjdAdZaRNaUjYNCnU17CkuEbCUKUIKLDuX+Ip5kmEcMYeDhRrVoKZA7eo6C0atphKaMHsTdAsb4s8ysf3Fg1fBIeKKENSGWSJ5ATEiK8FN0TERo2jHb6bsZZoGIX5UES0vxV5dQDk5jNLLkO+X+36vU7kG06Qv45blRFwaGfmLTcY+SPFxKelpp37cwevL+KwwA2B/qb+F0chK7JCvpgeXfh4xr0vB7k+x0NJyHt8bpjr2z93ehLoUHAotTtOQn+YU4IO6gdPzMHGjLyzUyrJRmp/UXgTMY6IfjIm0mEscoN9I99W0ZSUKGmv0CadKRaNJnbAtZCdcrbM27YJtrsI="
+  site: bat-dev-manage-courses-api-app
+  on:
+    branch: master
+- provider: azure_web_apps
+  username: govuk-dfe-bat-deployment-user
+  password: 
+    secure: "rTkCAwevPFsv0qm6VzpPjWpmluqsTim4T5E8Z0C/h4mUd//syfMH1crewQEToOz341ShB1Nt/zlDL2BJJVAqOuGFJP+W2osiWr5NeodI2s8ZCvhMgDwD6Yfn4Bex9IrGaMbadcijUqo2gbQcTTNxzZ+aY6dB0oo5hjson0Bo9jdTphlHuBNRmXgPcIvCSnpOQrDGXbrpNy/9Chk68Q0BjZ6MJ+qoGA3fmed1esOjpqwpGdQ54VdU9T04f1fx+iyPSEOVCzwcbWks2sTm3taI8NMXc1qMsbD46UR7DeFq0CxOIxzSdr58TvA0EHO110mhTWTqMJ0TxwMOcG5gzaszvCXjdAdZaRNaUjYNCnU17CkuEbCUKUIKLDuX+Ip5kmEcMYeDhRrVoKZA7eo6C0atphKaMHsTdAsb4s8ysf3Fg1fBIeKKENSGWSJ5ATEiK8FN0TERo2jHb6bsZZoGIX5UES0vxV5dQDk5jNLLkO+X+36vU7kG06Qv45blRFwaGfmLTcY+SPFxKelpp37cwevL+KwwA2B/qb+F0chK7JCvpgeXfh4xr0vB7k+x0NJyHt8bpjr2z93ehLoUHAotTtOQn+YU4IO6gdPzMHGjLyzUyrJRmp/UXgTMY6IfjIm0mEscoN9I99W0ZSUKGmv0CadKRaNJnbAtZCdcrbM27YJtrsI="
+  site: bat-staging-manage-courses-api-app
+  on:
+    branch: staging
+- provider: azure_web_apps
+  username: govuk-dfe-bat-deployment-user
+  password: 
+    secure: "rTkCAwevPFsv0qm6VzpPjWpmluqsTim4T5E8Z0C/h4mUd//syfMH1crewQEToOz341ShB1Nt/zlDL2BJJVAqOuGFJP+W2osiWr5NeodI2s8ZCvhMgDwD6Yfn4Bex9IrGaMbadcijUqo2gbQcTTNxzZ+aY6dB0oo5hjson0Bo9jdTphlHuBNRmXgPcIvCSnpOQrDGXbrpNy/9Chk68Q0BjZ6MJ+qoGA3fmed1esOjpqwpGdQ54VdU9T04f1fx+iyPSEOVCzwcbWks2sTm3taI8NMXc1qMsbD46UR7DeFq0CxOIxzSdr58TvA0EHO110mhTWTqMJ0TxwMOcG5gzaszvCXjdAdZaRNaUjYNCnU17CkuEbCUKUIKLDuX+Ip5kmEcMYeDhRrVoKZA7eo6C0atphKaMHsTdAsb4s8ysf3Fg1fBIeKKENSGWSJ5ATEiK8FN0TERo2jHb6bsZZoGIX5UES0vxV5dQDk5jNLLkO+X+36vU7kG06Qv45blRFwaGfmLTcY+SPFxKelpp37cwevL+KwwA2B/qb+F0chK7JCvpgeXfh4xr0vB7k+x0NJyHt8bpjr2z93ehLoUHAotTtOQn+YU4IO6gdPzMHGjLyzUyrJRmp/UXgTMY6IfjIm0mEscoN9I99W0ZSUKGmv0CadKRaNJnbAtZCdcrbM27YJtrsI="
+  site: bat-prod-manage-courses-api-app
+  on:
+    branch: production
 services:
 - postgresql: '9.6'
