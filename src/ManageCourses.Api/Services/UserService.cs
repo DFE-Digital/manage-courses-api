@@ -24,7 +24,14 @@ namespace GovUk.Education.ManageCourses.Api.Services
         /// <inheritdoc />
         public async Task UserSignedInAsync(JsonUserDetails userDetails)
         {
-            var mcUser = await _context.McUsers.ByEmail(userDetails.Email).SingleOrDefaultAsync();
+            var mcUser = await _context.McUsers.SingleOrDefaultAsync(u => u.SignInUserId == userDetails.Subject);
+            if (mcUser == null)
+            {
+                // fall back to email address for users where we don't yet know their sign-in id
+                mcUser = await _context.McUsers.ByEmail(userDetails.Email).SingleOrDefaultAsync();
+                // record the sign-in id and use that in future
+                mcUser.SignInUserId = userDetails.Subject;
+            }
             if (mcUser == null)
             {
                 throw new UnknownMcUserException();
@@ -47,10 +54,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
         private static void UpdateMcUserFromSignIn(McUser user, JsonUserDetails userDetails)
         {
-            if (user.SignInUserId == null)
-            {
-                user.SignInUserId = userDetails.Subject;
-            }
             user.Email = userDetails.Email;
             user.FirstName = userDetails.GivenName;
             user.LastName = userDetails.FamilyName;
