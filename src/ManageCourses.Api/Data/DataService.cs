@@ -25,21 +25,21 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// <param name="payload"></param>
         public void ProcessPayload(Payload payload)
         {
-            //ResetDatabase();
+            ResetDatabase();
 
-            var uniqueCourseCodes = payload.Courses.Select(course => new CourseCode
+            var userDatahelper = new UserDataHelper(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
+            if (!userDatahelper.Upsert())
+            {
+                return;
+            }
+
+            var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
                 InstCode = course.InstCode,
                 CrseCode = course.CrseCode
-            }).Distinct(new CourseCodeComparer());
+            }).Distinct(new CourseComparer());
 
-            var userDatahelper = new UserDataHelper(_context, payload.Users.Where(u => ! string.IsNullOrWhiteSpace(u.Email)).ToList());
-            if (! userDatahelper.Upsert())
-            {
-                //do something
-            }
-
-            #region Old Code
+            _context.CourseCodes.AddRange(uniqueCourses);
 
             foreach (var course in payload.Courses)
             {
@@ -190,8 +190,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
   
             _context.Save();
 
-            #endregion
-
         }
         private void ResetDatabase()
         {
@@ -207,221 +205,10 @@ namespace GovUk.Education.ManageCourses.Api.Data
             _context.McOrganisations.RemoveRange(_context.McOrganisations);
             _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
             _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
-            //_context.McUsers.RemoveRange(_context.McUsers);
             _context.Save();
         }
 
-        /*
-        /// <summary>
-        /// Returns a list of course code that DO NOT exist in the database
-        /// </summary>
-        /// <param name="courseCodes"></param>
-        /// <returns>list of new course codes to add</returns>
-        private ImportMapper GetDataMapper(IReadOnlyCollection<CourseCode> courseCodes)
-        {
-            var mapperToReturn = new ImportMapper();
-            var additions = new List<CourseCode>();
-            var updates = new List<CourseCode>();
-            var deletes = new List<CourseCode>();
-
-            foreach (var courseCode in courseCodes)
-            {
-                var dbRecord = GetDbRecord(courseCode);
-                if (dbRecord == null)
-                {
-                    additions.Add(courseCode);
-                }
-                else
-                {
-                    //dont worry about updates for course codes as there are only 2 fields
-                }
-            }
-
-            foreach (var dbRecord in _context.CourseCodes)
-            {
-                if (! courseCodes.Any(c => c.CrseCode == dbRecord.CrseCode && c.InstCode == dbRecord.InstCode))
-                {
-                    deletes.Add(dbRecord);
-                }
-            }
-
-            mapperToReturn.Additions = additions;
-            mapperToReturn.Updates = updates;
-            mapperToReturn.Deletes = deletes;
-
-            return mapperToReturn;
-        }
-        /// <summary>
-        /// Returns an ImportMapper class thats holds list for all additions/updates and deletions
-        /// </summary>
-        /// <param name="courses"></param>
-        /// <returns>list of new course codes to add</returns>
-        private ImportMapper GetDataMapper(IReadOnlyCollection<UcasCourse> courses)
-        {
-            var mapperToReturn = new ImportMapper();
-            var additions = new List<UcasCourse>();
-            var updates = new List<UcasCourse>();
-
-            foreach (var course in courses)
-            {
-                var dbRecord = GetDbRecord(course);
-                if (dbRecord == null)
-                {
-                    additions.Add(course);
-                }
-                else
-                {
-                    if (IsUpdated(dbRecord, course))
-                    {
-                        updates.Add(course);
-                    }
-                }
-            }
-
-            var deletes = _context.UcasCourses.Where(dbRecord => !courses.Any(c => c.CrseCode == dbRecord.CrseCode && c.InstCode == dbRecord.InstCode && dbRecord.CampusCode == c.CampusCode)).ToList();
-
-            mapperToReturn.Additions = additions;
-            mapperToReturn.Updates = updates;
-            mapperToReturn.Deletes = deletes;
-
-            return mapperToReturn;
-        }
-        /// <summary>
-        /// Returns an ImportMapper class thats holds list for all additions/updates and deletions
-        /// </summary>
-        /// <param name="institutions"></param>
-        /// <returns>list of new course codes to add</returns>
-        private ImportMapper GetDataMapper(IReadOnlyCollection<UcasInstitution> institutions)
-        {
-            var mapperToReturn = new ImportMapper();
-            var additions = new List<UcasInstitution>();
-            var updates = new List<UcasInstitution>();
-
-            foreach (var institution in institutions)
-            {
-                var dbRecord = GetDbRecord(institution);
-                if (dbRecord == null)
-                {
-                    additions.Add(institution);
-                }
-                else
-                {
-                    if (IsUpdated(dbRecord, institution))
-                    {
-                        updates.Add(institution);
-                    }
-                }
-            }
-           
-            var deletes = _context.UcasInstitutions.Where(dbRecord => institutions.All(x => x.InstCode != dbRecord.InstCode)).ToList();
-
-            mapperToReturn.Additions = additions;
-            mapperToReturn.Updates = updates;
-            mapperToReturn.Deletes = deletes;
-
-            return mapperToReturn;
-        }
-        /// <summary>
-        /// Returns an ImportMapper class thats holds list for all additions/updates and deletions
-        /// </summary>
-        /// <param name="subjects"></param>
-        /// <returns>list of new course codes to add</returns>
-        private ImportMapper GetDataMapper(IReadOnlyCollection<UcasSubject> subjects)
-        {
-            var mapperToReturn = new ImportMapper();
-            var additions = new List<UcasSubject>();
-            var updates = new List<UcasSubject>();
-
-            foreach (var subject in subjects)
-            {
-                var dbRecord = GetDbRecord(subject);
-                if (dbRecord == null)
-                {
-                    additions.Add(subject);
-                }
-                else
-                {
-                    if (IsUpdated(dbRecord, subject))
-                    {
-                        updates.Add(subject);
-                    }
-                }
-            }
-
-            var deletes = _context.UcasSubjects.Where(dbRecord => !subjects.Any(c => c.SubjectCode == dbRecord.SubjectCode)).ToList();
-
-            mapperToReturn.Additions = additions;
-            mapperToReturn.Updates = updates;
-            mapperToReturn.Deletes = deletes;
-
-            return mapperToReturn;
-        }
-
-        private bool IsUpdated(UcasCourse dbRecord, UcasCourse importRecord)
-        {
-            bool returnBool;
-            returnBool = (dbRecord.CrseCode != importRecord.CrseCode ||
-                          dbRecord.InstCode != importRecord.InstCode ||
-                          dbRecord.CampusCode != importRecord.CampusCode ||
-                          dbRecord.AccreditingProvider != importRecord.AccreditingProvider ||
-                          dbRecord.Age != importRecord.Age ||
-                          dbRecord.CrseOpenDate != importRecord.CrseOpenDate ||
-                          dbRecord.CrseTitle != importRecord.CrseTitle ||
-                          dbRecord.ProfpostFlag != importRecord.ProfpostFlag ||
-                          dbRecord.ProgramType != importRecord.ProgramType ||
-                          dbRecord.Studymode != importRecord.Studymode);
-
-            return returnBool;
-        }
-        private bool IsUpdated(UcasInstitution dbRecord, UcasInstitution importRecord)
-        {
-            bool returnBool;
-            returnBool = (dbRecord.AccreditingProvider != importRecord.AccreditingProvider ||
-                          dbRecord.ContactName != importRecord.ContactName ||
-                          dbRecord.InstFull != importRecord.InstFull ||
-                          dbRecord.InstName != importRecord.InstName ||
-                          dbRecord.InstBig != importRecord.InstBig ||
-                          dbRecord.InstType != importRecord.InstType ||
-                          dbRecord.YearCode != importRecord.YearCode ||
-                          dbRecord.Scitt != importRecord.Scitt ||
-                          dbRecord.SchemeMember != importRecord.SchemeMember ||
-                          dbRecord.Addr1 != importRecord.Addr1 ||
-                          dbRecord.Addr2 != importRecord.Addr2 ||
-                          dbRecord.Addr3 != importRecord.Addr3 ||
-                          dbRecord.Addr4 != importRecord.Addr4 ||
-                          dbRecord.Postcode != importRecord.Postcode);                          
-
-            return returnBool;
-        }
-        private bool IsUpdated(UcasSubject dbRecord, UcasSubject importRecord)
-        {
-            bool returnBool;
-            returnBool = (dbRecord.SubjectDescription != importRecord.SubjectDescription ||
-                          dbRecord.TitleMatch != importRecord.TitleMatch);
-
-            return returnBool;
-        }
-        private UcasCourse GetDbRecord(UcasCourse course)
-        {
-            return _context.UcasCourses.FirstOrDefault(x =>
-                x.CrseCode == course.CrseCode && x.InstCode == course.InstCode && x.CampusCode == course.CampusCode);          
-        }
-        private CourseCode GetDbRecord(CourseCode courseCode)
-        {
-            return _context.CourseCodes.FirstOrDefault(x =>
-                x.InstCode == courseCode.InstCode && x.CrseCode == courseCode.CrseCode);
-        }
-        private UcasInstitution GetDbRecord(UcasInstitution institution)
-        {
-            return _context.UcasInstitutions.FirstOrDefault(x => x.InstCode == institution.InstCode);
-        }
-        private UcasSubject GetDbRecord(UcasSubject subject)
-        {
-            return _context.UcasSubjects.FirstOrDefault(x =>
-                x.SubjectCode == subject.SubjectCode);
-        }
-*/
-        public class CourseCodeComparer : IEqualityComparer<CourseCode>
+        public class CourseComparer : IEqualityComparer<CourseCode>
         {
             public bool Equals(CourseCode x, CourseCode y)
             {
@@ -433,19 +220,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 return ($"{cc.InstCode}_{cc.CrseCode}").GetHashCode();
             }
         }
-        public class CourseComparer : IEqualityComparer<UcasCourse>
-        {
-            public bool Equals(UcasCourse x, UcasCourse y)
-            {
-                return x.InstCode == y.InstCode && x.CrseCode == y.CrseCode;
-            }
-
-            public int GetHashCode(UcasCourse cc)
-            {
-                return ($"{cc.InstCode}_{cc.CrseCode}").GetHashCode();
-            }
-        }
-
         #endregion
 
         #region Export
