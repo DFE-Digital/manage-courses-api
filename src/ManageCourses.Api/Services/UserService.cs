@@ -29,8 +29,11 @@ namespace GovUk.Education.ManageCourses.Api.Services
             {
                 // fall back to email address for users where we don't yet know their sign-in id
                 mcUser = await _context.McUsers.ByEmail(userDetails.Email).SingleOrDefaultAsync();
-                // record the sign-in id and use that in future
-                mcUser.SignInUserId = userDetails.Subject;
+                if (mcUser != null)
+                {
+                    // record the sign-in id and use that in future
+                    mcUser.SignInUserId = userDetails.Subject;
+                }
             }
             if (mcUser == null)
             {
