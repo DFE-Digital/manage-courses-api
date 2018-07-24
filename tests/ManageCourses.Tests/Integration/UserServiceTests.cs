@@ -77,7 +77,8 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         [Test]
         public void SignInTest()
         {
-            _mockTime = new DateTime(2017, 12, 31, 23, 59, 59);
+            var firstSignInTime = new DateTime(2017, 12, 31, 23, 59, 59);
+            _mockTime = firstSignInTime;
 
             const string bobSubject = "2C4B4170-8979-444F-8D44-DC6DE22BEABF";
             var jsonUserDetails = new JsonUserDetails
@@ -94,13 +95,14 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             _userService.UserSignedInAsync(jsonUserDetails);
             // check user data updated from claims and timestamps have been set
             CheckUserDataUpdated(_testUserBob, jsonUserDetails);
-            _testUserBob.FirstLoginDateUtc.Should().Be(_mockTime);
-            _testUserBob.LastLoginDateUtc.Should().Be(_mockTime);
+            _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
+            _testUserBob.LastLoginDateUtc.Should().Be(firstSignInTime);
             // check welcome email sent & logged
-            _testUserBob.WelcomeEmailDateUtc.Should().Be(_mockTime);
+            _testUserBob.WelcomeEmailDateUtc.Should().Be(firstSignInTime);
             _mockWelcomeEmailService.Verify(x => x.Send(_testUserBob), Times.Once);
 
-            var mockLaterTime = _mockTime.AddHours(8);
+            var secondSignInTime = _mockTime.AddHours(8);
+            _mockTime = secondSignInTime;
 
             // bob signs in again, with a new name & email
             // this checks that we are now relying on the sign-in guid and not the email address,
@@ -111,10 +113,10 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             _userService.UserSignedInAsync(jsonUserDetails); // would throw if it couldn't find the McUser entry
             // check user data updated from claims and timestamps have been set
             CheckUserDataUpdated(_testUserBob, jsonUserDetails);
-            _testUserBob.LastLoginDateUtc.Should().Be(mockLaterTime);
+            _testUserBob.LastLoginDateUtc.Should().Be(secondSignInTime);
             // check original timestamps have not been altered
-            _testUserBob.FirstLoginDateUtc.Should().Be(_mockTime);
-            _testUserBob.WelcomeEmailDateUtc.Should().Be(_mockTime);
+            _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
+            _testUserBob.WelcomeEmailDateUtc.Should().Be(firstSignInTime);
 
             // check only one email was sent
             _mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Once);
