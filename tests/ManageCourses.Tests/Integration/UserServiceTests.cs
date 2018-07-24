@@ -51,13 +51,11 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         }
 
         [TearDown]
-        public override void TearDown()
+        public void Cleanup()
         {
-            foreach (var item in context.McUsers)
-            {
-                var x = ((DbContext)context).Entry(item);
-                this.entitiesToCleanUp.Add(x);
-            }
+            context.Remove(_testUserBob);
+            context.Remove(_userTestUserFrank);
+            context.Save();
         }
 
         [Test]
