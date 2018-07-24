@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
+using GovUk.Education.ManageCourses.Api.Services.Email;
+using GovUk.Education.ManageCourses.Api.Services.Email.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
 namespace GovUk.Education.ManageCourses.Tests.Integration
@@ -20,7 +20,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
     {
         private IUserService _userService;
         private Mock<IWelcomeEmailService> _mockWelcomeEmailService;
-        private DateTime _mockTime = new DateTime(1978,1,2,3,4,5,7);
+        private DateTime _mockTime = new DateTime(1978, 1, 2, 3, 4, 5, 7);
         private McUser _testUserBob;
         private McUser _userTestUserFrank;
 
@@ -98,7 +98,11 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             _testUserBob.LastLoginDateUtc.Should().Be(firstSignInTime);
             // check welcome email sent & logged
             _testUserBob.WelcomeEmailDateUtc.Should().Be(firstSignInTime);
-            _mockWelcomeEmailService.Verify(x => x.Send(_testUserBob), Times.Once);
+
+            var welcomeModelBob = new WelcomeEmailModel(_testUserBob);
+            _mockWelcomeEmailService.Verify(
+                x => x.Send(It.Is<WelcomeEmailModel>(model => (model.EmailAddress == welcomeModelBob.EmailAddress))),
+                Times.Once);
 
             var secondSignInTime = _mockTime.AddHours(8);
             _mockTime = secondSignInTime;
@@ -118,7 +122,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             _testUserBob.WelcomeEmailDateUtc.Should().Be(firstSignInTime);
 
             // check only one email was sent
-            _mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Once);
+            _mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<WelcomeEmailModel>()), Times.Once);
         }
 
         private void CheckUserDataUpdated(McUser mcUser, JsonUserDetails jsonUserDetails)

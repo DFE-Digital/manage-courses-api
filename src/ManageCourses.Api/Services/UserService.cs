@@ -1,5 +1,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Middleware;
+using GovUk.Education.ManageCourses.Api.Services.Email;
+using GovUk.Education.ManageCourses.Api.Services.Email.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +51,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             if (user.WelcomeEmailDateUtc == null)
             {
-                _welcomeEmailService.Send(user);
+                var welcomedata = new WelcomeEmailModel(user);
+                _welcomeEmailService.Send(welcomedata);
                 user.WelcomeEmailDateUtc = _clock.UtcNow;
             }
             _context.Save();
