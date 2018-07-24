@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Notify.Models.Responses;
 using Microsoft.Extensions.Configuration;
 
-namespace GovUk.Education.ManageCourses.Api.Services
+namespace GovUk.Education.ManageCourses.Api.Services.Email
 {
     /// <summary>
     /// This is a basic wrapper for <see cref="NotificationClient"/>
@@ -19,7 +19,10 @@ namespace GovUk.Education.ManageCourses.Api.Services
         private readonly ILogger _logger = null;
         private readonly bool hasClient = false;
 
-        public NotificationClientWrapper(IConfiguration config, ILogger<NotificationClientWrapper> logger) : this(config["email:api_key"], logger) { }
+        public NotificationClientWrapper(IConfiguration config, ILogger<NotificationClientWrapper> logger) : this(config["email:api_key"], logger)
+        {
+        }
+
         private NotificationClientWrapper(string api, ILogger<NotificationClientWrapper> logger)
         {
             _logger = logger;
@@ -40,6 +43,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             EmailNotificationResponse result = null;
 
             if (hasClient) {
+                _logger.LogDebug("Sending email using templateId {0}", templateId);
                 result = _client.SendEmail(emailAddress, templateId, personalisation, clientReference, emailReplyToId);
             }
             else

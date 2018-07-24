@@ -3,6 +3,8 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ManageCourses.Api.Services.Email.Model;
+using GovUk.Education.ManageCourses.Api.Services.Email;
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
@@ -29,7 +31,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
                     if (add)
                     {
-                        _welcomeEmailService.Send(user);
+                        var welcomedata = new WelcomeEmailModel(user);
+                        _welcomeEmailService.Send(welcomedata);
                         _context.UserLogs.Add(userLog);
                     }
                     else
