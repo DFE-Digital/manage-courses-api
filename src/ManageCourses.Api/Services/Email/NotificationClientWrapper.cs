@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Notify.Models.Responses;
 using Microsoft.Extensions.Configuration;
 
-namespace GovUk.Education.ManageCourses.Api.Services
+namespace GovUk.Education.ManageCourses.Api.Services.Email
 {
     /// <summary>
     /// This is a basic wrapper for <see cref="NotificationClient"/>

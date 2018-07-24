@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Notify.Models.Responses;
 
-namespace GovUk.Education.ManageCourses.Api.Services
+namespace GovUk.Education.ManageCourses.Api.Services.Email
 {
     public interface INotificationClientWrapper
     {
