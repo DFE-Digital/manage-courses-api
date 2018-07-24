@@ -3,7 +3,7 @@ using GovUk.Education.ManageCourses.Api.Services.Email.Config;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Email
 {
-    public class TemplateEmailService<TEmailModel> : ITemplateEmailService<TEmailModel> where TEmailModel : class, IEmailModel
+    public abstract class TemplateEmailService<TEmailModel> : ITemplateEmailService<TEmailModel> where TEmailModel : class, IEmailModel
     {
         private readonly INotificationClientWrapper _notificationClient;
 

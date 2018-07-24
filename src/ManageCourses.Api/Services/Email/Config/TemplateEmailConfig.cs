@@ -1,5 +1,6 @@
 using System;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Email.Config
 {
@@ -7,14 +8,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email.Config
     {
         public Type Type { get; }
 
-        public string ConfigId { get; }
+        public abstract string ConfigId { get; }
         public string TemplateId { get; }
 
-        public TemplateEmailConfig(string _config, string _templateId)
+        public TemplateEmailConfig(IConfiguration configuration)
         {
             Type = typeof(TEmailModel);
-            ConfigId = _config;
-            TemplateId = _templateId;
+            
+            TemplateId = configuration[ConfigId];
         }
     }
 }

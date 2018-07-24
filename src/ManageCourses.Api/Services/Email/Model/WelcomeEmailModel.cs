@@ -5,7 +5,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email.Model
 {
     public class WelcomeEmailModel : IEmailModel
     {
-        public string EmailAddress { get; set; }
+        public string EmailAddress { get; private set; }
         public Dictionary<string, dynamic> Personalisation { get; private set; }
 
         public WelcomeEmailModel(McUser user)

@@ -5,9 +5,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email.Config
 {
     public class WelcomeTemplateEmailConfig : TemplateEmailConfig<WelcomeEmailModel>, IWelcomeTemplateEmailConfig
     {
-        private static string ConfigId = "email:welcome_template_id";
-
-        public WelcomeTemplateEmailConfig(IConfiguration configuration): base(ConfigId, configuration[ConfigId])
+        public override string ConfigId => "email:welcome_template_id";
+        public WelcomeTemplateEmailConfig(IConfiguration configuration): base(configuration)
         {
         }
     }
