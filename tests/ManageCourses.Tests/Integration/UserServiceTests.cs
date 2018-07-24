@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Middleware;
@@ -122,6 +123,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
         private void CheckUserDataUpdated(McUser mcUser, JsonUserDetails jsonUserDetails)
         {
+            Thread.Sleep(100); // EF Core proxy object is returning stale data. Delay allows it to settle. Suggestions welcome!
             var mcUserFirstName = mcUser.FirstName; // seems to be a race condition or something here, keep getting stale value assigned
             mcUserFirstName.Should().Be(jsonUserDetails.GivenName);
             mcUser.LastName.Should().Be(jsonUserDetails.FamilyName);
