@@ -22,11 +22,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             configMock.Setup(x => x[configId]).Returns(templateId);
 
-            var subject = new WelcomeTemplateEmailConfig(configMock.Object);
+            var emailConfig = new WelcomeTemplateEmailConfig(configMock.Object);
 
-            Assert.AreEqual(configId, subject.ConfigId);
-            Assert.AreEqual(templateId, subject.TemplateId);
-            Assert.AreEqual(typeof(WelcomeEmailModel), subject.Type);
+            Assert.AreEqual(configId, emailConfig.ConfigId);
+            Assert.AreEqual(templateId, emailConfig.TemplateId);
+            Assert.AreEqual(typeof(WelcomeEmailModel), emailConfig.Type);
         }
     }
 }

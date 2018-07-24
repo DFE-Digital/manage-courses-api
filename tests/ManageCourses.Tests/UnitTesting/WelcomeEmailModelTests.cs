@@ -24,10 +24,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var personalisation = new Dictionary<string, dynamic>() {
                 {"first_name", user.FirstName.Trim() } };
 
-            var subject = new WelcomeEmailModel(user);
+            var model = new WelcomeEmailModel(user);
 
-            Assert.AreEqual(user.Email, subject.EmailAddress);
-            CollectionAssert.AreEqual(personalisation, subject.Personalisation);
+            Assert.AreEqual(user.Email, model.EmailAddress);
+            CollectionAssert.AreEqual(personalisation, model.Personalisation);
         }
     }
 }

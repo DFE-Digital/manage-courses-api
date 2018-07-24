@@ -77,7 +77,7 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
             
-            services.AddMvc();            
+            services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -14,7 +14,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
     [TestFixture]
     public class WelcomeEmailServiceTests
     {
-        private IWelcomeEmailService Subject = null;
+        private IWelcomeEmailService Service = null;
         private Mock<INotificationClientWrapper> mockNotificationClientWrapper = null;
         private Mock<IWelcomeTemplateEmailConfig> mockWelcomeTemplateEmailConfig = null;
 
@@ -28,7 +28,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             
             mockWelcomeTemplateEmailConfig.Setup(x => x.TemplateId).Returns(templateId);
 
-            Subject = new WelcomeEmailService(mockNotificationClientWrapper.Object, mockWelcomeTemplateEmailConfig.Object);
+            Service = new WelcomeEmailService(mockNotificationClientWrapper.Object, mockWelcomeTemplateEmailConfig.Object);
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 {"first_name", user.FirstName.Trim() } };
 
             var model = new WelcomeEmailModel(user);
-            Subject.Send(model);
+            Service.Send(model);
 
             mockNotificationClientWrapper.Verify(x => x.SendEmail(user.Email, templateId, personalisation, null, null), Times.Once);
         }

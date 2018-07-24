@@ -43,7 +43,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email
             EmailNotificationResponse result = null;
 
             if (hasClient) {
-                _logger.LogDebug("Email is sent using templateId {0}", templateId);
+                _logger.LogDebug("Sending email using templateId {0}", templateId);
                 result = _client.SendEmail(emailAddress, templateId, personalisation, clientReference, emailReplyToId);
             }
             else
