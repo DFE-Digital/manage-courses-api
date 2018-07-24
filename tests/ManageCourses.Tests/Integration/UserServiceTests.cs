@@ -28,7 +28,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         {
             _testUserBob = new McUser
             {
-                FirstName = "Spongebob",
+                FirstName = "1.Spongebob",
                 LastName = "Squarepants",
                 Email = "bob@example.org",
             };
@@ -82,8 +82,8 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             var jsonUserDetails = new JsonUserDetails
             {
                 Email = _testUserBob.Email,
+                GivenName = "2.Bobby",
                 FamilyName = "Charlton", // different to contents of McUsers to check it gets updated
-                GivenName = "Bobby",
                 Subject = bobSubject,
             };
 
@@ -106,7 +106,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             // this checks that we are now relying on the sign-in guid and not the email address,
             // and also that the email address gets updated
             //jsonUserDetails.Email = "sirbob@example.org"; // todo: check for email address changes, blocked by use of email as an FK
-            jsonUserDetails.GivenName = "Sir Bob";
+            jsonUserDetails.GivenName = "3.Sir Bob";
             jsonUserDetails.FamilyName = "Charlton the legend";
             _userService.UserSignedInAsync(jsonUserDetails); // would throw if it couldn't find the McUser entry
             // check user data updated from claims and timestamps have been set
