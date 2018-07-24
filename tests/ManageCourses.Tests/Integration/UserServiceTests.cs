@@ -120,11 +120,12 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             _mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Once);
         }
 
-        private void CheckUserDataUpdated(McUser user, JsonUserDetails jsonUserDetails)
+        private void CheckUserDataUpdated(McUser mcUser, JsonUserDetails jsonUserDetails)
         {
-            user.FirstName.Should().Be(jsonUserDetails.GivenName);
-            user.LastName.Should().Be(jsonUserDetails.FamilyName);
-            user.Email.Should().Be(jsonUserDetails.Email);
+            var mcUserFirstName = mcUser.FirstName; // seems to be a race condition or something here, keep getting stale value assigned
+            mcUserFirstName.Should().Be(jsonUserDetails.GivenName);
+            mcUser.LastName.Should().Be(jsonUserDetails.FamilyName);
+            mcUser.Email.Should().Be(jsonUserDetails.Email);
         }
     }
 }
