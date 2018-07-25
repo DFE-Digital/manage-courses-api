@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Text.Encodings.Web;
+using GovUk.Education.ManageCourses.Api.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using GovUk.Education.ManageCourses.Api.Services;

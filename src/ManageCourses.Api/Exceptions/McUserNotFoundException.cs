@@ -1,6 +1,6 @@
 using System;
 
-namespace GovUk.Education.ManageCourses.Api.Services
+namespace GovUk.Education.ManageCourses.Api.Exceptions
 {
     /// <summary>
     /// Thrown when we receive a sign-in from an email address we don't know about.
