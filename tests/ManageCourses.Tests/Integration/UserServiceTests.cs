@@ -82,7 +82,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             _mockTime = firstSignInTime;
 
             const string bobSubject = "2C4B4170-8979-444F-8D44-DC6DE22BEABF";
-            var jsonUserDetails = new JsonUserDetails
+            var userDetails1 = new JsonUserDetails
             {
                 Email = _testUserBob.Email,
                 GivenName = "2.Bobby",
@@ -93,9 +93,9 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             // test a realistic journey, validating the state of the data at each step
 
             // bob signs in for the first time
-            _userService.UserSignedInAsync(jsonUserDetails);
+            _userService.UserSignedInAsync(userDetails1);
             // check user data updated from claims and timestamps have been set
-            CheckUserDataUpdated(_testUserBob, jsonUserDetails);
+            CheckUserDataUpdated(_testUserBob, userDetails1);
             _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
             _testUserBob.LastLoginDateUtc.Should().Be(firstSignInTime);
             // check welcome email sent & logged
@@ -112,12 +112,17 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             // bob signs in again, with a new name & email
             // this checks that we are now relying on the sign-in guid and not the email address,
             // and also that the email address gets updated
-            //jsonUserDetails.Email = "sirbob@example.org"; // todo: check for email address changes, blocked by use of email as an FK
-            jsonUserDetails.GivenName = "3.Sir Bob";
-            jsonUserDetails.FamilyName = "Charlton the legend";
-            _userService.UserSignedInAsync(jsonUserDetails); // would throw if it couldn't find the McUser entry
+            var userDetails2 = new JsonUserDetails
+            {
+                Email = _testUserBob.Email,
+                //Email = "sirbob@example.org"; // todo: check for email address changes, blocked by use of email as an FK
+                GivenName = "3.Sir Bob",
+                FamilyName = "Charlton the legend",
+                Subject = bobSubject,
+            };
+            _userService.UserSignedInAsync(userDetails2); // would throw if it couldn't find the McUser entry
             // check user data updated from claims and timestamps have been set
-            CheckUserDataUpdated(_testUserBob, jsonUserDetails);
+            CheckUserDataUpdated(_testUserBob, userDetails2);
             _testUserBob.LastLoginDateUtc.Should().Be(secondSignInTime);
             // check original timestamps have not been altered
             _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
