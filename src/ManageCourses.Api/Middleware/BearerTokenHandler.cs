@@ -52,6 +52,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 catch (McUserNotFoundException)
                 {
                     _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
+                    return AuthenticateResult.NoResult();
                 }
 
                 var identity = new ClaimsIdentity(
@@ -69,8 +70,6 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             {
                 return AuthenticateResult.Fail(ex);
             }
-
-            return AuthenticateResult.NoResult();
         }
 
         private JsonUserDetails GetJsonUserDetails(string accessToken)
