@@ -10,6 +10,7 @@ using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess;
 using Moq;
 using NUnit.Framework;
+
 namespace GovUk.Education.ManageCourses.Tests.Integration
 {
     [TestFixture]
@@ -70,7 +71,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 Subject = "673535D4-3CB3-4A1D-B1F0-B0FFB787CECF",
             };
             Func<Task> signIn = async () => { await _userService.UserSignedInAsync(unknownUser); };
-            signIn.Should().Throw<UnknownMcUserException>($"{unknownUser.Email} / {unknownUser.Subject} does not exist in McUsers");
+            signIn.Should().Throw<McUserNotFoundException>($"{unknownUser.Email} / {unknownUser.Subject} does not exist in McUsers");
         }
 
         [Test]

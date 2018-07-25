@@ -39,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             }
             if (mcUser == null)
             {
-                throw new UnknownMcUserException();
+                throw new McUserNotFoundException();
             }
             LogLogin(mcUser);
             UpdateMcUserFromSignIn(mcUser, userDetails);

@@ -48,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 {
                     await _userService.UserSignedInAsync(userDetails);
                 }
-                catch (UnknownMcUserException)
+                catch (McUserNotFoundException)
                 {
                     _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
                 }
