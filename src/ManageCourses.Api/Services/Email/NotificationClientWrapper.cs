@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Notify.Client;
-using Microsoft.Extensions.Logging;
-using Notify.Models.Responses;
+﻿using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Notify.Client;
+using Notify.Models.Responses;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Email
 {
@@ -15,11 +12,12 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email
     /// </summary>
     public class NotificationClientWrapper : INotificationClientWrapper
     {
-        private readonly NotificationClient _client = null;
-        private readonly ILogger _logger = null;
-        private readonly bool hasClient = false;
+        private const string EmailApiKey = "email:api_key";
+        private readonly NotificationClient _client;
+        private readonly ILogger _logger;
+        private readonly bool hasClient;
 
-        public NotificationClientWrapper(IConfiguration config, ILogger<NotificationClientWrapper> logger) : this(config["email:api_key"], logger)
+        public NotificationClientWrapper(IConfiguration config, ILogger<NotificationClientWrapper> logger) : this(config[EmailApiKey], logger)
         {
         }
 
@@ -31,10 +29,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email
                 _client = new NotificationClient(api);
                 hasClient = true;
             }
-
-            var clientType = hasClient ? "LIVE" : "Stub";
-
-            _logger.LogInformation("Using {0} Notification Client", clientType);
+            else
+            {
+                _logger.LogCritical("Notification Client not configured, emails will *not* be sent. Missing config: {0}", EmailApiKey);
+            }
         }
 
 
@@ -42,13 +40,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email
         {
             EmailNotificationResponse result = null;
 
-            if (hasClient) {
+            if (hasClient)
+            {
                 _logger.LogDebug("Sending email using templateId {0}", templateId);
                 result = _client.SendEmail(emailAddress, templateId, personalisation, clientReference, emailReplyToId);
             }
             else
             {
-                _logger.LogCritical("No email is sent");
+                _logger.LogCritical("Email not send. Missing config: {0}", EmailApiKey);
             }
 
             return result;
