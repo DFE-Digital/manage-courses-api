@@ -58,8 +58,10 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IWelcomeEmailService, WelcomeEmailService>();
             services.AddScoped<IClock, Clock>();
 
-            services.AddScoped<IAccessRequestService>(provider =>
-            {
+            services.AddScoped<IInviteTemplateEmailConfig, InviteTemplateEmailConfig>();
+            services.AddScoped<IInviteEmailService, InviteEmailService>();
+
+            services.AddScoped<IAccessRequestService>(provider => {
                 return new AccessRequestService(provider.GetService<IManageCoursesDbContext>(),
                  new EmailServiceFactory(Configuration["email:api_key"])
                  .MakeAccessRequestEmailService(
