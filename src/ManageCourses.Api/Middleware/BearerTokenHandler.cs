@@ -21,12 +21,14 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
         private readonly IManageCoursesDbContext _manageCoursesDbContext;
 
         private readonly IUserService _userService;
+        private ILogger<BearerTokenHandler> _logger;
 
         public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserService userService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
-            this._manageCoursesDbContext = manageCoursesDbContext;
-            this._backChannel = new HttpClient();
-            this._userService = userService;
+            _manageCoursesDbContext = manageCoursesDbContext;
+            _backChannel = new HttpClient();
+            _userService = userService;
+            _logger = logger.CreateLogger<BearerTokenHandler>();
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -35,6 +37,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
             if (string.IsNullOrEmpty(accessToken))
             {
+                _logger.LogDebug("Bearer token not found in request headers");
                 return AuthenticateResult.NoResult();
             }
 
@@ -47,7 +50,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 }
                 catch (UnknownMcUserException)
                 {
-                    Logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
+                    _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
                 }
 
                 var identity = new ClaimsIdentity(
@@ -58,6 +61,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
                 var princical = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
+                _logger.LogDebug("User successfully signed in. SignIn-Id {0}", userDetails.Subject);
                 return AuthenticateResult.Success(ticket);
             }
             catch (Exception ex)
@@ -97,10 +101,10 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            var authResult = this.HandleAuthenticateOnceSafeAsync().Result;
+            var authResult = HandleAuthenticateOnceSafeAsync().Result;
             if (!authResult.Succeeded && authResult.Failure != null)
             {
-                Logger.LogDebug(authResult.Failure, "Failed challenge");
+                _logger.LogDebug(authResult.Failure, "Failed challenge");
                 Context.Response.StatusCode = 404;
                 return Task.CompletedTask;
             }
