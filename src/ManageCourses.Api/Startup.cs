@@ -66,6 +66,7 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddScoped<ITemplateEmailServiceFactory, TemplateEmailServiceFactory>();
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
+            services.AddScoped<IDataHelper, UserDataHelper>();
 
             var welcomeEmailConfigKey = "email:welcome_template_id";
 

@@ -6,16 +6,21 @@ using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
     public class DataService : IDataService
     {
         private readonly IManageCoursesDbContext _context;
+        private readonly IDataHelper _dataHelper;
+        private readonly ILogger _logger;
 
-        public DataService(IManageCoursesDbContext context)
+        public DataService(IManageCoursesDbContext context, IDataHelper dataHelper, ILogger<DataService> logger)
         {
             _context = context;
+            _dataHelper = dataHelper;
+            _logger = logger;
         }
 
         #region Import
@@ -26,12 +31,15 @@ namespace GovUk.Education.ManageCourses.Api.Data
         public void ProcessPayload(Payload payload)
         {
             ResetDatabase();
+            _dataHelper.Load(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
 
-            var userDatahelper = new UserDataHelper(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
-            if (!userDatahelper.Upsert())
+            var result = _dataHelper.Upsert();
+            if (! result.Success)
             {
+                _logger.LogCritical("Error during user upsert:{0} Import terminated", result.errorMessage);
                 return;
             }
+            _logger.LogInformation("User upsert result: {0} inserted, {1} deleted, {2} updated", result.NumberInserted, result.NumberDeleted, result.NumberUpdated);
 
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {

@@ -4,6 +4,7 @@ using System.Text;
 using System.Linq;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.Tests.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
@@ -23,16 +24,41 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
 
         public static string OrgUcasCodeNoProviders { get; } = "B20";
 
-        public static ManageCoursesDbContext GetFakeData()
+        public static ManageCoursesDbContext GetFakeData(EnumTestType testType)
+        {
+            SetupContext();
+            switch (testType)
+            {
+                case EnumTestType.DataService:
+                    BuildFakeDataForService();
+                    break;
+                case EnumTestType.DataHelper:
+                    BuildFakeDataForHelper();
+                    break;
+            }
+            return _dbContext;
+        }
+
+        private static void SetupContext()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ManageCoursesDbContext>();
             optionsBuilder.UseInMemoryDatabase("dbInMemory");
             _dbContext = new ManageCoursesDbContext(optionsBuilder.Options);
-
-            BuildFakeData();
-            return _dbContext;
         }
-        private static void BuildFakeData()
+
+        private static void BuildFakeDataForHelper()
+        {
+            _dbContext.McUsers.AddRange(new List<McUser>
+            {
+                new McUser { Email = "tester1@test.com", FirstName = "Firstname1", LastName = "Lastname1" },
+                new McUser { Email = "tester2@test.com", FirstName = "Firstname2", LastName = "Lastname2" },
+                new McUser { Email = "tester3@test.com", FirstName = "Firstname3", LastName = "Lastname3" },
+                new McUser { Email = "tester4@test.com", FirstName = "Firstname4", LastName = "Lastname4" },
+                new McUser { Email = "tester5@test.com", FirstName = "Firstname5", LastName = "Lastname5" }
+            });
+            _dbContext.Save();
+        }
+        private static void BuildFakeDataForService()
         {
             _dbContext.McUsers.AddRange(new List<McUser>
             {
