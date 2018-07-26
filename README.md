@@ -25,11 +25,23 @@ In a windows command prompt:
     cd src/ManageCourses.Api
     dotnet run
 
+## Database
+
+There's a script for setting up a postgres user and database: `setup-pg-user.sh`
+
 ## Config
 
 An example of the config keys that are required for Secret Manager are available from:
 
 	src\ManageCourses.Api\appsettings.SecretManager_Example.json
+
+E.g.
+
+    dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST localhost
+    dotnet user-secrets set PG_DATABASE the-database (will be created if missing and sufficient rights, e.g. 'manage')
+    dotnet user-secrets set PG_USERNAME the-user-you-created
+    dotnet user-secrets set PG_PASSWORD the-password-you-set
+
 
 For additional details, refer to
 https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
@@ -54,6 +66,59 @@ For more information see:
 
 * https://github.com/serilog/serilog-settings-configuration
 * https://nblumhardt.com/2016/07/serilog-2-minimumlevel-override/
+
+# Running tests
+
+## Unit tests
+
+```
+cd tests\ManageCourses.Tests\
+dotnet test
+```
+
+## Integration tests
+
+You will need to provide a postgresql server. A default localhost installation works. For everything else you can set the following overrides as user secrets:
+
+- MANAGE_COURSES_POSTGRESQL_SERVICE_HOST (the host of the PostgreSQL server)
+- MANAGE_COURSES_POSTGRESQL_SERVICE_PORT (its port)
+- PG_USERNAME (the log in user)
+- PG_PASSWORD (...and corresponding password)
+- PG_DATABASE (the database to use)
+
+You can set these by going to `tests\ManageCourses.Tests` and running `dotnet user-secrets add <key> <value>`.
+
+Then run 
+```
+cd tests\ManageCourses.Tests
+dotnet test --filter TestCategory=Integration
+```
+
+## Smoke tests
+
+These need internet access and the following additional user secrets
+
+- credentials:dfesignin:clientid (Client ID for the dfe signin test oauth server)
+- credentials:dfesignin:clientsecret (...and corresponding secret)
+- credentials:dfesignin:host (... and domain name of the test oath server)
+- credentials:dfesignin:redirect_host (... and domain name:port of the server to be redirected to - needs to be whitelisted by the test oauth server!)
+- auth:oidc:userinfo_endpoint (the user_info endpoint of the dfe signin test oauth server, e.g. https://signin-test-oidc-as.azurewebsites.net/me)
+- credentials:dfesignin:username (User name of an existing account on the Dfe Sign in test server)
+- credentials:dfesignin:password (...and corresponding password)
+- api:key (The api key)
+
+Then run
+```
+cd tests\ManageCourses.Tests
+dotnet test --filter TestCategory=Smoke
+```
+
+## Notes
+
+An example of the config keys that are required for Secret Manager are available from:
+
+	src\ManageCourses.Tests\appsettings.SecretManager_Example.json
+
 
 # Using the API
 

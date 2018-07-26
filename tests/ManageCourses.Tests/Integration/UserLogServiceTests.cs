@@ -2,11 +2,15 @@
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
+using Moq;
+
 using GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess;
 using GovUk.Education.ManageCourses.Api.Services;
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Api.Services.Email;
+using GovUk.Education.ManageCourses.Api.Services.Email.Model;
+
 using GovUk.Education.ManageCourses.Domain.Models;
-using Moq;
+
 namespace GovUk.Education.ManageCourses.Tests.Integration
 {
     [TestFixture]
@@ -51,7 +55,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         }
 
         [TearDown]
-        public void TearDown()
+        override public void TearDown()
         {
 
             foreach (var item in context.McUsers)
@@ -65,6 +69,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 var x = ((DbContext)context).Entry(item);
                 this.entitiesToCleanUp.Add(x);
             }
+            base.TearDown();
         }
 
         [Test]
@@ -89,7 +94,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Assert.AreNotEqual(firstLoginDateUtc, saved.LastLoginDateUtc);
             Assert.IsNull(saved.WelcomeEmailDateUtc);
 
-            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Never);
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<WelcomeEmailModel>()), Times.Never);
         }
 
         [Test]
@@ -112,10 +117,20 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             {
                 Assert.IsNotNull(userLog.WelcomeEmailDateUtc);
             }
-            
-            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_1, true)), Times.Once);
-            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Once);
-            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Exactly(2));
+
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<WelcomeEmailModel>()), Times.Exactly(2));
+
+            var welcomeModel1 = new WelcomeEmailModel(GetUser(TestUserEmail_1, true));
+            mockWelcomeEmailService.Verify(x => x.Send(
+                It.Is<WelcomeEmailModel>(model =>
+                    (model.EmailAddress == welcomeModel1.EmailAddress)
+                    )
+                ), Times.Once);
+
+            var welcomeModel2 = new WelcomeEmailModel(GetUser(TestUserEmail_2, true));
+            mockWelcomeEmailService.Verify(x => x.Send(It.Is<WelcomeEmailModel>(model =>
+                    (model.EmailAddress == welcomeModel2.EmailAddress)
+                )), Times.Once);
         }
 
 
@@ -136,9 +151,19 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             Assert.AreEqual(1, context.UserLogs.Count());
 
-            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_1, true)), Times.Once);
-            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Never);
-            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Once);
+            var welcomeModel1 = new WelcomeEmailModel(GetUser(TestUserEmail_1, true));
+            mockWelcomeEmailService.Verify(x => x.Send(
+                It.Is<WelcomeEmailModel>(model =>
+                    (model.EmailAddress == welcomeModel1.EmailAddress)                    
+                    )
+                ), Times.Once);
+
+            var welcomeModel2 = new WelcomeEmailModel(GetUser(TestUserEmail_2, true));
+            mockWelcomeEmailService.Verify(x => x.Send(It.Is<WelcomeEmailModel>(model =>
+                    (model.EmailAddress == welcomeModel2.EmailAddress)
+                )), Times.Never);
+
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<WelcomeEmailModel>()), Times.Once);
         }
 
         [Test]
@@ -164,10 +189,19 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             Assert.IsNull(context.UserLogs.Include(x => x.User).First().User);
 
-            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<McUser>()), Times.Once);
+            mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<WelcomeEmailModel>()), Times.Once);
 
-            mockWelcomeEmailService.Verify(x => x.Send(firstUser), Times.Once);
-            mockWelcomeEmailService.Verify(x => x.Send(GetUser(TestUserEmail_2, true)), Times.Never);
+            var welcomeModel1 = new WelcomeEmailModel(firstUser);
+            mockWelcomeEmailService.Verify(x => x.Send(
+                It.Is<WelcomeEmailModel>(model =>
+                    (model.EmailAddress == welcomeModel1.EmailAddress)
+                    )
+                ), Times.Once);
+
+            var welcomeModel2 = new WelcomeEmailModel(GetUser(TestUserEmail_2, true));
+            mockWelcomeEmailService.Verify(x => x.Send(It.Is<WelcomeEmailModel>(model =>
+                    (model.EmailAddress == welcomeModel2.EmailAddress)
+                    )), Times.Never);
 
             Assert.IsNotNull(context.UserLogs.First().WelcomeEmailDateUtc);
         }

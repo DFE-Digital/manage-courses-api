@@ -1,22 +1,34 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using GovUk.Education.ManageCourses.Api.Services;
+
+using Moq;
+
+using GovUk.Education.ManageCourses.Api.Services.Email;
+using GovUk.Education.ManageCourses.Api.Services.Email.Config;
+using GovUk.Education.ManageCourses.Api.Services.Email.Model;
 
 using GovUk.Education.ManageCourses.Domain.Models;
-using Moq;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
     public class WelcomeEmailServiceTests
     {
-        private IWelcomeEmailService Subject = null;
-        private Mock<ITemplateEmailService> mock = null;
+        private IWelcomeEmailService Service = null;
+        private Mock<INotificationClientWrapper> mockNotificationClientWrapper = null;
+        private Mock<IWelcomeTemplateEmailConfig> mockWelcomeTemplateEmailConfig = null;
+
+        private string templateId = "mockWelcomeTemplateEmailConfig templateId";
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            mock = new Mock<ITemplateEmailService>();
-            Subject = new WelcomeEmailService(mock.Object);
+            mockNotificationClientWrapper = new Mock<INotificationClientWrapper>();
+            mockWelcomeTemplateEmailConfig = new Mock<IWelcomeTemplateEmailConfig>();
+
+            
+            mockWelcomeTemplateEmailConfig.Setup(x => x.TemplateId).Returns(templateId);
+
+            Service = new WelcomeEmailService(mockNotificationClientWrapper.Object, mockWelcomeTemplateEmailConfig.Object);
         }
 
         [Test]
@@ -31,9 +43,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var personalisation = new Dictionary<string, dynamic>() {
                 {"first_name", user.FirstName.Trim() } };
 
-            Subject.Send(user);
+            var model = new WelcomeEmailModel(user);
+            Service.Send(model);
 
-            mock.Verify(x => x.Send(user.Email, personalisation), Times.Once);
+            mockNotificationClientWrapper.Verify(x => x.SendEmail(user.Email, templateId, personalisation, null, null), Times.Once);
         }
     }
 }

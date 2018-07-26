@@ -1,7 +1,5 @@
 using System;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
 {
