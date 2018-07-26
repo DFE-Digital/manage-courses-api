@@ -38,8 +38,8 @@
       <PackageVersion>$(GitBaseVersion).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>
     <PropertyGroup Condition="'$(GitBranch)'!='master'">
-      <Version>$(GitBaseVersion)-$(GitBranch).$(GitSemVerPatch)</Version>
-      <PackageVersion>$(GitBaseVersion)-$(GitBranch).$(GitSemVerPatch)</PackageVersion>
+      <Version>$(GitBaseVersion)-$([System.String]::Copy('$(GitBranch)').Replace('_','-')).$(GitSemVerPatch)</Version>
+      <PackageVersion>$(GitBaseVersion)-$([System.String]::Copy('$(GitBranch)').Replace('_','-')).$(GitSemVerPatch)</PackageVersion>
     </PropertyGroup>    
   </Target>
   <Target Name="NSwag" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" Outputs="$(OutputSwaggerGeneration)">
