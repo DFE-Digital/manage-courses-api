@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// <summary>
         /// Processes data in the payload object into the database as an upsert/delta
         /// </summary>
-        /// <param name="payload"></param>
+        /// <param name="payload">Holds all the data entities that need to be imported</param>
         public void ProcessPayload(Payload payload)
         {
             ResetDatabase();
