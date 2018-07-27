@@ -37,15 +37,15 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                             
 
             var httpClient = new HttpClient();
-
             var apiKeyAccessToken = config["api:key"];
 
 
             var clientImport = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), httpClient);
             clientImport.BaseUrl = localWebHost.Address;
 
-            clientImport.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Wait();
-
+            clientImport.Data_ImportReferenceDataAsync(TestData.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
+            clientImport.Data_ImportAsync(TestData.MakeSimpleUcasPayload()).Wait();
+            
 
             var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
             clientExport.BaseUrl = localWebHost.Address;
@@ -90,7 +90,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
 
-            Assert.That(() => client.Data_ImportAsync(new Payload()),
+            Assert.That(() => client.Data_ImportAsync(new UcasPayload()),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
 
@@ -158,55 +158,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 return Task.FromResult(accessToken);
             }
-        }
-        private static class TestData {
-            public static Payload MakeSimplePayload(string username) => new Payload {
-                   
-                Users = ListOfOne(new McUser{
-                    FirstName = "Joe",
-                    LastName = "Bloggs",
-                    Email = username
-                }),
-
-                Organisations = ListOfOne(new McOrganisation {
-                    Name = "Joe's school",
-                    OrgId = "123"
-                }),
-
-                OrganisationUsers = ListOfOne(new McOrganisationUser {
-                    Email = username,
-                    OrgId = "123"
-                }),
-
-                Institutions = ListOfOne(new UcasInstitution { 
-                    InstFull = "Joe's school @ UCAS",
-                    InstCode = "ABC"
-                }),
-
-                OrganisationInstitutions = ListOfOne(new McOrganisationInstitution {
-                    InstitutionCode = "ABC",
-                    OrgId = "123"
-                }),
-                
-                Campuses = ListOfOne(new UcasCampus {
-                    InstCode = "ABC",
-                    CampusCode = "", // NOTE: EMPTY STRING
-                    CampusName = "Main campus site"
-                }),
-
-                Courses = ListOfOne(new UcasCourse {
-                    InstCode = "ABC",
-                    CampusCode = "",
-                    CrseCode = "XYZ",
-                    CrseTitle = "Joe's course for Primary teachers"
-                })
-
-            };
-        }
-        
-        private static ObservableCollection<T> ListOfOne<T> (T one) {
-            return new ObservableCollection<T> { one };
-        }
-
+        }        
     }
 }

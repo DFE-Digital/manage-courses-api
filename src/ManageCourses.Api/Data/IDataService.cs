@@ -5,9 +5,10 @@ namespace GovUk.Education.ManageCourses.Api.Data
 {
     public interface IDataService
     {
-        void ProcessPayload(Payload payload);
+        void ProcessUcasPayload(UcasPayload payload);
         OrganisationCourses GetCoursesForUserOrganisation(string email, string ucasCode); 
         IEnumerable<UserOrganisation> GetOrganisationsForUser(string email);
+        void ProcessReferencePayload(ReferenceDataPayload payload);
     }
 }
     

@@ -36,9 +36,23 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// </summary>
         [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
         [HttpPost]
-        public void Import([FromBody] Payload payload)
+        [Route("ucas")]
+        public void Import([FromBody] UcasPayload payload)
         {
-            _dataService.ProcessPayload(payload);
+            _dataService.ProcessUcasPayload(payload);
+
+            //TODO return Ok/Fail in action result
+        }
+
+        /// <summary>
+        /// Imports the reference data.
+        /// </summary>
+        [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+        [HttpPost]
+        [Route("referencedata")]
+        public void ImportReferenceData([FromBody] ReferenceDataPayload payload)
+        {
+            _dataService.ProcessReferencePayload(payload);
 
             //TODO return Ok/Fail in action result
         }

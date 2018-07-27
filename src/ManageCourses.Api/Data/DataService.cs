@@ -28,19 +28,10 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// Processes data in the payload object into the database as an upsert/delta
         /// </summary>
         /// <param name="payload">Holds all the data entities that need to be imported</param>
-        public void ProcessPayload(Payload payload)
+        public void ProcessUcasPayload(UcasPayload payload)
         {
-            ResetDatabase();
-            _dataHelper.Load(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
-
-            var result = _dataHelper.Upsert();
-            if (! result.Success)
-            {
-                _logger.LogCritical("Error during user upsert:{0} Import terminated", result.errorMessage);
-                return;
-            }
-            _logger.LogInformation("User upsert result: {0} inserted, {1} deleted, {2} updated", result.NumberInserted, result.NumberDeleted, result.NumberUpdated);
-
+            ResetUcasSchema();
+            
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
                 InstCode = course.InstCode,
@@ -65,31 +56,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     AccreditingProvider = course.AccreditingProvider,
                     CrseOpenDate = course.CrseOpenDate
                 });
-            }
-
-            foreach (var institution in payload.Institutions)
-            {
-                _context.AddUcasInstitution(
-                    new UcasInstitution
-                    {
-                        InstCode = institution.InstCode,
-                        InstName = institution.InstName,
-                        InstBig = institution.InstBig,
-                        InstFull = institution.InstFull,
-                        InstType = institution.InstType,
-                        Addr1 = institution.Addr1,
-                        Addr2 = institution.Addr2,
-                        Addr3 = institution.Addr3,
-                        Addr4 = institution.Addr4,
-                        Postcode = institution.Postcode,
-                        ContactName = institution.ContactName,
-                        Url = institution.Url,
-                        YearCode = institution.YearCode,
-                        Scitt = institution.Scitt,
-                        AccreditingProvider = institution.AccreditingProvider,
-                        SchemeMember = institution.SchemeMember
-                    }
-                );
             }
 
             foreach (var courseSubject in payload.CourseSubjects)
@@ -165,6 +131,23 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 );
             }
 
+            _context.Save();
+
+        }
+
+        public void ProcessReferencePayload(ReferenceDataPayload payload)
+        {
+            ResetReferenceSchema();
+            _dataHelper.Load(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
+
+            var result = _dataHelper.Upsert();
+            if (! result.Success)
+            {
+                _logger.LogCritical("Error during user upsert:{0} Import terminated", result.errorMessage);
+                return;
+            }
+            _logger.LogInformation("User upsert result: {0} inserted, {1} deleted, {2} updated", result.NumberInserted, result.NumberDeleted, result.NumberUpdated);
+
             foreach (var organisation in payload.Organisations)
             {
                 _context.AddMcOrganisation(
@@ -174,6 +157,30 @@ namespace GovUk.Education.ManageCourses.Api.Data
                         Name = organisation.Name
                     }
                     );
+            }            
+            foreach (var institution in payload.Institutions)
+            {
+                _context.AddUcasInstitution(
+                    new UcasInstitution
+                    {
+                        InstCode = institution.InstCode,
+                        InstName = institution.InstName,
+                        InstBig = institution.InstBig,
+                        InstFull = institution.InstFull,
+                        InstType = institution.InstType,
+                        Addr1 = institution.Addr1,
+                        Addr2 = institution.Addr2,
+                        Addr3 = institution.Addr3,
+                        Addr4 = institution.Addr4,
+                        Postcode = institution.Postcode,
+                        ContactName = institution.ContactName,
+                        Url = institution.Url,
+                        YearCode = institution.YearCode,
+                        Scitt = institution.Scitt,
+                        AccreditingProvider = institution.AccreditingProvider,
+                        SchemeMember = institution.SchemeMember
+                    }
+                );
             }
             foreach (var organisatioInstitution in payload.OrganisationInstitutions)
             {
@@ -195,23 +202,31 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     }
                 );
             }
+            
   
             _context.Save();
 
         }
-        private void ResetDatabase()
+
+        private void ResetUcasSchema()
         {
             // clear out the existing data
             _context.UcasCourses.RemoveRange(_context.UcasCourses);
             _context.CourseCodes.RemoveRange(_context.CourseCodes);
-            _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
             _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
             _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
             _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
             _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
             _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
-            _context.McOrganisations.RemoveRange(_context.McOrganisations);
+            _context.Save();
+        }
+
+        private void ResetReferenceSchema()
+        {
+            // clear out the existing data            
             _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
+            _context.UcasInstitutions.RemoveRange(_context.UcasInstitutions);
+            _context.McOrganisations.RemoveRange(_context.McOrganisations);
             _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
             _context.Save();
         }
