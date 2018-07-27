@@ -257,6 +257,74 @@ namespace GovUk.Education.ManageCourses.ApiClient
             }
         }
     
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task<FileResponse> Invite_IndexAsync()
+        {
+            return Invite_IndexAsync(System.Threading.CancellationToken.None);
+        }
+    
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        public async System.Threading.Tasks.Task<FileResponse> Invite_IndexAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Invite");
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "200" || status_ == "206") 
+                        {
+                            var responseStream_ = response_.Content == null ? System.IO.Stream.Null : await response_.Content.ReadAsStreamAsync().ConfigureAwait(false);
+                            var fileResponse_ = new FileResponse((int)response_.StatusCode, headers_, responseStream_, null, response_); 
+                            client_ = null; response_ = null; // response and client are disposed by FileResponse
+                            return fileResponse_;
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new SwaggerException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+            
+                        return default(FileResponse);
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
         /// <summary>Exports the data.</summary>
         /// <returns>The exported data</returns>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
@@ -2177,9 +2245,12 @@ namespace GovUk.Education.ManageCourses.ApiClient
         private string _firstName;
         private string _lastName;
         private string _email;
+        private string _signInUserId;
+        private System.DateTime? _firstLoginDateUtc;
+        private System.DateTime? _lastLoginDateUtc;
+        private System.DateTime? _welcomeEmailDateUtc;
         private System.Collections.ObjectModel.ObservableCollection<McOrganisationUser> _mcOrganisationUsers;
         private System.Collections.ObjectModel.ObservableCollection<AccessRequest2> _accessRequests;
-        private System.Collections.ObjectModel.ObservableCollection<UserLog> _userLogs;
     
         [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Always)]
         public int Id
@@ -2237,6 +2308,62 @@ namespace GovUk.Education.ManageCourses.ApiClient
             }
         }
     
+        [Newtonsoft.Json.JsonProperty("SignInUserId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public string SignInUserId
+        {
+            get { return _signInUserId; }
+            set 
+            {
+                if (_signInUserId != value)
+                {
+                    _signInUserId = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("FirstLoginDateUtc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime? FirstLoginDateUtc
+        {
+            get { return _firstLoginDateUtc; }
+            set 
+            {
+                if (_firstLoginDateUtc != value)
+                {
+                    _firstLoginDateUtc = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("LastLoginDateUtc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime? LastLoginDateUtc
+        {
+            get { return _lastLoginDateUtc; }
+            set 
+            {
+                if (_lastLoginDateUtc != value)
+                {
+                    _lastLoginDateUtc = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("WelcomeEmailDateUtc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.DateTime? WelcomeEmailDateUtc
+        {
+            get { return _welcomeEmailDateUtc; }
+            set 
+            {
+                if (_welcomeEmailDateUtc != value)
+                {
+                    _welcomeEmailDateUtc = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
         [Newtonsoft.Json.JsonProperty("McOrganisationUsers", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.ObjectModel.ObservableCollection<McOrganisationUser> McOrganisationUsers
         {
@@ -2260,20 +2387,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 if (_accessRequests != value)
                 {
                     _accessRequests = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("UserLogs", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.ObjectModel.ObservableCollection<UserLog> UserLogs
-        {
-            get { return _userLogs; }
-            set 
-            {
-                if (_userLogs != value)
-                {
-                    _userLogs = value; 
                     RaisePropertyChanged();
                 }
             }
@@ -2501,153 +2614,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
         Completed = 2,
     
         Declined = 3,
-    
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.10.50.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class UserLog : System.ComponentModel.INotifyPropertyChanged
-    {
-        private int _id;
-        private System.DateTime _firstLoginDateUtc;
-        private int? _userId;
-        private McUser _user;
-        private string _userEmail;
-        private System.DateTime _lastLoginDateUtc;
-        private string _signInUserId;
-        private System.DateTime? _welcomeEmailDateUtc;
-    
-        [Newtonsoft.Json.JsonProperty("Id", Required = Newtonsoft.Json.Required.Always)]
-        public int Id
-        {
-            get { return _id; }
-            set 
-            {
-                if (_id != value)
-                {
-                    _id = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("FirstLoginDateUtc", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.DateTime FirstLoginDateUtc
-        {
-            get { return _firstLoginDateUtc; }
-            set 
-            {
-                if (_firstLoginDateUtc != value)
-                {
-                    _firstLoginDateUtc = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("UserId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int? UserId
-        {
-            get { return _userId; }
-            set 
-            {
-                if (_userId != value)
-                {
-                    _userId = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("User", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public McUser User
-        {
-            get { return _user; }
-            set 
-            {
-                if (_user != value)
-                {
-                    _user = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("UserEmail", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string UserEmail
-        {
-            get { return _userEmail; }
-            set 
-            {
-                if (_userEmail != value)
-                {
-                    _userEmail = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("LastLoginDateUtc", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.DateTime LastLoginDateUtc
-        {
-            get { return _lastLoginDateUtc; }
-            set 
-            {
-                if (_lastLoginDateUtc != value)
-                {
-                    _lastLoginDateUtc = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("SignInUserId", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public string SignInUserId
-        {
-            get { return _signInUserId; }
-            set 
-            {
-                if (_signInUserId != value)
-                {
-                    _signInUserId = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("WelcomeEmailDateUtc", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.DateTime? WelcomeEmailDateUtc
-        {
-            get { return _welcomeEmailDateUtc; }
-            set 
-            {
-                if (_welcomeEmailDateUtc != value)
-                {
-                    _welcomeEmailDateUtc = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        public string ToJson() 
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
-        
-        public static UserLog FromJson(string data)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<UserLog>(data);
-        }
-    
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
-        {
-            var handler = PropertyChanged;
-            if (handler != null) 
-                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-        }
     
     }
     
