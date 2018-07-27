@@ -1,25 +1,45 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
     public class DataService : IDataService
     {
         private readonly IManageCoursesDbContext _context;
+        private readonly IDataHelper _dataHelper;
+        private readonly ILogger _logger;
 
-        public DataService(IManageCoursesDbContext context)
+        public DataService(IManageCoursesDbContext context, IDataHelper dataHelper, ILogger<DataService> logger)
         {
             _context = context;
+            _dataHelper = dataHelper;
+            _logger = logger;
         }
 
         #region Import
+        /// <summary>
+        /// Processes data in the payload object into the database as an upsert/delta
+        /// </summary>
+        /// <param name="payload">Holds all the data entities that need to be imported</param>
         public void ProcessPayload(Payload payload)
         {
             ResetDatabase();
+            _dataHelper.Load(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
+
+            var result = _dataHelper.Upsert();
+            if (! result.Success)
+            {
+                _logger.LogCritical("Error during user upsert:{0} Import terminated", result.errorMessage);
+                return;
+            }
+            _logger.LogInformation("User upsert result: {0} inserted, {1} deleted, {2} updated", result.NumberInserted, result.NumberDeleted, result.NumberUpdated);
 
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
@@ -32,7 +52,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
             foreach (var course in payload.Courses)
             {
                 // copy props to prevent changing id
-                // todo: consider removing id from exposed API
                 _context.AddUcasCourse(new UcasCourse
                 {
                     InstCode = course.InstCode,
@@ -176,21 +195,10 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     }
                 );
             }
-            foreach (var user in payload.Users)
-            {
-                _context.AddMcUser(
-                    new McUser
-                    {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Email = user.Email
-                    }
-                );
-            }
-
+  
             _context.Save();
-        }
 
+        }
         private void ResetDatabase()
         {
             // clear out the existing data
@@ -205,7 +213,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
             _context.McOrganisations.RemoveRange(_context.McOrganisations);
             _context.McOrganisationIntitutions.RemoveRange(_context.McOrganisationIntitutions);
             _context.McOrganisationUsers.RemoveRange(_context.McOrganisationUsers);
-            _context.McUsers.RemoveRange(_context.McUsers);
             _context.Save();
         }
 
@@ -221,7 +228,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 return ($"{cc.InstCode}_{cc.CrseCode}").GetHashCode();
             }
         }
-
         #endregion
 
         #region Export

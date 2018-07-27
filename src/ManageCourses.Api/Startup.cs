@@ -76,6 +76,7 @@ namespace GovUk.Education.ManageCourses.Api
             });
 
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
+            services.AddScoped<IDataHelper, UserDataHelper>();
             
             services.AddMvc();
         }
