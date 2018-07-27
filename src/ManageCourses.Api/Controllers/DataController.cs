@@ -45,8 +45,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Imports the data.
+        /// Imports the reference data.
         /// </summary>
+        [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
         [HttpPost]
         [Route("referencedata")]
         public void ImportReferenceData([FromBody] ReferenceDataPayload payload)
