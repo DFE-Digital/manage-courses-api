@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180723111412_UserLog-MoveData")]
+    partial class UserLogMoveData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -432,6 +433,37 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("ucas_subject");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UserLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("FirstLoginDateUtc")
+                        .HasColumnName("first_login_date_utc");
+
+                    b.Property<DateTime>("LastLoginDateUtc")
+                        .HasColumnName("last_login_date_utc");
+
+                    b.Property<string>("SignInUserId")
+                        .HasColumnName("sign_in_user_id");
+
+                    b.Property<string>("UserEmail")
+                        .HasColumnName("user_email");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnName("user_id");
+
+                    b.Property<DateTime?>("WelcomeEmailDateUtc")
+                        .HasColumnName("welcome_email_date_utc");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("user_log");
+                });
+
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.AccessRequest", b =>
                 {
                     b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "Requester")
@@ -523,6 +555,14 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .WithMany("UcasCourseSubjects")
                         .HasForeignKey("InstCode", "CrseCode")
                         .HasPrincipalKey("InstCode", "CrseCode");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UserLog", b =>
+                {
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "User")
+                        .WithMany("UserLogs")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 #pragma warning restore 612, 618
         }

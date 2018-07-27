@@ -19,7 +19,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         DbSet<McUser> McUsers { get; set; }
         DbSet<AccessRequest> AccessRequests { get; set; }
-        DbSet<UserLog> UserLogs { get; set; }
         IList<UcasCourse> GetAllUcasCourses();
         IList<UcasInstitution> GetAllUcasInstitutions();
         IList<UcasSubject> GetAllUcasSubjects();

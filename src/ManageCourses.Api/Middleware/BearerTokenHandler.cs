@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Text.Encodings.Web;
+using GovUk.Education.ManageCourses.Api.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using GovUk.Education.ManageCourses.Api.Services;
@@ -20,52 +21,55 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
         private readonly HttpClient _backChannel;
         private readonly IManageCoursesDbContext _manageCoursesDbContext;
 
-        private readonly IUserLogService _userLogService;
+        private readonly IUserService _userService;
+        private ILogger<BearerTokenHandler> _logger;
 
-        public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserLogService userLogService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        public BearerTokenHandler(IOptionsMonitor<BearerTokenOptions> options, IManageCoursesDbContext manageCoursesDbContext, IUserService userService, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
-            this._manageCoursesDbContext = manageCoursesDbContext;
-            this._backChannel = new HttpClient();
-            this._userLogService = userLogService;
+            _manageCoursesDbContext = manageCoursesDbContext;
+            _backChannel = new HttpClient();
+            _userService = userService;
+            _logger = logger.CreateLogger<BearerTokenHandler>();
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var accessToken = Request.GetAccessToken();
 
-            if (!string.IsNullOrEmpty(accessToken))
+            if (string.IsNullOrEmpty(accessToken))
             {
-                try
-                {
-                    var userDetails = GetJsonUserDetails(accessToken);
-
-                    var mcuser = _manageCoursesDbContext.McUsers.ByEmail(userDetails.Email).SingleOrDefault();
-                    if (mcuser == null)
-                    {
-                        Logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
-                        return AuthenticateResult.NoResult();
-                    }
-
-                    var identity = new ClaimsIdentity( 
-                        new[] {
-                            new Claim (ClaimTypes.NameIdentifier, userDetails.Subject),
-                            new Claim (ClaimTypes.Email, userDetails.Email)
-                        }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
-                    
-                    var princical = new ClaimsPrincipal(identity);
-
-                    _userLogService.CreateOrUpdateUserLog(userDetails.Subject, mcuser);
-                    var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
-
-                    return AuthenticateResult.Success(ticket);
-                }
-                catch (Exception ex)
-                {
-                    return AuthenticateResult.Fail(ex);
-                }
+                _logger.LogDebug("Bearer token not found in request headers");
+                return AuthenticateResult.NoResult();
             }
 
-            return AuthenticateResult.NoResult();
+            try
+            {
+                var userDetails = GetJsonUserDetails(accessToken);
+                try
+                {
+                    await _userService.UserSignedInAsync(userDetails);
+                }
+                catch (McUserNotFoundException)
+                {
+                    _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
+                    return AuthenticateResult.NoResult();
+                }
+
+                var identity = new ClaimsIdentity(
+                    new[] {
+                        new Claim (ClaimTypes.NameIdentifier, userDetails.Subject),
+                        new Claim (ClaimTypes.Email, userDetails.Email)
+                    }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
+
+                var princical = new ClaimsPrincipal(identity);
+                var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
+                _logger.LogDebug("User successfully signed in. SignIn-Id {0}", userDetails.Subject);
+                return AuthenticateResult.Success(ticket);
+            }
+            catch (Exception ex)
+            {
+                return AuthenticateResult.Fail(ex);
+            }
         }
 
         private JsonUserDetails GetJsonUserDetails(string accessToken)
@@ -97,10 +101,10 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            var authResult = this.HandleAuthenticateOnceSafeAsync().Result;
+            var authResult = HandleAuthenticateOnceSafeAsync().Result;
             if (!authResult.Succeeded && authResult.Failure != null)
             {
-                Logger.LogDebug(authResult.Failure, "Failed challenge");
+                _logger.LogDebug(authResult.Failure, "Failed challenge");
                 Context.Response.StatusCode = 404;
                 return Task.CompletedTask;
             }

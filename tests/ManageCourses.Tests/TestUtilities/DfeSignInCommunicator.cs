@@ -21,6 +21,26 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
         public DfeSignInCommunicator(string dfeSignInDomain, string redirectUriHostAndPort, string clientId, string clientSecret)
         {
+            if (string.IsNullOrEmpty(dfeSignInDomain))
+            {
+                throw new ArgumentException("required", nameof(dfeSignInDomain));
+            }
+
+            if (string.IsNullOrEmpty(redirectUriHostAndPort))
+            {
+                throw new ArgumentException("required", nameof(redirectUriHostAndPort));
+            }
+
+            if (string.IsNullOrEmpty(clientId))
+            {
+                throw new ArgumentException("required", nameof(clientId));
+            }
+
+            if (string.IsNullOrEmpty(clientSecret))
+            {
+                throw new ArgumentException("required", nameof(clientSecret));
+            }
+
             this.dfeSignInDomain = dfeSignInDomain;
             this.redirectUriHostAndPort = redirectUriHostAndPort;
             this.clientId = clientId;

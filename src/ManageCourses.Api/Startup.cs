@@ -1,27 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NJsonSchema;
-using NSwag.AspNetCore;
-using NSwag.SwaggerGeneration.Processors.Security;
-using NSwag;
-
+﻿using System.Reflection;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Config;
-using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NJsonSchema;
+using NSwag;
+using NSwag.AspNetCore;
+using NSwag.SwaggerGeneration.Processors.Security;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -61,12 +53,13 @@ namespace GovUk.Education.ManageCourses.Api
             });
 
             services.AddScoped<IDataService, DataService>();
-            services.AddScoped<IUserLogService, UserLogService>();
-
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IWelcomeTemplateEmailConfig, WelcomeTemplateEmailConfig>();
             services.AddScoped<IWelcomeEmailService, WelcomeEmailService>();
+            services.AddScoped<IClock, Clock>();
 
-            services.AddScoped<IAccessRequestService>(provider => {
+            services.AddScoped<IAccessRequestService>(provider =>
+            {
                 return new AccessRequestService(provider.GetService<IManageCoursesDbContext>(),
                  new EmailServiceFactory(Configuration["email:api_key"])
                  .MakeAccessRequestEmailService(
@@ -77,7 +70,7 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
             services.AddScoped<IDataHelper, UserDataHelper>();
-            
+
             services.AddMvc();
         }
 
@@ -107,7 +100,7 @@ namespace GovUk.Education.ManageCourses.Api
                 {
                     Type = SwaggerSecuritySchemeType.ApiKey,
                     Description = "In order to interactive with the api please input `Bearer {code}`",
-                    In = SwaggerSecurityApiKeyLocation.Header, 
+                    In = SwaggerSecurityApiKeyLocation.Header,
                     Name = "Authorization"
                 }));
 

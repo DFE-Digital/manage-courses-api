@@ -2,6 +2,10 @@
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
 {
+    /// <summary>
+    /// Claims from DfE Sign-in.
+    /// Use this class for deserializing and inspecting.
+    /// </summary>
     public class JsonUserDetails
     {
         [JsonProperty("email")]

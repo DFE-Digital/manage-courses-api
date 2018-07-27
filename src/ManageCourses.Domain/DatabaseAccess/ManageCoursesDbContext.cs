@@ -112,12 +112,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasForeignKey(ar => ar.RequesterId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<UserLog>()
-                .HasOne(ul => ul.User)
-                .WithMany(u => u.UserLogs)
-                .HasForeignKey(ul => ul.UserId)
-                .OnDelete(DeleteBehavior.SetNull);                
-
             base.OnModelCreating(modelBuilder);
         }
 
@@ -145,7 +139,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         public DbSet<McUser> McUsers { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
-        public DbSet<UserLog> UserLogs { get; set; }
 
         public IList<UcasCourse> GetAllUcasCourses()
         {
