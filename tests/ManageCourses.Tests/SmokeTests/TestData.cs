@@ -1,3 +1,6 @@
+using System.Collections.ObjectModel;
+using GovUk.Education.ManageCourses.ApiClient;
+
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
     public static class TestData {
