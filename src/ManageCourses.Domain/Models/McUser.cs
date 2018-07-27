@@ -40,6 +40,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         /// </summary>
         public DateTime? WelcomeEmailDateUtc { get; set; }
 
+        public ICollection<McOrganisation> McOrganisation { get; set; }
         public ICollection<McOrganisationUser> McOrganisationUsers { get; set; }
         public ICollection<AccessRequest> AccessRequests { get; set; }
     }
