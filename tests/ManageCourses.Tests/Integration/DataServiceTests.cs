@@ -31,27 +31,42 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         public void Setup()
         {
             Context = this.GetContext();
+            Context.UcasCourses.RemoveRange(Context.UcasCourses);
+            Context.CourseCodes.RemoveRange(Context.CourseCodes);
+            Context.UcasSubjects.RemoveRange(Context.UcasSubjects);
+            Context.UcasCourseSubjects.RemoveRange(Context.UcasCourseSubjects);
+            Context.UcasCampuses.RemoveRange(Context.UcasCampuses);
+            Context.UcasCourseNotes.RemoveRange(Context.UcasCourseNotes);
+            Context.UcasNoteTexts.RemoveRange(Context.UcasNoteTexts);         
+            Context.McOrganisationIntitutions.RemoveRange(Context.McOrganisationIntitutions);
+            Context.UcasInstitutions.RemoveRange(Context.UcasInstitutions);
+            Context.McOrganisations.RemoveRange(Context.McOrganisations);
+            Context.McOrganisationUsers.RemoveRange(Context.McOrganisationUsers);
+            Context.Save();
+
             Subject = new DataService(this.Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
 
         [Test]
         public void ProcessPayload()
-        {
-            var payload = GetPayload();
-
-            Subject.ProcessPayload(payload);
+        {            
+            var userPayload = GetUserPayload();
+            Subject.ProcessReferencePayload(userPayload);
+            
+            var payload = GetUcasPayload();
+            Subject.ProcessUcasPayload(payload);
 
 
             foreach (var item in Context.McUsers)
             {
-                var payloadUser = payload.Users.FirstOrDefault(
+                var payloadUser = userPayload.Users.FirstOrDefault(
                     x => x.FirstName == item.FirstName &&
                     x.LastName == item.LastName &&
                     x.Email == item.Email);
 
                 Assert.IsNotNull(payloadUser);
 
-                var payloadOrgUser = payload.OrganisationUsers.FirstOrDefault(x => x.Email == payloadUser.Email);
+                var payloadOrgUser = userPayload.OrganisationUsers.FirstOrDefault(x => x.Email == payloadUser.Email);
 
                 if (payloadOrgUser != null)
                 {
@@ -76,7 +91,76 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             GetCoursesForUser_isNull(TestUserEmail_3, "OrgId_1"); 
         }
 
-        public Payload GetPayload()
+        [Test]
+        public void RepeatImportsArePossible()
+        {            
+            var payload = GetUcasPayload();            
+            var userPayload = GetUserPayload();
+
+            Subject.ProcessReferencePayload(userPayload);
+            Subject.ProcessUcasPayload(payload);
+                        
+            Subject.ProcessReferencePayload(userPayload);
+            Subject.ProcessUcasPayload(payload);
+
+            Subject.ProcessReferencePayload(userPayload);
+            Subject.ProcessReferencePayload(userPayload);
+            
+            Subject.ProcessUcasPayload(payload);
+            Subject.ProcessUcasPayload(payload);
+
+
+            foreach(var expected in userPayload.Users) 
+            {
+                var storedUser = Context.McUsers.ByEmail(expected.Email);
+
+                Assert.AreEqual(1, storedUser.Count());
+                Assert.AreEqual(expected.FirstName, storedUser.Single().FirstName);
+                Assert.AreEqual(expected.LastName, storedUser.Single().LastName);
+            }
+
+            foreach(var expected in userPayload.Organisations) 
+            {
+                var storedOrg = Context.McOrganisations.Where(o => o.OrgId == expected.OrgId);
+
+                Assert.AreEqual(1, storedOrg.Count());
+            }
+
+            foreach(var expected in userPayload.Institutions) 
+            {
+                var storedOrg = Context.UcasInstitutions.Where(o => o.InstCode == expected.InstCode);
+
+                Assert.AreEqual(1, storedOrg.Count());
+            }
+
+            foreach(var expected in userPayload.OrganisationUsers) 
+            {
+                var count = Context.McOrganisationUsers
+                    .Count(o => o.OrgId == expected.OrgId && o.Email == expected.Email);
+
+                Assert.AreEqual(1, count);
+            }
+
+            foreach(var expected in userPayload.OrganisationInstitutions) 
+            {
+                var count = Context.McOrganisationIntitutions
+                    .Count(o => o.OrgId == expected.OrgId && o.InstitutionCode == expected.InstitutionCode);
+
+                Assert.AreEqual(1, count);
+            }
+
+            foreach(var expected in payload.Courses) 
+            {
+                var count = Context.UcasCourses
+                    .Count(o => o.CrseCode == expected.CrseCode);
+
+                Assert.AreEqual(1, count);
+            }
+        }
+
+
+
+        public ReferenceDataPayload GetUserPayload()
         {
             var users = new List<McUser>()
             {
@@ -136,16 +220,30 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                     OrgId = "OrgId_1"
                 }
             };
-            var result = new Payload()
+            var result = new ReferenceDataPayload()
             {
                 Users = users,
                 OrganisationInstitutions = organisationInstitutions,
                 OrganisationUsers = organisationUsers,
                 Organisations = organisations,
-                Institutions = institutions,
+                Institutions = institutions
             };
 
             return result;
+        }
+
+        public UcasPayload GetUcasPayload()
+        {
+            return new UcasPayload()
+            {
+                Courses = new List<UcasCourse>{
+                    new UcasCourse()
+                    {
+                        InstCode = "InstCode_1",
+                        CrseCode = "CourseCode_1"
+                    }
+                }
+            };
         }
 
         [TestCase("nothing@nowhere.com", null)]

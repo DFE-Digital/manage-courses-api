@@ -37,7 +37,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                             
 
             var httpClient = new HttpClient();
-
+            client.Data_ImportReferenceDataAsync(TestData.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
+            client.Data_ImportAsync(TestData.MakeSimpleUcasPayload()).Wait();
+            
             var apiKeyAccessToken = config["api:key"];
 
 
@@ -160,8 +162,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             }
         }
         private static class TestData {
-            public static Payload MakeSimplePayload(string username) => new Payload {
-                   
+            
+            public static ReferenceDataPayload MakeReferenceDataPayload(string username) => new ReferenceDataPayload {
+            
                 Users = ListOfOne(new McUser{
                     FirstName = "Joe",
                     LastName = "Bloggs",
@@ -178,16 +181,20 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     OrgId = "123"
                 }),
 
-                Institutions = ListOfOne(new UcasInstitution { 
-                    InstFull = "Joe's school @ UCAS",
-                    InstCode = "ABC"
-                }),
-
                 OrganisationInstitutions = ListOfOne(new McOrganisationInstitution {
                     InstitutionCode = "ABC",
                     OrgId = "123"
                 }),
                 
+                Institutions = ListOfOne(new UcasInstitution { 
+                    InstFull = "Joe's school @ UCAS",
+                    InstCode = "ABC"
+                })
+            };
+        
+
+        public static UcasPayload MakeSimpleUcasPayload() => new UcasPayload {
+                            
                 Campuses = ListOfOne(new UcasCampus {
                     InstCode = "ABC",
                     CampusCode = "", // NOTE: EMPTY STRING
@@ -200,7 +207,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     CrseCode = "XYZ",
                     CrseTitle = "Joe's course for Primary teachers"
                 })
-
             };
         }
         

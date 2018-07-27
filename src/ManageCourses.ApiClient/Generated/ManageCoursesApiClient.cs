@@ -193,7 +193,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
     
         /// <summary>Imports the data.</summary>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
-        public System.Threading.Tasks.Task Data_ImportAsync(Payload payload)
+        public System.Threading.Tasks.Task Data_ImportAsync(UcasPayload payload)
         {
             return Data_ImportAsync(payload, System.Threading.CancellationToken.None);
         }
@@ -201,10 +201,76 @@ namespace GovUk.Education.ManageCourses.ApiClient
         /// <summary>Imports the data.</summary>
         /// <exception cref="SwaggerException">A server side error occurred.</exception>
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        public async System.Threading.Tasks.Task Data_ImportAsync(Payload payload, System.Threading.CancellationToken cancellationToken)
+        public async System.Threading.Tasks.Task Data_ImportAsync(UcasPayload payload, System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Data");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Data/ucas");
+    
+            var client_ = _httpClient;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(payload, _settings.Value));
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+    
+                    PrepareRequest(client_, request_, urlBuilder_);
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+                    PrepareRequest(client_, request_, url_);
+    
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+    
+                        ProcessResponse(client_, response_);
+    
+                        var status_ = ((int)response_.StatusCode).ToString();
+                        if (status_ == "204") 
+                        {
+                            return;
+                        }
+                        else
+                        if (status_ != "200" && status_ != "204")
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false); 
+                            throw new SwaggerException("The HTTP status code of the response was not expected (" + (int)response_.StatusCode + ").", (int)response_.StatusCode, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (response_ != null)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+            }
+        }
+    
+        /// <summary>Imports the data.</summary>
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        public System.Threading.Tasks.Task Data_ImportReferenceDataAsync(ReferenceDataPayload payload)
+        {
+            return Data_ImportReferenceDataAsync(payload, System.Threading.CancellationToken.None);
+        }
+    
+        /// <summary>Imports the data.</summary>
+        /// <exception cref="SwaggerException">A server side error occurred.</exception>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        public async System.Threading.Tasks.Task Data_ImportReferenceDataAsync(ReferenceDataPayload payload, System.Threading.CancellationToken cancellationToken)
+        {
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Data/referencedata");
     
             var client_ = _httpClient;
             try
@@ -1129,19 +1195,14 @@ namespace GovUk.Education.ManageCourses.ApiClient
     }
     
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.10.50.0 (Newtonsoft.Json v9.0.0.0)")]
-    public partial class Payload : System.ComponentModel.INotifyPropertyChanged
+    public partial class UcasPayload : System.ComponentModel.INotifyPropertyChanged
     {
         private System.Collections.ObjectModel.ObservableCollection<UcasCourse> _courses;
-        private System.Collections.ObjectModel.ObservableCollection<UcasInstitution> _institutions;
         private System.Collections.ObjectModel.ObservableCollection<UcasSubject> _subjects;
         private System.Collections.ObjectModel.ObservableCollection<UcasCourseSubject> _courseSubjects;
         private System.Collections.ObjectModel.ObservableCollection<UcasCampus> _campuses;
         private System.Collections.ObjectModel.ObservableCollection<UcasCourseNote> _courseNotes;
         private System.Collections.ObjectModel.ObservableCollection<UcasNoteText> _noteTexts;
-        private System.Collections.ObjectModel.ObservableCollection<McOrganisation> _organisations;
-        private System.Collections.ObjectModel.ObservableCollection<McOrganisationInstitution> _organisationInstitutions;
-        private System.Collections.ObjectModel.ObservableCollection<McOrganisationUser> _organisationUsers;
-        private System.Collections.ObjectModel.ObservableCollection<McUser> _users;
     
         [Newtonsoft.Json.JsonProperty("Courses", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public System.Collections.ObjectModel.ObservableCollection<UcasCourse> Courses
@@ -1152,20 +1213,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 if (_courses != value)
                 {
                     _courses = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("Institutions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.ObjectModel.ObservableCollection<UcasInstitution> Institutions
-        {
-            get { return _institutions; }
-            set 
-            {
-                if (_institutions != value)
-                {
-                    _institutions = value; 
                     RaisePropertyChanged();
                 }
             }
@@ -1241,70 +1288,14 @@ namespace GovUk.Education.ManageCourses.ApiClient
             }
         }
     
-        [Newtonsoft.Json.JsonProperty("Organisations", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.ObjectModel.ObservableCollection<McOrganisation> Organisations
-        {
-            get { return _organisations; }
-            set 
-            {
-                if (_organisations != value)
-                {
-                    _organisations = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("OrganisationInstitutions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.ObjectModel.ObservableCollection<McOrganisationInstitution> OrganisationInstitutions
-        {
-            get { return _organisationInstitutions; }
-            set 
-            {
-                if (_organisationInstitutions != value)
-                {
-                    _organisationInstitutions = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("OrganisationUsers", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.ObjectModel.ObservableCollection<McOrganisationUser> OrganisationUsers
-        {
-            get { return _organisationUsers; }
-            set 
-            {
-                if (_organisationUsers != value)
-                {
-                    _organisationUsers = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
-        [Newtonsoft.Json.JsonProperty("Users", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public System.Collections.ObjectModel.ObservableCollection<McUser> Users
-        {
-            get { return _users; }
-            set 
-            {
-                if (_users != value)
-                {
-                    _users = value; 
-                    RaisePropertyChanged();
-                }
-            }
-        }
-    
         public string ToJson() 
         {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
         
-        public static Payload FromJson(string data)
+        public static UcasPayload FromJson(string data)
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Payload>(data);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<UcasPayload>(data);
         }
     
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
@@ -3429,6 +3420,106 @@ namespace GovUk.Education.ManageCourses.ApiClient
         public static UcasNoteText FromJson(string data)
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<UcasNoteText>(data);
+        }
+    
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected virtual void RaisePropertyChanged([System.Runtime.CompilerServices.CallerMemberName] string propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler != null) 
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "9.10.50.0 (Newtonsoft.Json v9.0.0.0)")]
+    public partial class ReferenceDataPayload : System.ComponentModel.INotifyPropertyChanged
+    {
+        private System.Collections.ObjectModel.ObservableCollection<McOrganisation> _organisations;
+        private System.Collections.ObjectModel.ObservableCollection<UcasInstitution> _institutions;
+        private System.Collections.ObjectModel.ObservableCollection<McOrganisationInstitution> _organisationInstitutions;
+        private System.Collections.ObjectModel.ObservableCollection<McOrganisationUser> _organisationUsers;
+        private System.Collections.ObjectModel.ObservableCollection<McUser> _users;
+    
+        [Newtonsoft.Json.JsonProperty("Organisations", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.ObjectModel.ObservableCollection<McOrganisation> Organisations
+        {
+            get { return _organisations; }
+            set 
+            {
+                if (_organisations != value)
+                {
+                    _organisations = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("Institutions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.ObjectModel.ObservableCollection<UcasInstitution> Institutions
+        {
+            get { return _institutions; }
+            set 
+            {
+                if (_institutions != value)
+                {
+                    _institutions = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("OrganisationInstitutions", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.ObjectModel.ObservableCollection<McOrganisationInstitution> OrganisationInstitutions
+        {
+            get { return _organisationInstitutions; }
+            set 
+            {
+                if (_organisationInstitutions != value)
+                {
+                    _organisationInstitutions = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("OrganisationUsers", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.ObjectModel.ObservableCollection<McOrganisationUser> OrganisationUsers
+        {
+            get { return _organisationUsers; }
+            set 
+            {
+                if (_organisationUsers != value)
+                {
+                    _organisationUsers = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        [Newtonsoft.Json.JsonProperty("Users", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public System.Collections.ObjectModel.ObservableCollection<McUser> Users
+        {
+            get { return _users; }
+            set 
+            {
+                if (_users != value)
+                {
+                    _users = value; 
+                    RaisePropertyChanged();
+                }
+            }
+        }
+    
+        public string ToJson() 
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+        
+        public static ReferenceDataPayload FromJson(string data)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<ReferenceDataPayload>(data);
         }
     
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
