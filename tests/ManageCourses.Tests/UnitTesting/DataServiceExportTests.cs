@@ -3,7 +3,10 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Tests.Enums;
 using GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
@@ -17,8 +20,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [OneTimeSetUp]
         public void Setup()
         {
-            _dbContext = TestHelper.GetFakeData();
-            _dataService = new DataService(_dbContext);
+            _dbContext = TestHelper.GetFakeData(EnumTestType.DataService);
+            _dataService = new DataService(_dbContext, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
         [Test]
         public void GetOrganisationsForUser_should_return_multiple_organisations()

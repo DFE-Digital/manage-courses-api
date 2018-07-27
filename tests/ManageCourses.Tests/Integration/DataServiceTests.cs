@@ -8,6 +8,8 @@ using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace GovUk.Education.ManageCourses.Tests.Integration
 {
@@ -29,7 +31,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
         public void Setup()
         {
             Context = this.GetContext();
-            Subject = new DataService(this.Context);
+            Subject = new DataService(this.Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
 
         [Test]
