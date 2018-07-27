@@ -1,7 +1,9 @@
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Api.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -32,6 +34,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Imports the data.
         /// </summary>
+        [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
         [HttpPost]
         public void Import([FromBody] Payload payload)
         {

@@ -35,12 +35,22 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"], dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
             var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
                             
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient());
-            client.BaseUrl = localWebHost.Address;             
 
-            client.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Wait();
+            var httpClient = new HttpClient();
 
-            var export = client.Data_ExportByOrganisationAsync("ABC").Result;
+            var apiKeyAccessToken = config["api:key"];
+
+
+            var clientImport = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), httpClient);
+            clientImport.BaseUrl = localWebHost.Address;
+
+            clientImport.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Wait();
+
+
+            var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
+            clientExport.BaseUrl = localWebHost.Address;
+
+            var export = clientExport.Data_ExportByOrganisationAsync("ABC").Result;
 
             Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
             Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName, "OrganisationName should be retrieved");
@@ -79,6 +89,11 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Assert.That(() => client.Data_ExportByOrganisationAsync("ABC"),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+
+            Assert.That(() => client.Data_ImportAsync(new Payload()),
+                Throws.TypeOf<SwaggerException>()
+                    .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+
         }
 
         [Test]
