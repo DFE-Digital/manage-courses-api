@@ -37,17 +37,15 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                             
 
             var httpClient = new HttpClient();
-            client.Data_ImportReferenceDataAsync(TestData.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
-            client.Data_ImportAsync(TestData.MakeSimpleUcasPayload()).Wait();
-            
             var apiKeyAccessToken = config["api:key"];
 
 
             var clientImport = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), httpClient);
             clientImport.BaseUrl = localWebHost.Address;
 
-            clientImport.Data_ImportAsync(TestData.MakeSimplePayload(dfeSignInConfig["username"])).Wait();
-
+            clientImport.Data_ImportReferenceDataAsync(TestData.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
+            clientImport.Data_ImportAsync(TestData.MakeSimpleUcasPayload()).Wait();
+            
 
             var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
             clientExport.BaseUrl = localWebHost.Address;
@@ -92,7 +90,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
 
-            Assert.That(() => client.Data_ImportAsync(new Payload()),
+            Assert.That(() => client.Data_ImportAsync(new UcasPayload()),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
 
