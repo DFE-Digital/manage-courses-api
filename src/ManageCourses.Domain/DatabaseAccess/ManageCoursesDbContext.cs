@@ -9,6 +9,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 {
     public class ManageCoursesDbContext : DbContext, IManageCoursesDbContext
     {
+        public ManageCoursesDbContext()
+        {
+        }
+
         public ManageCoursesDbContext(DbContextOptions<ManageCoursesDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -137,7 +141,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McOrganisation> McOrganisations { get; set; }
         public DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
-        public DbSet<McUser> McUsers { get; set; }
+        public virtual DbSet<McUser> McUsers { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
 
         public IList<UcasCourse> GetAllUcasCourses()
