@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NUnit.Framework;
 
-namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
+namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
 {
 
     /// <summary>

@@ -1,15 +1,14 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
-using GovUk.Education.ManageCourses;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
-using GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess;
+using GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace GovUk.Education.ManageCourses.Tests.Integration
+namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 {
     [TestFixture]
     [Category("Integration")]
