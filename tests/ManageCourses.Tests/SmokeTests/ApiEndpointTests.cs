@@ -32,8 +32,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var clientImport = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), httpClient);
             clientImport.BaseUrl = localWebHost.Address;
 
-            clientImport.Data_ImportReferenceDataAsync(TestData.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
-            clientImport.Data_ImportAsync(TestData.MakeSimpleUcasPayload()).Wait();
+            clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
+            clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
 
 
             var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
