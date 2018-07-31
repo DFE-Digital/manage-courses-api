@@ -15,7 +15,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
     [Category("Integration")]
     [Category("Integration_DB")]
     [Explicit]
-    public class AccessRequestServiceTests : ManageCoursesDbContextIntegrationBase
+    public class AccessRequestServiceTests : DbIntegrationTestBase
     {        
         private IManageCoursesDbContext Context = null;
         private AccessRequestService System;

@@ -17,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
     [Category("Integration")]
     [Category("Integration_DB")]
     [Explicit]
-    public class DataServiceTests : ManageCoursesDbContextIntegrationBase
+    public class DataServiceTests : DbIntegrationTestBase
     {
         public IDataService Subject = null;
         public IManageCoursesDbContext Context = null;

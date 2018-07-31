@@ -12,7 +12,7 @@ using GovUk.Education.ManageCourses.Api;
 namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
 {
 
-    public class ManageCoursesDbContextIntegrationBase
+    public class DbIntegrationTestBase
     {
         protected ManageCoursesDbContext context;
 

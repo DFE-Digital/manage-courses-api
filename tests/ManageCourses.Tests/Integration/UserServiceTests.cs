@@ -18,7 +18,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
     [Category("Integration")]
     [Category("Integration_DB")]
     [Explicit]
-    public class UserServiceTests : ManageCoursesDbContextIntegrationBase
+    public class UserServiceTests : DbIntegrationTestBase
     {
         private IUserService _userService;
         private Mock<IWelcomeEmailService> _mockWelcomeEmailService;
