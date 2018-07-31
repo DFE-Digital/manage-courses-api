@@ -12,6 +12,9 @@ using GovUk.Education.ManageCourses.Api;
 namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
 {
 
+    /// <summary>
+    /// Base class for test classes that connect to a real database
+    /// </summary>
     public class DbIntegrationTestBase
     {
         protected ManageCoursesDbContext context;
