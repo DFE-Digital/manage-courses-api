@@ -1,11 +1,9 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using GovUk.Education.ManageCourses.Api;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
@@ -22,16 +20,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
 
         protected ManageCoursesDbContext GetContext()
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("integration-tests.json")
-                .Build();
-
-            var options = new DbContextOptionsBuilder<ManageCoursesDbContext>()
-                .UseNpgsql(Startup.GetConnectionString(config))
-                .Options;
-
-            return new ManageCoursesDbContext(options);
+            return ContextLoader.GetDbContext(ContextLoader.IntegrationTestJson);
         }
 
         [OneTimeSetUp]
