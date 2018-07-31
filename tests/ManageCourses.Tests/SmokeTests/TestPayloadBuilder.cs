@@ -3,7 +3,7 @@ using GovUk.Education.ManageCourses.ApiClient;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
-    public static class TestData {
+    public static class TestPayloadBuilder {
             
         public static ReferenceDataPayload MakeReferenceDataPayload(string username) => new ReferenceDataPayload {
             

@@ -4,7 +4,6 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
-using GovUk.Education.ManageCourses.Tests.Enums;
 using GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers;
 using NUnit.Framework;
 

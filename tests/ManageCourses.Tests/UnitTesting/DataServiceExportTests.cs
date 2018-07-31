@@ -3,7 +3,6 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
-using GovUk.Education.ManageCourses.Tests.Enums;
 using GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;

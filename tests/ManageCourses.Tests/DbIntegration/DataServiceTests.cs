@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
-using NUnit.Framework;
-using GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess;
 using Microsoft.Extensions.Logging;
 using Moq;
+using NUnit.Framework;
 
-namespace GovUk.Education.ManageCourses.Tests.Integration
+namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 {
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
     [Explicit]
-    public class DataServiceTests : ManageCoursesDbContextIntegrationBase
+    public class DataServiceTests : DbIntegrationTestBase
     {
         public IDataService Subject = null;
         public IManageCoursesDbContext Context = null;
@@ -37,7 +35,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
             Context.UcasCourseSubjects.RemoveRange(Context.UcasCourseSubjects);
             Context.UcasCampuses.RemoveRange(Context.UcasCampuses);
             Context.UcasCourseNotes.RemoveRange(Context.UcasCourseNotes);
-            Context.UcasNoteTexts.RemoveRange(Context.UcasNoteTexts);         
+            Context.UcasNoteTexts.RemoveRange(Context.UcasNoteTexts);
             Context.McOrganisationIntitutions.RemoveRange(Context.McOrganisationIntitutions);
             Context.UcasInstitutions.RemoveRange(Context.UcasInstitutions);
             Context.McOrganisations.RemoveRange(Context.McOrganisations);
@@ -49,10 +47,10 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
         [Test]
         public void ProcessPayload()
-        {            
+        {
             var userPayload = GetUserPayload();
             Subject.ProcessReferencePayload(userPayload);
-            
+
             var payload = GetUcasPayload();
             Subject.ProcessUcasPayload(payload);
 
@@ -88,29 +86,29 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
 
             GetCoursesForUser_isNull(TestUserEmail_1, null);
             GetCoursesForUser_isNull(TestUserEmail_2, null);
-            GetCoursesForUser_isNull(TestUserEmail_3, "OrgId_1"); 
+            GetCoursesForUser_isNull(TestUserEmail_3, "OrgId_1");
         }
 
         [Test]
         public void RepeatImportsArePossible()
-        {            
-            var payload = GetUcasPayload();            
+        {
+            var payload = GetUcasPayload();
             var userPayload = GetUserPayload();
 
             Subject.ProcessReferencePayload(userPayload);
             Subject.ProcessUcasPayload(payload);
-                        
+
             Subject.ProcessReferencePayload(userPayload);
             Subject.ProcessUcasPayload(payload);
 
             Subject.ProcessReferencePayload(userPayload);
             Subject.ProcessReferencePayload(userPayload);
-            
+
             Subject.ProcessUcasPayload(payload);
             Subject.ProcessUcasPayload(payload);
 
 
-            foreach(var expected in userPayload.Users) 
+            foreach (var expected in userPayload.Users)
             {
                 var storedUser = Context.McUsers.ByEmail(expected.Email);
 
@@ -119,21 +117,21 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 Assert.AreEqual(expected.LastName, storedUser.Single().LastName);
             }
 
-            foreach(var expected in userPayload.Organisations) 
+            foreach (var expected in userPayload.Organisations)
             {
                 var storedOrg = Context.McOrganisations.Where(o => o.OrgId == expected.OrgId);
 
                 Assert.AreEqual(1, storedOrg.Count());
             }
 
-            foreach(var expected in userPayload.Institutions) 
+            foreach (var expected in userPayload.Institutions)
             {
                 var storedOrg = Context.UcasInstitutions.Where(o => o.InstCode == expected.InstCode);
 
                 Assert.AreEqual(1, storedOrg.Count());
             }
 
-            foreach(var expected in userPayload.OrganisationUsers) 
+            foreach (var expected in userPayload.OrganisationUsers)
             {
                 var count = Context.McOrganisationUsers
                     .Count(o => o.OrgId == expected.OrgId && o.Email == expected.Email);
@@ -141,7 +139,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 Assert.AreEqual(1, count);
             }
 
-            foreach(var expected in userPayload.OrganisationInstitutions) 
+            foreach (var expected in userPayload.OrganisationInstitutions)
             {
                 var count = Context.McOrganisationIntitutions
                     .Count(o => o.OrgId == expected.OrgId && o.InstitutionCode == expected.InstitutionCode);
@@ -149,7 +147,7 @@ namespace GovUk.Education.ManageCourses.Tests.Integration
                 Assert.AreEqual(1, count);
             }
 
-            foreach(var expected in payload.Courses) 
+            foreach (var expected in payload.Courses)
             {
                 var count = Context.UcasCourses
                     .Count(o => o.CrseCode == expected.CrseCode);

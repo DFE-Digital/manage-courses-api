@@ -1,40 +1,29 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.Extensions.Configuration.UserSecrets;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
+    /// <summary>
+    /// These tests poke the http endpoints of the api whilst the api is running in a
+    /// a captive web host.
+    /// </summary>
     [TestFixture]
     [Category("Smoke")]
     [Explicit]
-    public class SystemUnderTest : ApiSmokeTestBase
+    public class ApiEndpointTests : ApiSmokeTestBase
     {
-        [Test]        
+        [Test]
         public void DataExport_WithEmptyCampus()
         {
             var dfeSignInConfig = config.GetSection("credentials").GetSection("dfesignin");
-                                
+
             var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"], dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
-            var accessToken =  communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
-                            
+            var accessToken = communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
+
 
             var httpClient = new HttpClient();
             var apiKeyAccessToken = config["api:key"];
@@ -43,9 +32,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var clientImport = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), httpClient);
             clientImport.BaseUrl = localWebHost.Address;
 
-            clientImport.Data_ImportReferenceDataAsync(TestData.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
-            clientImport.Data_ImportAsync(TestData.MakeSimpleUcasPayload()).Wait();
-            
+            clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
+            clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
+
 
             var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
             clientExport.BaseUrl = localWebHost.Address;
@@ -62,7 +51,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var details = course.CourseDetails.Single();
 
             Assert.AreEqual("Joe's course for Primary teachers", details.CourseTitle, "ProviderCourses.CourseDetails.CourseTitle should be retrieved");
-                        
+
             Assert.AreEqual(1, details.Variants.Count, "Expecting exactly one in ProviderCourses.CourseDetails.Variants");
             var variant = details.Variants.Single();
 
@@ -71,7 +60,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Assert.AreEqual(1, variant.Campuses.Count, "Expecting exactly one in ProviderCourses.CourseDetails.Variants.Campuses");
             var campus = variant.Campuses.Single();
 
-            Assert.AreEqual("", campus.Code, "ProviderCourses.CourseDetails.Variants.Campuses.Code should be retrieved");                
+            Assert.AreEqual("", campus.Code, "ProviderCourses.CourseDetails.Variants.Campuses.Code should be retrieved");
             Assert.AreEqual("Main campus site", campus.Name, "ProviderCourses.CourseDetails.Variants.Campuses.Name should be retrieved");
         }
 
@@ -158,6 +147,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 return Task.FromResult(accessToken);
             }
-        }        
+        }
     }
 }
