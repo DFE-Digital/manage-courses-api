@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
@@ -313,7 +314,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
              var ucasInstitution = mcOrganisationUsers.SelectMany(ou =>
                 ou.McOrganisationUsers.SelectMany(oi => oi.McOrganisation.McOrganisationInstitutions)).ToList();
 
-            var mcOrganisationInstitution = ucasInstitution.SingleOrDefault(oi => oi.UcasInstitution.InstCode == ucasCode);
+            var mcOrganisationInstitution = ucasInstitution.SingleOrDefault(oi => ucasCode.Equals(oi.UcasInstitution.InstCode, StringComparison.InvariantCultureIgnoreCase));
 
             if (mcOrganisationInstitution == null) return null;
 
