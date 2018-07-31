@@ -1,5 +1,6 @@
 using System.IO;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
@@ -14,9 +15,14 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
+            var context = ContextLoader.GetDbContext(ContextLoader.IntegrationTestJson);
+
+            context.Database.EnsureDeleted();
+            context.Database.Migrate();
+
             config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("integration-tests.json")
+                .AddJsonFile(ContextLoader.IntegrationTestJson)
                 .AddUserSecrets<ApiEndpointTests>()
                 .AddEnvironmentVariables()
                 .Build();
