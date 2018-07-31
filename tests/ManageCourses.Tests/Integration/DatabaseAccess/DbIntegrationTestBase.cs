@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using GovUk.Education.ManageCourses.Api;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Configuration;
-
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using NUnit.Framework;
-using GovUk.Education.ManageCourses.Api;
 
 namespace GovUk.Education.ManageCourses.Tests.Integration.DatabaseAccess
 {
