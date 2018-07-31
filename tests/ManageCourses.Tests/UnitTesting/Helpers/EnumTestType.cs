@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ManageCourses.Tests.Enums
+﻿namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
 {
     public enum EnumTestType
     {
