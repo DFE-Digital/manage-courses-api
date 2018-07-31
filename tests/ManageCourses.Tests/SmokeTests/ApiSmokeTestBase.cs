@@ -17,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("integration-tests.json")
-                .AddUserSecrets<SystemUnderTest>()
+                .AddUserSecrets<ApiEndpointTests>()
                 .AddEnvironmentVariables()
                 .Build();
 
