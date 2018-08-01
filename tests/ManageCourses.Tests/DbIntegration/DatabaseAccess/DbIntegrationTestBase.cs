@@ -21,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
         protected ManageCoursesDbContext GetContext()
         {
             var config = TestConfigBuilder.BuildTestConfig();
-            return ContextLoader.GetDbContext(config, "integration");
+            return ContextLoader.GetDbContext(config, "dbintegration");
         }
 
         [OneTimeSetUp]
