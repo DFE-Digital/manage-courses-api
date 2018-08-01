@@ -41,24 +41,24 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 LastName = "Sinatra",
                 Email = "frank@example.org",
             };
-            context.AddMcUser(_testUserBob);
-            context.AddMcUser(_userTestUserFrank);
-            context.SaveChanges();
+            Context.AddMcUser(_testUserBob);
+            Context.AddMcUser(_userTestUserFrank);
+            Context.SaveChanges();
 
             _mockWelcomeEmailService = new Mock<IWelcomeEmailService>();
 
             var mockClock = new Mock<IClock>();
             mockClock.SetupGet(c => c.UtcNow).Returns(() => _mockTime);
 
-            _userService = new UserService(context, _mockWelcomeEmailService.Object, mockClock.Object);
+            _userService = new UserService(Context, _mockWelcomeEmailService.Object, mockClock.Object);
         }
 
         [TearDown]
         public void Cleanup()
         {
-            context.Remove(_testUserBob);
-            context.Remove(_userTestUserFrank);
-            context.Save();
+            Context.Remove(_testUserBob);
+            Context.Remove(_userTestUserFrank);
+            Context.Save();
         }
 
         [Test]

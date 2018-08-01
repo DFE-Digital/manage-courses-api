@@ -1,7 +1,0 @@
-﻿{
-  "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST": "localhost",
-  "MANAGE_COURSES_POSTGRESQL_SERVICE_PORT": "5432",
-  "PG_DATABASE": "manage-test",
-  "PG_USERNAME": "postgres",
-  "PG_PASSWORD": "postgres"
-}

@@ -19,25 +19,25 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public void DataExport_WithEmptyCampus()
         {
-            var dfeSignInConfig = config.GetSection("credentials").GetSection("dfesignin");
+            var dfeSignInConfig = Config.GetSection("credentials").GetSection("dfesignin");
 
             var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"], dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
             var accessToken = communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
 
 
             var httpClient = new HttpClient();
-            var apiKeyAccessToken = config["api:key"];
+            var apiKeyAccessToken = Config["api:key"];
 
 
             var clientImport = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), httpClient);
-            clientImport.BaseUrl = localWebHost.Address;
+            clientImport.BaseUrl = LocalWebHost.Address;
 
             clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
             clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
 
 
             var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            clientExport.BaseUrl = localWebHost.Address;
+            clientExport.BaseUrl = LocalWebHost.Address;
 
             var export = clientExport.Data_ExportByOrganisationAsync("ABC").Result;
 
@@ -72,7 +72,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var httpClient = new HttpClient();
 
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = localWebHost.Address;
+            client.BaseUrl = LocalWebHost.Address;
 
 
             Assert.That(() => client.Data_ExportByOrganisationAsync("ABC"),
@@ -88,19 +88,19 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public async Task Invite()
         {
-            var accessToken = config["api:key"];
+            var accessToken = Config["api:key"];
 
             var httpClient = new HttpClient();
 
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = localWebHost.Address;
+            client.BaseUrl = LocalWebHost.Address;
 
             var result = await client.Invite_IndexAsync();
 
             Assert.AreEqual(200, result.StatusCode);
 
             var client2 = new ManageCoursesApiClient(new MockApiClientConfiguration("accessToken"), httpClient);
-            client2.BaseUrl = localWebHost.Address;
+            client2.BaseUrl = LocalWebHost.Address;
         }
 
         [Test]
@@ -111,7 +111,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var httpClient = new HttpClient();
 
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = localWebHost.Address;
+            client.BaseUrl = LocalWebHost.Address;
 
 
             Assert.That(() => client.Invite_IndexAsync(),
@@ -127,7 +127,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var httpClient = new HttpClient();
 
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = localWebHost.Address;
+            client.BaseUrl = LocalWebHost.Address;
 
             Assert.That(() => client.Invite_IndexAsync(),
                 Throws.TypeOf<SwaggerException>()

@@ -1,35 +1,43 @@
-using System.IO;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
-    public class ApiSmokeTestBase
-    {        
-        protected ApiLocalWebHost localWebHost = null;
-
-        protected IConfiguration config = null;
+    public abstract class ApiSmokeTestBase
+    {
+        protected ApiLocalWebHost LocalWebHost;
+        protected IConfiguration Config;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("integration-tests.json")
-                .AddUserSecrets<ApiEndpointTests>()
-                .AddEnvironmentVariables()
-                .Build();
 
-            localWebHost = new ApiLocalWebHost(config).Launch();
+            Config = TestConfigBuilder.BuildTestConfig();
+
+            var context = GetContext();
+
+            context.Database.EnsureDeleted();
+            context.Database.Migrate();
+
+            LocalWebHost = new ApiLocalWebHost(Config).Launch();
+        }
+
+        private ManageCoursesDbContext GetContext()
+        {
+            Config["PG_DATABASE"] += "-smoke";
+            var context = ContextLoader.GetDbContext(Config);
+            return context;
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            if (localWebHost != null)
+            if (LocalWebHost != null)
             {
-                localWebHost.Stop();
+                LocalWebHost.Stop();
             }
         }
     }

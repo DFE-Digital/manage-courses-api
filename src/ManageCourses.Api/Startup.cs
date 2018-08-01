@@ -29,12 +29,11 @@ namespace GovUk.Education.ManageCourses.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = GetConnectionString(Configuration);
-
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<ManageCoursesDbContext>(
                     options => options.UseNpgsql(
-                        connectionString, b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
+                        GetConnectionString(Configuration),
+                        b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
                     )
                 );
 
@@ -61,7 +60,8 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IInviteTemplateEmailConfig, InviteTemplateEmailConfig>();
             services.AddScoped<IInviteEmailService, InviteEmailService>();
 
-            services.AddScoped<IAccessRequestService>(provider => {
+            services.AddScoped<IAccessRequestService>(provider =>
+            {
                 return new AccessRequestService(provider.GetService<IManageCoursesDbContext>(),
                  new EmailServiceFactory(Configuration["email:api_key"])
                  .MakeAccessRequestEmailService(
@@ -113,6 +113,10 @@ namespace GovUk.Education.ManageCourses.Api
             app.UseMvc();
         }
 
+        /// <summary>
+        /// Build a postgres connection string from configuration data
+        /// </summary>
+        /// <param name="config"></param>
         public static string GetConnectionString(IConfiguration config)
         {
             var server = config["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
