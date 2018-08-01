@@ -39,9 +39,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 LocalWebHost.Stop();
             }
-
-            var context = GetContext();
-            context.Database.EnsureDeleted();
         }
     }
 }

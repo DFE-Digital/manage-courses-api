@@ -51,12 +51,5 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
                 Context.SaveChanges();
             }
         }
-
-        [OneTimeTearDown]
-        public void TearDownFixture()
-        {
-            Context = GetContext();
-            Context.Database.EnsureDeleted();
-        }
     }
 }
