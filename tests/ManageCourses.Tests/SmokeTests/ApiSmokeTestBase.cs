@@ -8,38 +8,37 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
     public abstract class ApiSmokeTestBase
     {
-        protected ApiLocalWebHost localWebHost;
-
-        protected IConfiguration config;
+        protected ApiLocalWebHost LocalWebHost;
+        protected IConfiguration Config;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
 
-            config = TestConfigBuilder.BuildTestConfig();
+            Config = TestConfigBuilder.BuildTestConfig();
 
             var context = GetContext();
 
             context.Database.EnsureDeleted();
             context.Database.Migrate();
 
-            localWebHost = new ApiLocalWebHost(config).Launch();
+            LocalWebHost = new ApiLocalWebHost(Config).Launch();
         }
 
         private ManageCoursesDbContext GetContext()
         {
             // Note this has to be the *same* database as the one that the captive api host will have configured using its own
             // view of the configuration.
-            var context = ContextLoader.GetDbContext(config);
+            var context = ContextLoader.GetDbContext(Config);
             return context;
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            if (localWebHost != null)
+            if (LocalWebHost != null)
             {
-                localWebHost.Stop();
+                LocalWebHost.Stop();
             }
 
             var context = GetContext();
