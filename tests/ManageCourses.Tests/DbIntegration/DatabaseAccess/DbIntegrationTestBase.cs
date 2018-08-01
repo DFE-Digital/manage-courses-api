@@ -14,9 +14,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
     /// </summary>
     public class DbIntegrationTestBase
     {
-        protected ManageCoursesDbContext context;
-
-        protected IList<EntityEntry> entitiesToCleanUp = new List<EntityEntry>();
+        protected ManageCoursesDbContext Context;
+        protected IList<EntityEntry> EntitiesToCleanUp = new List<EntityEntry>();
 
         protected ManageCoursesDbContext GetContext()
         {
@@ -27,36 +26,36 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
         [OneTimeSetUp]
         public void SetUpFixture()
         {
-            context = GetContext();
-            context.Database.EnsureDeleted();
-            context.Database.Migrate();
+            Context = GetContext();
+            Context.Database.EnsureDeleted();
+            Context.Database.Migrate();
         }
 
         [SetUp]
         public void SetUp()
         {
-            context = GetContext();
+            Context = GetContext();
         }
 
         [TearDown]
         public virtual void TearDown()
         {
-            if (entitiesToCleanUp.Any())
+            if (EntitiesToCleanUp.Any())
             {
-                foreach (var e in entitiesToCleanUp)
+                foreach (var e in EntitiesToCleanUp)
                 {
                     e.State = EntityState.Deleted;
                 }
-                entitiesToCleanUp.Clear();
-                context.SaveChanges();
+                EntitiesToCleanUp.Clear();
+                Context.SaveChanges();
             }
         }
 
         [OneTimeTearDown]
         public void TearDownFixture()
         {
-            context = GetContext();
-            context.Database.EnsureDeleted();
+            Context = GetContext();
+            Context.Database.EnsureDeleted();
         }
     }
 }
