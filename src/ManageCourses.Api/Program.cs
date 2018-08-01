@@ -9,17 +9,10 @@ namespace GovUk.Education.ManageCourses.Api
 {
     public class Program
     {
-        public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
-
         public static int Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
+                .ReadFrom.Configuration(LoggerConfiguration)
                 .CreateLogger();
 
             var programLogger = Log.ForContext<Program>();
@@ -50,5 +43,12 @@ namespace GovUk.Education.ManageCourses.Api
                 .UseStartup<Startup>()
                 .UseSerilog()
                 .Build();
+
+        private static IConfiguration LoggerConfiguration { get; } = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
     }
 }
