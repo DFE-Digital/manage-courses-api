@@ -16,6 +16,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     [Explicit]
     public class ApiEndpointTests : ApiSmokeTestBase
     {
+            const string Email = "feddie.krueger@example.org";
+
         [Test]
         public void DataExport_WithEmptyCampus()
         {
@@ -95,7 +97,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
             client.BaseUrl = LocalWebHost.Address;
 
-            var result = await client.Invite_IndexAsync();
+            client.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(Email)).Wait();
+
+            var result = await client.Invite_IndexAsync(Email);
 
             Assert.AreEqual(200, result.StatusCode);
 
@@ -114,7 +118,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             client.BaseUrl = LocalWebHost.Address;
 
 
-            Assert.That(() => client.Invite_IndexAsync(),
+            Assert.That(() => client.Invite_IndexAsync(Email),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
         }
@@ -129,7 +133,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
             client.BaseUrl = LocalWebHost.Address;
 
-            Assert.That(() => client.Invite_IndexAsync(),
+            Assert.That(() => client.Invite_IndexAsync(Email),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
         }

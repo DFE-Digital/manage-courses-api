@@ -1,25 +1,26 @@
+using GovUk.Education.ManageCourses.Api.Middleware;
+using GovUk.Education.ManageCourses.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using GovUk.Education.ManageCourses.Api.Middleware;
-using GovUk.Education.ManageCourses.Api.Services.Email;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
-    
+
     [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     public class InviteController : Controller
     {
-        private readonly IInviteEmailService _inviteEmailService;
+        private readonly IInviteService _inviteService;
 
-        public InviteController(IInviteEmailService inviteEmailService)
+        public InviteController(IInviteService inviteService)
         {
-            _inviteEmailService = inviteEmailService;
+            _inviteService = inviteService;
         }
 
         [HttpPost]
-        public IActionResult Index() 
+        public IActionResult Index(string email)
         {
+            _inviteService.Invite(email);
             return this.Ok();
         }
     }
