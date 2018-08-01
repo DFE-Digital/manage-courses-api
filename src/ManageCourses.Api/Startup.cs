@@ -122,7 +122,6 @@ namespace GovUk.Education.ManageCourses.Api
         ///     Optional. String to append to the database name, e.g. "test" to use "manage-test" as the database name.
         ///     Intended to be used for building various test databases
         /// </param>
-        /// <returns></returns>
         public static string GetConnectionString(IConfiguration config, string dbNameSuffix = null)
         {
             var server = config["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
