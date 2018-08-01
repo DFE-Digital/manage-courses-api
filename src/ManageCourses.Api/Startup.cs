@@ -113,7 +113,16 @@ namespace GovUk.Education.ManageCourses.Api
             app.UseMvc();
         }
 
-        public static string GetConnectionString(IConfiguration config)
+        /// <summary>
+        /// Build a postgres connection string from configuration data
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="dbNameSuffix">
+        ///     Optional. String to append to the database name, e.g. "test" to use "manage-test" as the database name.
+        ///     Intended to be used for building various test databases
+        /// </param>
+        /// <returns></returns>
+        public static string GetConnectionString(IConfiguration config, string dbNameSuffix = null)
         {
             var server = config["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
             var port = config["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"];
@@ -121,6 +130,11 @@ namespace GovUk.Education.ManageCourses.Api
             var user = config["PG_USERNAME"];
             var pword = config["PG_PASSWORD"];
             var dbase = config["PG_DATABASE"];
+
+            if (!string.IsNullOrWhiteSpace(dbNameSuffix))
+            {
+                dbase = $"{dbase}-{dbNameSuffix}";
+            }
 
             var sslDefault = "SSL Mode=Prefer;Trust Server Certificate=true";
             var ssl = config["PG_SSL"] ?? sslDefault;
