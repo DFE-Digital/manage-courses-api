@@ -1,4 +1,4 @@
-using System.IO;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,12 +18,18 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             config = TestConfigBuilder.BuildTestConfig();
 
-            var context = ContextLoader.GetDbContext(config, "smoke");
+            var context = GetContext();
 
             context.Database.EnsureDeleted();
             context.Database.Migrate();
 
             localWebHost = new ApiLocalWebHost(config).Launch();
+        }
+
+        private ManageCoursesDbContext GetContext()
+        {
+            var context = ContextLoader.GetDbContext(config, "smoke");
+            return context;
         }
 
         [OneTimeTearDown]
@@ -33,6 +39,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 localWebHost.Stop();
             }
+
+            var context = GetContext();
+            context.Database.EnsureDeleted();
         }
     }
 }
