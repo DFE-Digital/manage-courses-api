@@ -61,7 +61,8 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IInviteTemplateEmailConfig, InviteTemplateEmailConfig>();
             services.AddScoped<IInviteEmailService, InviteEmailService>();
 
-            services.AddScoped<IAccessRequestService>(provider => {
+            services.AddScoped<IAccessRequestService>(provider =>
+            {
                 return new AccessRequestService(provider.GetService<IManageCoursesDbContext>(),
                  new EmailServiceFactory(Configuration["email:api_key"])
                  .MakeAccessRequestEmailService(
