@@ -8,9 +8,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
     public abstract class ApiSmokeTestBase
     {
-        protected ApiLocalWebHost localWebHost = null;
+        protected ApiLocalWebHost localWebHost;
 
-        protected IConfiguration config = null;
+        protected IConfiguration config;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
