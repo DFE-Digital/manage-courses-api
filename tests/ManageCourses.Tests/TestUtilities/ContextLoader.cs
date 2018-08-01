@@ -10,12 +10,12 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
         /// <summary>
         /// Configures and returns a manage-courses dbContext
         /// </summary>
-        /// <param name="config"></param>
-        /// <param name="dbNameSuffix">Database name suffix to separate different test types into different databases</param>
-        public static ManageCoursesDbContext GetDbContext(IConfiguration config, string dbNameSuffix = null)
+        public static ManageCoursesDbContext GetDbContext(IConfiguration config)
         {
             var options = new DbContextOptionsBuilder<ManageCoursesDbContext>()
-                .UseNpgsql(Startup.GetConnectionString(config, dbNameSuffix))
+                .UseNpgsql(
+                        Startup.GetConnectionString(config)
+                    )
                 .Options;
 
             return new ManageCoursesDbContext(options);

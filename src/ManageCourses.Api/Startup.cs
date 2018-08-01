@@ -29,12 +29,11 @@ namespace GovUk.Education.ManageCourses.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = GetConnectionString(Configuration);
-
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<ManageCoursesDbContext>(
                     options => options.UseNpgsql(
-                        connectionString, b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
+                        GetConnectionString(Configuration),
+                        b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
                     )
                 );
 
@@ -118,11 +117,7 @@ namespace GovUk.Education.ManageCourses.Api
         /// Build a postgres connection string from configuration data
         /// </summary>
         /// <param name="config"></param>
-        /// <param name="dbNameSuffix">
-        ///     Optional. String to append to the database name, e.g. "test" to use "manage-test" as the database name.
-        ///     Intended to be used for building various test databases
-        /// </param>
-        public static string GetConnectionString(IConfiguration config, string dbNameSuffix = null)
+        public static string GetConnectionString(IConfiguration config)
         {
             var server = config["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
             var port = config["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"];
@@ -130,11 +125,6 @@ namespace GovUk.Education.ManageCourses.Api
             var user = config["PG_USERNAME"];
             var pword = config["PG_PASSWORD"];
             var dbase = config["PG_DATABASE"];
-
-            if (!string.IsNullOrWhiteSpace(dbNameSuffix))
-            {
-                dbase = $"{dbase}-{dbNameSuffix}";
-            }
 
             var sslDefault = "SSL Mode=Prefer;Trust Server Certificate=true";
             var ssl = config["PG_SSL"] ?? sslDefault;

@@ -27,8 +27,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
         private ManageCoursesDbContext GetContext()
         {
-            // Note this has to be the *same* database as the one that the captive api host will have configured using its own
-            // view of the configuration.
+            Config["PG_DATABASE"] += "-smoke";
             var context = ContextLoader.GetDbContext(Config);
             return context;
         }
