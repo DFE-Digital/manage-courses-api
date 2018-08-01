@@ -26,11 +26,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasIndex(ou => new { ou.Email, ou.OrgId })
                 .IsUnique();
             modelBuilder.Entity<McOrganisationUser>()
-                .HasOne(ou => ou.McUser)
-                .WithMany(u => u.McOrganisationUsers)
-                .HasForeignKey(ou => ou.Email)
-                .HasPrincipalKey(u => u.Email);
-            modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McOrganisation)
                 .WithMany(u => u.McOrganisationUsers)
                 .HasForeignKey(ou => ou.OrgId)
