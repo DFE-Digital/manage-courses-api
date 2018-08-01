@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
-    public class ApiSmokeTestBase
+    public abstract class ApiSmokeTestBase
     {
         protected ApiLocalWebHost localWebHost = null;
 
