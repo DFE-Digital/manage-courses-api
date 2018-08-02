@@ -42,8 +42,6 @@ deploy:
   script: chmod +x ./travis-nuget-deploy.sh && ./travis-nuget-deploy.sh $NUGET_API_KEY $NUGET_SOURCE
   on:
     all_branches: true
-services:
-- postgresql: '9.6'
 addons:
   postgresql: "9.6"
   apt:
