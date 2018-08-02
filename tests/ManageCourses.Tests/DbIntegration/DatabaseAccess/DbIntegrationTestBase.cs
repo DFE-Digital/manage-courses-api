@@ -9,7 +9,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
     /// <summary>
     /// Base class for test classes that connect to a real database
     /// </summary>
-    public class DbIntegrationTestBase
+    public abstract class DbIntegrationTestBase
     {
         protected ManageCoursesDbContext Context;
 
