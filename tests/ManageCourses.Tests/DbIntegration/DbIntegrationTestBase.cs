@@ -3,7 +3,7 @@ using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
-namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
+namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 {
 
     /// <summary>

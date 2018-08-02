@@ -6,7 +6,6 @@ using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
-using GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;

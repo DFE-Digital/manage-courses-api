@@ -4,7 +4,6 @@ using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
-using GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
