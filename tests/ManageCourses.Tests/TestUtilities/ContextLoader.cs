@@ -12,10 +12,11 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
         /// </summary>
         public static ManageCoursesDbContext GetDbContext(IConfiguration config)
         {
+            var mcConfig = new McConfig(config);
+            var connectionString = mcConfig.BuildConnectionString();
+
             var options = new DbContextOptionsBuilder<ManageCoursesDbContext>()
-                .UseNpgsql(
-                        Startup.GetConnectionString(config)
-                    )
+                .UseNpgsql(connectionString)
                 .Options;
 
             return new ManageCoursesDbContext(options);

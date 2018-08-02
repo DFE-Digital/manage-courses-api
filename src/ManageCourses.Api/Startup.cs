@@ -29,13 +29,17 @@ namespace GovUk.Education.ManageCourses.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var mcConfig = new McConfig(Configuration);
+            var connectionString = mcConfig.BuildConnectionString();
+
             services.AddEntityFrameworkNpgsql()
                 .AddDbContext<ManageCoursesDbContext>(
-                    options => options.UseNpgsql(
-                        GetConnectionString(Configuration),
-                        b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
-                    )
-                );
+                    options =>
+                    {
+                        options.UseNpgsql(connectionString,
+                            b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
+                        );
+                    });
 
             services.AddScoped<IManageCoursesDbContext>(provider => provider.GetService<ManageCoursesDbContext>());
 
@@ -112,26 +116,6 @@ namespace GovUk.Education.ManageCourses.Api
 
             app.UseAuthentication();
             app.UseMvc();
-        }
-
-        /// <summary>
-        /// Build a postgres connection string from configuration data
-        /// </summary>
-        /// <param name="config"></param>
-        public static string GetConnectionString(IConfiguration config)
-        {
-            var server = config["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
-            var port = config["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"];
-
-            var user = config["PG_USERNAME"];
-            var pword = config["PG_PASSWORD"];
-            var dbase = config["PG_DATABASE"];
-
-            var sslDefault = "SSL Mode=Prefer;Trust Server Certificate=true";
-            var ssl = config["PG_SSL"] ?? sslDefault;
-
-            var connectionString = $"Server={server};Port={port};Database={dbase};User Id={user};Password={pword};{ssl}";
-            return connectionString;
         }
     }
 }
