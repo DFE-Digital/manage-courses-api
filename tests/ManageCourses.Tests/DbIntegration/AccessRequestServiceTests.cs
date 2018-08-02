@@ -2,7 +2,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
@@ -15,15 +14,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class AccessRequestServiceTests : DbIntegrationTestBase
     {        
-        private IManageCoursesDbContext Context = null;
         private AccessRequestService System;
-
         private MockEmailService EmailService;
         
         [SetUp]
         public void Setup()
         {
-            Context = this.GetContext();
             Context.AccessRequests.RemoveRange(Context.AccessRequests);
             
             Context.McOrganisationUsers.RemoveRange(Context.McOrganisationUsers);

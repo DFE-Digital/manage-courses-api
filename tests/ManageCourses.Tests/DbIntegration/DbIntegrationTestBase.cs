@@ -1,6 +1,7 @@
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.DbIntegration
@@ -12,17 +13,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     public abstract class DbIntegrationTestBase
     {
         protected ManageCoursesDbContext Context;
-
-        protected ManageCoursesDbContext GetContext()
-        {
-            var config = TestConfigBuilder.BuildTestConfig();
-            return ContextLoader.GetDbContext(config);
-        }
+        protected IConfigurationRoot Config;
 
         [OneTimeSetUp]
-        public void SetUpFixture()
+        public virtual void OneTimeSetUp()
         {
-            Context = GetContext();
+            Config = TestConfigBuilder.BuildTestConfig();
+            Context = ContextLoader.GetDbContext(Config);
             Context.Database.EnsureDeleted();
             Context.Database.Migrate();
         }
