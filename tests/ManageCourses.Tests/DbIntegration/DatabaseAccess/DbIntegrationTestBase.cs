@@ -20,7 +20,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess
         protected ManageCoursesDbContext GetContext()
         {
             var config = TestConfigBuilder.BuildTestConfig();
-            config["PG_DATABASE"] += "-dbintegration";
             return ContextLoader.GetDbContext(config);
         }
 

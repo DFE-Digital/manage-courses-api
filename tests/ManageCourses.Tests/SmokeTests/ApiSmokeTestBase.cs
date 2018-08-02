@@ -27,7 +27,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
         private ManageCoursesDbContext GetContext()
         {
-            Config["PG_DATABASE"] += "-smoke";
             var context = ContextLoader.GetDbContext(Config);
             return context;
         }
