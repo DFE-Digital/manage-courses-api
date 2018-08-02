@@ -4,7 +4,6 @@ using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
-using GovUk.Education.ManageCourses.Tests.DbIntegration.DatabaseAccess;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -17,8 +16,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class DataServiceTests : DbIntegrationTestBase
     {
-        public IDataService Subject = null;
-        public IManageCoursesDbContext Context = null;
+        public IDataService Subject;
 
         private const string TestUserEmail_1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail_2 = "email_2@test-manage-courses.gov.uk";
@@ -28,7 +26,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [SetUp]
         public void Setup()
         {
-            Context = this.GetContext();
             Context.UcasCourses.RemoveRange(Context.UcasCourses);
             Context.CourseCodes.RemoveRange(Context.CourseCodes);
             Context.UcasSubjects.RemoveRange(Context.UcasSubjects);

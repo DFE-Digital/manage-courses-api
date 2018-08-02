@@ -8,10 +8,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     /// then they are updated from DfE SignIn every time they
     /// access the service to keep it fresh.
     /// </summary>
-    public class McUser
+    public class McUser : McBase
     {
-        public int Id { get; set; }
-
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
@@ -25,6 +23,10 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Email { get; set; }
 
         /// <summary>
+        /// When the user was sent the invite email
+        /// </summary>
+        public DateTime? InviteDateUtc { get; set; }
+
         /// GUID from DfE Sign-in uniquely identifying this user.
         /// We capture this the first time a user signs and then use
         /// it to match up the currently signed in user from then on.

@@ -1,44 +1,25 @@
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Tests.DbIntegration;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
-    public abstract class ApiSmokeTestBase
+    public abstract class ApiSmokeTestBase : DbIntegrationTestBase
     {
         protected ApiLocalWebHost LocalWebHost;
-        protected IConfiguration Config;
 
         [OneTimeSetUp]
-        public void OneTimeSetUp()
+        public override void OneTimeSetUp()
         {
-
-            Config = TestConfigBuilder.BuildTestConfig();
-
-            var context = GetContext();
-
-            context.Database.EnsureDeleted();
-            context.Database.Migrate();
+            base.OneTimeSetUp();
 
             LocalWebHost = new ApiLocalWebHost(Config).Launch();
-        }
-
-        private ManageCoursesDbContext GetContext()
-        {
-            Config["PG_DATABASE"] += "-smoke";
-            var context = ContextLoader.GetDbContext(Config);
-            return context;
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            if (LocalWebHost != null)
-            {
-                LocalWebHost.Stop();
-            }
+            LocalWebHost?.Stop();
         }
     }
 }
