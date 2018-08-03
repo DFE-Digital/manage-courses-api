@@ -29,8 +29,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             catch (McUserNotFoundException)
             {
                 // Using 422 because: https://stackoverflow.com/questions/3050518/what-http-status-response-code-should-i-use-if-the-request-is-missing-a-required/10323055#10323055
-                Response.StatusCode = 422; // unprocessable entity (extension to http)
-                return Json(new { error = "McUser not found" });
+                // 422 = Unprocessable entity (extension to http)
+                return new ObjectResult(new { error = "McUser not found" }) { StatusCode = 422 };
             }
         }
     }

@@ -27,7 +27,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
             inviteServiceMock.Setup(s => s.Invite(It.IsAny<string>())).Throws<McUserNotFoundException>();
             var inviteController = new InviteController(inviteServiceMock.Object);
             var result = inviteController.Index("foo@example.org");
-            result.Should().BeOfType<OkResult>();
+            result.Should().BeOfType<ObjectResult>();
+            var objResult = (ObjectResult)result;
+            objResult.StatusCode.Should().Be(422);
         }
     }
 }
