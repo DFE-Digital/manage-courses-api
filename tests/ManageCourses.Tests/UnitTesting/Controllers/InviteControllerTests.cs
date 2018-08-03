@@ -11,22 +11,36 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
     [TestFixture]
     public class InviteControllerTests
     {
+        private Mock<IInviteService> _inviteServiceMock;
+        private InviteController _inviteController;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _inviteServiceMock = new Mock<IInviteService>();
+            _inviteController = new InviteController(_inviteServiceMock.Object);
+        }
+
         [Test]
         public void Invite_Returns200()
         {
-            var inviteServiceMock = new Mock<IInviteService>(); // default mock is enough to accecpt call to Invite() without error
-            var inviteController = new InviteController(inviteServiceMock.Object);
-            var result = inviteController.Index("foo@example.org");
+            // act
+            var result = _inviteController.Index("foo@example.org");
+
+            // assert
             result.Should().BeOfType<OkResult>();
         }
 
         [Test]
         public void Invite_UnknownUser_Returns422()
         {
-            var inviteServiceMock = new Mock<IInviteService>();
-            inviteServiceMock.Setup(s => s.Invite(It.IsAny<string>())).Throws<McUserNotFoundException>();
-            var inviteController = new InviteController(inviteServiceMock.Object);
-            var result = inviteController.Index("foo@example.org");
+            // arrange
+            _inviteServiceMock.Setup(s => s.Invite(It.IsAny<string>())).Throws<McUserNotFoundException>();
+
+            // act
+            var result = _inviteController.Index("foo@example.org");
+
+            // assert
             result.Should().BeOfType<ObjectResult>();
             var objResult = (ObjectResult)result;
             objResult.StatusCode.Should().Be(422);
