@@ -32,7 +32,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
         }
 
         [Test]
-        public void Invite_UnknownUser_Returns422()
+        public void Invite_UnknownUser_ReturnsBadRequest()
         {
             // arrange
             _inviteServiceMock.Setup(s => s.Invite(It.IsAny<string>())).Throws<McUserNotFoundException>();
@@ -41,9 +41,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
             var result = _inviteController.Index("foo@example.org");
 
             // assert
-            result.Should().BeOfType<ObjectResult>();
-            var objResult = (ObjectResult)result;
-            objResult.StatusCode.Should().Be(422);
+            result.Should().BeOfType<BadRequestObjectResult>();
         }
     }
 }
