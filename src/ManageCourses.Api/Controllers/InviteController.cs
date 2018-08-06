@@ -1,3 +1,4 @@
+using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -20,8 +21,15 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [HttpPost]
         public IActionResult Index(string email)
         {
-            _inviteService.Invite(email);
-            return this.Ok();
+            try
+            {
+                _inviteService.Invite(email);
+                return Ok();
+            }
+            catch (McUserNotFoundException)
+            {
+                return BadRequest(new { error = "McUser not found" });
+            }
         }
     }
 }
