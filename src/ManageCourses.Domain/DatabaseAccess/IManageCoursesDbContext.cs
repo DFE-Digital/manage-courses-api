@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,6 +43,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution);
         void AddMcOrganisationUser(McOrganisationUser organisationUser);
         void AddMcUser(McUser user);
+        List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email);
+        List<UcasCourse> GetUcasCourseRecordsByInstCode(string instCode, string email);
+        IQueryable<McOrganisationInstitution> GetUserOrganisations(string email);
+        McOrganisationInstitution GetUserOrganisation(string email, string instCode);
         void Save();
     }
 }

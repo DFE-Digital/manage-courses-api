@@ -136,6 +136,12 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
         }
 
+        public UserOrganisation GetOrganisationForUser(string email, string instCode)
+        {
+            var org = GetUserOrganisation(email, instCode);
+            return org;
+        }
+
         public void ProcessReferencePayload(ReferenceDataPayload payload)
         {
             ResetReferenceSchema();
@@ -209,6 +215,127 @@ namespace GovUk.Education.ManageCourses.Api.Data
 
         }
 
+        /// <summary>
+        /// returns a Course object containing all the required fields
+        /// </summary>
+        /// <param name="email">email of the user</param>
+        /// <param name="instCode">the institution code</param>
+        /// <param name="ucasCode">the ucas code of the course</param>
+        /// <returns></returns>
+        public Course GetCourse(string email, string instCode, string ucasCode)
+        {
+
+            var courseRecords = _context.GetUcasCourseRecordsByUcasCode(instCode, ucasCode, email);
+
+            if (courseRecords.Count == 0)
+            {
+                return null;
+            }
+            var course = LoadCourse(courseRecords);
+            return course;
+        }
+        /// <summary>
+        /// returns an InstitutionCourses object for a specified institution with the required courses mapped to a user email address
+        /// </summary>
+        /// <param name="email">user email address</param>
+        /// <param name="instCode">the institution code</param>
+        /// <returns></returns>
+        public InstitutionCourses GetCourses(string email, string instCode)
+        {
+            var returnCourses = new InstitutionCourses();
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(instCode)) { return returnCourses; }
+
+            try
+            {
+                var courseRecords = _context.GetUcasCourseRecordsByInstCode(instCode, email);
+                returnCourses = LoadCourses(courseRecords);
+            }
+            catch (Exception e)
+            {
+                _logger.LogCritical("Error in GetCourses(): Email={0} InstCode={1}", email, instCode);
+            }
+            return returnCourses;
+        }
+        private InstitutionCourses LoadCourses(IReadOnlyList<UcasCourse> courseRecords)
+        {
+            var returnCourses = new InstitutionCourses();
+            if (courseRecords.Count > 0)
+            {
+                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical info so just get the first one
+                returnCourses.InstitutionName = organisationCourseRecord.UcasInstitution.InstFull;
+                returnCourses.InstitutionCode = organisationCourseRecord.InstCode;
+                returnCourses.Courses = new List<Course>();
+                foreach (var courseCode in courseRecords.Select(c => c.CrseCode).Distinct())
+                {
+                    var courseRecord = courseRecords.FirstOrDefault(c => c.CrseCode == courseCode);
+                    if (courseRecord != null)
+                    {
+                        var course = new Course
+                        {
+                            Name = courseRecord.CrseTitle,
+                            CourseCode = courseRecord.CrseCode,
+                            ProfpostFlag = courseRecord.ProfpostFlag,
+                            ProgramType = courseRecord.ProgramType,
+                            StudyMode = courseRecord.Studymode
+                        };
+                        returnCourses.Courses.Add(course);
+                    }
+                }
+            }
+
+            return returnCourses;
+
+        }
+        private Course LoadCourse(IReadOnlyList<UcasCourse> courseRecords)
+        {
+            var returnCourse = new Course();
+            if (courseRecords.Count > 0)
+            {
+                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical info so just get the first one
+                returnCourse.InstCode = organisationCourseRecord.InstCode;
+                returnCourse.CourseCode = organisationCourseRecord.CrseCode;
+                returnCourse.AccreditingProviderId = organisationCourseRecord.AccreditingProvider;
+                if (organisationCourseRecord.AccreditingProviderInstitution != null)
+                {
+                    returnCourse.AccreditingProviderName = organisationCourseRecord.AccreditingProviderInstitution.InstFull;
+                }                    
+                returnCourse.AgeRange = organisationCourseRecord.Age;
+                returnCourse.Name = organisationCourseRecord.CrseTitle;
+                returnCourse.ProgramType = organisationCourseRecord.ProgramType;
+                returnCourse.ProfpostFlag = organisationCourseRecord.ProfpostFlag;
+                returnCourse.StudyMode = organisationCourseRecord.Studymode;
+                var subjects = _context.UcasSubjects
+                    .Join(_context.UcasCourseSubjects, s => s.SubjectCode, cs => cs.SubjectCode,
+                        (s, cs) => new { s.SubjectDescription, cs.CrseCode, cs.InstCode })
+                    .Where(x => x.CrseCode == organisationCourseRecord.CrseCode && x.InstCode == organisationCourseRecord.InstCode)
+                    .Select(x => x.SubjectDescription).ToList();
+
+                returnCourse.Subjects = string.Join(", ", subjects);
+            }
+            var schools = courseRecords.Select(courseRecord => new School
+            {
+                LocationName = courseRecord.UcasCampus.CampusName,
+                Address1 = courseRecord.UcasCampus.Addr1,
+                Address2 = courseRecord.UcasCampus.Addr2,
+                Address3 = courseRecord.UcasCampus.Addr3,
+                Address4 = courseRecord.UcasCampus.Addr4,
+                PostCode = courseRecord.UcasCampus.Postcode,
+                ApplicationsAcceptedFrom = courseRecord.CrseOpenDate,
+                Code = courseRecord.UcasCampus.CampusCode
+            })
+                .ToList();
+            //look for the main site and move it to the top of the list
+            var main = schools.FirstOrDefault(s => s.Code == "-");
+            if (main != null)
+            {
+                schools.Remove(main);
+                schools.Insert(0, main);
+            }
+
+            returnCourse.Schools = schools;
+
+            return returnCourse;
+        }
         private void ResetUcasSchema()
         {
             // clear out the existing data
@@ -327,26 +454,33 @@ namespace GovUk.Education.ManageCourses.Api.Data
         }
         private IEnumerable<UserOrganisation> GetOrganisations(string email)
         {
-            var userOrgs = _context.McUsers.ByEmail(email)
-                .Join(_context.McOrganisationUsers, u => u.Email, ou => ou.Email,
-                    (user, organisationUser) => organisationUser)
-                .Join(_context.McOrganisationIntitutions, oi => oi.OrgId, i => i.OrgId,
-                    (user, institution) => new
-                    {
-                        institution.OrgId,
-                        institution.InstitutionCode,
-                        institution.UcasInstitution.InstFull
-                    })
-                .Select(arg => new Organisation { Name = arg.InstFull, OrgId = arg.OrgId, UcasCode = arg.InstitutionCode }).ToList();
+            var userOrganisations = _context.GetUserOrganisations(email)
+                .Select(orgInst => new UserOrganisation()
+                {
+                    OrganisationId = orgInst.OrgId,
+                    OrganisationName = orgInst.UcasInstitution.InstFull,
+                    UcasCode = orgInst.InstitutionCode,
+                    TotalCourses = orgInst.UcasInstitution.UcasCourses.Select(c => c.CrseCode).Distinct().Count()
+                }).OrderBy(x => x.OrganisationName).ToList();
 
-            var userOrganisations = userOrgs?.Select(organisation => new UserOrganisation
-            {
-                OrganisationId = organisation.OrgId,
-                OrganisationName = organisation.Name,
-                UcasCode = organisation.UcasCode,
-                TotalCourses = GetProviderCourses(organisation).SelectMany(x => x.CourseDetails).SelectMany(v => v.Variants).Count()
-            });
             return userOrganisations;
+        }
+        private UserOrganisation GetUserOrganisation(string email, string instCode)
+        {
+            var userOrganisation = _context.GetUserOrganisation(email, instCode);
+            if (userOrganisation != null)
+            {
+                return new UserOrganisation()
+                {
+                    OrganisationId = userOrganisation.OrgId,
+                    OrganisationName = userOrganisation.UcasInstitution.InstFull,
+                    UcasCode = userOrganisation.InstitutionCode,
+                    TotalCourses = userOrganisation.UcasInstitution.UcasCourses.Select(c => c.CrseCode).Distinct()
+                        .Count()
+                };
+            }
+
+            return null;
         }
         private List<UcasInstitution> GetProviders(IQueryable<UcasCourse> mappedCourses)
         {

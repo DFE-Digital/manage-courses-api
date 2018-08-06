@@ -17,14 +17,28 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Exports the data.
+        /// Gets an organisations by Institution Code
         /// </summary>
-        /// <returns>The exported data</returns>
+        /// <returns>a single UserOrganisation object</returns>
         [Authorize]
         [HttpGet]
-        public IEnumerable<UserOrganisation> Get()
+        [Route("{instCode}")]
+        public UserOrganisation Get(string instCode)
         {
-            var name = this.User.Identity.Name;            
+            var name = this.User.Identity.Name;
+            var organisation = _dataService.GetOrganisationForUser(name, instCode);
+
+            return organisation;
+        }
+        /// <summary>
+        /// Gets a list of organisations for the user
+        /// </summary>
+        /// <returns>a list of UserOrganisation objects</returns>
+        [Authorize]
+        [HttpGet]
+        public IEnumerable<UserOrganisation> GetAll()
+        {
+            var name = this.User.Identity.Name;
             var organisations = _dataService.GetOrganisationsForUser(name);
 
             return organisations;

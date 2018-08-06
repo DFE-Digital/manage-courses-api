@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Npgsql;
 
 namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 {
@@ -243,12 +244,63 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         {
             McUsers.Add(user);
         }
+        public List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
+        {
+            var ucasCourses = UcasCourses.FromSql(
+                    $"select c.* from ucas_course c " +
+                    $"join mc_organisation_institution oi on oi.institution_code=c.inst_code " +
+                    $"join mc_organisation_user ou on ou.org_id=oi.org_id " +
+                    $"where lower(c.inst_code)=lower(@instCode) " +
+                    $"and lower(c.crse_code)=lower(@ucasCode) " +
+                    $"and lower(ou.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
+                .Include(x => x.UcasInstitution)
+                .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
+                .Include(x => x.AccreditingProviderInstitution)
+                .Include(x => x.UcasCampus)
+                .ToList();
+
+            return ucasCourses;
+        }
+        public List<UcasCourse> GetUcasCourseRecordsByInstCode(string instCode, string email)
+        {
+            var ucasCourses = UcasCourses.FromSql(
+                    $"select c.* from ucas_course c " +
+                    $"join mc_organisation_institution oi on oi.institution_code=c.inst_code " +
+                    $"join mc_organisation_user ou on ou.org_id=oi.org_id " +
+                    $"where lower(c.inst_code)=lower(@instCode) " +
+                    $"and lower(ou.email)=lower(@email) order by c.crse_title", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
+                .Include(x => x.UcasInstitution)
+                .ToList();
+
+            return ucasCourses;
+        }
+        public IQueryable<McOrganisationInstitution> GetUserOrganisations(string email)
+        {
+            var userOrganisations = McOrganisationIntitutions.FromSql(
+                $"select oi.* from mc_organisation_institution oi " +
+                $"join mc_organisation_user ou on ou.org_id = oi.org_id " +
+                $"where lower(ou.email) = lower(@email)",
+                new NpgsqlParameter("email", email)
+            );
+
+            return userOrganisations;
+        }
+        public McOrganisationInstitution GetUserOrganisation(string email, string instCode)
+        {
+            var userOrganisations = McOrganisationIntitutions.FromSql(
+                $"select oi.* from mc_organisation_institution oi " +
+                $"join mc_organisation_user ou on ou.org_id = oi.org_id " +
+                $"where lower(ou.email) = lower(@email) and Lower(oi.institution_code) = lower(@instCode)",
+                new NpgsqlParameter("email", email), new NpgsqlParameter("instCode", instCode)
+            ).FirstOrDefault();
+
+            return userOrganisations;
+        }
 
         public void AddUcasCourse(UcasCourse course)
         {
             UcasCourses.Add(course);
         }
-
         public void Save()
         {
             SaveChanges();
