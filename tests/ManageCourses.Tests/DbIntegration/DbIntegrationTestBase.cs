@@ -16,16 +16,23 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected IConfigurationRoot Config;
 
         [OneTimeSetUp]
-        public virtual void OneTimeSetUp()
+        public virtual void BaseOneTimeSetUp()
         {
             Config = TestConfigBuilder.BuildTestConfig();
             Context = ContextLoader.GetDbContext(Config);
             Context.Database.EnsureDeleted();
             Context.Database.Migrate();
+            OneTimeSetup();
         }
 
+        /// <summary>
+        /// Optionally override this in derived test classes to do any fixture-specific setup.
+        /// This will be run once the database has been reset and migrated.
+        /// </summary>
+        public virtual void OneTimeSetup() { }
+
         [SetUp]
-        public void SetUp()
+        public void BaseSetup()
         {
             // get a fresh context every time to avoid stale in-memory data contaminating subsequent tests
             Context = ContextLoader.GetDbContext(Config);
@@ -43,6 +50,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                    );
                 END
                 $func$;").Wait();
+            Setup();
         }
+
+        /// <summary>
+        /// Optionally override this in derived test classes to do any test-specific setup.
+        /// This will be run once the database cleared of any stale data from previous tests
+        /// and a fresh <see cref="Context"/> obtained.
+        /// </summary>
+        protected virtual void Setup() { }
     }
 }

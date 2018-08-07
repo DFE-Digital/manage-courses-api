@@ -8,11 +8,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     {
         protected ApiLocalWebHost LocalWebHost;
 
-        [OneTimeSetUp]
-        public override void OneTimeSetUp()
+        public override void OneTimeSetup()
         {
-            base.OneTimeSetUp();
-
             LocalWebHost = new ApiLocalWebHost(Config).Launch();
         }
 
