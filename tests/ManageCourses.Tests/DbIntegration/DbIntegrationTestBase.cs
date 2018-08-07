@@ -32,7 +32,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         public virtual void OneTimeSetup() { }
 
         [SetUp]
-        public void SetUp()
+        public void BaseSetup()
         {
             // get a fresh context every time to avoid stale in-memory data contaminating subsequent tests
             Context = ContextLoader.GetDbContext(Config);
@@ -50,6 +50,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                    );
                 END
                 $func$;").Wait();
+            Setup();
         }
+
+        /// <summary>
+        /// Optionally override this in derived test classes to do any test-specific setup.
+        /// This will be run once the database cleared of any stale data from previous tests
+        /// and a fresh <see cref="Context"/> obtained.
+        /// </summary>
+        protected virtual void Setup() { }
     }
 }

@@ -17,8 +17,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private AccessRequestService System;
         private MockEmailService EmailService;
 
-        [SetUp]
-        public void Setup()
+        protected override void Setup()
         {
             Context.AccessRequests.RemoveRange(Context.AccessRequests);
 

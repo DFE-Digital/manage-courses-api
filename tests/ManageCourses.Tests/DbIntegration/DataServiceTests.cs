@@ -23,8 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private const string TestUserEmail_3 = "email_3@test-manage-courses.gov.uk";
 
 
-        [SetUp]
-        public void Setup()
+        protected override void Setup()
         {
             Context.UcasCourses.RemoveRange(Context.UcasCourses);
             Context.CourseCodes.RemoveRange(Context.CourseCodes);

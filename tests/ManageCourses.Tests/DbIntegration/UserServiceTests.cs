@@ -25,8 +25,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private McUser _testUserBob;
         private McUser _userTestUserFrank;
 
-        [SetUp]
-        public void Setup()
+        protected override void Setup()
         {
             _testUserBob = new McUser
             {
