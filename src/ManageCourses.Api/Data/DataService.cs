@@ -221,7 +221,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// <param name="email">email of the user</param>
         /// <param name="instCode">the institution code</param>
         /// <param name="ucasCode">the ucas code of the course</param>
-        /// <returns></returns>
+        /// <returns>new Course object. Null if not found</returns>
         public Course GetCourse(string email, string instCode, string ucasCode)
         {
 
@@ -239,7 +239,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         /// </summary>
         /// <param name="email">user email address</param>
         /// <param name="instCode">the institution code</param>
-        /// <returns></returns>
+        /// <returns>new InstitutionCourse object with a list of all courses found</returns>
         public InstitutionCourses GetCourses(string email, string instCode)
         {
             var returnCourses = new InstitutionCourses();
@@ -252,7 +252,8 @@ namespace GovUk.Education.ManageCourses.Api.Data
             }
             catch (Exception e)
             {
-                _logger.LogCritical("Error in GetCourses(): Email={0} InstCode={1}", email, instCode);
+                //log the exception and return empty object
+                _logger.LogCritical(e, "Error in GetCourses(): InstCode={0}", instCode);
             }
             return returnCourses;
         }

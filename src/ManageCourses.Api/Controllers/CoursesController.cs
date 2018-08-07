@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>a single course</returns>
         [Authorize]
         [HttpGet]
-        [Route("{instCode}/{ucasCode}")]
+        [Route("{instCode}/course/{ucasCode}")]
         public Course Get(string instCode, string ucasCode)
         {
             var name = this.User.Identity.Name;
