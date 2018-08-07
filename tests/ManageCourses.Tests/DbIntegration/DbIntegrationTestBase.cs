@@ -16,13 +16,20 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected IConfigurationRoot Config;
 
         [OneTimeSetUp]
-        public virtual void OneTimeSetUp()
+        public virtual void BaseOneTimeSetUp()
         {
             Config = TestConfigBuilder.BuildTestConfig();
             Context = ContextLoader.GetDbContext(Config);
             Context.Database.EnsureDeleted();
             Context.Database.Migrate();
+            OneTimeSetup();
         }
+
+        /// <summary>
+        /// Optionally override this in derived test classes to do any fixture-specific setup.
+        /// This will be run once the database has been reset and migrated.
+        /// </summary>
+        public virtual void OneTimeSetup() { }
 
         [SetUp]
         public void SetUp()
