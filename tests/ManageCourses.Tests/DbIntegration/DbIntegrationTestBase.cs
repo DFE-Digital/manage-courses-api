@@ -1,7 +1,10 @@
+using System;
+using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Moq;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.DbIntegration
@@ -14,6 +17,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     {
         protected ManageCoursesDbContext Context;
         protected IConfigurationRoot Config;
+        protected DateTime MockTime;
+        protected Mock<IClock> MockClock;
 
         [OneTimeSetUp]
         public virtual void BaseOneTimeSetUp()
@@ -22,6 +27,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context = ContextLoader.GetDbContext(Config);
             Context.Database.EnsureDeleted();
             Context.Database.Migrate();
+            MockClock = new Mock<IClock>();
+            MockClock.SetupGet(c => c.UtcNow).Returns(() => MockTime);
             OneTimeSetup();
         }
 
@@ -50,6 +57,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                    );
                 END
                 $func$;").Wait();
+
+            // reset clock
+            MockTime = new DateTime(1977, 1, 2, 3, 4, 5, 7);
+
+            // allow derived tests to do their own setup
             Setup();
         }
 

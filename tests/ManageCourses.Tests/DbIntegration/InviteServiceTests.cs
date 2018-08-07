@@ -18,12 +18,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class InviteServiceTests : DbIntegrationTestBase
     {
-        private DateTime _mockTime = new DateTime(1977, 1, 2, 3, 4, 5, 7);
         private Mock<IInviteEmailService> _mockInviteEmailService;
         private InviteService _inviteService;
 
-        [OneTimeSetUp]
-        public void Setup()
+        protected override void Setup()
         {
             var mockUsers = new List<McUser>
             {
@@ -31,10 +29,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
             Context.McUsers.AddRange(mockUsers);
             Context.SaveChanges();
-            var mockClock = new Mock<IClock>();
-            mockClock.SetupGet(c => c.UtcNow).Returns(() => _mockTime);
             _mockInviteEmailService = new Mock<IInviteEmailService>();
-            _inviteService = new InviteService(_mockInviteEmailService.Object, Context, mockClock.Object);
+            _inviteService = new InviteService(_mockInviteEmailService.Object, Context, MockClock.Object);
         }
 
         [Test]
@@ -55,7 +51,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const string email = "john@example.org";
             var user = AddUser(email);
             var inviteTime = new DateTime(2020, 12, 31, 8, 7, 6);
-            _mockTime = inviteTime;
+            MockTime = inviteTime;
 
             // act
             _inviteService.Invite(email);
@@ -72,10 +68,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var user = AddUser(email);
             var originalInviteTime = new DateTime(2020, 12, 31, 8, 7, 7);
 
-            _mockTime = originalInviteTime;
+            MockTime = originalInviteTime;
             _inviteService.Invite(email);
 
-            _mockTime = originalInviteTime.AddSeconds(1);
+            MockTime = originalInviteTime.AddSeconds(1);
             _inviteService.Invite(email);
 
             // assert
