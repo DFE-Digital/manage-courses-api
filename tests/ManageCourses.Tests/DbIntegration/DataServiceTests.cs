@@ -318,7 +318,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             foreach (var org in orgList)//we have a valist list of data
             {
                 var result = Subject.GetCourses(TestUserEmail_1, org.UcasCode);//get the course for each org
-                Assert.IsTrue(result != null && result.Courses.Count == numCourses);
+                Assert.AreEqual(numCourses, result.Courses.Count);
             }
         }
         [Test]
