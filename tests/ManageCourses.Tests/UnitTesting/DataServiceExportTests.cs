@@ -23,48 +23,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             _dataService = new DataService(_dbContext, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
         [Test]
-        public void GetOrganisationsForUser_should_return_multiple_organisations()
-        {
-            var result = _dataService.GetOrganisationsForUser(TestHelper.UserWithMultipleOrganisationsEmail);
-
-            Assert.IsTrue(result.Count() > 1);
-        }
-        [Test]
-        public void GetOrganisationsForUser_should_return_multiple_organisations_with_different_data()
-        {
-            var results = _dataService.GetOrganisationsForUser(TestHelper.UserWithMultipleOrganisationsEmail).ToList();
-            Assert.False(CheckForDuplicateOrganisations(results));
-
-        }
-        [Test]
-        public void GetOrganisationsForUser_should_return_multiple_ucasCodes()
-        {
-            var result = _dataService.GetOrganisationsForUser(TestHelper.UserWithMultipleOrganisationUcasCodesEmail);
-
-            Assert.IsTrue(result.Count() > 1);
-        }
-        [Test]
-        [TestCase("someuser@somewhere.com")]
-        [TestCase("someotheruser@somewhereelse.com")]
-        public void GetOrganisationsForUser_should_return_single_organisations(string email)
-        {
-            var result = _dataService.GetOrganisationsForUser(email);
-
-            Assert.IsTrue(result.Count() == 1);
-        }
-        [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("      ")]
-        [TestCase("qwpeoiqwepoi")]
-        [TestCase("idontexist@nowhere.com")]
-        public void GetOrganisationsForUser_should_return_zero_organisations(string email)
-        {
-            var result = _dataService.GetOrganisationsForUser(email);
-
-            Assert.IsTrue(!result.Any());
-        }
-        [Test]
         public void GetCoursesForUserOrganisation_with_email_should_return_loaded_object()
         {
             var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders);
