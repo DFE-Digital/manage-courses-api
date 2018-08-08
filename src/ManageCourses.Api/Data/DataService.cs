@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
-using Microsoft.AspNetCore.Mvc.TagHelpers.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -32,7 +30,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         public void ProcessUcasPayload(UcasPayload payload)
         {
             ResetUcasSchema();
-            
+
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
                 InstCode = course.InstCode,
@@ -148,7 +146,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
             _dataHelper.Load(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
 
             var result = _dataHelper.Upsert();
-            if (! result.Success)
+            if (!result.Success)
             {
                 _logger.LogCritical("Error during user upsert:{0} Import terminated", result.errorMessage);
                 return;
@@ -164,7 +162,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                         Name = organisation.Name
                     }
                     );
-            }            
+            }
             foreach (var institution in payload.Institutions)
             {
                 _context.AddUcasInstitution(
@@ -209,8 +207,8 @@ namespace GovUk.Education.ManageCourses.Api.Data
                     }
                 );
             }
-            
-  
+
+
             _context.Save();
 
         }
@@ -427,7 +425,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         }
 
         #endregion
-    
+
         /// <summary>
         /// Gets a specific organisation that is linked to the users email
         /// </summary>
@@ -438,13 +436,14 @@ namespace GovUk.Education.ManageCourses.Api.Data
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(ucasCode)) return null;
 
-            var mcOrganisationUsers = _context.McUsers.ByEmail(email)
+            var mcUsers = _context.McUsers.ByEmail(email)
                 .Include("McOrganisationUsers.McOrganisation.McOrganisationInstitutions.UcasInstitution").ToList();
 
-             var ucasInstitution = mcOrganisationUsers.SelectMany(ou =>
-                ou.McOrganisationUsers.SelectMany(oi => oi.McOrganisation.McOrganisationInstitutions)).ToList();
+            var mcOrganisationInstitutions = mcUsers.SelectMany(
+                ou => ou.McOrganisationUsers.SelectMany(oi => oi.McOrganisation.McOrganisationInstitutions)).ToList();
 
-            var mcOrganisationInstitution = ucasInstitution.SingleOrDefault(oi => ucasCode.Equals(oi.UcasInstitution.InstCode, StringComparison.InvariantCultureIgnoreCase));
+            var mcOrganisationInstitution = mcOrganisationInstitutions.SingleOrDefault(
+                oi => ucasCode.Equals(oi.UcasInstitution.InstCode, StringComparison.InvariantCultureIgnoreCase));
 
             if (mcOrganisationInstitution == null) return null;
 
