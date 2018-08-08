@@ -277,8 +277,11 @@ namespace GovUk.Education.ManageCourses.Api.Data
                             CourseCode = courseRecord.CrseCode,
                             ProfpostFlag = courseRecord.ProfpostFlag,
                             ProgramType = courseRecord.ProgramType,
-                            StudyMode = courseRecord.Studymode
+                            StudyMode = courseRecord.Studymode,
+                            AccreditingProviderId = courseRecord.AccreditingProviderInstitution?.InstCode,
+                            AccreditingProviderName = courseRecord.AccreditingProviderInstitution?.InstFull
                         };
+
                         returnCourses.Courses.Add(course);
                     }
                 }
@@ -299,7 +302,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 if (organisationCourseRecord.AccreditingProviderInstitution != null)
                 {
                     returnCourse.AccreditingProviderName = organisationCourseRecord.AccreditingProviderInstitution.InstFull;
-                }                    
+                }
                 returnCourse.AgeRange = organisationCourseRecord.Age;
                 returnCourse.Name = organisationCourseRecord.CrseTitle;
                 returnCourse.ProgramType = organisationCourseRecord.ProgramType;
@@ -323,8 +326,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
                 PostCode = courseRecord.UcasCampus.Postcode,
                 ApplicationsAcceptedFrom = courseRecord.CrseOpenDate,
                 Code = courseRecord.UcasCampus.CampusCode
-            })
-                .ToList();
+            }).ToList();
             //look for the main site and move it to the top of the list
             var main = schools.FirstOrDefault(s => s.Code == "-");
             if (main != null)

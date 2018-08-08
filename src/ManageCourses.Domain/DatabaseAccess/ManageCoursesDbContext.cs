@@ -270,6 +270,9 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     $"where lower(c.inst_code)=lower(@instCode) " +
                     $"and lower(ou.email)=lower(@email) order by c.crse_title", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
                 .Include(x => x.UcasInstitution)
+                .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
+                .Include(x => x.AccreditingProviderInstitution)
+                .Include(x => x.UcasCampus)
                 .ToList();
 
             return ucasCourses;
