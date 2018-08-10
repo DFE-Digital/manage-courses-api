@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
@@ -14,34 +15,18 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     [TestFixture]
     [Category("Smoke")]
     [Explicit]
-    public class ApiEndpointTests : ApiSmokeTestBase
+    public partial class ApiEndpointTests : ApiSmokeTestBase
     {
-            const string Email = "feddie.krueger@example.org";
+        private const string Email = "feddie.krueger@example.org";
 
         [Test]
         public void DataExport_WithEmptyCampus()
         {
-            var dfeSignInConfig = Config.GetSection("credentials").GetSection("dfesignin");
+            SetupDataForExportTest();
 
-            var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"], dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
-            var accessToken = communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
+            var apiClient = BuildSigninAwareClient();
 
-
-            var httpClient = new HttpClient();
-            var apiKeyAccessToken = Config["api:key"];
-
-
-            var clientImport = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), httpClient);
-            clientImport.BaseUrl = LocalWebHost.Address;
-
-            clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
-            clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
-
-
-            var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            clientExport.BaseUrl = LocalWebHost.Address;
-
-            var export = clientExport.Data_ExportByOrganisationAsync("ABC").Result;
+            var export = apiClient.Data_ExportByOrganisationAsync("ABC").Result;
 
             Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
             Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName, "OrganisationName should be retrieved");
@@ -69,22 +54,15 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public void DataExport_badAccesCode_404()
         {
-            var accessToken = "badAccesCode";
+            var apiClient = BuildApiKeyClient("badAccesCode");
 
-            var httpClient = new HttpClient();
-
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = LocalWebHost.Address;
-
-
-            Assert.That(() => client.Data_ExportByOrganisationAsync("ABC"),
+            Assert.That(() => apiClient.Data_ExportByOrganisationAsync("ABC"),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
 
-            Assert.That(() => client.Data_ImportAsync(new UcasPayload()),
+            Assert.That(() => apiClient.Data_ImportAsync(new UcasPayload()),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
-
         }
 
         [Test]
@@ -138,19 +116,40 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
         }
 
-        private class MockApiClientConfiguration : IManageCoursesApiClientConfiguration
+        private void SetupDataForExportTest()
         {
-            private string accessToken;
+            var dfeSignInConfig = GetSigninConfig(Config);
+            var clientImport = BuildApiKeyClient();
+            clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
+            clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
+        }
 
-            public MockApiClientConfiguration(string accessToken)
+        private ManageCoursesApiClient BuildSigninAwareClient()
+        {
+            var dfeSignInConfig = GetSigninConfig(Config);
+            var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"],
+                dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
+            var accessToken = communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
+            var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient())
             {
-                this.accessToken = accessToken;
-            }
+                BaseUrl = LocalWebHost.Address
+            };
+            return clientExport;
+        }
 
-            public Task<string> GetAccessTokenAsync()
+        private ManageCoursesApiClient BuildApiKeyClient(string apiKey = null)
+        {
+            var apiKeyAccessToken = apiKey ?? Config["api:key"];
+            var importClient = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), new HttpClient())
             {
-                return Task.FromResult(accessToken);
-            }
+                BaseUrl = LocalWebHost.Address
+            };
+            return importClient;
+        }
+
+        private static IConfigurationSection GetSigninConfig(IConfiguration configuration)
+        {
+            return configuration.GetSection("credentials").GetSection("dfesignin");
         }
     }
 }
