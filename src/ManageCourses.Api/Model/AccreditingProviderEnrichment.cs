@@ -9,7 +9,7 @@
         /// <summary>
         /// Foreign key to the ucas institution that is this accrediting provider.
         /// </summary>
-        public string InstitutionCode { get; set; }
+        public string UcasInstitutionCode { get; set; }
 
         /// <summary>
         /// Enrichment data entered by a manage courses user, explaining more about this accrediting provider
