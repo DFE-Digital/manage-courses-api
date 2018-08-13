@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.Extensions.Configuration;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public void DataExport_WithEmptyCampus()
         {
-            SetupDataForExportTest();
+            SetupSmokeTestData();
 
             var apiClient = BuildSigninAwareClient();
 
@@ -63,6 +64,26 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Assert.That(() => apiClient.Data_ImportAsync(new UcasPayload()),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+        }
+
+
+        [Test]
+        public async Task EnrichmentSaveTest()
+        {
+            SetupSmokeTestData();
+            var apiClient = BuildSigninAwareClient();
+            var model = new UcasInstitutionEnrichmentPostModel();
+            await apiClient.Enrichment_SaveInstitutionAsync("foo", model);
+        }
+
+        [Test]
+        public async Task EnrichmentLoadTest()
+        {
+            SetupSmokeTestData();
+            var apiClient = BuildSigninAwareClient();
+            const string ucasInstitutionCode = "INST0";
+            var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
+            loadedEnrichment.Should().NotBeNull();
         }
 
         [Test]
@@ -116,7 +137,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
         }
 
-        private void SetupDataForExportTest()
+        private void SetupSmokeTestData()
         {
             var dfeSignInConfig = GetSigninConfig(Config);
             var clientImport = BuildApiKeyClient();
