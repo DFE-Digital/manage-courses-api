@@ -7,6 +7,11 @@ namespace GovUk.Education.ManageCourses.Api.Model
     /// </summary>
     public class InstitutionEnrichmentModel
     {
+        public InstitutionEnrichmentModel()
+        {
+            AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>();
+        }
+
         public string TrainWithUs { get; set; }
         public string TrainWithDisability { get; set; }
 
