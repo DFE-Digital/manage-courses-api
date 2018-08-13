@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public void DataExport_WithEmptyCampus()
         {
-            SetupDataForExportTest();
+            SetupSmokeTestData();
 
             var apiClient = BuildSigninAwareClient();
 
@@ -70,6 +70,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public async Task EnrichmentSaveTest()
         {
+            SetupSmokeTestData();
             var apiClient = BuildSigninAwareClient();
             var model = new UcasInstitutionEnrichment();
             await apiClient.Enrichment_SaveInstitutionAsync("foo", model);
@@ -78,6 +79,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public async Task EnrichmentLoadTest()
         {
+            SetupSmokeTestData();
             var apiClient = BuildSigninAwareClient();
             const string ucasInstitutionCode = "INST0";
             var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
@@ -135,7 +137,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
         }
 
-        private void SetupDataForExportTest()
+        private void SetupSmokeTestData()
         {
             var dfeSignInConfig = GetSigninConfig(Config);
             var clientImport = BuildApiKeyClient();
