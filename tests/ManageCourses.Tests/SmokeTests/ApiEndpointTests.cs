@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.Extensions.Configuration;
@@ -63,6 +64,24 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Assert.That(() => apiClient.Data_ImportAsync(new UcasPayload()),
                 Throws.TypeOf<SwaggerException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+        }
+
+
+        [Test]
+        public async Task EnrichmentSaveTest()
+        {
+            var apiClient = BuildSigninAwareClient();
+            var model = new UcasInstitutionEnrichment();
+            await apiClient.Enrichment_SaveInstitutionAsync("foo", model);
+        }
+
+        [Test]
+        public async Task EnrichmentLoadTest()
+        {
+            var apiClient = BuildSigninAwareClient();
+            const string ucasInstitutionCode = "INST0";
+            var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
+            loadedEnrichment.Should().NotBeNull();
         }
 
         [Test]
