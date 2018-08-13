@@ -10,14 +10,14 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     {
         [HttpGet]
         [Route("institution/{institutionCode}")]
-        public UcasInstitutionEnrichment GetInstitution(string institutionCode)
+        public UcasInstitutionEnrichmentGetModel GetInstitution(string institutionCode)
         {
-            return new UcasInstitutionEnrichment();
+            return new UcasInstitutionEnrichmentGetModel();
         }
 
         [HttpPost]
         [Route("institution/{institutionCode}")]
-        public void SaveInstitution(string institutionCode, UcasInstitutionEnrichment model)
+        public void SaveInstitution(string institutionCode, UcasInstitutionEnrichmentPostModel model)
         {
         }
     }

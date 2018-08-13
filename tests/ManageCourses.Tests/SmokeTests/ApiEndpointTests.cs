@@ -72,7 +72,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             SetupSmokeTestData();
             var apiClient = BuildSigninAwareClient();
-            var model = new UcasInstitutionEnrichment();
+            var model = new UcasInstitutionEnrichmentPostModel();
             await apiClient.Enrichment_SaveInstitutionAsync("foo", model);
         }
 
