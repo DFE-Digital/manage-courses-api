@@ -51,18 +51,30 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             var mcUser = ValidateUserOrg(email, instCode);
 
+            var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
             var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
 
-            var enrichment = new InstitutionEnrichment
+            if (enrichmentRecord != null)
             {
-                InstCode = instCode,
-                CreatedTimestampUtc = DateTime.UtcNow,
-                UpdateTimestampUtc = DateTime.UtcNow,
-                SavedByUserId = mcUser.Id,
-                UpdatedByUserId = mcUser.Id,
-                JsonData = content,
-            };
-            _context.InstitutionEnrichments.Add(enrichment);
+                //update
+                enrichmentRecord.UpdateTimestampUtc = DateTime.UtcNow;
+                enrichmentRecord.UpdatedByUserId = mcUser.Id;
+                enrichmentRecord.JsonData = content;                
+            }
+            else
+            {
+                //insert
+                var enrichment = new InstitutionEnrichment
+                {
+                    InstCode = instCode,
+                    CreatedTimestampUtc = DateTime.UtcNow,
+                    UpdateTimestampUtc = DateTime.UtcNow,
+                    SavedByUserId = mcUser.Id,
+                    UpdatedByUserId = mcUser.Id,
+                    JsonData = content,
+                };
+                _context.InstitutionEnrichments.Add(enrichment);
+            }
             _context.Save();
         }
     }

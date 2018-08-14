@@ -100,10 +100,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         }
 
         [Test]
-        public void Test_SaveInstitutionEnrichment_should_return_results()
+        public void Test_InstitutionEnrichment_workflow_should_not_error()
         {
             const string trainWithDisabilityText = "TrainWithDisabilily Text";
             const string trainWithUsText = "TrainWithUs Text";
+            const string trainWithDisabilityUpdatedText = "TrainWithDisabilily Text updated";
+            const string trainWithUsUpdatedText = "TrainWithUs Text updated";
             const string instDesc = "school1 description enrichement";
 
         var enrichmentService = new EnrichmentService(Context);
@@ -123,15 +125,38 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     }
                 }
             };
-            
+            //test save
             enrichmentService.SaveInstitutionEnrichment(model, _providerInstCode, _email);
-
+            //test get
             var result = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
 
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
             result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
             result.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
+            
+            //test update
+            var updatedmodel = new UcasInstitutionEnrichmentPostModel
+            {
+                EnrichmentModel = new InstitutionEnrichmentModel
+                {
+                    TrainWithDisability = trainWithDisabilityUpdatedText,
+                    TrainWithUs = trainWithUsUpdatedText,
+                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
+                    {
+                        new AccreditingProviderEnrichment
+                        {
+                            UcasInstitutionCode = _accreditingInstCode,
+                            Description = instDesc,
+                        }
+                    }
+                }
+            };
+
+            enrichmentService.SaveInstitutionEnrichment(updatedmodel, _providerInstCode, _email);
+            var updateResult = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
+            updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
+            updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
         }
         [Test]
         [TestCase("", "")]
@@ -162,6 +187,16 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
 
             Assert.Throws<InvalidOperationException>(() => enrichmentService.SaveInstitutionEnrichment(model, instCode, email));
+        }
+        [Test]
+        [TestCase("", "")]
+        [TestCase(null, null)]
+        [TestCase("eqweqw", "qweqweq")]
+        public void Test_GetInstitutionEnrichment_should_error(string instCode, string email)
+        {
+            var enrichmentService = new EnrichmentService(Context);
+
+            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetInstitutionEnrichment(instCode, email));
         }
     }
 }
