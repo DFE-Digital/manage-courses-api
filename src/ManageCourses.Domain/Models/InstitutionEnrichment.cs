@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
@@ -8,6 +9,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     public class InstitutionEnrichment
     {
         public int Id { get; set; }
+        [Required]
         public string InstCode { get; set; }
         public DateTime CreatedTimestampUtc { get; set; }
         public DateTime UpdateTimestampUtc { get; set; }
