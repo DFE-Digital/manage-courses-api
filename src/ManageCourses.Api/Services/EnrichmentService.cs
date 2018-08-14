@@ -24,6 +24,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
         }
         public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email)
         {
+            ValidateUserOrg(email, instCode);
+
             var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
             var enrichment = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
             if (enrichment != null)
@@ -36,13 +38,18 @@ namespace GovUk.Education.ManageCourses.Api.Services
             return enrichmentToReturn;
         }
 
-        public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
+        private McUser ValidateUserOrg(string email, string instCode)
         {
             var mcUser = _context.McUsers.ByEmail(email).Single();
 
             var institution = mcUser.McOrganisationUsers
                 .SelectMany(ou => ou.McOrganisation.McOrganisationInstitutions)
                 .Single(i => i.InstitutionCode == instCode).UcasInstitution;//should throw an error if the user doesn't have acces to the inst or the inst doesn't exist
+            return mcUser;
+        }
+        public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
+        {
+            var mcUser = ValidateUserOrg(email, instCode);
 
             var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
 

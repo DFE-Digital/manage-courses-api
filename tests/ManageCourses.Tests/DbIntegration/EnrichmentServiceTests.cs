@@ -100,25 +100,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         }
 
         [Test]
-        public void Test_GetInstitutionEnrichment_should_not_be_null()
-        {
-            var enrichmentService = new EnrichmentService(Context);
-            var result = enrichmentService.GetInstitutionEnrichment(_email, _providerInstCode);
-
-            result.Should().NotBeNull();
-            result.EnrichmentModel.AccreditingProviderEnrichments.Should().BeEmpty();
-        }
-        [Test]
-        public void Test_GetInstitutionEnrichment_should_return_results()
-        {
-            var instCode = "123";
-            var enrichmentService = new EnrichmentService(Context);
-            var result = enrichmentService.GetInstitutionEnrichment(_email, instCode);
-
-            result.Should().BeNull();
-        }
-        [Test]
-        public void Test_SaveInstitutionEnrichment_should_not_error()
+        public void Test_SaveInstitutionEnrichment_should_return_results()
         {
             const string trainWithDisabilityText = "TrainWithDisabilily Text";
             const string trainWithUsText = "TrainWithUs Text";
