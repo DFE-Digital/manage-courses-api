@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore;
@@ -8,27 +7,27 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Tests.TestUtilities
-{    
+{
     public class ApiLocalWebHost
     {        
-        private readonly IWebHost theHost;
-        private int hasLaunched = 0;
+        private readonly IWebHost _theHost;
+        private int _hasLaunched;
 
         public ApiLocalWebHost(IConfiguration config)
         {
-            theHost = WebHost.CreateDefaultBuilder()
-                .UseStartup<ManageCourses.Api.Startup>()
+            _theHost = WebHost.CreateDefaultBuilder()
+                .UseStartup<Api.Startup>()
                 .UseConfiguration(config)
                 .Build();                 
         }
 
         public ApiLocalWebHost Launch()
         {
-            bool shouldLaunch = 0 == Interlocked.Exchange(ref hasLaunched, 1);
+            bool shouldLaunch = 0 == Interlocked.Exchange(ref _hasLaunched, 1);
 
             if (shouldLaunch)
             {
-                theHost.RunAsync();
+                _theHost.RunAsync();
 
                 // HACK!
                 // The Web Host needs a bit of time to warm up befor it serves requests
@@ -41,10 +40,10 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
         public void Stop()
         {
-            bool shouldStop = 1 == Interlocked.Exchange(ref hasLaunched, 0);
+            bool shouldStop = 1 == Interlocked.Exchange(ref _hasLaunched, 0);
             if (shouldStop)
             {                
-                theHost.StopAsync().Wait();
+                _theHost.StopAsync().Wait();
             }
         }
 
@@ -52,12 +51,12 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
         {
             get
             {
-                if (hasLaunched == 0) 
+                if (_hasLaunched == 0) 
                 {
                     throw new InvalidOperationException("Called Address on unlaunched web host");
                 }
 
-                var addressesFeature = theHost.ServerFeatures.Get<IServerAddressesFeature>();
+                var addressesFeature = _theHost.ServerFeatures.Get<IServerAddressesFeature>();
 
                 return addressesFeature.Addresses.First();
             }
