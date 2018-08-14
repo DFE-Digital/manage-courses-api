@@ -34,21 +34,23 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         {
             var uniqueCampuses = payload.Campuses;
 
-            var campusesToDelete = _context.UcasCampuses.Except(uniqueCampuses, new UcasCampusEquivalencyComparer());
+            var campusesToDelete = _context.UcasCampuses.ToList().Except(uniqueCampuses, new UcasCampusEquivalencyComparer());
 
             foreach(var campus in campusesToDelete)
             {
-                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => {
-                    DeleteCampus(campus);
-                });
+                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
             }
 
             foreach(var campus in uniqueCampuses)
             {
-                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => {
-                    DeleteCampus(campus);
-                    AddCampus(campus);
-                });
+                var deletedPayload = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
+                var added = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => AddCampus(campus));
+
+                if (added == null && deletedPayload != null && deletedPayload.Campuses.FirstOrDefault() != null)
+                {
+                    //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
+                    AttemptTransaction("campus (restore)", campus.InstCode, campus.CampusCode, () => AddCampus(deletedPayload.Campuses.First()));
+                }
             }
 
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
@@ -57,53 +59,81 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 CrseCode = course.CrseCode
             }).Distinct(new CourseComparer());
 
-            var coursesToDelete = _context.CourseCodes.Except(uniqueCourses, new CourseCodeEquivalencyComparer());
+            var coursesToDelete = _context.CourseCodes.ToList().Except(uniqueCourses, new CourseCodeEquivalencyComparer());
 
             foreach(var course in coursesToDelete)
             {
-                AttemptTransaction("course", course.InstCode, course.CrseCode, () => 
-                    DeleteCourse(course)
-                );
+                AttemptTransaction("course", course.InstCode, course.CrseCode, () => DeleteCourse(course));
             }
 
             foreach(var course in uniqueCourses)
             {
-                AttemptTransaction("course", course.InstCode, course.CrseCode, () => {                                
-                    DeleteCourse(course);
-                    AddCourse(course, payload);
-                });
+                var deleted = AttemptTransaction("course", course.InstCode, course.CrseCode, () => DeleteCourse(course));
+                var added = AttemptTransaction("course", course.InstCode, course.CrseCode, () => AddCourse(course, payload));
+
+                if (added == null && deleted != null)
+                {
+                    //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
+                    AttemptTransaction("course (restore)", course.InstCode, course.CrseCode, () => AddCourse(course, deleted));
+                }
             }
         }
         
-        private void AttemptTransaction(string type, string instCode, string courseCode, Action performActions)
+        private UcasPayload AttemptTransaction(string type, string instCode, string courseCode, Func<UcasPayload> performActions) 
         {
             var transaction = (_context as DbContext).Database.BeginTransaction();
             try
             {
-                performActions();
+                var res = performActions();
                 
                 (_context as DbContext).SaveChanges();
                 transaction.Commit();
+                return res;
             }
             catch(Exception e)
             {
                 _logger.LogError($"Import failed to update {type} {courseCode} for institution {instCode}", e);
                 transaction.Rollback();
+
+                foreach (var entry in (_context as DbContext).ChangeTracker.Entries().ToList())
+                {
+                    switch (entry.State)
+                    {
+                        case EntityState.Modified:
+                        case EntityState.Deleted:
+                            entry.State = EntityState.Modified; //Revert changes made to deleted entity.
+                            entry.State = EntityState.Unchanged;
+                            break;
+                        case EntityState.Added:
+                            entry.State = EntityState.Detached;
+                            break;
+                    }
+                }
+                return null;
             }
         }
 
-        private void DeleteCourse(CourseCode course)
+        private UcasPayload DeleteCourse(CourseCode course)
         {
-            var courseNotesToDelete = _context.UcasCourseNotes.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode);
+            var toDelete = new UcasPayload() 
+            {
+                CourseNotes = _context.UcasCourseNotes.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode).ToList(),
+                CourseSubjects = _context.UcasCourseSubjects.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode).ToList(),
+                Courses = _context.UcasCourses.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode).ToList()
+            };
 
-            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts.Where(x => courseNotesToDelete.Any(y => x.InstCode == y.InstCode && x.NoteNo == y.NoteNo)));
-            _context.UcasCourseNotes.RemoveRange(courseNotesToDelete);
-            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode));
-            _context.UcasCourses.RemoveRange(_context.UcasCourses.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode));
+            toDelete.NoteTexts = _context.UcasNoteTexts.Where(x => toDelete.CourseNotes.Any(y => x.InstCode == y.InstCode && x.NoteNo == y.NoteNo)).ToList();
+
+            _context.UcasNoteTexts.RemoveRange(toDelete.NoteTexts);
+            _context.UcasCourseNotes.RemoveRange(toDelete.CourseNotes);
+            _context.UcasCourseSubjects.RemoveRange(toDelete.CourseSubjects);
+            _context.UcasCourses.RemoveRange(toDelete.Courses);
             _context.CourseCodes.RemoveRange(_context.CourseCodes.Where(c => new CourseCodeEquivalencyComparer().Equals(c, course)));
+
+            return toDelete;
         }
 
-        private void AddCourse(CourseCode courseToAdd, UcasPayload payload)
+        private UcasPayload AddCourse(CourseCode courseToAdd, UcasPayload payload)
         {
             _context.CourseCodes.Add(courseToAdd);
             foreach (var course in payload.Courses.Where(c => c.CrseCode == courseToAdd.CrseCode && c.InstCode == courseToAdd.InstCode))
@@ -163,14 +193,20 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     }
                 );
             }
+            return payload;
         }
 
-        private void DeleteCampus(UcasCampus campus)
+        private UcasPayload DeleteCampus(UcasCampus campus)
         {
-            _context.UcasCampuses.RemoveRange(_context.UcasCampuses.Where(c => c.CampusCode == campus.CampusCode && c.InstCode == campus.InstCode));
+            var toDelete = new UcasPayload() 
+            {
+                Campuses = _context.UcasCampuses.Where(c => c.CampusCode == campus.CampusCode && c.InstCode == campus.InstCode)
+            };
+            _context.UcasCampuses.RemoveRange(toDelete.Campuses);
+            return toDelete;
         }
 
-        private void AddCampus(UcasCampus campus)
+        private UcasPayload AddCampus(UcasCampus campus)
         {
             _context.AddUcasCampus(
                 new UcasCampus
@@ -187,7 +223,12 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     Email = campus.Email,
                     RegionCode = campus.RegionCode
                 }
-            );            
+            );      
+
+            return new UcasPayload()
+            {
+                Campuses = new List<UcasCampus>{campus}
+            };      
         }
         
         public UserOrganisation GetOrganisationForUser(string email, string instCode)

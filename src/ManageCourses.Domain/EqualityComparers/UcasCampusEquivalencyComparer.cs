@@ -7,7 +7,7 @@ namespace GovUk.Education.ManageCourses.Domain.EqualityComparers
     {
         public bool Equals(UcasCampus x, UcasCampus y)
         {
-            return (x != null ^ y != null) && string.Equals(x.CampusCode, y.CampusCode) && string.Equals(x.InstCode, y.InstCode); 
+            return x != null && y != null && string.Equals(x.CampusCode, y.CampusCode) && string.Equals(x.InstCode, y.InstCode); 
         }
 
         public int GetHashCode(UcasCampus obj)

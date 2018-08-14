@@ -155,6 +155,31 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             }
         }
 
+        [Test]
+        public void ErroneousCourseLeavesOtherCoursesAlone()
+        {
+            Subject.ProcessReferencePayload(GetUserPayload());
+
+            var import = GetUcasPayload();
+
+            //make dodgy
+            import.Courses = import.Courses.Concat(new List<UcasCourse>() {new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "Foo"}});
+            Subject.ProcessUcasPayload(import);
+
+            Assert.AreEqual(1, Context.CourseCodes.Count(), "valid courses should be imported anyway");
+            Assert.AreEqual(1, Context.UcasCourses.Count(), "valid courses should be imported anyway");
+
+            //make an update and change import order
+            import.Courses.First().CrseTitle = "The best title";
+            import.Courses = import.Courses.Reverse();
+
+            Subject.ProcessUcasPayload(import);
+
+            Assert.AreEqual(1, Context.CourseCodes.Count(), "valid courses should be re-imported anyway");
+            Assert.AreEqual(1, Context.UcasCourses.Count(), "valid courses should be re-imported anyway");
+            Assert.AreEqual("The best title", Context.UcasCourses.Single().CrseTitle);
+        }
+
 
 
         public ReferenceDataPayload GetUserPayload()
