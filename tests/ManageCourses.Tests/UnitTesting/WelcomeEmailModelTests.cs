@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
-
-using Moq;
-
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
-
 using GovUk.Education.ManageCourses.Domain.Models;
+using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {

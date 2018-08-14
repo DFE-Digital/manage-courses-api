@@ -1,34 +1,31 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
-
-using Moq;
-
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Config;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
-
 using GovUk.Education.ManageCourses.Domain.Models;
+using Moq;
+using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
     public class WelcomeEmailServiceTests
     {
-        private IWelcomeEmailService Service = null;
-        private Mock<INotificationClientWrapper> mockNotificationClientWrapper = null;
-        private Mock<IWelcomeTemplateEmailConfig> mockWelcomeTemplateEmailConfig = null;
+        private IWelcomeEmailService _service;
+        private Mock<INotificationClientWrapper> _mockNotificationClientWrapper;
+        private Mock<IWelcomeTemplateEmailConfig> _mockWelcomeTemplateEmailConfig;
 
-        private string templateId = "mockWelcomeTemplateEmailConfig templateId";
+        private readonly string _templateId = "mockWelcomeTemplateEmailConfig templateId";
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            mockNotificationClientWrapper = new Mock<INotificationClientWrapper>();
-            mockWelcomeTemplateEmailConfig = new Mock<IWelcomeTemplateEmailConfig>();
+            _mockNotificationClientWrapper = new Mock<INotificationClientWrapper>();
+            _mockWelcomeTemplateEmailConfig = new Mock<IWelcomeTemplateEmailConfig>();
 
-            
-            mockWelcomeTemplateEmailConfig.Setup(x => x.TemplateId).Returns(templateId);
 
-            Service = new WelcomeEmailService(mockNotificationClientWrapper.Object, mockWelcomeTemplateEmailConfig.Object);
+            _mockWelcomeTemplateEmailConfig.Setup(x => x.TemplateId).Returns(_templateId);
+
+            _service = new WelcomeEmailService(_mockNotificationClientWrapper.Object, _mockWelcomeTemplateEmailConfig.Object);
         }
 
         [Test]
@@ -44,9 +41,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 {"first_name", user.FirstName.Trim() } };
 
             var model = new WelcomeEmailModel(user);
-            Service.Send(model);
+            _service.Send(model);
 
-            mockNotificationClientWrapper.Verify(x => x.SendEmail(user.Email, templateId, personalisation, null, null), Times.Once);
+            _mockNotificationClientWrapper.Verify(x => x.SendEmail(user.Email, _templateId, personalisation, null, null), Times.Once);
         }
     }
 }

@@ -1,11 +1,8 @@
-﻿using NUnit.Framework;
-
-using Moq;
-
-using Microsoft.Extensions.Configuration;
-
-using GovUk.Education.ManageCourses.Api.Services.Email.Config;
+﻿using GovUk.Education.ManageCourses.Api.Services.Email.Config;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
+using Microsoft.Extensions.Configuration;
+using Moq;
+using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {

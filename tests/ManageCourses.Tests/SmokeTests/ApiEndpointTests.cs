@@ -93,17 +93,16 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var httpClient = new HttpClient();
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = LocalWebHost.Address;
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
+            {
+                BaseUrl = LocalWebHost.Address
+            };
 
             client.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(Email)).Wait();
 
             var result = await client.Invite_IndexAsync(Email);
 
-            Assert.AreEqual(200, result.StatusCode);
-
-            var client2 = new ManageCoursesApiClient(new MockApiClientConfiguration("accessToken"), httpClient);
-            client2.BaseUrl = LocalWebHost.Address;
+            result.StatusCode.Should().Be(200);
         }
 
         [Test]
@@ -113,8 +112,10 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var httpClient = new HttpClient();
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = LocalWebHost.Address;
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
+            {
+                BaseUrl = LocalWebHost.Address
+            };
 
 
             Assert.That(() => client.Invite_IndexAsync(Email),
@@ -125,12 +126,14 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public void Invite_noAccesCode_401()
         {
-            var accessToken = "";
+            const string accessToken = "";
 
             var httpClient = new HttpClient();
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient);
-            client.BaseUrl = LocalWebHost.Address;
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
+            {
+                BaseUrl = LocalWebHost.Address
+            };
 
             Assert.That(() => client.Invite_IndexAsync(Email),
                 Throws.TypeOf<SwaggerException>()

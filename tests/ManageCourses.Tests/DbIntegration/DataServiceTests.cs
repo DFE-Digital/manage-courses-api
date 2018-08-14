@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Data;
@@ -7,7 +6,6 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -22,9 +20,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     {
         public IDataService Subject;
 
-        private const string TestUserEmail_1 = "email_1@test-manage-courses.gov.uk";
-        private const string TestUserEmail_2 = "email_2@test-manage-courses.gov.uk";
-        private const string TestUserEmail_3 = "email_3@test-manage-courses.gov.uk";
+        private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
+        private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
+        private const string TestUserEmail3 = "email_3@test-manage-courses.gov.uk";
 
 
         protected override void Setup()
@@ -43,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.McUsers.RemoveRange(Context.McUsers);
             Context.Save();
 
-            Subject = new DataService(this.Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            Subject = new DataService(Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
 
         [Test]
@@ -71,23 +69,23 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     if (!string.IsNullOrEmpty(payloadOrgUser.OrgId))
                     {
-                        Assert.AreEqual(payloadUser.Email, TestUserEmail_3);
+                        Assert.AreEqual(payloadUser.Email, TestUserEmail3);
                         Assert.AreEqual(item.McOrganisationUsers.First().McOrganisation.OrgId, payloadOrgUser.OrgId);
                     }
                     else
                     {
-                        Assert.AreEqual(payloadUser.Email, TestUserEmail_2);
+                        Assert.AreEqual(payloadUser.Email, TestUserEmail2);
                     }
                 }
                 else
                 {
-                    Assert.AreEqual(payloadUser.Email, TestUserEmail_1);
+                    Assert.AreEqual(payloadUser.Email, TestUserEmail1);
                 }
             }
 
-            GetCoursesForUser_isNull(TestUserEmail_1, null);
-            GetCoursesForUser_isNull(TestUserEmail_2, null);
-            GetCoursesForUser_isNull(TestUserEmail_3, "OrgId_1");
+            GetCoursesForUser_isNull(TestUserEmail1, null);
+            GetCoursesForUser_isNull(TestUserEmail2, null);
+            GetCoursesForUser_isNull(TestUserEmail3, "OrgId_1");
         }
 
         [Test]
@@ -167,19 +165,19 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     FirstName = "FirstName_1",
                     LastName = "LastName_1",
-                    Email = TestUserEmail_1
+                    Email = TestUserEmail1
                 },
                 new McUser
                 {
                     FirstName = "FirstName_2",
                     LastName = "LastName_2",
-                    Email = TestUserEmail_2
+                    Email = TestUserEmail2
                 },
                 new McUser
                 {
                     FirstName = "FirstName_3",
                     LastName = "LastName_3",
-                    Email = TestUserEmail_3
+                    Email = TestUserEmail3
                 }
             };
             var organisations = new List<McOrganisation> {
@@ -212,10 +210,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var organisationUsers = new List<McOrganisationUser>
             {
                 new McOrganisationUser {
-                    Email = TestUserEmail_2,
+                    Email = TestUserEmail2,
                 },
                 new McOrganisationUser {
-                    Email = TestUserEmail_3,
+                    Email = TestUserEmail3,
                     OrgId = "OrgId_1"
                 }
             };
@@ -258,8 +256,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
-            var result = Subject.GetOrganisationsForUser(TestUserEmail_1).ToList();
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var result = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(result.Count == numOrgs);
             Assert.IsTrue(result.All(c => c.TotalCourses == numCourses));
         }
@@ -268,7 +266,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
+            LoadData(TestUserEmail1, numOrgs, numCourses);
             var result = Subject.GetOrganisationsForUser("anyone@testing.com").ToList();//try to get the list using an invalid email
             Assert.IsTrue(result.Count == 0);
             Assert.IsTrue(result.All(c => c.TotalCourses == 0));
@@ -278,15 +276,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail_1).ToList();
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
 
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valid list of data
             {
-                var result = Subject.GetOrganisationForUser(TestUserEmail_1, org.UcasCode);//get the organisation
+                var result = Subject.GetOrganisationForUser(TestUserEmail1, org.UcasCode);//get the organisation
                 Assert.IsTrue(result.OrganisationName == org.OrganisationName);
             }
         }
@@ -295,8 +293,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail_1).ToList();
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
@@ -311,14 +309,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail_1).ToList();
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var result = Subject.GetCourses(TestUserEmail_1, org.UcasCode);//get the course for each org
+                var result = Subject.GetCourses(TestUserEmail1, org.UcasCode);//get the course for each org
                 Assert.AreEqual(numCourses, result.Courses.Count);
             }
         }
@@ -335,7 +333,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);//ensure we have data
+            LoadData(TestUserEmail1, numOrgs, numCourses);//ensure we have data
 
             var result = Subject.GetCourses(email, ucasCode);//get the course for each org
             Assert.True(result.Courses.Count == 0);
@@ -345,8 +343,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail_1).ToList();
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
@@ -365,9 +363,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
+            LoadData(TestUserEmail1, numOrgs, numCourses);
 
-            var result = Subject.GetCourses(TestUserEmail_1, ucasCode);//get the course for each org
+            var result = Subject.GetCourses(TestUserEmail1, ucasCode);//get the course for each org
             Assert.True(result.Courses.Count == 0);
         }
         [Test]
@@ -375,17 +373,17 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail_1).ToList();
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var coursesList = Subject.GetCourses(TestUserEmail_1, org.UcasCode);//get the courses for each org
+                var coursesList = Subject.GetCourses(TestUserEmail1, org.UcasCode);//get the courses for each org
                 foreach (var course in coursesList.Courses)
                 {
-                    var result = Subject.GetCourse(TestUserEmail_1, org.UcasCode, course.CourseCode);
+                    var result = Subject.GetCourse(TestUserEmail1, org.UcasCode, course.CourseCode);
                     Assert.IsTrue(course != null && result.Name == course.Name);
                 }
             }
@@ -395,14 +393,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const int numOrgs = 5;
             const int numCourses = 6;
-            LoadData(TestUserEmail_1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail_1).ToList();
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var coursesList = Subject.GetCourses(TestUserEmail_1, org.UcasCode);//get the courses for each org
+                var coursesList = Subject.GetCourses(TestUserEmail1, org.UcasCode);//get the courses for each org
                 foreach (var course in coursesList.Courses)
                 {
                     var result = Subject.GetCourse("someone@somewhere.com", org.UcasCode, course.CourseCode);
@@ -449,11 +447,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             Context.Save();
         }
+
         /// <summary>
         /// Generates course records for a specific institution
         /// </summary>
         /// <param name="instCode">institution code</param>
         /// <param name="numRecords">number of course records to generate</param>
+        /// <param name="numSubjects"></param>
         private void LoadCourses(string instCode, int numRecords, int numSubjects)
         {
             for (var counter = 1; counter <= numRecords; counter++)
@@ -487,6 +487,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 LoadCourseSubjects(courseCode, instCode, numSubjects);
             }
         }
+
         private void LoadSubjects(int numRecords)
         {
             for (var counter = 1; counter <= numRecords; counter++)

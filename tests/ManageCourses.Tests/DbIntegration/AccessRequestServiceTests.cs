@@ -15,8 +15,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class AccessRequestServiceTests : DbIntegrationTestBase
     {
-        private AccessRequestService System;
-        private MockEmailService EmailService;
+        private AccessRequestService _system;
+        private MockEmailService _emailService;
 
         protected override void Setup()
         {
@@ -28,9 +28,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             Context.Save();
 
-            EmailService = new MockEmailService();
+            _emailService = new MockEmailService();
 
-            System = new AccessRequestService(Context, EmailService);
+            _system = new AccessRequestService(Context, _emailService);
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.AddMcUser(MakeSomeExistingUser());
             Context.Save();
 
-            System.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
+            _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
 
             var savedRequest = Context.AccessRequests.Include(x => x.Requester).First();
 
@@ -54,21 +54,21 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Assert.AreEqual(Context.McUsers.First().Email, savedRequest.RequesterEmail);
             Assert.AreEqual(Context.McUsers.First().Email, savedRequest.Requester.Email);
 
-            Assert.AreEqual(MakeSomeExistingUser().Email, EmailService.lastRequester.Email);
-            Assert.AreEqual(MakeSomeExistingUser().FirstName, EmailService.lastRequester.FirstName);
-            Assert.AreEqual(MakeSomeExistingUser().LastName, EmailService.lastRequester.LastName);
+            Assert.AreEqual(MakeSomeExistingUser().Email, _emailService.LastRequester.Email);
+            Assert.AreEqual(MakeSomeExistingUser().FirstName, _emailService.LastRequester.FirstName);
+            Assert.AreEqual(MakeSomeExistingUser().LastName, _emailService.LastRequester.LastName);
 
-            Assert.AreEqual(MakeSomeExistingUser().McOrganisationUsers.First().McOrganisation.Name, EmailService.lastRequester.McOrganisationUsers.First().McOrganisation.Name);
+            Assert.AreEqual(MakeSomeExistingUser().McOrganisationUsers.First().McOrganisation.Name, _emailService.LastRequester.McOrganisationUsers.First().McOrganisation.Name);
 
-            Assert.IsNull(EmailService.lastRequested);
+            Assert.IsNull(_emailService.LastRequested);
 
-            Assert.AreEqual(MakeSomeAccessRequest().FirstName, EmailService.lastAccessRequest.FirstName);
-            Assert.AreEqual(MakeSomeAccessRequest().LastName, EmailService.lastAccessRequest.LastName);
-            Assert.AreEqual(MakeSomeAccessRequest().EmailAddress, EmailService.lastAccessRequest.EmailAddress);
-            Assert.AreEqual(MakeSomeAccessRequest().Organisation, EmailService.lastAccessRequest.Organisation);
-            Assert.AreEqual(MakeSomeAccessRequest().Reason, EmailService.lastAccessRequest.Reason);
+            Assert.AreEqual(MakeSomeAccessRequest().FirstName, _emailService.LastAccessRequest.FirstName);
+            Assert.AreEqual(MakeSomeAccessRequest().LastName, _emailService.LastAccessRequest.LastName);
+            Assert.AreEqual(MakeSomeAccessRequest().EmailAddress, _emailService.LastAccessRequest.EmailAddress);
+            Assert.AreEqual(MakeSomeAccessRequest().Organisation, _emailService.LastAccessRequest.Organisation);
+            Assert.AreEqual(MakeSomeAccessRequest().Reason, _emailService.LastAccessRequest.Reason);
 
-            Assert.AreEqual("joe@example.com", EmailService.lastAccessRequest.RequesterEmail);
+            Assert.AreEqual("joe@example.com", _emailService.LastAccessRequest.RequesterEmail);
         }
 
         [Test]
@@ -81,13 +81,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.AddMcUser(user2);
             Context.Save();
 
-            System.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
+            _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
 
-            var savedRequest = Context.AccessRequests.Include(x => x.Requester).First();
+            Context.AccessRequests.Include(x => x.Requester).First();
 
-            Assert.AreEqual(user2.FirstName, EmailService.lastRequested.FirstName);
-            Assert.AreEqual(user2.LastName, EmailService.lastRequested.LastName);
-            Assert.AreEqual(user2.Email, EmailService.lastRequested.Email);
+            Assert.AreEqual(user2.FirstName, _emailService.LastRequested.FirstName);
+            Assert.AreEqual(user2.LastName, _emailService.LastRequested.LastName);
+            Assert.AreEqual(user2.Email, _emailService.LastRequested.Email);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.AddMcUser(userToDelete);
             Context.Save();
 
-            System.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
+            _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
 
             Context.McUsers.Remove(userToDelete);
             Context.Save();
@@ -119,7 +119,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.AddMcUser(user);
             Context.Save();
 
-            System.LogAccessRequest(MakeSomeAccessRequest(), "JoE@eXaMpLE.CoM");
+            _system.LogAccessRequest(MakeSomeAccessRequest(), "JoE@eXaMpLE.CoM");
 
             var savedRequest = Context.AccessRequests.Include(x => x.Requester).First();
 
@@ -140,12 +140,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             var accessRequest = MakeSomeAccessRequest();
             accessRequest.EmailAddress = "jAnE@eXaMpLe.CoM";
-            System.LogAccessRequest(accessRequest, "joe@example.com");
+            _system.LogAccessRequest(accessRequest, "joe@example.com");
 
             var savedRequest = Context.AccessRequests.Include(x => x.Requester).First();
 
             Assert.Less(0, savedRequest.Id);
-            Assert.AreEqual("jane@example.com", EmailService.lastRequested.Email);
+            Assert.AreEqual("jane@example.com", _emailService.LastRequested.Email);
         }
 
         [Test]
@@ -153,12 +153,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             try
             {
-                System.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
+                _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
             }
             catch
             {
                 Assert.AreEqual(0, Context.AccessRequests.Count());
-                Assert.IsNull(EmailService.lastAccessRequest);
+                Assert.IsNull(_emailService.LastAccessRequest);
                 return;
             }
             Assert.Fail("Should have thrown");
@@ -170,10 +170,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.AddMcUser(MakeSomeExistingUser());
             Context.Save();
 
-            System = new AccessRequestService(Context, new ErroringEmailService());
+            _system = new AccessRequestService(Context, new ErroringEmailService());
             try
             {
-                System.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
+                _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
             }
             catch
             {
@@ -207,7 +207,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             return res;
         }
 
-        private McUser MakeSomeOtherExistingUser()
+        private static McUser MakeSomeOtherExistingUser()
         {
             return new McUser()
             {
@@ -217,7 +217,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
         }
 
-        private Api.Model.AccessRequest MakeSomeAccessRequest()
+        private static Api.Model.AccessRequest MakeSomeAccessRequest()
         {
             return new Api.Model.AccessRequest
             {
@@ -244,17 +244,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         private class MockEmailService : IAccessRequestEmailService
         {
-            public AccessRequest lastAccessRequest = null;
-            public McUser lastRequester = null;
-            public McUser lastRequested = null;
+            public AccessRequest LastAccessRequest;
+            public McUser LastRequester;
+            public McUser LastRequested;
 
-            public int called = 0;
             public void SendAccessRequestEmailToSupport(AccessRequest accessRequest, McUser requester, McUser requestedOrNull)
             {
-                called++;
-                lastAccessRequest = accessRequest;
-                lastRequester = requester;
-                lastRequested = requestedOrNull;
+                LastAccessRequest = accessRequest;
+                LastRequester = requester;
+                LastRequested = requestedOrNull;
             }
         }
     }
