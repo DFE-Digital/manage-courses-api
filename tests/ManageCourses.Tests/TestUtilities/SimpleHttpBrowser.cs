@@ -32,14 +32,14 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
                     formBody[item.Groups[1].Value]= item.Groups[2].Value;                
                 }
 
-                foreach(KeyValuePair<string,string> pair in body)
+                foreach(var pair in body)
                 {
                     formBody[pair.Key] = pair.Value;
                 }
 
                 var formActionMatch = formActionRegex.Match(html);
                 var originalUri = new Uri(originalUrl);
-                var formAction = formActionMatch == null || String.IsNullOrEmpty(formActionMatch.Groups[1].Value)
+                var formAction = string.IsNullOrEmpty(formActionMatch.Groups[1].Value)
                     ? originalUrl
                     : formActionMatch.Groups[1].Value.StartsWith("http")
                     ? formActionMatch.Groups[1].Value
@@ -76,15 +76,15 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
                 return res;
             }        
-            private Dictionary<string, List<string>> hostToCookie = new Dictionary<string, List<string>>();
+            private readonly Dictionary<string, List<string>> _hostToCookie = new Dictionary<string, List<string>>();
 
             private void StoreCookies(Uri uri, HttpResponseHeaders headers)
             {
-                if (!hostToCookie.ContainsKey(uri.Host)) hostToCookie[uri.Host] = new List<string>();
+                if (!_hostToCookie.ContainsKey(uri.Host)) _hostToCookie[uri.Host] = new List<string>();
 
                 if (headers.Any(kvp => kvp.Key == "Set-Cookie"))
                 {
-                    hostToCookie[uri.Host] = hostToCookie[uri.Host]
+                    _hostToCookie[uri.Host] = _hostToCookie[uri.Host]
                         .Concat(headers.GetValues("Set-Cookie").Select(x => x.Substring(0, x.IndexOf(';'))))
                         .Distinct().ToList();
                 }
@@ -93,7 +93,7 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
             private string GetCookieHeader(string url)
             {
                 var host = new Uri(url).Host;
-                return hostToCookie.ContainsKey(host) ? String.Join("; ", hostToCookie[host]) : null;
+                return _hostToCookie.ContainsKey(host) ? String.Join("; ", _hostToCookie[host]) : null;
             }       
         }
     }
