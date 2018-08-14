@@ -4,8 +4,10 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Domain.EqualityComparers;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Data
@@ -30,7 +32,24 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         /// <param name="payload">Holds all the data entities that need to be imported</param>
         public void ProcessUcasPayload(UcasPayload payload)
         {
-            ResetUcasSchema();
+            var uniqueCampuses = payload.Campuses;
+
+            var campusesToDelete = _context.UcasCampuses.Except(uniqueCampuses, new UcasCampusEquivalencyComparer());
+
+            foreach(var campus in campusesToDelete)
+            {
+                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => {
+                    DeleteCampus(campus);
+                });
+            }
+
+            foreach(var campus in uniqueCampuses)
+            {
+                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => {
+                    DeleteCampus(campus);
+                    AddCampus(campus);
+                });
+            }
 
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
@@ -38,9 +57,56 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 CrseCode = course.CrseCode
             }).Distinct(new CourseComparer());
 
-            _context.CourseCodes.AddRange(uniqueCourses);
+            var coursesToDelete = _context.CourseCodes.Except(uniqueCourses, new CourseCodeEquivalencyComparer());
 
-            foreach (var course in payload.Courses)
+            foreach(var course in coursesToDelete)
+            {
+                AttemptTransaction("course", course.InstCode, course.CrseCode, () => 
+                    DeleteCourse(course)
+                );
+            }
+
+            foreach(var course in uniqueCourses)
+            {
+                AttemptTransaction("course", course.InstCode, course.CrseCode, () => {                                
+                    DeleteCourse(course);
+                    AddCourse(course, payload);
+                });
+            }
+        }
+        
+        private void AttemptTransaction(string type, string instCode, string courseCode, Action performActions)
+        {
+            var transaction = (_context as DbContext).Database.BeginTransaction();
+            try
+            {
+                performActions();
+                
+                (_context as DbContext).SaveChanges();
+                transaction.Commit();
+            }
+            catch(Exception e)
+            {
+                _logger.LogError($"Import failed to update {type} {courseCode} for institution {instCode}", e);
+                transaction.Rollback();
+            }
+        }
+
+        private void DeleteCourse(CourseCode course)
+        {
+            var courseNotesToDelete = _context.UcasCourseNotes.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode);
+
+            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts.Where(x => courseNotesToDelete.Any(y => x.InstCode == y.InstCode && x.NoteNo == y.NoteNo)));
+            _context.UcasCourseNotes.RemoveRange(courseNotesToDelete);
+            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode));
+            _context.UcasCourses.RemoveRange(_context.UcasCourses.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode));
+            _context.CourseCodes.RemoveRange(_context.CourseCodes.Where(c => new CourseCodeEquivalencyComparer().Equals(c, course)));
+        }
+
+        private void AddCourse(CourseCode courseToAdd, UcasPayload payload)
+        {
+            _context.CourseCodes.Add(courseToAdd);
+            foreach (var course in payload.Courses.Where(c => c.CrseCode == courseToAdd.CrseCode && c.InstCode == courseToAdd.InstCode))
             {
                 // copy props to prevent changing id
                 _context.AddUcasCourse(new UcasCourse
@@ -57,8 +123,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     CrseOpenDate = course.CrseOpenDate
                 });
             }
-
-            foreach (var courseSubject in payload.CourseSubjects)
+            foreach (var courseSubject in payload.CourseSubjects.Where(c => c.CrseCode == courseToAdd.CrseCode && c.InstCode == courseToAdd.InstCode))
             {
                 _context.AddUcasCourseSubject(
                     new UcasCourseSubject
@@ -70,40 +135,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     }
                 );
             }
-
-            foreach (var subject in payload.Subjects)
-            {
-                _context.AddUcasSubject(
-                    new UcasSubject
-                    {
-                        SubjectCode = subject.SubjectCode,
-                        SubjectDescription = subject.SubjectDescription,
-                        TitleMatch = subject.TitleMatch
-                    }
-                );
-            }
-
-            foreach (var campus in payload.Campuses)
-            {
-                _context.AddUcasCampus(
-                    new UcasCampus
-                    {
-                        InstCode = campus.InstCode,
-                        CampusCode = campus.CampusCode,
-                        CampusName = campus.CampusName,
-                        Addr1 = campus.Addr1,
-                        Addr2 = campus.Addr2,
-                        Addr3 = campus.Addr3,
-                        Addr4 = campus.Addr4,
-                        Postcode = campus.Postcode,
-                        TelNo = campus.TelNo,
-                        Email = campus.Email,
-                        RegionCode = campus.RegionCode
-                    }
-                );
-            }
-
-            foreach (var courseNote in payload.CourseNotes)
+            var courseNotesAdded = new List<UcasCourseNote>();
+            foreach (var courseNote in payload.CourseNotes.Where(c => c.CrseCode == courseToAdd.CrseCode && c.InstCode == courseToAdd.InstCode))
             {
                 _context.AddUcasCourseNote(
                     new UcasCourseNote
@@ -115,9 +148,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                         YearCode = courseNote.YearCode
                     }
                     );
+                courseNotesAdded.Add(courseNote);
             }
-
-            foreach (var noteText in payload.NoteTexts)
+            foreach (var noteText in payload.NoteTexts.Where(c => courseNotesAdded.Any(n => c.NoteNo == n.NoteNo && c.InstCode == n.InstCode)))
             {
                 _context.AddUcasNoteText(
                     new UcasNoteText
@@ -130,11 +163,33 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     }
                 );
             }
-
-            _context.Save();
-
         }
 
+        private void DeleteCampus(UcasCampus campus)
+        {
+            _context.UcasCampuses.RemoveRange(_context.UcasCampuses.Where(c => c.CampusCode == campus.CampusCode && c.InstCode == campus.InstCode));
+        }
+
+        private void AddCampus(UcasCampus campus)
+        {
+            _context.AddUcasCampus(
+                new UcasCampus
+                {
+                    InstCode = campus.InstCode,
+                    CampusCode = campus.CampusCode,
+                    CampusName = campus.CampusName,
+                    Addr1 = campus.Addr1,
+                    Addr2 = campus.Addr2,
+                    Addr3 = campus.Addr3,
+                    Addr4 = campus.Addr4,
+                    Postcode = campus.Postcode,
+                    TelNo = campus.TelNo,
+                    Email = campus.Email,
+                    RegionCode = campus.RegionCode
+                }
+            );            
+        }
+        
         public UserOrganisation GetOrganisationForUser(string email, string instCode)
         {
             var org = GetUserOrganisation(email, instCode);
@@ -209,9 +264,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 );
             }
 
-
             _context.Save();
-
         }
 
         /// <summary>
@@ -337,18 +390,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             returnCourse.Schools = schools;
 
             return returnCourse;
-        }
-        private void ResetUcasSchema()
-        {
-            // clear out the existing data
-            _context.UcasCourses.RemoveRange(_context.UcasCourses);
-            _context.CourseCodes.RemoveRange(_context.CourseCodes);
-            _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
-            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
-            _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
-            _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
-            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
-            _context.Save();
         }
 
         private void ResetReferenceSchema()
