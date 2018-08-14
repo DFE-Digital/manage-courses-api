@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ManageCourses.Api.Services
@@ -40,11 +41,15 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
         private McUser ValidateUserOrg(string email, string instCode)
         {
-            var mcUser = _context.McUsers.ByEmail(email).Single();
+            var mcUser = _context.McUsers.ByEmail(email)
+                .Include(x => x.McOrganisationUsers)
+                .ThenInclude(x => x.McOrganisation)
+                .ThenInclude(x => x.McOrganisationInstitutions)
+                .Single();
 
             var institution = mcUser.McOrganisationUsers
                 .SelectMany(ou => ou.McOrganisation.McOrganisationInstitutions)
-                .Single(i => i.InstitutionCode == instCode).UcasInstitution;//should throw an error if the user doesn't have acces to the inst or the inst doesn't exist
+                .Single(i => instCode.ToLower() == i.InstitutionCode.ToLower()).UcasInstitution;//should throw an error if the user doesn't have acces to the inst or the inst doesn't exist
             return mcUser;
         }
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)

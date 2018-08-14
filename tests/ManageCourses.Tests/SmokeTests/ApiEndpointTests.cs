@@ -66,14 +66,19 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
         }
 
-
         [Test]
         public async Task EnrichmentSaveTest()
         {
             SetupSmokeTestData();
             var apiClient = BuildSigninAwareClient();
+            const string ucasInstitutionCode = "ABC";
             var model = new UcasInstitutionEnrichmentPostModel();
-            await apiClient.Enrichment_SaveInstitutionAsync("foo", model);
+            model.EnrichmentModel = new InstitutionEnrichmentModel
+            {
+                TrainWithUs = "wqeqwe",
+                TrainWithDisability = "werwer"
+            };
+            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
         }
 
         [Test]
@@ -81,7 +86,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             SetupSmokeTestData();
             var apiClient = BuildSigninAwareClient();
-            const string ucasInstitutionCode = "INST0";
+            const string ucasInstitutionCode = "ABC";
             var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
             loadedEnrichment.Should().NotBeNull();
         }

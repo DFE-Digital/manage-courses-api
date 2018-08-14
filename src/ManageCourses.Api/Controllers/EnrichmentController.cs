@@ -18,14 +18,14 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Route("institution/{ucasInstitutionCode}")]
         public UcasInstitutionEnrichmentGetModel GetInstitution(string ucasInstitutionCode)
         {
-            return _service.GetInstitutionEnrichment(User.Identity.Name, ucasInstitutionCode);
+            return _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
         }
 
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}")]
         public void SaveInstitution(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
         {
-            _service.SaveInstitutionEnrichment(model, User.Identity.Name, ucasInstitutionCode);
+            _service.SaveInstitutionEnrichment(model, ucasInstitutionCode, User.Identity.Name);
         }
     }
 }
