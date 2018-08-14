@@ -20,6 +20,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         DbSet<McUser> McUsers { get; set; }
         DbSet<AccessRequest> AccessRequests { get; set; }
+        DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         IList<UcasCourse> GetAllUcasCourses();
         IList<UcasInstitution> GetAllUcasInstitutions();
         IList<UcasSubject> GetAllUcasSubjects();
@@ -31,6 +32,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         IList<McOrganisationInstitution> GetAllMcOrganisationsInstitutions();
         IList<McOrganisationUser> GetAllMcOrganisationsUsers();
         IList<McUser> GetAllMcUsers();
+        IList<InstitutionEnrichment> GetAllInstitutionEnrichments();
 
         void AddUcasCourse(UcasCourse course);
         void AddUcasInstitution(UcasInstitution institution);
@@ -42,6 +44,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         void AddMcOrganisation(McOrganisation organisation);
         void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution);
         void AddMcOrganisationUser(McOrganisationUser organisationUser);
+        void AddInstitutionEnrichment(InstitutionEnrichment institutionEnrichment);
         void AddMcUser(McUser user);
         List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email);
         List<UcasCourse> GetUcasCourseRecordsByInstCode(string instCode, string email);

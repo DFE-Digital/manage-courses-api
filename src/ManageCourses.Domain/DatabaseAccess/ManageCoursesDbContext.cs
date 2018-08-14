@@ -140,6 +140,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         public DbSet<McUser> McUsers { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
+        public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
 
         public IList<UcasCourse> GetAllUcasCourses()
         {
@@ -195,6 +196,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return McUsers.ToList();
         }
 
+        public IList<InstitutionEnrichment> GetAllInstitutionEnrichments()
+        {
+            return InstitutionEnrichments.ToList();
+        }
+
         public void AddUcasInstitution(UcasInstitution institution)
         {
             UcasInstitutions.Add(institution);
@@ -243,6 +249,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public void AddMcUser(McUser user)
         {
             McUsers.Add(user);
+        }
+        public void AddInstitutionEnrichment(InstitutionEnrichment institutionEnrichment)
+        {
+            InstitutionEnrichments.Add(institutionEnrichment);
         }
         public List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
         {
