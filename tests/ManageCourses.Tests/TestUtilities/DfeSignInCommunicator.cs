@@ -49,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
         public async Task<string> GetAccessTokenAsync(string username, string password) 
         {
-            var startUrl = $"https://{dfeSignInDomain}/auth?redirect_uri=https://{redirectUriHostAndPort}/auth/cb&scope=openid profile email&response_type=code&state=1238&client_id={clientId}";
+            var startUrl = $"https://{dfeSignInDomain}/auth?redirect_uri=https://{redirectUriHostAndPort}/auth/cb&scope=offline_access openid profile email&response_type=code&state=1238&client_id={clientId}&prompt=consent";
             var loginPage = await GetUrl(startUrl, true);
 
             var form1 = await PostForm(loginPage, new Dictionary<string, string>{
