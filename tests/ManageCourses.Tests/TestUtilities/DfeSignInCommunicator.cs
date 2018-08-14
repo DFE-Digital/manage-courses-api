@@ -11,13 +11,13 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 {
     public partial class DfeSignInCommunicator
     {
-        
-        private readonly string dfeSignInDomain;
-        private readonly string redirectUriHostAndPort;
-        private readonly string clientId;
-        private readonly string clientSecret;
 
-        private readonly SimpleHttpBrowser httpBrowser = new SimpleHttpBrowser();
+        private readonly string _dfeSignInDomain;
+        private readonly string _redirectUriHostAndPort;
+        private readonly string _clientId;
+        private readonly string _clientSecret;
+
+        private readonly SimpleHttpBrowser _httpBrowser = new SimpleHttpBrowser();
 
         public DfeSignInCommunicator(string dfeSignInDomain, string redirectUriHostAndPort, string clientId, string clientSecret)
         {
@@ -41,15 +41,15 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
                 throw new ArgumentException("required", nameof(clientSecret));
             }
 
-            this.dfeSignInDomain = dfeSignInDomain;
-            this.redirectUriHostAndPort = redirectUriHostAndPort;
-            this.clientId = clientId;
-            this.clientSecret = clientSecret;
+            _dfeSignInDomain = dfeSignInDomain;
+            _redirectUriHostAndPort = redirectUriHostAndPort;
+            _clientId = clientId;
+            _clientSecret = clientSecret;
         }
 
-        public async Task<string> GetAccessTokenAsync(string username, string password) 
+        public async Task<string> GetAccessTokenAsync(string username, string password)
         {
-            var startUrl = $"https://{dfeSignInDomain}/auth?redirect_uri=https://{redirectUriHostAndPort}/auth/cb&scope=openid profile email&response_type=code&state=1238&client_id={clientId}";
+            var startUrl = $"https://{_dfeSignInDomain}/auth?redirect_uri=https://{_redirectUriHostAndPort}/auth/cb&scope=openid profile email&response_type=code&state=1238&client_id={_clientId}";
             var loginPage = await GetUrl(startUrl, true);
 
             var form1 = await PostForm(loginPage, new Dictionary<string, string>{
@@ -62,42 +62,42 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
             var authCode = new Regex(@"[?&]code=([^&]+)").Match(cb.Url).Groups[1].Value;
 
-            var acHttpClient = await new HttpClient().PostAsync($"https://{dfeSignInDomain}/token", new FormUrlEncodedContent(new Dictionary<string, string>() {
-                    {"client_id", clientId},
-                    {"client_secret", clientSecret},
-                    {"redirect_uri", $"https://{redirectUriHostAndPort}/auth/cb"},
+            var acHttpClient = await new HttpClient().PostAsync($"https://{_dfeSignInDomain}/token", new FormUrlEncodedContent(new Dictionary<string, string>() {
+                    {"client_id", _clientId},
+                    {"client_secret", _clientSecret},
+                    {"redirect_uri", $"https://{_redirectUriHostAndPort}/auth/cb"},
                     {"grant_type", "authorization_code"},
                     {"code",  authCode}
                 }));
 
 
             var json = await acHttpClient.Content.ReadAsStringAsync();
-            
-            try 
+
+            try
             {
                 string accessToken = JObject.Parse(json)["access_token"].Value<string>();
                 if (string.IsNullOrEmpty(accessToken))
                 {
-                    throw new Exception($"could not get access_token with settings: {clientId}, {username}, {clientSecret.Substring(0,3)}, {password.Substring(0,3)}");
+                    throw new Exception($"could not get access_token with settings: {_clientId}, {username}, {_clientSecret.Substring(0, 3)}, {password.Substring(0, 3)}");
                 }
                 return accessToken;
             }
             catch (JsonReaderException)
             {
-                throw new Exception($"could not get access_token with settings: {clientId}, {username}, {clientSecret.Substring(0,3)}, {password.Substring(0,3)}");
+                throw new Exception($"could not get access_token with settings: {_clientId}, {username}, {_clientSecret.Substring(0, 3)}, {password.Substring(0, 3)}");
             }
         }
 
         private async Task<NavigationResult> GetUrl(string url, bool shouldRedirect)
         {
-            var res = await httpBrowser.GetAsync(url);
+            var res = await _httpBrowser.GetAsync(url);
             return await Navigate(url, shouldRedirect, res);
         }
-        
-        private async Task<NavigationResult> PostForm(NavigationResult navResult, IDictionary<string,string> body, bool shouldRedirect)
+
+        private async Task<NavigationResult> PostForm(NavigationResult navResult, IDictionary<string, string> body, bool shouldRedirect)
         {
-            var res = await httpBrowser.PostFormAsync(navResult.Url, navResult.Content, body);
-            
+            var res = await _httpBrowser.PostFormAsync(navResult.Url, navResult.Content, body);
+
             return await Navigate(res.RequestMessage.RequestUri.AbsoluteUri, shouldRedirect, res);
         }
 
@@ -105,8 +105,8 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
         {
             var isRedirect = res.Headers.Any(kvp => kvp.Key == "Location");
             if (isRedirect)
-            {                
-                var uri=new Uri(url);
+            {
+                var uri = new Uri(url);
                 var location = res.Headers.Location.OriginalString;
                 var newLocation = location.StartsWith("/")
                     ? $"{uri.Scheme}://{uri.Host}{location}"
@@ -114,15 +114,13 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
                 if (shouldRedirect)
                 {
-                    return await GetUrl(newLocation, shouldRedirect);
+                    return await GetUrl(newLocation, true);
                 }
-                else
+
+                return new NavigationResult
                 {
-                    return new NavigationResult
-                    {
-                        Url = newLocation
-                    };
-                }
+                    Url = newLocation
+                };
             }
             else
             {
@@ -134,11 +132,11 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
                 };
             }
         }
-        
-        private class NavigationResult 
+
+        private class NavigationResult
         {
-            public string Url {get;set;}
-            public string Content {get;set;}
+            public string Url { get; set; }
+            public string Content { get; set; }
         }
     }
 }
