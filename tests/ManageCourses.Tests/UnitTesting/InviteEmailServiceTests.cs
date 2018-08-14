@@ -1,34 +1,29 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
-
-using Moq;
-
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Config;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
-
 using GovUk.Education.ManageCourses.Domain.Models;
+using Moq;
+using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
     public class InviteEmailServiceTests
     {
-        private IInviteEmailService Service = null;
-        private Mock<INotificationClientWrapper> mockNotificationClientWrapper = null;
-        private Mock<IInviteTemplateEmailConfig> mockInviteTemplateEmailConfig = null;
+        private IInviteEmailService _service;
+        private Mock<INotificationClientWrapper> _mockNotificationClientWrapper;
+        private Mock<IInviteTemplateEmailConfig> _mockInviteTemplateEmailConfig;
+        private readonly string _templateId = "mockInviteTemplateEmailConfig templateId";
 
-        private string templateId = "mockInviteTemplateEmailConfig templateId";
         [OneTimeSetUp]
         public void OneTimeSetUp()
         {
-            mockNotificationClientWrapper = new Mock<INotificationClientWrapper>();
-            mockInviteTemplateEmailConfig = new Mock<IInviteTemplateEmailConfig>();
+            _mockNotificationClientWrapper = new Mock<INotificationClientWrapper>();
+            _mockInviteTemplateEmailConfig = new Mock<IInviteTemplateEmailConfig>();
+            _mockInviteTemplateEmailConfig.Setup(x => x.TemplateId).Returns(_templateId);
 
-            
-            mockInviteTemplateEmailConfig.Setup(x => x.TemplateId).Returns(templateId);
-
-            Service = new InviteEmailService(mockNotificationClientWrapper.Object, mockInviteTemplateEmailConfig.Object);
+            _service = new InviteEmailService(_mockNotificationClientWrapper.Object, _mockInviteTemplateEmailConfig.Object);
         }
 
         [Test]
@@ -44,9 +39,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 {"first_name", user.FirstName.Trim() } };
 
             var model = new InviteEmailModel(user);
-            Service.Send(model);
+            _service.Send(model);
 
-            mockNotificationClientWrapper.Verify(x => x.SendEmail(user.Email, templateId, personalisation, null, null), Times.Once);
+            _mockNotificationClientWrapper.Verify(x => x.SendEmail(user.Email, _templateId, personalisation, null, null), Times.Once);
         }
     }
 }
