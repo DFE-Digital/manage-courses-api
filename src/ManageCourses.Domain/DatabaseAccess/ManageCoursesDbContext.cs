@@ -101,6 +101,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(us => us.UcasCourseSubjects)
                 .HasForeignKey(ucs => ucs.SubjectCode)
                 .HasPrincipalKey(ui => ui.SubjectCode);
+
             modelBuilder.Entity<UcasCourseSubject>()
                 .HasOne(ucs => ucs.CourseCode)
                 .WithMany(cc => cc.UcasCourseSubjects)
@@ -112,6 +113,12 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(u => u.AccessRequests)
                 .HasForeignKey(ar => ar.RequesterId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<InstitutionEnrichment>()
+                .HasOne(ie => ie.UcasInstitution)
+                .WithMany(ui => ui.InstitutionEnrichments)
+                .HasForeignKey(ie => ie.InstCode)
+                .HasPrincipalKey(ui => ui.InstCode);
 
             base.OnModelCreating(modelBuilder);
         }
