@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 
-namespace GovUk.Education.ManageCourses.Api.Data
+namespace GovUk.Education.ManageCourses.Api.Services.Data
 {
     public interface IDataHelper
     {

@@ -2,8 +2,12 @@
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
+using GovUk.Education.ManageCourses.Api.Services.AccessRequests;
+using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Config;
+using GovUk.Education.ManageCourses.Api.Services.Invites;
+using GovUk.Education.ManageCourses.Api.Services.Users;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

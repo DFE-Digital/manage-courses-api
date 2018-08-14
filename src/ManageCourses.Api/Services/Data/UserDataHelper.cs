@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 
-namespace GovUk.Education.ManageCourses.Api.Data
+namespace GovUk.Education.ManageCourses.Api.Services.Data
 {
     /// <summary>
     /// This helper class generates the diff between the existing and new dataset.

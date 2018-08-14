@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
+using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ManageCourses.Domain.DatabaseAccess.McUserQueryableExtensions;
 
-namespace GovUk.Education.ManageCourses.Api.Data
+namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
 {
     public class AccessRequestService : IAccessRequestService
     {

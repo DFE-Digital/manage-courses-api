@@ -1,14 +1,11 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Notify.Client;
 
-namespace GovUk.Education.ManageCourses.Api.Data
+namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
 {
     public class AccessRequestEmailService : IAccessRequestEmailService
     {

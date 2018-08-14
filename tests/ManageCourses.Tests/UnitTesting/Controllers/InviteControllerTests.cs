@@ -2,6 +2,7 @@
 using GovUk.Education.ManageCourses.Api.Controllers;
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Services;
+using GovUk.Education.ManageCourses.Api.Services.Invites;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;

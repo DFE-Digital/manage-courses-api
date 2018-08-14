@@ -7,6 +7,7 @@ using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
+using GovUk.Education.ManageCourses.Api.Services.Users;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Moq;
 using NUnit.Framework;

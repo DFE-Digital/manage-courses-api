@@ -4,7 +4,7 @@ using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 
-namespace GovUk.Education.ManageCourses.Api.Services
+namespace GovUk.Education.ManageCourses.Api.Services.Invites
 {
     public class InviteService : IInviteService
     {
