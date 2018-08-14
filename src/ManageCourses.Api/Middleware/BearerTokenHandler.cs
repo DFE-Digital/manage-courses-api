@@ -13,6 +13,7 @@ using GovUk.Education.ManageCourses.Api.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using GovUk.Education.ManageCourses.Api.Services;
+using GovUk.Education.ManageCourses.Api.Services.Users;
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
 {

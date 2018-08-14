@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ManageCourses.Api.Services
+﻿namespace GovUk.Education.ManageCourses.Api.Services.Invites
 {
     public interface IInviteService
     {

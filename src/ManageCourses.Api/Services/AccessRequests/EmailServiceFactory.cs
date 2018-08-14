@@ -1,4 +1,5 @@
 using System;
+using GovUk.Education.ManageCourses.Api.Services.AccessRequests;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {

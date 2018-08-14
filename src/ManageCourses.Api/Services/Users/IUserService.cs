@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Middleware;
 
-namespace GovUk.Education.ManageCourses.Api.Services
+namespace GovUk.Education.ManageCourses.Api.Services.Users
 {
     /// <summary>
     /// Encapsulate logic for handling user interactions
