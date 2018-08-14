@@ -23,8 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private Mock<IInviteEmailService> _mockInviteEmailService;
         private InviteService _inviteService;
 
-        [OneTimeSetUp]
-        public void Setup()
+        protected override void Setup()
         {
             var mockUsers = new List<McUser>
             {
