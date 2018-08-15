@@ -23,9 +23,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
         }
         public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email)
         {
-            if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided.");}
-            if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
-
             ValidateUserOrg(email, instCode);
 
             var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
@@ -44,6 +41,9 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
         private UserInstitution ValidateUserOrg(string email, string instCode)
         {
+            if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided."); }
+            if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
+
             var user = _context.McUsers.ByEmail(email)
                 .Include(x => x.McOrganisationUsers)
                 .ThenInclude(x => x.McOrganisation)
@@ -65,9 +65,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
         }
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
         {
-            if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided."); }
-            if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
-
             var userInst = ValidateUserOrg(email, instCode);
 
             var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
