@@ -34,6 +34,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         {
             var allInstitutions = _context.UcasInstitutions.ToList();
             
+            _logger.LogWarning("Beginning UCAS import");
             _logger.LogInformation($"Upserting {allInstitutions.Count()} institutions");
             int processed = 0;
             foreach (var inst in allInstitutions)
@@ -48,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 }
                 if(++processed % 100 == 0) 
                 {
-                    _logger.LogInformation($"Upserted ${processed} institutions so far");
+                    _logger.LogInformation($"Upserted {processed} institutions so far");
                 }            
             }
             _logger.LogWarning("Completed UCAS import");  
@@ -203,41 +204,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 );
             }
             return payload;
-        }
-
-        private UcasPayload DeleteCampus(UcasCampus campus)
-        {
-            var toDelete = new UcasPayload() 
-            {
-                Campuses = _context.UcasCampuses.Where(c => c.CampusCode == campus.CampusCode && c.InstCode == campus.InstCode)
-            };
-            _context.UcasCampuses.RemoveRange(toDelete.Campuses);
-            return toDelete;
-        }
-
-        private UcasPayload AddCampus(UcasCampus campus)
-        {
-            _context.AddUcasCampus(
-                new UcasCampus
-                {
-                    InstCode = campus.InstCode,
-                    CampusCode = campus.CampusCode,
-                    CampusName = campus.CampusName,
-                    Addr1 = campus.Addr1,
-                    Addr2 = campus.Addr2,
-                    Addr3 = campus.Addr3,
-                    Addr4 = campus.Addr4,
-                    Postcode = campus.Postcode,
-                    TelNo = campus.TelNo,
-                    Email = campus.Email,
-                    RegionCode = campus.RegionCode
-                }
-            );      
-
-            return new UcasPayload()
-            {
-                Campuses = new List<UcasCampus>{campus}
-            };      
         }
         
         public UserOrganisation GetOrganisationForUser(string email, string instCode)
