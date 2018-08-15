@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -44,25 +42,33 @@ namespace GovUk.Education.ManageCourses.Api.Services
             return enrichmentToReturn;
         }
 
-        private McUser ValidateUserOrg(string email, string instCode)
+        private UserInstitution ValidateUserOrg(string email, string instCode)
         {
-            var mcUser = _context.McUsers.ByEmail(email)
+            var user = _context.McUsers.ByEmail(email)
                 .Include(x => x.McOrganisationUsers)
                 .ThenInclude(x => x.McOrganisation)
                 .ThenInclude(x => x.McOrganisationInstitutions)
+                .ThenInclude(x => x.UcasInstitution)
                 .Single();
 
-            var institution = mcUser.McOrganisationUsers
+            var institution = user.McOrganisationUsers
                 .SelectMany(ou => ou.McOrganisation.McOrganisationInstitutions)
                 .Single(i => instCode.ToLower() == i.InstitutionCode.ToLower()).UcasInstitution;//should throw an error if the user doesn't have acces to the inst or the inst doesn't exist
-            return mcUser;
+
+            var returnUserInst = new UserInstitution
+            {
+                McUser = user,
+                UcasInstitution = institution
+            };
+
+            return returnUserInst;
         }
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
         {
             if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided."); }
             if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
 
-            var mcUser = ValidateUserOrg(email, instCode);
+            var userInst = ValidateUserOrg(email, instCode);
 
             var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
             var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
@@ -71,7 +77,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             {
                 //update
                 enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentRecord.UpdatedByUser = mcUser;
+                enrichmentRecord.UpdatedByUser = userInst.McUser;
                 enrichmentRecord.JsonData = content;                
             }
             else
@@ -79,12 +85,13 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 //insert
                 var enrichment = new InstitutionEnrichment
                 {
-                    InstCode = instCode,
+                    InstCode = userInst.UcasInstitution.InstCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
-                    CreatedByUser = mcUser,
-                    UpdatedByUser = mcUser,
+                    CreatedByUser = userInst.McUser,
+                    UpdatedByUser = userInst.McUser,
                     JsonData = content,
+                    //UcasInstitution = institution
                 };
                 _context.InstitutionEnrichments.Add(enrichment);
             }

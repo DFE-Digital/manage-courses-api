@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}")]
-        public void SaveInstitution(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
+        public void SaveInstitution(string ucasInstitutionCode, [FromBody] UcasInstitutionEnrichmentPostModel model)
         {
             _service.SaveInstitutionEnrichment(model, ucasInstitutionCode, User.Identity.Name);
         }
