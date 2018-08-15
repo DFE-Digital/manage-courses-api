@@ -36,23 +36,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
             var campusesToDelete = _context.UcasCampuses.ToList().Except(uniqueCampuses, new UcasCampusEquivalencyComparer());
 
-            foreach(var campus in campusesToDelete)
-            {
-                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
-            }
-
-            foreach(var campus in uniqueCampuses)
-            {
-                var deletedPayload = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
-                var added = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => AddCampus(campus));
-
-                if (added == null && deletedPayload != null && deletedPayload.Campuses.FirstOrDefault() != null)
-                {
-                    //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
-                    AttemptTransaction("campus (restore)", campus.InstCode, campus.CampusCode, () => AddCampus(deletedPayload.Campuses.First()));
-                }
-            }
-
             var uniqueCourses = payload.Courses.Select(course => new CourseCode
             {
                 InstCode = course.InstCode,
@@ -77,6 +60,24 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     AttemptTransaction("course (restore)", course.InstCode, course.CrseCode, () => AddCourse(course, deleted));
                 }
             }
+
+            foreach(var campus in campusesToDelete)
+            {
+                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
+            }
+
+            foreach(var campus in uniqueCampuses)
+            {
+                var deletedPayload = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
+                var added = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => AddCampus(campus));
+
+                if (added == null && deletedPayload != null && deletedPayload.Campuses.FirstOrDefault() != null)
+                {
+                    //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
+                    AttemptTransaction("campus (restore)", campus.InstCode, campus.CampusCode, () => AddCampus(deletedPayload.Campuses.First()));
+                }
+            }
+
         }
         
         private UcasPayload AttemptTransaction(string type, string instCode, string courseCode, Func<UcasPayload> performActions) 
