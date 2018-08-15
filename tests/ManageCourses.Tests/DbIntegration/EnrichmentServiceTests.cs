@@ -159,10 +159,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
         }
         [Test]
-        [TestCase("", "")]
-        [TestCase(null, null)]
         [TestCase("eqweqw", "qweqweq")]
-        public void Test_SaveInstitutionEnrichment_should_error(string instCode, string email)
+        public void Test_SaveInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
         {
             const string trainWithDisabilityText = "TrainWithDisabilily Text";
             const string trainWithUsText = "TrainWithUs Text";
@@ -191,6 +189,33 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         [TestCase("", "")]
         [TestCase(null, null)]
+        public void Test_SaveInstitutionEnrichment_should__argument_exception(string instCode, string email)
+        {
+            const string trainWithDisabilityText = "TrainWithDisabilily Text";
+            const string trainWithUsText = "TrainWithUs Text";
+            const string instDesc = "school1 description enrichement";
+
+            var enrichmentService = new EnrichmentService(Context);
+            var model = new UcasInstitutionEnrichmentPostModel
+            {
+                EnrichmentModel = new InstitutionEnrichmentModel
+                {
+                    TrainWithDisability = trainWithDisabilityText,
+                    TrainWithUs = trainWithUsText,
+                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
+                    {
+                        new AccreditingProviderEnrichment
+                        {
+                            UcasInstitutionCode = _accreditingInstCode,
+                            Description = instDesc,
+                        }
+                    }
+                }
+            };
+
+            Assert.Throws<ArgumentException>(() => enrichmentService.SaveInstitutionEnrichment(model, instCode, email));
+        }
+        [Test]
         [TestCase("eqweqw", "qweqweq")]
         public void Test_GetInstitutionEnrichment_should_error(string instCode, string email)
         {

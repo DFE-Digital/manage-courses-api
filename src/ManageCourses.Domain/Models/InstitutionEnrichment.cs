@@ -12,9 +12,9 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         [Required]
         public string InstCode { get; set; }
         public DateTime CreatedTimestampUtc { get; set; }
-        public DateTime UpdateTimestampUtc { get; set; }
-        public int SavedByUserId { get; set; }
-        public int UpdatedByUserId { get; set; }
+        public DateTime UpdatedTimestampUtc { get; set; }
+        public McUser CreatedByUser { get; set; }
+        public McUser UpdatedByUser { get; set; }
         [Column(TypeName = "jsonb")]
         public string JsonData { get; set; }
         public UcasInstitution UcasInstitution { get; set; }

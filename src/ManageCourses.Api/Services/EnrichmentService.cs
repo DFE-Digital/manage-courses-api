@@ -25,6 +25,9 @@ namespace GovUk.Education.ManageCourses.Api.Services
         }
         public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email)
         {
+            if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided.");}
+            if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
+
             ValidateUserOrg(email, instCode);
 
             var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
@@ -34,6 +37,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 var enrichmentModel = enrichment.JsonData != null ? JsonConvert.DeserializeObject<InstitutionEnrichmentModel>(enrichment.JsonData, _jsonSerializerSettings) : null;
 
                 enrichmentToReturn.EnrichmentModel = enrichmentModel;
+                enrichmentToReturn.CreatedTimestampUtc = enrichment.CreatedTimestampUtc;
+                enrichmentToReturn.UpdatedTimestampUtc = enrichment.UpdatedTimestampUtc;
             }
 
             return enrichmentToReturn;
@@ -54,6 +59,9 @@ namespace GovUk.Education.ManageCourses.Api.Services
         }
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
         {
+            if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided."); }
+            if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
+
             var mcUser = ValidateUserOrg(email, instCode);
 
             var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
@@ -62,8 +70,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
             if (enrichmentRecord != null)
             {
                 //update
-                enrichmentRecord.UpdateTimestampUtc = DateTime.UtcNow;
-                enrichmentRecord.UpdatedByUserId = mcUser.Id;
+                enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentRecord.UpdatedByUser = mcUser;
                 enrichmentRecord.JsonData = content;                
             }
             else
@@ -73,9 +81,9 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 {
                     InstCode = instCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
-                    UpdateTimestampUtc = DateTime.UtcNow,
-                    SavedByUserId = mcUser.Id,
-                    UpdatedByUserId = mcUser.Id,
+                    UpdatedTimestampUtc = DateTime.UtcNow,
+                    CreatedByUser = mcUser,
+                    UpdatedByUser = mcUser,
                     JsonData = content,
                 };
                 _context.InstitutionEnrichments.Add(enrichment);
