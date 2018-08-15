@@ -29,11 +29,59 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var enrichment = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
             if (enrichment != null)
             {
-                var enrichmentModel = enrichment.JsonData != null ? JsonConvert.DeserializeObject<InstitutionEnrichmentModel>(enrichment.JsonData, _jsonSerializerSettings) : null;
+                enrichmentToReturn = Convert(enrichment);
+            }
 
-                enrichmentToReturn.EnrichmentModel = enrichmentModel;
-                enrichmentToReturn.CreatedTimestampUtc = enrichment.CreatedTimestampUtc;
-                enrichmentToReturn.UpdatedTimestampUtc = enrichment.UpdatedTimestampUtc;
+            return enrichmentToReturn;
+        }
+        public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
+        {
+            var userInst = ValidateUserOrg(email, instCode);
+
+            var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
+            var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
+
+            if (enrichmentRecord != null)
+            {
+                //update
+                enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentRecord.UpdatedByUser = userInst.McUser;
+                enrichmentRecord.JsonData = content;                
+            }
+            else
+            {
+                //insert
+                var enrichment = new InstitutionEnrichment
+                {
+                    InstCode = userInst.UcasInstitution.InstCode,
+                    CreatedTimestampUtc = DateTime.UtcNow,
+                    UpdatedTimestampUtc = DateTime.UtcNow,
+                    CreatedByUser = userInst.McUser,
+                    UpdatedByUser = userInst.McUser,
+                    Status = EnumStatus.Draft,
+                    JsonData = content,
+                };
+                _context.InstitutionEnrichments.Add(enrichment);
+            }
+            _context.Save();
+        }
+        public UcasInstitutionEnrichmentGetModel PublishInstitutionEnrichment(string instCode, string email)
+        {
+            var userInst = ValidateUserOrg(email, instCode);
+
+            var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
+
+            var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
+
+            if (enrichmentRecord != null)
+            {
+                //update
+                enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentRecord.UpdatedByUser = userInst.McUser;
+                enrichmentRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
+                enrichmentRecord.Status = EnumStatus.Published;
+                _context.Save();
+                enrichmentToReturn = Convert(enrichmentRecord);
             }
 
             return enrichmentToReturn;
@@ -63,36 +111,20 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             return returnUserInst;
         }
-        public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
+        private UcasInstitutionEnrichmentGetModel Convert(InstitutionEnrichment source)
         {
-            var userInst = ValidateUserOrg(email, instCode);
-
-            var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
-            var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
-
-            if (enrichmentRecord != null)
+            var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
+            if (source != null)
             {
-                //update
-                enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentRecord.UpdatedByUser = userInst.McUser;
-                enrichmentRecord.JsonData = content;                
+                var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<InstitutionEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
+
+                enrichmentToReturn.EnrichmentModel = enrichmentModel;
+                enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
+                enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
+                enrichmentToReturn.Status = source.Status;
             }
-            else
-            {
-                //insert
-                var enrichment = new InstitutionEnrichment
-                {
-                    InstCode = userInst.UcasInstitution.InstCode,
-                    CreatedTimestampUtc = DateTime.UtcNow,
-                    UpdatedTimestampUtc = DateTime.UtcNow,
-                    CreatedByUser = userInst.McUser,
-                    UpdatedByUser = userInst.McUser,
-                    JsonData = content,
-                    //UcasInstitution = institution
-                };
-                _context.InstitutionEnrichments.Add(enrichment);
-            }
-            _context.Save();
+
+            return enrichmentToReturn;
         }
     }
 }

@@ -87,7 +87,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             SetupSmokeTestData();
             var apiClient = BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
-            var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
+            var loadedEnrichment = await apiClient.Enrichment_GetLatestInstitutionAsync(ucasInstitutionCode);
             loadedEnrichment.Should().NotBeNull();
         }
 

@@ -14,18 +14,40 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// always get the latest enrichment record regardless of status
+        /// </summary>
+        /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("institution/{ucasInstitutionCode}")]
-        public UcasInstitutionEnrichmentGetModel GetInstitution(string ucasInstitutionCode)
+        public UcasInstitutionEnrichmentGetModel GetLatestInstitution(string ucasInstitutionCode)
         {
             return _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
         }
-
+        /// <summary>
+        /// saves an enrichment record (always draft)
+        /// </summary>
+        /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
+        /// <param name="model">containds the payload that represents the records to be saved</param>
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}")]
         public void SaveInstitution(string ucasInstitutionCode, [FromBody] UcasInstitutionEnrichmentPostModel model)
         {
             _service.SaveInstitutionEnrichment(model, ucasInstitutionCode, User.Identity.Name);
+        }
+        /// <summary>
+        /// sets the status of the latest draft record to 'published'
+        /// </summary>
+        /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
+        /// <returns>Ok if successful. 404 if unsuccessful</returns>
+        [HttpPost]
+        [Route("institution/{ucasInstitutionCode}/publish")]
+        public ActionResult Publish(string ucasInstitutionCode)
+        {
+            //TODO send to search and compare. Return success/fail
+            var result = _service.PublishInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
+            return result != null ? Ok() : StatusCode(404);
         }
     }
 }
