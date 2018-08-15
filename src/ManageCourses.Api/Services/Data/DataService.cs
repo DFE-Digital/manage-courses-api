@@ -32,55 +32,29 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         /// <param name="payload">Holds all the data entities that need to be imported</param>
         public void ProcessUcasPayload(UcasPayload payload)
         {
-            var uniqueCampuses = payload.Campuses;
-
-            var campusesToDelete = _context.UcasCampuses.ToList().Except(uniqueCampuses, new UcasCampusEquivalencyComparer());
-
-            var uniqueCourses = payload.Courses.Select(course => new CourseCode
+            var allInstitutions = _context.UcasInstitutions.ToList();
+            
+            _logger.LogInformation($"Upserting {allInstitutions.Count()} institutions");
+            int processed = 0;
+            foreach (var inst in allInstitutions)
             {
-                InstCode = course.InstCode,
-                CrseCode = course.CrseCode
-            }).Distinct(new CourseComparer());
-
-            var coursesToDelete = _context.CourseCodes.ToList().Except(uniqueCourses, new CourseCodeEquivalencyComparer());
-
-            foreach(var course in coursesToDelete)
-            {
-                AttemptTransaction("course", course.InstCode, course.CrseCode, () => DeleteCourse(course));
-            }
-
-            foreach(var course in uniqueCourses)
-            {
-                var deleted = AttemptTransaction("course", course.InstCode, course.CrseCode, () => DeleteCourse(course));
-                var added = AttemptTransaction("course", course.InstCode, course.CrseCode, () => AddCourse(course, payload));
+                var deleted = AttemptTransaction(inst.InstCode, "delete for replace", () => DeleteForInstitution(inst.InstCode));
+                var added = AttemptTransaction(inst.InstCode, "insert", () => AddForInstitution(inst.InstCode, payload));
 
                 if (added == null && deleted != null)
                 {
                     //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
-                    AttemptTransaction("course (restore)", course.InstCode, course.CrseCode, () => AddCourse(course, deleted));
+                    AttemptTransaction(inst.InstCode, "restore", () => AddForInstitution(inst.InstCode, deleted));
                 }
-            }
-
-            foreach(var campus in campusesToDelete)
-            {
-                AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
-            }
-
-            foreach(var campus in uniqueCampuses)
-            {
-                var deletedPayload = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => DeleteCampus(campus));
-                var added = AttemptTransaction("campus", campus.InstCode, campus.CampusCode, () => AddCampus(campus));
-
-                if (added == null && deletedPayload != null && deletedPayload.Campuses.FirstOrDefault() != null)
+                if(++processed % 100 == 0) 
                 {
-                    //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
-                    AttemptTransaction("campus (restore)", campus.InstCode, campus.CampusCode, () => AddCampus(deletedPayload.Campuses.First()));
-                }
+                    _logger.LogInformation($"Upserted ${processed} institutions so far");
+                }            
             }
-
+            _logger.LogWarning("Completed UCAS import");  
         }
         
-        private UcasPayload AttemptTransaction(string type, string instCode, string courseCode, Func<UcasPayload> performActions) 
+        private UcasPayload AttemptTransaction(string instCode, string operationName, Func<UcasPayload> performActions) 
         {
             var transaction = (_context as DbContext).Database.BeginTransaction();
             try
@@ -93,7 +67,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             }
             catch(Exception e)
             {
-                _logger.LogError($"Import failed to update {type} {courseCode} for institution {instCode}", e);
+                _logger.LogError(e, $"Import failed to update ({operationName}) Institution {instCode}");
+                
                 transaction.Rollback();
 
                 foreach (var entry in (_context as DbContext).ChangeTracker.Entries().ToList())
@@ -114,31 +89,66 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             }
         }
 
-        private UcasPayload DeleteCourse(CourseCode course)
+        private UcasPayload DeleteForInstitution(string instCode)
         {
             var toDelete = new UcasPayload() 
             {
-                CourseNotes = _context.UcasCourseNotes.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode).ToList(),
-                CourseSubjects = _context.UcasCourseSubjects.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode).ToList(),
-                Courses = _context.UcasCourses.Where(c => c.InstCode == course.InstCode && c.CrseCode == course.CrseCode).ToList()
+                NoteTexts = _context.UcasNoteTexts.Where(c => c.InstCode == instCode).ToList(),
+                CourseNotes = _context.UcasCourseNotes.Where(c => c.InstCode == instCode).ToList(),
+                CourseSubjects = _context.UcasCourseSubjects.Where(c => c.InstCode == instCode).ToList(),
+                Courses = _context.UcasCourses.Where(c => c.InstCode == instCode).ToList(),
+                Campuses = _context.UcasCampuses.Where(c => c.InstCode == instCode).ToList()
             };
-
-            toDelete.NoteTexts = _context.UcasNoteTexts.Where(x => toDelete.CourseNotes.Any(y => x.InstCode == y.InstCode && x.NoteNo == y.NoteNo)).ToList();
 
             _context.UcasNoteTexts.RemoveRange(toDelete.NoteTexts);
             _context.UcasCourseNotes.RemoveRange(toDelete.CourseNotes);
             _context.UcasCourseSubjects.RemoveRange(toDelete.CourseSubjects);
             _context.UcasCourses.RemoveRange(toDelete.Courses);
-            _context.CourseCodes.RemoveRange(_context.CourseCodes.Where(c => new CourseCodeEquivalencyComparer().Equals(c, course)));
-
+            _context.CourseCodes.RemoveRange(_context.CourseCodes.Where(c => c.InstCode == instCode));
+            _context.UcasCampuses.RemoveRange(toDelete.Campuses);
+            
             return toDelete;
         }
 
-        private UcasPayload AddCourse(CourseCode courseToAdd, UcasPayload payload)
+        private UcasPayload AddForInstitution(string instCode, UcasPayload payload)
         {
-            _context.CourseCodes.Add(courseToAdd);
-            foreach (var course in payload.Courses.Where(c => c.CrseCode == courseToAdd.CrseCode && c.InstCode == courseToAdd.InstCode))
+            
+            foreach(var campus in payload.Campuses.Where(c => c.InstCode == instCode))
             {
+                _context.AddUcasCampus(
+                    new UcasCampus
+                    {
+                        InstCode = campus.InstCode,
+                        CampusCode = campus.CampusCode,
+                        CampusName = campus.CampusName,
+                        Addr1 = campus.Addr1,
+                        Addr2 = campus.Addr2,
+                        Addr3 = campus.Addr3,
+                        Addr4 = campus.Addr4,
+                        Postcode = campus.Postcode,
+                        TelNo = campus.TelNo,
+                        Email = campus.Email,
+                        RegionCode = campus.RegionCode
+                    });                
+            }
+
+            var courseCodes = payload.Courses.Where(c => c.InstCode == instCode)
+                .Select(c => new CourseCode(){
+                    CrseCode = c.CrseCode,
+                    InstCode = c.InstCode
+                }).Distinct(new CourseCodeEquivalencyComparer());
+
+            foreach (var course in courseCodes)
+            {
+                _context.CourseCodes.Add(new CourseCode{
+                    CrseCode = course.CrseCode,
+                    InstCode = course.InstCode
+                });
+            }            
+
+
+            foreach (var course in payload.Courses.Where(c => c.InstCode == instCode))
+            {            
                 // copy props to prevent changing id
                 _context.AddUcasCourse(new UcasCourse
                 {
@@ -154,7 +164,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     CrseOpenDate = course.CrseOpenDate
                 });
             }
-            foreach (var courseSubject in payload.CourseSubjects.Where(c => c.CrseCode == courseToAdd.CrseCode && c.InstCode == courseToAdd.InstCode))
+            foreach (var courseSubject in payload.CourseSubjects.Where(c => c.InstCode == instCode))
             {
                 _context.AddUcasCourseSubject(
                     new UcasCourseSubject
@@ -166,8 +176,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     }
                 );
             }
-            var courseNotesAdded = new List<UcasCourseNote>();
-            foreach (var courseNote in payload.CourseNotes.Where(c => c.CrseCode == courseToAdd.CrseCode && c.InstCode == courseToAdd.InstCode))
+            foreach (var courseNote in payload.CourseNotes.Where(c => c.InstCode == instCode))
             {
                 _context.AddUcasCourseNote(
                     new UcasCourseNote
@@ -177,11 +186,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                         NoteNo = courseNote.NoteNo,
                         NoteType = courseNote.NoteType,
                         YearCode = courseNote.YearCode
-                    }
-                    );
-                courseNotesAdded.Add(courseNote);
+                    });
             }
-            foreach (var noteText in payload.NoteTexts.Where(c => courseNotesAdded.Any(n => c.NoteNo == n.NoteNo && c.InstCode == n.InstCode)))
+
+            foreach (var noteText in payload.NoteTexts.Where(c => c.InstCode == instCode))
             {
                 _context.AddUcasNoteText(
                     new UcasNoteText
