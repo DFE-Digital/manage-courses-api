@@ -101,6 +101,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(us => us.UcasCourseSubjects)
                 .HasForeignKey(ucs => ucs.SubjectCode)
                 .HasPrincipalKey(ui => ui.SubjectCode);
+
             modelBuilder.Entity<UcasCourseSubject>()
                 .HasOne(ucs => ucs.CourseCode)
                 .WithMany(cc => cc.UcasCourseSubjects)
@@ -112,6 +113,12 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(u => u.AccessRequests)
                 .HasForeignKey(ar => ar.RequesterId)
                 .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<InstitutionEnrichment>()
+                .HasOne(ie => ie.UcasInstitution)
+                .WithMany(ui => ui.InstitutionEnrichments)
+                .HasForeignKey(ie => ie.InstCode)
+                .HasPrincipalKey(ui => ui.InstCode);
 
             base.OnModelCreating(modelBuilder);
         }
@@ -140,6 +147,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
         public DbSet<McUser> McUsers { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
+        public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
 
         public IList<UcasCourse> GetAllUcasCourses()
         {
@@ -195,6 +203,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return McUsers.ToList();
         }
 
+        public IList<InstitutionEnrichment> GetAllInstitutionEnrichments()
+        {
+            return InstitutionEnrichments.ToList();
+        }
+
         public void AddUcasInstitution(UcasInstitution institution)
         {
             UcasInstitutions.Add(institution);
@@ -243,6 +256,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public void AddMcUser(McUser user)
         {
             McUsers.Add(user);
+        }
+        public void AddInstitutionEnrichment(InstitutionEnrichment institutionEnrichment)
+        {
+            InstitutionEnrichments.Add(institutionEnrichment);
         }
         public List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
         {

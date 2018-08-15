@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180814083808_Added-InstitutionEnrichment")]
+    partial class AddedInstitutionEnrichment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,33 +87,20 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
-                    b.Property<int?>("CreatedByUserId")
-                        .HasColumnName("created_by_user_id");
-
-                    b.Property<DateTime>("CreatedTimestampUtc")
-                        .HasColumnName("created_timestamp_utc");
-
                     b.Property<string>("InstCode")
-                        .IsRequired()
                         .HasColumnName("inst_code");
 
                     b.Property<string>("JsonData")
                         .HasColumnName("json_data")
                         .HasColumnType("jsonb");
 
-                    b.Property<int?>("UpdatedByUserId")
+                    b.Property<int>("SavedByUserId")
+                        .HasColumnName("saved_by_user_id");
+
+                    b.Property<int>("UpdatedByUserId")
                         .HasColumnName("updated_by_user_id");
 
-                    b.Property<DateTime>("UpdatedTimestampUtc")
-                        .HasColumnName("updated_timestamp_utc");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("InstCode");
-
-                    b.HasIndex("UpdatedByUserId");
 
                     b.ToTable("institution_enrichment");
                 });
@@ -487,23 +475,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasForeignKey("InstCode")
                         .HasPrincipalKey("InstCode")
                         .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.InstitutionEnrichment", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("InstitutionEnrichments")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedByUserId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationInstitution", b =>

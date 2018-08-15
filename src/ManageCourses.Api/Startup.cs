@@ -62,6 +62,7 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IDataService, DataService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IInviteService, InviteService>();
+            services.AddScoped<IEnrichmentService, EnrichmentService>();
             services.AddScoped<IWelcomeTemplateEmailConfig, WelcomeTemplateEmailConfig>();
             services.AddScoped<IWelcomeEmailService, WelcomeEmailService>();
             services.AddScoped<IClock, Clock>();
