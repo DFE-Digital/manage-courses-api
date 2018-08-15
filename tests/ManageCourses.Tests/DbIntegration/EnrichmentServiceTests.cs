@@ -126,9 +126,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 }
             };
             //test save
-            enrichmentService.SaveInstitutionEnrichment(model, _providerInstCode, _email);
+            enrichmentService.SaveInstitutionEnrichment(model, _providerInstCode.ToLower(), _email);
             //test get
-            var result = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
+            var result = enrichmentService.GetInstitutionEnrichment(_providerInstCode.ToLower(), _email);
 
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
@@ -153,7 +153,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 }
             };
 
-            enrichmentService.SaveInstitutionEnrichment(updatedmodel, _providerInstCode, _email);
+            enrichmentService.SaveInstitutionEnrichment(updatedmodel, _providerInstCode.ToLower(), _email);
             var updateResult = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
             updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
             updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
