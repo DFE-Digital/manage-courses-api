@@ -3,6 +3,7 @@ using System.Linq;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -173,10 +174,27 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void ImportDoesntLoseEnrichment()
         {
-            // do an import, inst A,B
+            // set up ref data in context
+            // do an import
+            DataService.ProcessReferencePayload(todo);
             // add enrichment to A,B
+            var enrichmentService = new EnrichmentService(Context);
+            var enrichmentModel = new UcasInstitutionEnrichmentPostModel
+            {
+                EnrichmentModel = new InstitutionEnrichmentModel
+                {
+                    TrainWithUs = @"Come with us
+And leave your Earth behind
+Bright and clear
+We see the light
+All universes at your side",
+                }
+            };
+            enrichmentService.SaveInstitutionEnrichment(enrichmentModel, InstCode1, TestUserEmail1);
             // do another import with some modified data, inst B,C (A is gone)
+            DataService.ProcessReferencePayload(todo);
             // check the enrichment of B didn't go missing
+            Assert.Todo()
         }
 
         [TestCase("nothing@nowhere.com", null)]
