@@ -19,6 +19,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     public class DataServiceTests : DbIntegrationTestBase
     {
         public IDataService DataService;
+        private const string InstCode1 = "InstCode_1";
 
         private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
@@ -404,7 +405,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var institutions = new List<UcasInstitution>
             {
                 new UcasInstitution {
-                    InstCode = "InstCode_1"
+                    InstCode = InstCode1
                 },
                 new UcasInstitution {
                     InstCode = "InstCode_2"
@@ -447,7 +448,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Courses = new List<UcasCourse>{
                     new UcasCourse
                     {
-                        InstCode = "InstCode_1",
+                        InstCode = InstCode1,
                         CrseCode = "CourseCode_1"
                     }
                 }
