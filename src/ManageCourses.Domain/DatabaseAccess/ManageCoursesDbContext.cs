@@ -115,10 +115,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<InstitutionEnrichment>()
-                .HasOne(ie => ie.UcasInstitution)
-                .WithMany(ui => ui.InstitutionEnrichments)
-                .HasForeignKey(ie => ie.InstCode)
-                .HasPrincipalKey(ui => ui.InstCode);
+                .HasIndex(x => x.InstCode);
 
             base.OnModelCreating(modelBuilder);
         }

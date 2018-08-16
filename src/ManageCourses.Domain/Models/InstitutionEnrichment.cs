@@ -19,7 +19,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         [Column(TypeName = "jsonb")]
         public string JsonData { get; set; }
         public EnumStatus Status { get; set; }
-        public UcasInstitution UcasInstitution { get; set; }
     }
 }
  
