@@ -182,6 +182,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Assert.AreEqual("The best title", Context.UcasCourses.Single().CrseTitle);
         }
 
+        [Test]
+        public void ImportDoesntLoseEnrichment()
+        {
+            // do an import, inst A,B
+            // add enrichment to A,B
+            // do another import with some modified data, inst B,C (A is gone)
+            // check the enrichment of B didn't go missing
+        }
+
         [TestCase("nothing@nowhere.com", null)]
         public void GetCoursesForUser_isNull(string email, string orgId)
         {
