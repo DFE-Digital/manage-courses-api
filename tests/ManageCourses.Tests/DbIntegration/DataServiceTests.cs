@@ -18,12 +18,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class DataServiceTests : DbIntegrationTestBase
     {
-        public IDataService Subject;
+        public IDataService DataService;
 
         private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
         private const string TestUserEmail3 = "email_3@test-manage-courses.gov.uk";
-
 
         protected override void Setup()
         {
@@ -41,18 +40,18 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.McUsers.RemoveRange(Context.McUsers);
             Context.Save();
 
-            Subject = new DataService(Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            var mockLogger = new Mock<ILogger<DataService>>();
+            DataService = new DataService(Context, new UserDataHelper(), mockLogger.Object);
         }
 
         [Test]
         public void ProcessPayload()
         {
             var userPayload = GetUserPayload();
-            Subject.ProcessReferencePayload(userPayload);
+            DataService.ProcessReferencePayload(userPayload);
 
             var payload = GetUcasPayload();
-            Subject.ProcessUcasPayload(payload);
-
+            DataService.ProcessUcasPayload(payload);
 
             foreach (var item in Context.McUsers)
             {
@@ -94,18 +93,17 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var payload = GetUcasPayload();
             var userPayload = GetUserPayload();
 
-            Subject.ProcessReferencePayload(userPayload);
-            Subject.ProcessUcasPayload(payload);
+            DataService.ProcessReferencePayload(userPayload);
+            DataService.ProcessUcasPayload(payload);
 
-            Subject.ProcessReferencePayload(userPayload);
-            Subject.ProcessUcasPayload(payload);
+            DataService.ProcessReferencePayload(userPayload);
+            DataService.ProcessUcasPayload(payload);
 
-            Subject.ProcessReferencePayload(userPayload);
-            Subject.ProcessReferencePayload(userPayload);
+            DataService.ProcessReferencePayload(userPayload);
+            DataService.ProcessReferencePayload(userPayload);
 
-            Subject.ProcessUcasPayload(payload);
-            Subject.ProcessUcasPayload(payload);
-
+            DataService.ProcessUcasPayload(payload);
+            DataService.ProcessUcasPayload(payload);
 
             foreach (var expected in userPayload.Users)
             {
@@ -158,13 +156,17 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void ErroneousCourseLeavesOtherCoursesAlone()
         {
-            Subject.ProcessReferencePayload(GetUserPayload());
+            DataService.ProcessReferencePayload(GetUserPayload());
 
             var import = GetUcasPayload();
 
             //make dodgy
-            import.Courses = import.Courses.Concat(new List<UcasCourse>() {new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "Foo"}});
-            Subject.ProcessUcasPayload(import);
+            import.Courses = import.Courses.Concat(new List<UcasCourse>
+            {
+                new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "Foo"}
+            }).ToList();
+
+            DataService.ProcessUcasPayload(import);
 
             Assert.AreEqual(1, Context.CourseCodes.Count(), "valid courses should be imported anyway");
             Assert.AreEqual(1, Context.UcasCourses.Count(), "valid courses should be imported anyway");
@@ -173,18 +175,16 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             import.Courses.First().CrseTitle = "The best title";
             import.Courses = import.Courses.Reverse();
 
-            Subject.ProcessUcasPayload(import);
+            DataService.ProcessUcasPayload(import);
 
             Assert.AreEqual(1, Context.CourseCodes.Count(), "valid courses should be re-imported anyway");
             Assert.AreEqual(1, Context.UcasCourses.Count(), "valid courses should be re-imported anyway");
             Assert.AreEqual("The best title", Context.UcasCourses.Single().CrseTitle);
         }
 
-
-
         public ReferenceDataPayload GetUserPayload()
         {
-            var users = new List<McUser>()
+            var users = new List<McUser>
             {
                 new McUser
                 {
@@ -242,7 +242,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     OrgId = "OrgId_1"
                 }
             };
-            var result = new ReferenceDataPayload()
+            var result = new ReferenceDataPayload
             {
                 Users = users,
                 OrganisationInstitutions = organisationInstitutions,
@@ -253,12 +253,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             return result;
         }
+
         public UcasPayload GetUcasPayload()
         {
-            return new UcasPayload()
+            return new UcasPayload
             {
                 Courses = new List<UcasCourse>{
-                    new UcasCourse()
+                    new UcasCourse
                     {
                         InstCode = "InstCode_1",
                         CrseCode = "CourseCode_1"
@@ -270,81 +271,87 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [TestCase("nothing@nowhere.com", null)]
         public void GetCoursesForUser_isNull(string email, string orgId)
         {
-            var result = Subject.GetCoursesForUserOrganisation(email, orgId);
+            var result = DataService.GetCoursesForUserOrganisation(email, orgId);
 
             Assert.IsNull(result.OrganisationId);
             Assert.IsNull(result.OrganisationName);
 
         }
+
         [Test]
         public void GetOrganisationsShouldReturnData()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var result = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
+            var result = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(result.Count == numOrgs);
             Assert.IsTrue(result.All(c => c.TotalCourses == numCourses));
         }
+
         [Test]
         public void GetOrganisationsShouldReturnNoData()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var result = Subject.GetOrganisationsForUser("anyone@testing.com").ToList();//try to get the list using an invalid email
+            var result = DataService.GetOrganisationsForUser("anyone@testing.com").ToList();//try to get the list using an invalid email
             Assert.IsTrue(result.Count == 0);
             Assert.IsTrue(result.All(c => c.TotalCourses == 0));
         }
+
         [Test]
         public void GetOrganisationShouldReturnData()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
 
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valid list of data
             {
-                var result = Subject.GetOrganisationForUser(TestUserEmail1, org.UcasCode);//get the organisation
+                var result = DataService.GetOrganisationForUser(TestUserEmail1, org.UcasCode);//get the organisation
                 Assert.IsTrue(result.OrganisationName == org.OrganisationName);
             }
         }
+
         [Test]
         public void GetOrganisationShouldReturnNull()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var result = Subject.GetOrganisationForUser("anyone@testing.com", org.UcasCode);//try to get the organisation using an invalid email
+                var result = DataService.GetOrganisationForUser("anyone@testing.com", org.UcasCode);//try to get the organisation using an invalid email
                 Assert.IsNull(result);
             }
         }
+
         [Test]
         public void GetCoursesShouldReturnData()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var result = Subject.GetCourses(TestUserEmail1, org.UcasCode);//get the course for each org
+                var result = DataService.GetCourses(TestUserEmail1, org.UcasCode);//get the course for each org
                 Assert.AreEqual(numCourses, result.Courses.Count);
             }
         }
+
         [Test]
         [TestCase(null, "")]
         [TestCase("", null)]
@@ -360,25 +367,27 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);//ensure we have data
 
-            var result = Subject.GetCourses(email, ucasCode);//get the course for each org
+            var result = DataService.GetCourses(email, ucasCode);//get the course for each org
             Assert.True(result.Courses.Count == 0);
         }
+
         [Test]
         public void GetCoursesWithInvalidUserAndValidUcasCodeShouldNotReturnNoData()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var result = Subject.GetCourses("anyone@anywhere.com", org.UcasCode);//get the course for each org
+                var result = DataService.GetCourses("anyone@anywhere.com", org.UcasCode);//get the course for each org
                 Assert.True(result.Courses.Count == 0);
             }
         }
+
         [Test]
         [TestCase("xxx")]
         [TestCase("   ")]
@@ -390,45 +399,47 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
 
-            var result = Subject.GetCourses(TestUserEmail1, ucasCode);//get the course for each org
+            var result = DataService.GetCourses(TestUserEmail1, ucasCode);//get the course for each org
             Assert.True(result.Courses.Count == 0);
         }
+
         [Test]
         public void GetCourseShouldReturnData()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var coursesList = Subject.GetCourses(TestUserEmail1, org.UcasCode);//get the courses for each org
+                var coursesList = DataService.GetCourses(TestUserEmail1, org.UcasCode);//get the courses for each org
                 foreach (var course in coursesList.Courses)
                 {
-                    var result = Subject.GetCourse(TestUserEmail1, org.UcasCode, course.CourseCode);
+                    var result = DataService.GetCourse(TestUserEmail1, org.UcasCode, course.CourseCode);
                     Assert.IsTrue(course != null && result.Name == course.Name);
                 }
             }
         }
+
         [Test]
         public void GetCourseWithInvalidUserShouldReturnNoData()
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = Subject.GetOrganisationsForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valist list of data
             {
-                var coursesList = Subject.GetCourses(TestUserEmail1, org.UcasCode);//get the courses for each org
+                var coursesList = DataService.GetCourses(TestUserEmail1, org.UcasCode);//get the courses for each org
                 foreach (var course in coursesList.Courses)
                 {
-                    var result = Subject.GetCourse("someone@somewhere.com", org.UcasCode, course.CourseCode);
+                    var result = DataService.GetCourse("someone@somewhere.com", org.UcasCode, course.CourseCode);
                     result.Should().BeNull();
                 }
             }
@@ -460,9 +471,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Postcode = "AB1 CD2",
                     InstCode = instCode,
                     InstFull = "Intitution " + counter
-                });                
+                });
                 LoadCourses(instCode, numCourses, numSubjects);
-                Context.McOrganisationUsers.Add(new McOrganisationUser { Email = email, OrgId = orgId });                
+                Context.McOrganisationUsers.Add(new McOrganisationUser { Email = email, OrgId = orgId });
                 Context.McOrganisationIntitutions.Add(new McOrganisationInstitution
                 {
                     InstitutionCode = instCode,
@@ -508,7 +519,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     CampusName = "Campus " + counter,
                     InstCode = instCode
                 });
-                Context.CourseCodes.Add(new CourseCode {CrseCode = courseCode, InstCode = instCode});
+                Context.CourseCodes.Add(new CourseCode { CrseCode = courseCode, InstCode = instCode });
                 LoadCourseSubjects(courseCode, instCode, numSubjects);
             }
         }
@@ -525,6 +536,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 });
             }
         }
+
         private void LoadCourseSubjects(string courseCode, string instCode, int numRecords)
         {
             for (var counter = 1; counter <= numRecords; counter++)
