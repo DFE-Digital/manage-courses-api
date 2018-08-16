@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("institution/{ucasInstitutionCode}")]
-        public UcasInstitutionEnrichmentGetModel GetLatestInstitution(string ucasInstitutionCode)
+        public UcasInstitutionEnrichmentGetModel GetInstitution(string ucasInstitutionCode)
         {
             return _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
         }
@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>Ok if successful. Bad request if unsuccessful</returns>
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}/publish")]
-        public ActionResult Publish(string ucasInstitutionCode)
+        public ActionResult PublishInstitution(string ucasInstitutionCode)
         {            
             try
             {

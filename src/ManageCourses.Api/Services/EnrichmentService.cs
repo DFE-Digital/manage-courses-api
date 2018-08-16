@@ -127,8 +127,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 enrichmentToReturn.EnrichmentModel = enrichmentModel;
                 enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
                 enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
-                enrichmentToReturn.CreatedByUser = source.CreatedByUser;
-                enrichmentToReturn.UpdatedByUser = source.UpdatedByUser;
+                enrichmentToReturn.CreatedByUserId = source.CreatedByUser.Id;
+                enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser.Id;
                 enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
                 enrichmentToReturn.Status = source.Status;
             }
