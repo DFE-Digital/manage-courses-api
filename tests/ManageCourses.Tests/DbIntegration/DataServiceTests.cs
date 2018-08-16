@@ -24,6 +24,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
         private const string TestUserEmail3 = "email_3@test-manage-courses.gov.uk";
+        private const string OrgId1 = "OrgId_1";
 
         protected override void Setup()
         {
@@ -71,7 +72,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             GetCoursesForUser_isNull(TestUserEmail1, null);
             GetCoursesForUser_isNull(TestUserEmail2, null);
-            GetCoursesForUser_isNull(TestUserEmail3, "OrgId_1");
+            GetCoursesForUser_isNull(TestUserEmail3, OrgId1);
         }
 
         [Test]
@@ -378,31 +379,33 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Email = TestUserEmail3
                 }
             };
+            const string orgId2 = "OrgId_2";
             var organisations = new List<McOrganisation> {
                 new McOrganisation {
-                    OrgId = "OrgId_1"
+                    OrgId = OrgId1
                 },
                 new McOrganisation {
-                    OrgId = "OrgId_2"
+                    OrgId = orgId2
                 }
 
             };
 
+            const string instCode2 = "InstCode_2";
             var institutions = new List<UcasInstitution>
             {
                 new UcasInstitution {
                     InstCode = InstCode1
                 },
                 new UcasInstitution {
-                    InstCode = "InstCode_2"
+                    InstCode = instCode2
                 }
             };
 
             var organisationInstitutions = new List<McOrganisationInstitution>
             {
                 new McOrganisationInstitution {
-                    InstitutionCode = institutions[1].InstCode,
-                    OrgId = organisations[1].OrgId
+                    InstitutionCode = instCode2,
+                    OrgId = orgId2,
                 }
             };
             var organisationUsers = new List<McOrganisationUser>
@@ -412,7 +415,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 },
                 new McOrganisationUser {
                     Email = TestUserEmail3,
-                    OrgId = "OrgId_1"
+                    OrgId = OrgId1
                 }
             };
             var result = new ReferenceDataPayload
