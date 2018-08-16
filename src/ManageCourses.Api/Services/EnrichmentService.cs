@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             ValidateUserOrg(email, instCode);
 
             var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
-            var enrichment = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+            var enrichment = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower()).OrderByDescending(x => x.Id).FirstOrDefault();
             if (enrichment != null)
             {
                 enrichmentToReturn = Convert(enrichment);
@@ -39,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var userInst = ValidateUserOrg(email, instCode);
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
-            var enrichmentPublishRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Published).OrderByDescending(x => x.Id).FirstOrDefault();
+            
             var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
 
             if (enrichmentDraftRecord != null)
@@ -52,6 +52,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             else
             {
                 //insert
+                var enrichmentPublishRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Published).OrderByDescending(x => x.Id).FirstOrDefault();
                 DateTime? lastPublishedDate = null;
                 if (enrichmentPublishRecord != null)
                 {
