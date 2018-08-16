@@ -75,7 +75,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             if (enrichmentRecord != null)
             {
-                //update
                 enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
                 enrichmentRecord.UpdatedByUser = userInst.McUser;
                 enrichmentRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
@@ -121,6 +120,9 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 enrichmentToReturn.EnrichmentModel = enrichmentModel;
                 enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
                 enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
+                enrichmentToReturn.CreatedByUser = source.CreatedByUser;
+                enrichmentToReturn.UpdatedByUser = source.UpdatedByUser;
+                enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
                 enrichmentToReturn.Status = source.Status;
             }
 
