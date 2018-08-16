@@ -47,22 +47,22 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void ProcessPayload()
         {
-            var userPayload = GetUserPayload();
-            DataService.ProcessReferencePayload(userPayload);
+            var referenceDataPayload = GetReferenceDataPayload();
+            DataService.ProcessReferencePayload(referenceDataPayload);
 
-            var payload = GetUcasPayload();
+            var payload = GetUcasCoursesPayload();
             DataService.ProcessUcasPayload(payload);
 
             foreach (var item in Context.McUsers)
             {
-                var payloadUser = userPayload.Users.FirstOrDefault(
+                var payloadUser = referenceDataPayload.Users.FirstOrDefault(
                     x => x.FirstName == item.FirstName &&
                     x.LastName == item.LastName &&
                     x.Email == item.Email);
 
                 Assert.IsNotNull(payloadUser);
 
-                var payloadOrgUser = userPayload.OrganisationUsers.FirstOrDefault(x => x.Email == payloadUser.Email);
+                var payloadOrgUser = referenceDataPayload.OrganisationUsers.FirstOrDefault(x => x.Email == payloadUser.Email);
 
                 if (payloadOrgUser != null)
                 {
@@ -90,8 +90,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void RepeatImportsArePossible()
         {
-            var payload = GetUcasPayload();
-            var userPayload = GetUserPayload();
+            var payload = GetUcasCoursesPayload();
+            var userPayload = GetReferenceDataPayload();
 
             DataService.ProcessReferencePayload(userPayload);
             DataService.ProcessUcasPayload(payload);
@@ -156,9 +156,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void ErroneousCourseLeavesOtherCoursesAlone()
         {
-            DataService.ProcessReferencePayload(GetUserPayload());
+            DataService.ProcessReferencePayload(GetReferenceDataPayload());
 
-            var import = GetUcasPayload();
+            var import = GetUcasCoursesPayload();
 
             //make dodgy
             import.Courses = import.Courses.Concat(new List<UcasCourse>
@@ -368,7 +368,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             }
         }
 
-        private static ReferenceDataPayload GetUserPayload()
+        private static ReferenceDataPayload GetReferenceDataPayload()
         {
             var users = new List<McUser>
             {
@@ -440,7 +440,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             return result;
         }
 
-        private static UcasPayload GetUcasPayload()
+        private static UcasPayload GetUcasCoursesPayload()
         {
             return new UcasPayload
             {
