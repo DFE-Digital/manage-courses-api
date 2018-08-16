@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             ValidateUserOrg(email, instCode);
 
             var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
-            var enrichment = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
+            var enrichment = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower()).OrderByDescending(x => x.Id).FirstOrDefault();
             if (enrichment != null)
             {
                 enrichmentToReturn = Convert(enrichment);
@@ -38,24 +38,31 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             var userInst = ValidateUserOrg(email, instCode);
 
-            var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
+            var enrichmentDraftRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+            var enrichmentPublishRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Published).OrderByDescending(x => x.Id).FirstOrDefault();
             var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
 
-            if (enrichmentRecord != null)
+            if (enrichmentDraftRecord != null)
             {
                 //update
-                enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentRecord.UpdatedByUser = userInst.McUser;
-                enrichmentRecord.JsonData = content;                
+                enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.UpdatedByUser = userInst.McUser;
+                enrichmentDraftRecord.JsonData = content;                
             }
             else
             {
                 //insert
+                DateTime? lastPublishedDate = null;
+                if (enrichmentPublishRecord != null)
+                {
+                    lastPublishedDate = enrichmentPublishRecord.LastPublishedTimestampUtc;
+                }
                 var enrichment = new InstitutionEnrichment
                 {
                     InstCode = userInst.UcasInstitution.InstCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
+                    LastPublishedTimestampUtc = lastPublishedDate,
                     CreatedByUser = userInst.McUser,
                     UpdatedByUser = userInst.McUser,
                     Status = EnumStatus.Draft,
@@ -71,16 +78,16 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
 
-            var enrichmentRecord = _context.InstitutionEnrichments.SingleOrDefault(ie => instCode.ToLower() == ie.InstCode.ToLower());
+            var enrichmentDraftRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
 
-            if (enrichmentRecord != null)
+            if (enrichmentDraftRecord != null)
             {
-                enrichmentRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentRecord.UpdatedByUser = userInst.McUser;
-                enrichmentRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
-                enrichmentRecord.Status = EnumStatus.Published;
+                enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.UpdatedByUser = userInst.McUser;
+                enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.Status = EnumStatus.Published;
                 _context.Save();
-                enrichmentToReturn = Convert(enrichmentRecord);
+                enrichmentToReturn = Convert(enrichmentDraftRecord);
             }
 
             return enrichmentToReturn;

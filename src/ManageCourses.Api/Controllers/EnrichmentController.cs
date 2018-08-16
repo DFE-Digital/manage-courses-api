@@ -1,3 +1,4 @@
+using System;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -40,14 +41,21 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// sets the status of the latest draft record to 'published'
         /// </summary>
         /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
-        /// <returns>Ok if successful. 404 if unsuccessful</returns>
+        /// <returns>Ok if successful. Bad request if unsuccessful</returns>
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}/publish")]
         public ActionResult Publish(string ucasInstitutionCode)
-        {
-            //TODO send to search and compare. Return success/fail
-            var result = _service.PublishInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
-            return result != null ? Ok() : StatusCode(404);
+        {            
+            try
+            {
+                //TODO send to search and compare
+                var result = _service.PublishInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
+                return Ok(result);
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

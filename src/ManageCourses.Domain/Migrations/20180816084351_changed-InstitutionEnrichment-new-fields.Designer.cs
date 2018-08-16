@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180816084351_changed-InstitutionEnrichment-new-fields")]
+    partial class changedInstitutionEnrichmentnewfields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,7 +101,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("json_data")
                         .HasColumnType("jsonb");
 
-                    b.Property<DateTime?>("LastPublishedTimestampUtc")
+                    b.Property<DateTime>("LastPublishedTimestampUtc")
                         .HasColumnName("last_published_timestamp_utc");
 
                     b.Property<int>("Status")

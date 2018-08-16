@@ -134,6 +134,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             result.EnrichmentModel.Should().NotBeNull();
             result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
             result.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
+            result.LastPublishedTimestampUtc.Should().BeNull();
             
             //test update
             var updatedmodel = new UcasInstitutionEnrichmentPostModel
@@ -157,6 +158,20 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var updateResult = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
             updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
             updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
+            updateResult.LastPublishedTimestampUtc.Should().BeNull();
+            //publish
+            var publishResults = enrichmentService.PublishInstitutionEnrichment(_providerInstCode.ToLower(), _email);
+            publishResults.Should().NotBeNull();
+            var publishRecord = enrichmentService.GetInstitutionEnrichment(_providerInstCode.ToLower(), _email);
+            publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
+            publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
+            //test save again after publish
+            enrichmentService.SaveInstitutionEnrichment(model, _providerInstCode.ToLower(), _email);
+            var updateResult2 = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
+            updateResult2.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
+            updateResult2.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
+            updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
+            updateResult2.LastPublishedTimestampUtc.ToString().Should().BeEquivalentTo(publishRecord.LastPublishedTimestampUtc.ToString());
         }
         [Test]
         [TestCase("eqweqw", "qweqweq")]
@@ -222,6 +237,22 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var enrichmentService = new EnrichmentService(Context);
 
             Assert.Throws<InvalidOperationException>(() => enrichmentService.GetInstitutionEnrichment(instCode, email));
+        }
+        [Test]
+        [TestCase("eqweqw", "qweqweq")]
+        public void Test_PublishInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
+        {
+            var enrichmentService = new EnrichmentService(Context);
+
+            Assert.Throws<InvalidOperationException>(() => enrichmentService.PublishInstitutionEnrichment(instCode, email));
+        }
+        [Test]
+        [TestCase("", "")]
+        [TestCase(null, null)]
+        public void Test_PublishInstitutionEnrichment_should_argument_exception(string instCode, string email)
+        {
+            var enrichmentService = new EnrichmentService(Context);
+            Assert.Throws<ArgumentException>(() => enrichmentService.PublishInstitutionEnrichment(instCode, email));
         }
     }
 }
