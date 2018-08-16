@@ -182,92 +182,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Assert.AreEqual("The best title", Context.UcasCourses.Single().CrseTitle);
         }
 
-        public ReferenceDataPayload GetUserPayload()
-        {
-            var users = new List<McUser>
-            {
-                new McUser
-                {
-                    FirstName = "FirstName_1",
-                    LastName = "LastName_1",
-                    Email = TestUserEmail1
-                },
-                new McUser
-                {
-                    FirstName = "FirstName_2",
-                    LastName = "LastName_2",
-                    Email = TestUserEmail2
-                },
-                new McUser
-                {
-                    FirstName = "FirstName_3",
-                    LastName = "LastName_3",
-                    Email = TestUserEmail3
-                }
-            };
-            var organisations = new List<McOrganisation> {
-                new McOrganisation {
-                    OrgId = "OrgId_1"
-                },
-                new McOrganisation {
-                    OrgId = "OrgId_2"
-                }
-
-            };
-
-            var institutions = new List<UcasInstitution>
-            {
-                new UcasInstitution {
-                    InstCode = "InstCode_1"
-                },
-                new UcasInstitution {
-                    InstCode = "InstCode_2"
-                }
-            };
-
-            var organisationInstitutions = new List<McOrganisationInstitution>
-            {
-                new McOrganisationInstitution {
-                    InstitutionCode = institutions[1].InstCode,
-                    OrgId = organisations[1].OrgId
-                }
-            };
-            var organisationUsers = new List<McOrganisationUser>
-            {
-                new McOrganisationUser {
-                    Email = TestUserEmail2,
-                },
-                new McOrganisationUser {
-                    Email = TestUserEmail3,
-                    OrgId = "OrgId_1"
-                }
-            };
-            var result = new ReferenceDataPayload
-            {
-                Users = users,
-                OrganisationInstitutions = organisationInstitutions,
-                OrganisationUsers = organisationUsers,
-                Organisations = organisations,
-                Institutions = institutions
-            };
-
-            return result;
-        }
-
-        public UcasPayload GetUcasPayload()
-        {
-            return new UcasPayload
-            {
-                Courses = new List<UcasCourse>{
-                    new UcasCourse
-                    {
-                        InstCode = "InstCode_1",
-                        CrseCode = "CourseCode_1"
-                    }
-                }
-            };
-        }
-
         [TestCase("nothing@nowhere.com", null)]
         public void GetCoursesForUser_isNull(string email, string orgId)
         {
@@ -445,6 +359,91 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             }
         }
 
+        private static ReferenceDataPayload GetUserPayload()
+        {
+            var users = new List<McUser>
+            {
+                new McUser
+                {
+                    FirstName = "FirstName_1",
+                    LastName = "LastName_1",
+                    Email = TestUserEmail1
+                },
+                new McUser
+                {
+                    FirstName = "FirstName_2",
+                    LastName = "LastName_2",
+                    Email = TestUserEmail2
+                },
+                new McUser
+                {
+                    FirstName = "FirstName_3",
+                    LastName = "LastName_3",
+                    Email = TestUserEmail3
+                }
+            };
+            var organisations = new List<McOrganisation> {
+                new McOrganisation {
+                    OrgId = "OrgId_1"
+                },
+                new McOrganisation {
+                    OrgId = "OrgId_2"
+                }
+
+            };
+
+            var institutions = new List<UcasInstitution>
+            {
+                new UcasInstitution {
+                    InstCode = "InstCode_1"
+                },
+                new UcasInstitution {
+                    InstCode = "InstCode_2"
+                }
+            };
+
+            var organisationInstitutions = new List<McOrganisationInstitution>
+            {
+                new McOrganisationInstitution {
+                    InstitutionCode = institutions[1].InstCode,
+                    OrgId = organisations[1].OrgId
+                }
+            };
+            var organisationUsers = new List<McOrganisationUser>
+            {
+                new McOrganisationUser {
+                    Email = TestUserEmail2,
+                },
+                new McOrganisationUser {
+                    Email = TestUserEmail3,
+                    OrgId = "OrgId_1"
+                }
+            };
+            var result = new ReferenceDataPayload
+            {
+                Users = users,
+                OrganisationInstitutions = organisationInstitutions,
+                OrganisationUsers = organisationUsers,
+                Organisations = organisations,
+                Institutions = institutions
+            };
+
+            return result;
+        }
+
+        private static UcasPayload GetUcasPayload()
+        {
+            return new UcasPayload
+            {
+                Courses = new List<UcasCourse>{
+                    new UcasCourse
+                    {
+                        InstCode = "InstCode_1",
+                        CrseCode = "CourseCode_1"
+                    }
+                }
+            };
+        }
 
         /// <summary>
         /// setup data so we can test
