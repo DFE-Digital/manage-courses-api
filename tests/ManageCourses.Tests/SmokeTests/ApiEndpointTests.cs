@@ -94,7 +94,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             };
             await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
 
-            var result = await apiClient.Enrichment_PublishAsync(ucasInstitutionCode);
+            var result = await apiClient.Enrichment_PublishInstitutionAsync(ucasInstitutionCode);
             result.Should().NotBeNull();
         }
 
