@@ -10,5 +10,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
     {
         UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email);
         void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email);
+        bool PublishInstitutionEnrichment(string instCode, string email);
     }
 }

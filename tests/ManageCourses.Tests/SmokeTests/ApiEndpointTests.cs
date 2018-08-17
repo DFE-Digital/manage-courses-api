@@ -80,6 +80,23 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             };
             await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
         }
+        [Test]
+        public async Task EnrichmentPublishTest()
+        {
+            SetupSmokeTestData();
+            var apiClient = BuildSigninAwareClient();
+            const string ucasInstitutionCode = "ABC";
+            var model = new UcasInstitutionEnrichmentPostModel();
+            model.EnrichmentModel = new InstitutionEnrichmentModel
+            {
+                TrainWithUs = "wqeqwe",
+                TrainWithDisability = "werwer"
+            };
+            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+
+            var result = await apiClient.Enrichment_PublishInstitutionAsync(ucasInstitutionCode);
+            result.Should().BeTrue();
+        }
 
         [Test]
         public async Task EnrichmentLoadTest()
@@ -87,7 +104,16 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             SetupSmokeTestData();
             var apiClient = BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
+            var model = new UcasInstitutionEnrichmentPostModel();
+            model.EnrichmentModel = new InstitutionEnrichmentModel
+            {
+                TrainWithUs = "wqeqwe",
+                TrainWithDisability = "werwer"
+            };
+            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+
             var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
+
             loadedEnrichment.Should().NotBeNull();
         }
 
