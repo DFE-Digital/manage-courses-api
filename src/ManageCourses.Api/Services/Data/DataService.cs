@@ -4,8 +4,10 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Domain.EqualityComparers;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Data
@@ -30,60 +32,89 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         /// <param name="payload">Holds all the data entities that need to be imported</param>
         public void ProcessUcasPayload(UcasPayload payload)
         {
-            ResetUcasSchema();
-
-            var uniqueCourses = payload.Courses.Select(course => new CourseCode
+            var allInstitutions = _context.UcasInstitutions.ToList();
+            
+            _logger.LogWarning("Beginning UCAS import");
+            _logger.LogInformation($"Upserting {allInstitutions.Count()} institutions");
+            int processed = 0;
+            foreach (var inst in allInstitutions)
             {
-                InstCode = course.InstCode,
-                CrseCode = course.CrseCode
-            }).Distinct(new CourseComparer());
+                var deleted = AttemptTransaction(inst.InstCode, "delete for replace", () => DeleteForInstitution(inst.InstCode));
+                var added = AttemptTransaction(inst.InstCode, "insert", () => AddForInstitution(inst.InstCode, payload));
 
-            _context.CourseCodes.AddRange(uniqueCourses);
-
-            foreach (var course in payload.Courses)
-            {
-                // copy props to prevent changing id
-                _context.AddUcasCourse(new UcasCourse
+                if (added == null && deleted != null)
                 {
-                    InstCode = course.InstCode,
-                    CrseCode = course.CrseCode,
-                    CrseTitle = course.CrseTitle,
-                    Studymode = course.Studymode,
-                    Age = course.Age,
-                    CampusCode = course.CampusCode,
-                    ProfpostFlag = course.ProfpostFlag,
-                    ProgramType = course.ProgramType,
-                    AccreditingProvider = course.AccreditingProvider,
-                    CrseOpenDate = course.CrseOpenDate
-                });
+                    //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
+                    AttemptTransaction(inst.InstCode, "restore", () => AddForInstitution(inst.InstCode, deleted));
+                }
+                if(++processed % 100 == 0) 
+                {
+                    _logger.LogInformation($"Upserted {processed} institutions so far");
+                }            
             }
-
-            foreach (var courseSubject in payload.CourseSubjects)
+            _logger.LogWarning("Completed UCAS import");  
+        }
+        
+        private UcasPayload AttemptTransaction(string instCode, string operationName, Func<UcasPayload> performActions) 
+        {
+            var transaction = (_context as DbContext).Database.BeginTransaction();
+            try
             {
-                _context.AddUcasCourseSubject(
-                    new UcasCourseSubject
-                    {
-                        InstCode = courseSubject.InstCode,
-                        CrseCode = courseSubject.CrseCode,
-                        SubjectCode = courseSubject.SubjectCode,
-                        YearCode = courseSubject.YearCode
-                    }
-                );
+                var res = performActions();
+                
+                (_context as DbContext).SaveChanges();
+                transaction.Commit();
+                return res;
             }
-
-            foreach (var subject in payload.Subjects)
+            catch(Exception e)
             {
-                _context.AddUcasSubject(
-                    new UcasSubject
-                    {
-                        SubjectCode = subject.SubjectCode,
-                        SubjectDescription = subject.SubjectDescription,
-                        TitleMatch = subject.TitleMatch
-                    }
-                );
-            }
+                _logger.LogError(e, $"Import failed to update ({operationName}) Institution {instCode}");
+                
+                transaction.Rollback();
 
-            foreach (var campus in payload.Campuses)
+                foreach (var entry in (_context as DbContext).ChangeTracker.Entries().ToList())
+                {
+                    switch (entry.State)
+                    {
+                        case EntityState.Modified:
+                        case EntityState.Deleted:
+                            entry.State = EntityState.Modified; //Revert changes made to deleted entity.
+                            entry.State = EntityState.Unchanged;
+                            break;
+                        case EntityState.Added:
+                            entry.State = EntityState.Detached;
+                            break;
+                    }
+                }
+                return null;
+            }
+        }
+
+        private UcasPayload DeleteForInstitution(string instCode)
+        {
+            var toDelete = new UcasPayload() 
+            {
+                NoteTexts = _context.UcasNoteTexts.Where(c => c.InstCode == instCode).ToList(),
+                CourseNotes = _context.UcasCourseNotes.Where(c => c.InstCode == instCode).ToList(),
+                CourseSubjects = _context.UcasCourseSubjects.Where(c => c.InstCode == instCode).ToList(),
+                Courses = _context.UcasCourses.Where(c => c.InstCode == instCode).ToList(),
+                Campuses = _context.UcasCampuses.Where(c => c.InstCode == instCode).ToList()
+            };
+
+            _context.UcasNoteTexts.RemoveRange(toDelete.NoteTexts);
+            _context.UcasCourseNotes.RemoveRange(toDelete.CourseNotes);
+            _context.UcasCourseSubjects.RemoveRange(toDelete.CourseSubjects);
+            _context.UcasCourses.RemoveRange(toDelete.Courses);
+            _context.CourseCodes.RemoveRange(_context.CourseCodes.Where(c => c.InstCode == instCode));
+            _context.UcasCampuses.RemoveRange(toDelete.Campuses);
+            
+            return toDelete;
+        }
+
+        private UcasPayload AddForInstitution(string instCode, UcasPayload payload)
+        {
+            
+            foreach(var campus in payload.Campuses.Where(c => c.InstCode == instCode))
             {
                 _context.AddUcasCampus(
                     new UcasCampus
@@ -99,11 +130,54 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                         TelNo = campus.TelNo,
                         Email = campus.Email,
                         RegionCode = campus.RegionCode
+                    });                
+            }
+
+            var courseCodes = payload.Courses.Where(c => c.InstCode == instCode)
+                .Select(c => new CourseCode(){
+                    CrseCode = c.CrseCode,
+                    InstCode = c.InstCode
+                }).Distinct(new CourseCodeEquivalencyComparer());
+
+            foreach (var course in courseCodes)
+            {
+                _context.CourseCodes.Add(new CourseCode{
+                    CrseCode = course.CrseCode,
+                    InstCode = course.InstCode
+                });
+            }            
+
+
+            foreach (var course in payload.Courses.Where(c => c.InstCode == instCode))
+            {            
+                // copy props to prevent changing id
+                _context.AddUcasCourse(new UcasCourse
+                {
+                    InstCode = course.InstCode,
+                    CrseCode = course.CrseCode,
+                    CrseTitle = course.CrseTitle,
+                    Studymode = course.Studymode,
+                    Age = course.Age,
+                    CampusCode = course.CampusCode,
+                    ProfpostFlag = course.ProfpostFlag,
+                    ProgramType = course.ProgramType,
+                    AccreditingProvider = course.AccreditingProvider,
+                    CrseOpenDate = course.CrseOpenDate
+                });
+            }
+            foreach (var courseSubject in payload.CourseSubjects.Where(c => c.InstCode == instCode))
+            {
+                _context.AddUcasCourseSubject(
+                    new UcasCourseSubject
+                    {
+                        InstCode = courseSubject.InstCode,
+                        CrseCode = courseSubject.CrseCode,
+                        SubjectCode = courseSubject.SubjectCode,
+                        YearCode = courseSubject.YearCode
                     }
                 );
             }
-
-            foreach (var courseNote in payload.CourseNotes)
+            foreach (var courseNote in payload.CourseNotes.Where(c => c.InstCode == instCode))
             {
                 _context.AddUcasCourseNote(
                     new UcasCourseNote
@@ -113,11 +187,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                         NoteNo = courseNote.NoteNo,
                         NoteType = courseNote.NoteType,
                         YearCode = courseNote.YearCode
-                    }
-                    );
+                    });
             }
 
-            foreach (var noteText in payload.NoteTexts)
+            foreach (var noteText in payload.NoteTexts.Where(c => c.InstCode == instCode))
             {
                 _context.AddUcasNoteText(
                     new UcasNoteText
@@ -130,11 +203,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     }
                 );
             }
-
-            _context.Save();
-
+            return payload;
         }
-
+        
         public UserOrganisation GetOrganisationForUser(string email, string instCode)
         {
             var org = GetUserOrganisation(email, instCode);
@@ -209,9 +280,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 );
             }
 
-
             _context.Save();
-
         }
 
         /// <summary>
@@ -337,18 +406,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             returnCourse.Schools = schools;
 
             return returnCourse;
-        }
-        private void ResetUcasSchema()
-        {
-            // clear out the existing data
-            _context.UcasCourses.RemoveRange(_context.UcasCourses);
-            _context.CourseCodes.RemoveRange(_context.CourseCodes);
-            _context.UcasSubjects.RemoveRange(_context.UcasSubjects);
-            _context.UcasCourseSubjects.RemoveRange(_context.UcasCourseSubjects);
-            _context.UcasCampuses.RemoveRange(_context.UcasCampuses);
-            _context.UcasCourseNotes.RemoveRange(_context.UcasCourseNotes);
-            _context.UcasNoteTexts.RemoveRange(_context.UcasNoteTexts);
-            _context.Save();
         }
 
         private void ResetReferenceSchema()
