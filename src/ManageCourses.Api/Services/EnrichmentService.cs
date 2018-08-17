@@ -73,11 +73,10 @@ namespace GovUk.Education.ManageCourses.Api.Services
             }
             _context.Save();
         }
-        public UcasInstitutionEnrichmentGetModel PublishInstitutionEnrichment(string instCode, string email)
+        public bool PublishInstitutionEnrichment(string instCode, string email)
         {
+            var returnBool = false;
             var userInst = ValidateUserOrg(email, instCode);
-
-            var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
 
@@ -88,10 +87,10 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
                 _context.Save();
-                enrichmentToReturn = Convert(enrichmentDraftRecord);
+                returnBool = true;
             }
 
-            return enrichmentToReturn;
+            return returnBool;
         }
 
         private UserInstitution ValidateUserOrg(string email, string instCode)

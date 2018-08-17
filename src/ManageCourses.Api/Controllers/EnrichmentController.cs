@@ -44,18 +44,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>Ok if successful. Bad request if unsuccessful</returns>
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}/publish")]
-        public ActionResult PublishInstitution(string ucasInstitutionCode)
-        {            
-            try
-            {
-                //TODO send to search and compare
-                var result = _service.PublishInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
-                return Ok(result);
-            }
-            catch
-            {
-                return BadRequest();
-            }
+        public bool PublishInstitution(string ucasInstitutionCode)
+        {
+            //TODO send to search and compare
+            return _service.PublishInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
         }
     }
 }

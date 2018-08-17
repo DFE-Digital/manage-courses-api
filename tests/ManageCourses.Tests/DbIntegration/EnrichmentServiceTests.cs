@@ -161,7 +161,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             updateResult.LastPublishedTimestampUtc.Should().BeNull();
             //publish
             var publishResults = enrichmentService.PublishInstitutionEnrichment(_providerInstCode.ToLower(), _email);
-            publishResults.Should().NotBeNull();
+            publishResults.Should().BeTrue();
             var publishRecord = enrichmentService.GetInstitutionEnrichment(_providerInstCode.ToLower(), _email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
