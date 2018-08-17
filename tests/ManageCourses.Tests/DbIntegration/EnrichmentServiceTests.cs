@@ -98,7 +98,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             Context.SaveChanges();
         }
-
+        /// <summary>
+        /// This is a happy path test for all enrichment functionality.
+        /// This test ensures that the status is always correct at the right point in the workflow
+        /// </summary>
         [Test]
         public void Test_InstitutionEnrichment_workflow_should_not_error()
         {
@@ -127,6 +130,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
             //test save
             enrichmentService.SaveInstitutionEnrichment(model, _providerInstCode.ToLower(), _email);
+
             //test get
             var result = enrichmentService.GetInstitutionEnrichment(_providerInstCode.ToLower(), _email);
 
@@ -135,7 +139,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
             result.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
             result.LastPublishedTimestampUtc.Should().BeNull();
-            
+            result.Status.Should().BeEquivalentTo(EnumStatus.Draft);
+
             //test update
             var updatedmodel = new UcasInstitutionEnrichmentPostModel
             {
@@ -253,6 +258,17 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var enrichmentService = new EnrichmentService(Context);
             Assert.Throws<ArgumentException>(() => enrichmentService.PublishInstitutionEnrichment(instCode, email));
+        }
+        [Test]
+        public void Test_PublishInstitutionEnrichment_should_return_false()
+        {
+            Context.InstitutionEnrichments.RemoveRange(Context.InstitutionEnrichments);
+            Context.Save();
+
+            var enrichmentService = new EnrichmentService(Context);
+            var publishResults = enrichmentService.PublishInstitutionEnrichment(_providerInstCode.ToLower(), _email);
+            publishResults.Should().BeFalse();
+
         }
     }
 }

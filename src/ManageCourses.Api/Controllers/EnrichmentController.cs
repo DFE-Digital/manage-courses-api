@@ -18,8 +18,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// always get the latest enrichment record regardless of status
         /// </summary>
-        /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
-        /// <returns></returns>
+        /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution of the enrichment data</param>
+        /// <returns>a data object. null if not found</returns>
         [HttpGet]
         [Route("institution/{ucasInstitutionCode}")]
         public UcasInstitutionEnrichmentGetModel GetInstitution(string ucasInstitutionCode)
@@ -27,10 +27,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             return _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name);
         }
         /// <summary>
-        /// saves an enrichment record (always draft)
+        /// saves a draft enrichment record (upsert)
         /// </summary>
         /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
-        /// <param name="model">containds the payload that represents the records to be saved</param>
+        /// <param name="model">contains the payload that represents the data to be saved</param>
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}")]
         public void SaveInstitution(string ucasInstitutionCode, [FromBody] UcasInstitutionEnrichmentPostModel model)
@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// sets the status of the latest draft record to 'published'
         /// </summary>
         /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
-        /// <returns>Ok if successful. Bad request if unsuccessful</returns>
+        /// <returns>true if successful</returns>
         [HttpPost]
         [Route("institution/{ucasInstitutionCode}/publish")]
         public bool PublishInstitution(string ucasInstitutionCode)

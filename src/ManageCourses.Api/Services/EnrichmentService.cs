@@ -21,19 +21,31 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 NullValueHandling = NullValueHandling.Ignore
             };
         }
+        /// <summary>
+        /// gets the latest enrichment record regardless of the status
+        /// </summary>
+        /// <param name="instCode">institution code for the enrichment</param>
+        /// <param name="email">email of the user</param>
+        /// <returns>An enrichment object with the enrichment data (if found). Nul if not found</returns>
         public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email)
         {
             ValidateUserOrg(email, instCode);
 
-            var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
             var enrichment = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower()).OrderByDescending(x => x.Id).FirstOrDefault();
-            if (enrichment != null)
-            {
-                enrichmentToReturn = Convert(enrichment);
-            }
+            var enrichmentToReturn = Convert(enrichment);
 
             return enrichmentToReturn;
         }
+        /// <summary>
+        /// This is an upsert.
+        /// If a draft record exists then update it.
+        /// If a draft record does not exist then add a new one.
+        /// If a new draft record is created then:
+        ///check for the existence of a previous published record and get the last pulished date
+        /// </summary>
+        /// <param name="model">holds the enriched data</param>
+        /// <param name="instCode">the institution code for the enrichment data</param>
+        /// <param name="email">the email of the user</param>
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
         {
             var userInst = ValidateUserOrg(email, instCode);
@@ -73,6 +85,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
             }
             _context.Save();
         }
+        /// <summary>
+        /// Changes the status of the latest draft record to published
+        /// </summary>
+        /// <param name="instCode">institution code of the enrichemtn to be published</param>
+        /// <param name="email">email of the user</param>
+        /// <returns>true if successful</returns>
         public bool PublishInstitutionEnrichment(string instCode, string email)
         {
             var returnBool = false;
@@ -117,22 +135,25 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             return returnUserInst;
         }
+        /// <summary>
+        /// maps enrichment data from the data object to the returned enrichment model
+        /// </summary>
+        /// <param name="source">enrichment data object</param>
+        /// <returns>enrichment model with enrichment data (if found). Null if there is no source record</returns>
         private UcasInstitutionEnrichmentGetModel Convert(InstitutionEnrichment source)
         {
+            if (source == null) return null;
+
             var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
-            if (source != null)
-            {
-                var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<InstitutionEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
+            var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<InstitutionEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
 
-                enrichmentToReturn.EnrichmentModel = enrichmentModel;
-                enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
-                enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
-                enrichmentToReturn.CreatedByUserId = source.CreatedByUser.Id;
-                enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser.Id;
-                enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
-                enrichmentToReturn.Status = source.Status;
-            }
-
+            enrichmentToReturn.EnrichmentModel = enrichmentModel;
+            enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
+            enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
+            enrichmentToReturn.CreatedByUserId = source.CreatedByUser.Id;
+            enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser.Id;
+            enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
+            enrichmentToReturn.Status = source.Status;
             return enrichmentToReturn;
         }
     }
