@@ -171,32 +171,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Assert.AreEqual("The best title", Context.UcasCourses.Single().CrseTitle);
         }
 
-        [Test]
-        public void ImportDoesntLoseEnrichment()
-        {
-            // set up ref data in context
-            // do an import
-            DataService.ProcessReferencePayload(todo);
-            // add enrichment to A,B
-            var enrichmentService = new EnrichmentService(Context);
-            var enrichmentModel = new UcasInstitutionEnrichmentPostModel
-            {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithUs = @"Come with us
-And leave your Earth behind
-Bright and clear
-We see the light
-All universes at your side",
-                }
-            };
-            enrichmentService.SaveInstitutionEnrichment(enrichmentModel, InstCode1, TestUserEmail1);
-            // do another import with some modified data, inst B,C (A is gone)
-            DataService.ProcessReferencePayload(todo);
-            // check the enrichment of B didn't go missing
-            Assert.Todo()
-        }
-
         [TestCase("nothing@nowhere.com", null)]
         public void GetCoursesForUser_isNull(string email, string orgId)
         {
