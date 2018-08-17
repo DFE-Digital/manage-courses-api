@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Model;
@@ -177,6 +178,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             updateResult2.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
             updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
             updateResult2.LastPublishedTimestampUtc.ToString().Should().BeEquivalentTo(publishRecord.LastPublishedTimestampUtc.ToString());
+            //check number of records generated from this
+            var draftCount = Context.InstitutionEnrichments.Count(x => x.Status == EnumStatus.Draft);
+            var publishedCount = Context.InstitutionEnrichments.Count(x => x.Status == EnumStatus.Published);
+            publishedCount.Should().Be(1);
+            draftCount.Should().Be(1);
         }
         [Test]
         [TestCase("eqweqw", "qweqweq")]
