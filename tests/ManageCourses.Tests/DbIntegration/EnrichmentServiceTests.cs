@@ -4,7 +4,10 @@ using System.Linq;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
+using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.DbIntegration
@@ -260,5 +263,69 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             publishResults.Should().BeFalse();
 
         }
+
+        [Test]
+        public void EnrichmentDataSurvivesDeleteAndRecreate()
+        {
+            // Arrange
+            var enrichmentService = new EnrichmentService(Context);
+            var dataService = new DataService(Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            var sourceModel = new UcasInstitutionEnrichmentPostModel
+            {
+                EnrichmentModel = new InstitutionEnrichmentModel
+                {
+                    TrainWithUs = "Oh the grand old Duke of York",
+                    TrainWithDisability = "He had 10,000 men",
+                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
+                    {
+                        new AccreditingProviderEnrichment
+                        {
+                            UcasInstitutionCode = AccreditingInstCode,
+                            Description = "He marched them up to the top of the hill"
+                        }
+                    }
+                },
+            };
+            enrichmentService.SaveInstitutionEnrichment(sourceModel, _ucasInstitution.InstCode, Email);
+
+            // Act
+            var ucasPayload = new UcasPayload
+            {
+                // todo: test with change of this institution: https://trello.com/c/e1FwXuYk/133-ucas-institutions-dont-get-updated-during-ucas-import
+                Institutions = new List<UcasInstitution>
+                {
+                    new UcasInstitution
+                    {
+                        InstCode = _ucasInstitution.InstCode,
+                        InstName = "Rebranded Institution",
+                    },
+                    new UcasInstitution
+                    {
+                        InstCode = AccreditingInstCode,
+                        InstName = "Rebranded Accrediting Institution",
+                    },
+                },
+                Courses = new List<UcasCourse>
+                {
+                    new UcasCourse
+                    {
+                        InstCode = _ucasInstitution.InstCode,
+                        CrseCode = "CC11",
+                        AccreditingProvider = AccreditingInstCode,
+                    },
+                },
+            };
+            dataService.ProcessUcasPayload(ucasPayload);
+
+            // Assert
+            var res = enrichmentService.GetInstitutionEnrichment(_ucasInstitution.InstCode, Email);
+            res.EnrichmentModel.TrainWithUs.Should().Be(sourceModel.EnrichmentModel.TrainWithUs);
+            res.EnrichmentModel.TrainWithDisability.Should().Be(sourceModel.EnrichmentModel.TrainWithDisability);
+            res.EnrichmentModel.AccreditingProviderEnrichments.Should().HaveCount(1);
+            res.EnrichmentModel.AccreditingProviderEnrichments.Should().HaveSameCount(sourceModel.EnrichmentModel.AccreditingProviderEnrichments);
+            res.EnrichmentModel.AccreditingProviderEnrichments[0].Description.Should().Be(sourceModel.EnrichmentModel.AccreditingProviderEnrichments[0].Description);
+            res.EnrichmentModel.AccreditingProviderEnrichments[0].UcasInstitutionCode.Should().Be(sourceModel.EnrichmentModel.AccreditingProviderEnrichments[0].UcasInstitutionCode);
+        }
+
     }
 }
