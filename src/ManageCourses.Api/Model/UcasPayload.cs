@@ -7,6 +7,7 @@ namespace GovUk.Education.ManageCourses.Api.Model
     {
         public UcasPayload()
         {
+            this.Institutions = new List<UcasInstitution>();
             this.Courses = new List<UcasCourse>();
             this.Subjects = new List<UcasSubject>();
             this.CourseSubjects = new List<UcasCourseSubject>();
@@ -14,6 +15,8 @@ namespace GovUk.Education.ManageCourses.Api.Model
             this.CourseNotes = new List<UcasCourseNote>();
             this.NoteTexts = new List<UcasNoteText>();
         }
+
+        public IEnumerable<UcasInstitution> Institutions { get; set; }
         public IEnumerable<UcasCourse> Courses { get; set; }
         public IEnumerable<UcasSubject> Subjects { get; set; }
         public IEnumerable<UcasCourseSubject> CourseSubjects { get; set; }
