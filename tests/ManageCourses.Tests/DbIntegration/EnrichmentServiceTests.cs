@@ -16,17 +16,17 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     public class EnrichmentServiceTests : DbIntegrationTestBase
     {
         private UcasInstitution _ucasInstitution;
-        private const string _providerInstCode = "HNY1";
-        const string _accreditingInstCode = "TRILU";
+        private const string ProviderInstCode = "HNY1";
+        private const string AccreditingInstCode = "TRILU";
 
-        private const string _email = "12345@example.org";
+        private const string Email = "12345@example.org";
 
         protected override void Setup()
         {
             var accreditingInstitution = new UcasInstitution
             {
                 InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
-                InstCode = _accreditingInstCode,
+                InstCode = AccreditingInstCode,
             };
             Context.Add(accreditingInstitution);
 
@@ -48,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                             InstCode = providerInstCode,
                             CrseCode = crseCode,
                         },
-                        AccreditingProvider = _accreditingInstCode,
+                        AccreditingProvider = AccreditingInstCode,
                     }
                 }
             };
@@ -56,7 +56,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             var user = new McUser
             {
-                Email = _email,
+                Email = Email,
             };
             Context.Add(user);
 
@@ -107,17 +107,17 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         new AccreditingProviderEnrichment
                         {
-                            UcasInstitutionCode = _accreditingInstCode,
+                            UcasInstitutionCode = AccreditingInstCode,
                             Description = instDesc,
                         }
                     }
                 }
             };
             //test save
-            enrichmentService.SaveInstitutionEnrichment(model, _providerInstCode.ToLower(), _email);
+            enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
 
             //test get
-            var result = enrichmentService.GetInstitutionEnrichment(_providerInstCode.ToLower(), _email);
+            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
 
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
@@ -137,27 +137,27 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         new AccreditingProviderEnrichment
                         {
-                            UcasInstitutionCode = _accreditingInstCode,
+                            UcasInstitutionCode = AccreditingInstCode,
                             Description = instDesc,
                         }
                     }
                 }
             };
 
-            enrichmentService.SaveInstitutionEnrichment(updatedmodel, _providerInstCode.ToLower(), _email);
-            var updateResult = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
+            enrichmentService.SaveInstitutionEnrichment(updatedmodel, ProviderInstCode.ToLower(), Email);
+            var updateResult = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
             updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
             updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
             updateResult.LastPublishedTimestampUtc.Should().BeNull();
             //publish
-            var publishResults = enrichmentService.PublishInstitutionEnrichment(_providerInstCode.ToLower(), _email);
+            var publishResults = enrichmentService.PublishInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
             publishResults.Should().BeTrue();
-            var publishRecord = enrichmentService.GetInstitutionEnrichment(_providerInstCode.ToLower(), _email);
+            var publishRecord = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
             //test save again after publish
-            enrichmentService.SaveInstitutionEnrichment(model, _providerInstCode.ToLower(), _email);
-            var updateResult2 = enrichmentService.GetInstitutionEnrichment(_providerInstCode, _email);
+            enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
+            var updateResult2 = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
             updateResult2.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
             updateResult2.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
             updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
@@ -187,7 +187,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         new AccreditingProviderEnrichment
                         {
-                            UcasInstitutionCode = _accreditingInstCode,
+                            UcasInstitutionCode = AccreditingInstCode,
                             Description = instDesc,
                         }
                     }
@@ -216,7 +216,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         new AccreditingProviderEnrichment
                         {
-                            UcasInstitutionCode = _accreditingInstCode,
+                            UcasInstitutionCode = AccreditingInstCode,
                             Description = instDesc,
                         }
                     }
@@ -256,7 +256,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.Save();
 
             var enrichmentService = new EnrichmentService(Context);
-            var publishResults = enrichmentService.PublishInstitutionEnrichment(_providerInstCode.ToLower(), _email);
+            var publishResults = enrichmentService.PublishInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
             publishResults.Should().BeFalse();
 
         }
