@@ -23,21 +23,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         protected override void Setup()
         {
-            Context.UcasCourses.RemoveRange(Context.UcasCourses);
-            Context.CourseCodes.RemoveRange(Context.CourseCodes);
-            Context.UcasSubjects.RemoveRange(Context.UcasSubjects);
-            Context.UcasCourseSubjects.RemoveRange(Context.UcasCourseSubjects);
-            Context.UcasCampuses.RemoveRange(Context.UcasCampuses);
-            Context.UcasCourseNotes.RemoveRange(Context.UcasCourseNotes);
-            Context.UcasNoteTexts.RemoveRange(Context.UcasNoteTexts);
-            Context.McOrganisationIntitutions.RemoveRange(Context.McOrganisationIntitutions);
-            Context.UcasInstitutions.RemoveRange(Context.UcasInstitutions);
-            Context.McOrganisations.RemoveRange(Context.McOrganisations);
-            Context.McOrganisationUsers.RemoveRange(Context.McOrganisationUsers);
-            Context.McUsers.RemoveRange(Context.McUsers);
-            Context.InstitutionEnrichments.RemoveRange(Context.InstitutionEnrichments);
-            Context.Save();
-
             var accreditingInstitution = new UcasInstitution
             {
                 InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
