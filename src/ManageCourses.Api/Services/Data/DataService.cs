@@ -32,13 +32,17 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         /// <param name="payload">Holds all the data entities that need to be imported</param>
         public void ProcessUcasPayload(UcasPayload payload)
         {
-            var allInstitutions = _context.UcasInstitutions.ToList();
+            var allInstitutions = payload.Institutions.ToList();
             
             _logger.LogWarning("Beginning UCAS import");
             _logger.LogInformation($"Upserting {allInstitutions.Count()} institutions");
             int processed = 0;
             foreach (var inst in allInstitutions)
             {
+                // note: this does not perform a delete of existing institutions
+
+                var instRes = AttemptTransaction(inst.InstCode, "upsert institution entity", () => UpsertInstitution(inst));
+                
                 var deleted = AttemptTransaction(inst.InstCode, "delete for replace", () => DeleteForInstitution(inst.InstCode));
                 var added = AttemptTransaction(inst.InstCode, "insert", () => AddForInstitution(inst.InstCode, payload));
 
@@ -89,6 +93,25 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 return null;
             }
         }
+
+        private UcasPayload UpsertInstitution(UcasInstitution newValues)
+        {
+            var entity = _context.UcasInstitutions.FirstOrDefault(x => string.Equals(x.InstCode, newValues.InstCode, StringComparison.InvariantCultureIgnoreCase));
+            if (entity == null) 
+            {
+                // insert
+                _context.UcasInstitutions.Add(newValues);
+                return new UcasPayload  { Institutions = new List<UcasInstitution> { newValues } };
+
+            }
+            else
+            {
+                // update
+                entity.UpdateWith(newValues);                
+                return new UcasPayload { Institutions = new List<UcasInstitution> { entity } };
+            }
+        }
+
 
         private UcasPayload DeleteForInstitution(string instCode)
         {
