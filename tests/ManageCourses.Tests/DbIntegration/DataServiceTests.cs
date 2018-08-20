@@ -426,6 +426,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             return new UcasPayload
             {
+                Institutions = new List<UcasInstitution> 
+                {
+                    new UcasInstitution { InstCode = InstCode1 }
+                },
+
                 Courses = new List<UcasCourse>{
                     new UcasCourse
                     {
