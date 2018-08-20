@@ -36,6 +36,11 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         
 
         public static UcasPayload MakeSimpleUcasPayload() => new UcasPayload {
+
+                Institutions = ListOfOne(new UcasInstitution {
+                    InstFull = "Joe's school @ UCAS",
+                    InstCode = "ABC"
+                }),
                             
                 Campuses = ListOfOne(new UcasCampus {
                     InstCode = "ABC",
