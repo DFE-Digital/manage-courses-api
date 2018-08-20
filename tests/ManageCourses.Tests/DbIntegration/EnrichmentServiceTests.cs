@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
@@ -19,7 +18,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private UcasInstitution _ucasInstitution;
         private const string _providerInstCode = "HNY1";
         const string _accreditingInstCode = "TRILU";
-        
+
         private const string _email = "12345@example.org";
 
         protected override void Setup()
@@ -38,14 +37,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.McUsers.RemoveRange(Context.McUsers);
             Context.InstitutionEnrichments.RemoveRange(Context.InstitutionEnrichments);
             Context.Save();
- 
+
             var accreditingInstitution = new UcasInstitution
             {
                 InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
                 InstCode = _accreditingInstCode,
             };
             Context.Add(accreditingInstitution);
-            
+
             const string providerInstCode = "HNY1";
             const string crseCode = "TK101";
             _ucasInstitution = new UcasInstitution
@@ -112,7 +111,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const string trainWithUsUpdatedText = "TrainWithUs Text updated";
             const string instDesc = "school1 description enrichement";
 
-        var enrichmentService = new EnrichmentService(Context);
+            var enrichmentService = new EnrichmentService(Context);
             var model = new UcasInstitutionEnrichmentPostModel
             {
                 EnrichmentModel = new InstitutionEnrichmentModel
