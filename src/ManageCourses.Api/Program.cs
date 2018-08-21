@@ -43,6 +43,7 @@ namespace GovUk.Education.ManageCourses.Api
                 {
                     options.AddServerHeader = false;
                 })
+                .UseApplicationInsights()
                 .UseStartup<Startup>()
                 .UseSerilog()
                 .Build();
