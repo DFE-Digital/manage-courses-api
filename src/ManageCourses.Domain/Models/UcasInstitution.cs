@@ -48,7 +48,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public ICollection<UcasCourseSubject> UcasCourseSubjects { get; set; }
         public ICollection<UcasCampus> UcasCampuses { get; set; }
         public ICollection<CourseCode> CourseCodes { get; set; }
-        public ICollection<InstitutionEnrichment> InstitutionEnrichments { get; set; }
 
     }
 }

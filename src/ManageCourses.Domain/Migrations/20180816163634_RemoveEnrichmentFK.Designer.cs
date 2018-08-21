@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180816163634_RemoveEnrichmentFK")]
+    partial class RemoveEnrichmentFK
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,12 +100,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("JsonData")
                         .HasColumnName("json_data")
                         .HasColumnType("jsonb");
-
-                    b.Property<DateTime?>("LastPublishedTimestampUtc")
-                        .HasColumnName("last_published_timestamp_utc");
-
-                    b.Property<int>("Status")
-                        .HasColumnName("status");
 
                     b.Property<int?>("UpdatedByUserId")
                         .HasColumnName("updated_by_user_id");
@@ -300,14 +295,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("ProgramType")
                         .HasColumnName("program_type");
 
-                    b.Property<string>("Status")
-                        .HasColumnName("status");
-
                     b.Property<string>("Studymode")
                         .HasColumnName("studymode");
-
-                    b.Property<string>("VacStatus")
-                        .HasColumnName("vac_status");
 
                     b.HasKey("Id");
 
