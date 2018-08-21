@@ -248,6 +248,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             McOrganisations.Add(organisation);
         }
 
+        public void AddNctlOrganisation(NctlOrganisation organisation)
+        {
+            NctlOrganisations.Add(organisation);
+        }
+
         public void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution)
         {
             McOrganisationIntitutions.Add(organisationInstitution);
