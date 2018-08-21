@@ -11,8 +11,11 @@ namespace GovUk.Education.ManageCourses.Api
     {
         public static int Main(string[] args)
         {
+            var configuration = GetConfiguration();
             Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(LoggerConfiguration)
+                .ReadFrom.Configuration(configuration)
+                .WriteTo
+                .ApplicationInsightsTraces(configuration["APPINSIGHTS_INSTRUMENTATIONKEY"])
                 .CreateLogger();
 
             var programLogger = Log.ForContext<Program>();
@@ -36,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Api
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseKestrel(options => 
+                .UseKestrel(options =>
                 {
                     options.AddServerHeader = false;
                 })
@@ -44,11 +47,14 @@ namespace GovUk.Education.ManageCourses.Api
                 .UseSerilog()
                 .Build();
 
-        private static IConfiguration LoggerConfiguration { get; } = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
+        private static IConfiguration GetConfiguration()
+        {
+            return new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+                .AddEnvironmentVariables()
+                .Build();
+        }
     }
 }
