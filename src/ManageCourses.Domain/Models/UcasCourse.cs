@@ -13,8 +13,10 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string ProgramType { get; set; }
         public string AccreditingProvider { get; set; }
         public string CrseOpenDate { get; set; }
+        public string Publish { get; set; }
         public string Status { get; set; }
         public string VacStatus { get; set; }
+        public string HasBeenPublished { get; set; }
 
 
         public UcasInstitution UcasInstitution { get; set; }
