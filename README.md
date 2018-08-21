@@ -67,6 +67,11 @@ For more information see:
 * https://github.com/serilog/serilog-settings-configuration
 * https://nblumhardt.com/2016/07/serilog-2-minimumlevel-override/
 
+Serilog has been configured to spit logs out to both the console
+(for `dotnet run` testing & development locally) and Application Insights.
+
+Set the `APPINSIGHTS_INSTRUMENTATIONKEY` environment variable to tell Serilog the application insights key.
+
 # Running tests
 
 ## Unit tests
