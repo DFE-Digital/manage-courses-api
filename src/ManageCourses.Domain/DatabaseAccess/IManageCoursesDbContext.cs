@@ -41,6 +41,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         void AddUcasCampus(UcasCampus campus);
         void AddUcasCourseNote(UcasCourseNote courseNote);
         void AddUcasNoteText(UcasNoteText noteText);
+        void AddNctlOrganisation(NctlOrganisation nctlOrganisation);
         void AddMcOrganisation(McOrganisation organisation);
         void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution);
         void AddMcOrganisationUser(McOrganisationUser organisationUser);

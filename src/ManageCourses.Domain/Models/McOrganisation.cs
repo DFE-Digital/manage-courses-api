@@ -10,5 +10,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public ICollection<McOrganisationUser> McOrganisationUsers { get; set; }
         public ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
+
+        public ICollection<NctlOrganisation> NctlOrganisations { get; set; }
     }
 }
