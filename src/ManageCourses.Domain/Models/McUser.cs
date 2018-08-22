@@ -41,6 +41,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         /// When the user was sent the welcome email
         /// </summary>
         public DateTime? WelcomeEmailDateUtc { get; set; }
+        
+        public DateTime? AcceptTermsDateUtc { get; set; }
 
         public ICollection<McOrganisationUser> McOrganisationUsers { get; set; }
         public ICollection<AccessRequest> AccessRequests { get; set; }

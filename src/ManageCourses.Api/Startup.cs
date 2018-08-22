@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
@@ -83,7 +84,9 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
             services.AddScoped<IDataHelper, UserDataHelper>();
 
-            services.AddMvc();
+            services.AddMvc(options =>
+                options.Filters.Add(typeof(AcceptTermsFilter))            
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
