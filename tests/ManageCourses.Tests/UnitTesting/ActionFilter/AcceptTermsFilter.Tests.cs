@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading;
+using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -28,36 +29,36 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.ActionFilter
         [Test]
         public void NoConsent()
         {
-            var actionExecutingContext = GetActionExecutingContext("foo@bar.com", "Index");
+            var actionExecutingContext = GetActionExecutingContext("foo@example.com", "Index");
             var acceptTermsFilter = GetAcceptTermsFilter(GetUsers(null, 1));
 
             acceptTermsFilter.OnActionExecuting(actionExecutingContext);
 
-            Assert.That(actionExecutingContext.Result is StatusCodeResult);
-            Assert.AreEqual(451, (actionExecutingContext.Result as StatusCodeResult).StatusCode);
+            actionExecutingContext.Result.Should().BeOfType<StatusCodeResult>();
+            (actionExecutingContext.Result as StatusCodeResult).StatusCode.Should().Be(451);
         }
 
 
         [Test]
         public void WithConsent()
         {
-            var actionExecutingContext = GetActionExecutingContext("foo@bar.com", "Index");
+            var actionExecutingContext = GetActionExecutingContext("foo@example.com", "Index");
             var acceptTermsFilter = GetAcceptTermsFilter(GetUsers(DateTime.UtcNow, 1));
 
             acceptTermsFilter.OnActionExecuting(actionExecutingContext);
 
-            Assert.IsNull(actionExecutingContext.Result);
+            actionExecutingContext.Result.Should().BeNull();
         }
 
         [Test]
         public void NoConsent_ButExempt()
         {
-            var actionExecutingContext = GetActionExecutingContext("foo@bar.com", "Exempt");
+            var actionExecutingContext = GetActionExecutingContext("foo@example.com", "Exempt");
             var acceptTermsFilter = GetAcceptTermsFilter(GetUsers(null, 1));
 
             acceptTermsFilter.OnActionExecuting(actionExecutingContext);
 
-            Assert.IsNull(actionExecutingContext.Result);
+            actionExecutingContext.Result.Should().BeNull();
         }
 
         [Test]
@@ -66,42 +67,45 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.ActionFilter
             var actionExecutingContext = GetActionExecutingContext(null, "Index");
             var acceptTermsFilter = GetAcceptTermsFilter(GetUsers(null, 1));
 
-            Assert.Throws<InvalidOperationException>(() => acceptTermsFilter.OnActionExecuting(actionExecutingContext));
+            Action action = () => acceptTermsFilter.OnActionExecuting(actionExecutingContext);
+            action.Should().Throw<InvalidOperationException>();
         }
 
         [Test]
-        public void Unauth_ButExempt_DoesntThrow()
+        public void Unauth_ButExempt_DoesntChangeResult()
         {
             var actionExecutingContext = GetActionExecutingContext(null, "Exempt");
             var acceptTermsFilter = GetAcceptTermsFilter(GetUsers(null, 1));
 
             acceptTermsFilter.OnActionExecuting(actionExecutingContext);
             
-            Assert.IsNull(actionExecutingContext.Result);
+            actionExecutingContext.Result.Should().BeNull();
         }
 
         [Test]
         public void UnknownUser_Throws()
         {
-            var actionExecutingContext = GetActionExecutingContext("foo@bar.com", "Index");
+            var actionExecutingContext = GetActionExecutingContext("foo@example.com", "Index");
             var acceptTermsFilter = GetAcceptTermsFilter(GetUsers(DateTime.Now, 0));
 
-            Assert.Throws<InvalidOperationException>(() => acceptTermsFilter.OnActionExecuting(actionExecutingContext));
+            Action action = () => acceptTermsFilter.OnActionExecuting(actionExecutingContext);
+            action.Should().Throw<InvalidOperationException>();
         }
 
         [Test]
         public void MultiUser_Throws()
         {
-            var actionExecutingContext = GetActionExecutingContext("foo@bar.com", "Index");            
+            var actionExecutingContext = GetActionExecutingContext("foo@example.com", "Index");            
             var acceptTermsFilter = GetAcceptTermsFilter(GetUsers(DateTime.Now, 2));
 
-            Assert.Throws<InvalidOperationException>(() => acceptTermsFilter.OnActionExecuting(actionExecutingContext));
+            Action action = () => acceptTermsFilter.OnActionExecuting(actionExecutingContext);
+            action.Should().Throw<InvalidOperationException>();
         }
         
         private static AcceptTermsFilter GetAcceptTermsFilter(IQueryable<McUser> users)
         {
             var mockedContext = new Mock<IManageCoursesDbContext>();
-            mockedContext.Setup(x => x.GetMcUsers("foo@bar.com")).Returns(users);
+            mockedContext.Setup(x => x.GetMcUsers("foo@example.com")).Returns(users);
             var acceptTermsFilter = new AcceptTermsFilter(mockedContext.Object);
             return acceptTermsFilter;
         }
@@ -110,7 +114,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.ActionFilter
         {
             var list = new List<McUser>();
             for (var i = 0; i < multiple; i++) list.Add(new McUser {
-                Email = "foo@bar.com",
+                Email = "foo@example.com",
                 AcceptTermsDateUtc = consentDate
             });
             

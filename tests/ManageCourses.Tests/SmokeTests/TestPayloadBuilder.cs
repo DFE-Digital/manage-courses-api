@@ -12,7 +12,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     FirstName = "Joe",
                     LastName = "Bloggs",
                     Email = username,
-                    AcceptTermsDateUtc = DateTime.Now
+                    AcceptTermsDateUtc = DateTime.UtcNow
                 }),
 
                 Organisations = ListOfOne(new McOrganisation {

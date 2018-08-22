@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace GovUk.Education.ManageCourses.Api.ActionFilters
 {
+    /// <summary>
+    ///     Tests if users have accepted terms and conditions yet. If not, the request gets cancelled 
+    ///     (unless the endpoint is marked as exempt via ExemptFromAcceptTermsAttribute)         
+    /// </summary>
     public class AcceptTermsFilter : IActionFilter
     {
         private readonly IManageCoursesDbContext dbContext;
@@ -52,11 +56,8 @@ namespace GovUk.Education.ManageCourses.Api.ActionFilters
                 // consent hasn't been given, return a status code in order to supress Action execution.             
                 context.Result = new StatusCodeResult(451);
             }
-            else
-            {
-                // consent has been given, just return to proceed to the Action
-                return;
-            }
+            
+            // otherwise consent has been given, just return to proceed to the Action
         }
     }
 }
