@@ -327,6 +327,17 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return userOrganisations;
         }
 
+        public IQueryable<McUser> GetMcUsers(string email)
+        {
+            var users = McUsers.FromSql(
+                $"select * from mc_user " +
+                $"where lower(email) = lower(@email)",
+                new NpgsqlParameter("email", email)
+            );
+
+            return users;
+        }
+
         public void AddUcasCourse(UcasCourse course)
         {
             UcasCourses.Add(course);

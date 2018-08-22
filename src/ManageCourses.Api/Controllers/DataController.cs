@@ -1,3 +1,4 @@
+using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Middleware;
@@ -35,6 +36,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Imports the data.
         /// </summary>
         [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+        [ExemptFromAcceptTerms]
         [HttpPost]
         [Route("ucas")]
         public void Import([FromBody] UcasPayload payload)
@@ -48,6 +50,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Imports the reference data.
         /// </summary>
         [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+        [ExemptFromAcceptTerms]
         [HttpPost]
         [Route("referencedata")]
         public void ImportReferenceData([FromBody] ReferenceDataPayload payload)
