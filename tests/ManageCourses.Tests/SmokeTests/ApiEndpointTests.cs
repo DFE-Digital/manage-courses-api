@@ -118,6 +118,27 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         }
 
         [Test]
+        public async Task CourseEnrichmentRoundTrip()
+        {
+            SetupSmokeTestData();
+            var apiClient = BuildSigninAwareClient();
+            const string ucasInstitutionCode = "ABC";
+            const string ucasCourseCode = "CC101";
+            var postModel = new CourseEnrichmentModel
+            {
+                AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
+            };
+            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+
+            var loadedEnrichment = await apiClient.Enrichment_GetCourseAsync(ucasInstitutionCode, ucasCourseCode);
+
+            loadedEnrichment.Should().NotBeNull();
+            loadedEnrichment.EnrichmentModel.Should().NotBeNull();
+            loadedEnrichment.EnrichmentModel.AboutCourse.Should().Be(postModel.AboutCourse);
+        }
+
+
+        [Test]
         public async Task Invite()
         {
             var accessToken = Config["api:key"];
