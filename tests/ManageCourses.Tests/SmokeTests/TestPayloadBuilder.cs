@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using GovUk.Education.ManageCourses.ApiClient;
 
@@ -10,7 +11,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 Users = ListOfOne(new McUser{
                     FirstName = "Joe",
                     LastName = "Bloggs",
-                    Email = username
+                    Email = username,
+                    AcceptTermsDateUtc = DateTime.UtcNow
                 }),
 
                 Organisations = ListOfOne(new McOrganisation {

@@ -1,3 +1,4 @@
+using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
@@ -20,6 +21,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         [HttpPost]
+        [ExemptFromAcceptTerms]
         public IActionResult Index(string email)
         {
             try

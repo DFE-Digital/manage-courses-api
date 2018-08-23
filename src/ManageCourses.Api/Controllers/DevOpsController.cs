@@ -1,4 +1,5 @@
 ﻿using System;
+using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,6 +32,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Hit this to test exception logging. Always throws.
         /// </summary>
         [Route("throw")]
+        [ExemptFromAcceptTerms]
         public ActionResult Throw()
         {
             throw new Exception($"This is a test exception. {MagicString}");
@@ -40,6 +42,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Spits out log at every level for testing logging configuration.
         /// </summary>
         [Route("log")]
+        [ExemptFromAcceptTerms]
         public ActionResult Log()
         {
             _logger.LogCritical($"logtests: Critical. {MagicString}");
@@ -57,6 +60,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [Route("error")]
+        [ExemptFromAcceptTerms]
         public ActionResult ServerError()
         {
             return StatusCode(StatusCodes.Status500InternalServerError);

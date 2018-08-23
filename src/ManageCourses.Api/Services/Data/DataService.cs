@@ -262,6 +262,16 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     }
                     );
             }
+            foreach (var nctlOrganisation in payload.NctlOrganisation)
+            {
+                _context.AddNctlOrganisation(
+                    new NctlOrganisation
+                    {
+                        NctlId = nctlOrganisation.NctlId,
+                        OrgId = nctlOrganisation.OrgId,
+                        Name = nctlOrganisation.Name
+                    });
+            }
             foreach (var institution in payload.Institutions)
             {
                 _context.AddUcasInstitution(

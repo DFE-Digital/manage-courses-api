@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180821174525_AddNctlOrganisation")]
+    partial class AddNctlOrganisation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,9 +192,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
-                    b.Property<DateTime?>("AcceptTermsDateUtc")
-                        .HasColumnName("accept_terms_date_utc");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnName("email");
@@ -317,9 +315,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("CrseTitle")
                         .HasColumnName("crse_title");
 
-                    b.Property<string>("HasBeenPublished")
-                        .HasColumnName("has_been_published");
-
                     b.Property<string>("InstCode")
                         .HasColumnName("inst_code");
 
@@ -329,17 +324,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("ProgramType")
                         .HasColumnName("program_type");
 
-                    b.Property<string>("Publish")
-                        .HasColumnName("publish");
-
-                    b.Property<string>("Status")
-                        .HasColumnName("status");
-
                     b.Property<string>("Studymode")
                         .HasColumnName("studymode");
-
-                    b.Property<string>("VacStatus")
-                        .HasColumnName("vac_status");
 
                     b.HasKey("Id");
 
