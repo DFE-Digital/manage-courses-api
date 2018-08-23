@@ -185,7 +185,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     ProfpostFlag = course.ProfpostFlag,
                     ProgramType = course.ProgramType,
                     AccreditingProvider = course.AccreditingProvider,
-                    CrseOpenDate = course.CrseOpenDate
+                    CrseOpenDate = course.CrseOpenDate,
+                    Publish = course.Publish,
+                    Status = course.Status,
+                    VacStatus = course.VacStatus,
+                    HasBeenPublished = course.HasBeenPublished
                 });
             }
             foreach (var courseSubject in payload.CourseSubjects.Where(c => c.InstCode == instCode))
@@ -353,28 +357,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             var returnCourses = new InstitutionCourses();
             if (courseRecords.Count > 0)
             {
-                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical info so just get the first one
+                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical institution info so just get the first one
                 returnCourses.InstitutionName = organisationCourseRecord.UcasInstitution.InstFull;
                 returnCourses.InstitutionCode = organisationCourseRecord.InstCode;
                 returnCourses.Courses = new List<Course>();
                 foreach (var courseCode in courseRecords.Select(c => c.CrseCode).Distinct())
                 {
-                    var courseRecord = courseRecords.FirstOrDefault(c => c.CrseCode == courseCode);
-                    if (courseRecord != null)
-                    {
-                        var course = new Course
-                        {
-                            Name = courseRecord.CrseTitle,
-                            CourseCode = courseRecord.CrseCode,
-                            ProfpostFlag = courseRecord.ProfpostFlag,
-                            ProgramType = courseRecord.ProgramType,
-                            StudyMode = courseRecord.Studymode,
-                            AccreditingProviderId = courseRecord.AccreditingProviderInstitution?.InstCode,
-                            AccreditingProviderName = courseRecord.AccreditingProviderInstitution?.InstFull
-                        };
-
-                        returnCourses.Courses.Add(course);
-                    }
+                    returnCourses.Courses.Add(LoadCourse(courseRecords.Where(c => c.CrseCode == courseCode).ToList()));
                 }
             }
 
@@ -386,7 +375,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             var returnCourse = new Course();
             if (courseRecords.Count > 0)
             {
-                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical info so just get the first one
+                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical institution info so just get the first one
                 returnCourse.InstCode = organisationCourseRecord.InstCode;
                 returnCourse.CourseCode = organisationCourseRecord.CrseCode;
                 returnCourse.AccreditingProviderId = organisationCourseRecord.AccreditingProvider;
@@ -406,7 +395,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     .Select(x => x.SubjectDescription).ToList();
 
                 returnCourse.Subjects = string.Join(", ", subjects);
+                returnCourse.Schools = GetSchoolsData(courseRecords);
             }
+
+            return returnCourse;
+        }
+        private IEnumerable<School> GetSchoolsData(IEnumerable<UcasCourse> courseRecords)
+        {
             var schools = courseRecords.Select(courseRecord => new School
             {
                 LocationName = courseRecord.UcasCampus.CampusName,
@@ -416,7 +411,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 Address4 = courseRecord.UcasCampus.Addr4,
                 PostCode = courseRecord.UcasCampus.Postcode,
                 ApplicationsAcceptedFrom = courseRecord.CrseOpenDate,
-                Code = courseRecord.UcasCampus.CampusCode
+                Code = courseRecord.UcasCampus.CampusCode,
+                Status = courseRecord.Status
             }).ToList();
             //look for the main site and move it to the top of the list
             var main = schools.FirstOrDefault(s => s.Code == "-");
@@ -426,9 +422,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 schools.Insert(0, main);
             }
 
-            returnCourse.Schools = schools;
-
-            return returnCourse;
+            return schools;
         }
 
         private void ResetReferenceSchema()
