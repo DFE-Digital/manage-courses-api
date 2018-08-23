@@ -1,6 +1,6 @@
 # Manage Courses API project
 
-[<img src="https://api.travis-ci.org/DFE-Digital/manage-courses-api.svg?branch=master">](https://api.travis-ci.org/DFE-Digital/manage-courses-api.svg?branch=master)
+[<img src="https://api.travis-ci.org/DFE-Digital/manage-courses-api.svg?branch=master">](https://travis-ci.org/DFE-Digital/manage-courses-api?branch=master)
 
 ## About
 
