@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180821160356_more-fields-to-course")]
+    partial class morefieldstocourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,9 +192,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
-                    b.Property<DateTime?>("AcceptTermsDateUtc")
-                        .HasColumnName("accept_terms_date_utc");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnName("email");
@@ -222,29 +220,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("mc_user");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.NctlOrganisation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("Name")
-                        .HasColumnName("name");
-
-                    b.Property<string>("NctlId")
-                        .IsRequired()
-                        .HasColumnName("nctl_id");
-
-                    b.Property<string>("OrgId")
-                        .HasColumnName("org_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrgId");
-
-                    b.ToTable("nctl_organisation");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", b =>
@@ -568,15 +543,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .WithMany("McOrganisationUsers")
                         .HasForeignKey("OrgId")
                         .HasPrincipalKey("OrgId");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.NctlOrganisation", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McOrganisation", "McOrganisation")
-                        .WithMany("NctlOrganisations")
-                        .HasForeignKey("OrgId")
-                        .HasPrincipalKey("OrgId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", b =>
