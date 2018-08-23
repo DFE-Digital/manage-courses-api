@@ -254,6 +254,26 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Assert.AreEqual(numCourses, result.Courses.Count);
             }
         }
+        [Test]
+        public void GetCoursesShouldReturnStatus()
+        {
+            const int numOrgs = 5;
+            const int numCourses = 6;
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
+            Assert.IsTrue(orgList.Count == numOrgs);
+            Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
+
+            foreach (var org in orgList)//we have a valist list of data
+            {
+                var result = DataService.GetCourses(TestUserEmail1, org.UcasCode);//get the course for each org
+
+                foreach (var course in result.Courses)
+                {
+                    Assert.IsTrue(course.Schools.All(s => s.Status == "N"));
+                }
+            }
+        }
 
         [Test]
         [TestCase(null, "")]
@@ -435,7 +455,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     new UcasCourse
                     {
                         InstCode = InstCode1,
-                        CrseCode = "CourseCode_1"
+                        CrseCode = "CourseCode_1",
+                        Status = "N"
                     }
                 }
             };
@@ -502,6 +523,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     CrseTitle = "Title " + counter,
                     InstCode = instCode,
                     CampusCode = campusCode,
+                    Status = "N"
                 });
                 Context.UcasCampuses.Add(new UcasCampus
                 {
