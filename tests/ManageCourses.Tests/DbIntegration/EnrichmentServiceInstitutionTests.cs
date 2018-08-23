@@ -16,7 +16,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Category("Integration")]
     [Category("Integration_DB")]
     [Explicit]
-    public class EnrichmentServiceTests : DbIntegrationTestBase
+    public class EnrichmentServiceInstitutionTests : DbIntegrationTestBase
     {
         private UcasInstitution _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
