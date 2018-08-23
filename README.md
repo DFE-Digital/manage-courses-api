@@ -1,5 +1,7 @@
 # Manage Courses API project
 
+[<img src="https://api.travis-ci.org/DFE-Digital/manage-courses-api.svg?branch=master">](https://api.travis-ci.org/DFE-Digital/manage-courses-api.svg?branch=master)
+
 ## About
 
 This repo provides a dotnet core solution containing:
@@ -93,7 +95,7 @@ You will need to provide a postgresql server. A default localhost installation w
 
 You can set these by going to `tests\ManageCourses.Tests` and running `dotnet user-secrets set <key> <value>`.
 
-Then run 
+Then run
 ```
 cd tests\ManageCourses.Tests
 dotnet test --filter TestCategory=Integration
