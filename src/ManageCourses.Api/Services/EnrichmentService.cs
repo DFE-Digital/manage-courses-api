@@ -31,7 +31,11 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             ValidateUserOrg(email, instCode);
 
-            var enrichment = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower()).OrderByDescending(x => x.Id).FirstOrDefault();
+            var enrichment = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower())
+                .OrderByDescending(x => x.Id)
+                .Include(e => e.CreatedByUser)
+                .Include(e => e.UpdatedByUser)
+                .FirstOrDefault();
             var enrichmentToReturn = Convert(enrichment);
 
             return enrichmentToReturn;
