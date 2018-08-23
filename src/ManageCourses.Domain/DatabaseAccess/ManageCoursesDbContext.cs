@@ -108,6 +108,13 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasForeignKey(ucs => new { ucs.InstCode, ucs.CrseCode })
                 .HasPrincipalKey(cc => new { cc.InstCode, cc.CrseCode });
 
+            modelBuilder.Entity<NctlOrganisation>()
+                .HasOne(x => x.McOrganisation)                
+                .WithMany(x => x.NctlOrganisations)
+                .HasForeignKey(x => x.OrgId)
+                .HasPrincipalKey(x => x.OrgId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<AccessRequest>()
                 .HasOne(ar => ar.Requester)
                 .WithMany(u => u.AccessRequests)
@@ -139,6 +146,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<UcasCampus> UcasCampuses { get; set; }
         public DbSet<UcasCourseNote> UcasCourseNotes { get; set; }
         public DbSet<UcasNoteText> UcasNoteTexts { get; set; }
+        public DbSet<NctlOrganisation> NctlOrganisations { get; set; }
         public DbSet<McOrganisation> McOrganisations { get; set; }
         public DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
         public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
@@ -240,6 +248,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             McOrganisations.Add(organisation);
         }
 
+        public void AddNctlOrganisation(NctlOrganisation organisation)
+        {
+            NctlOrganisations.Add(organisation);
+        }
+
         public void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution)
         {
             McOrganisationIntitutions.Add(organisationInstitution);
@@ -312,6 +325,17 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             ).FirstOrDefault();
 
             return userOrganisations;
+        }
+
+        public IQueryable<McUser> GetMcUsers(string email)
+        {
+            var users = McUsers.FromSql(
+                $"select * from mc_user " +
+                $"where lower(email) = lower(@email)",
+                new NpgsqlParameter("email", email)
+            );
+
+            return users;
         }
 
         public void AddUcasCourse(UcasCourse course)
