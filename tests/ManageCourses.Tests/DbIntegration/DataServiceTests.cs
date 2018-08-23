@@ -261,8 +261,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
             var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
-            Assert.IsTrue(orgList.Count == numOrgs);
-            Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
+            orgList.Count.Should().Be(numOrgs);
 
             foreach (var org in orgList)//we have a valist list of data
             {
@@ -270,7 +269,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
                 foreach (var course in result.Courses)
                 {
-                    Assert.IsTrue(course.Schools.All(s => s.Status == "N"));
+                    course.Schools.All(s => s.Status == "N").Should().BeTrue();
                 }
             }
         }
@@ -456,7 +455,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         InstCode = InstCode1,
                         CrseCode = "CourseCode_1",
-                        Status = "N"
+                        Status = "N",
                     }
                 }
             };

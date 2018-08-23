@@ -422,7 +422,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 PostCode = courseRecord.UcasCampus.Postcode,
                 ApplicationsAcceptedFrom = courseRecord.CrseOpenDate,
                 Code = courseRecord.UcasCampus.CampusCode,
-                Status = courseRecord.Status
+                Status = courseRecord.Status,
             }).ToList();
             //look for the main site and move it to the top of the list
             var main = schools.FirstOrDefault(s => s.Code == "-");
