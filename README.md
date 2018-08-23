@@ -1,5 +1,6 @@
 # Manage Courses API project
 
+[<img src="https://img.shields.io/nuget/v/GovUk.Education.ManageCourses.ApiClient.svg">](https://www.nuget.org/packages/GovUk.Education.ManageCourses.ApiClient/)
 [<img src="https://api.travis-ci.org/DFE-Digital/manage-courses-api.svg?branch=master">](https://travis-ci.org/DFE-Digital/manage-courses-api?branch=master)
 
 ## About
