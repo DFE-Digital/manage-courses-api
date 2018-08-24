@@ -21,6 +21,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private UcasInstitution _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
+        private const string UcasCourseCode = "451F";
 
         private const string Email = "12345@example.org";
 
@@ -91,202 +92,121 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         /// This test ensures that the status is always correct at the right point in the workflow
         /// </summary>
         [Test]
-        public void Test_InstitutionEnrichment_workflow_should_not_error()
+        public void Test_CourseEnrichment_And_Publishing_Workflow()
         {
-            const string trainWithDisabilityText = "TrainWithDisabilily Text";
-            const string trainWithUsText = "TrainWithUs Text";
-            const string trainWithDisabilityUpdatedText = "TrainWithDisabilily Text updated";
-            const string trainWithUsUpdatedText = "TrainWithUs Text updated";
-            const string instDesc = "school1 description enrichement";
+            const string aboutCourseText = "About Course Text";
+            const string aboutCourseUpdatedText = "About Course Text updated";
 
             var enrichmentService = new EnrichmentService(Context);
-            var model = new UcasInstitutionEnrichmentPostModel
+            var model = new CourseEnrichmentModel
             {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityText,
-                    TrainWithUs = trainWithUsText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
+                AboutCourse =aboutCourseText,
             };
             //test save
-            enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
+            enrichmentService.SaveCourseEnrichment(model, ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
 
             //test get
-            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
+            var result = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
 
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
-            result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
-            result.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
+            result.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(aboutCourseText);
             result.LastPublishedTimestampUtc.Should().BeNull();
             result.Status.Should().BeEquivalentTo(EnumStatus.Draft);
 
             //test update
-            var updatedmodel = new UcasInstitutionEnrichmentPostModel
+            var updatedmodel = new CourseEnrichmentModel
             {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityUpdatedText,
-                    TrainWithUs = trainWithUsUpdatedText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
+                AboutCourse = aboutCourseUpdatedText,
             };
 
-            enrichmentService.SaveInstitutionEnrichment(updatedmodel, ProviderInstCode.ToLower(), Email);
-            var updateResult = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
-            updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
-            updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
+            enrichmentService.SaveCourseEnrichment(updatedmodel, ProviderInstCode.ToLower(), UcasCourseCode, Email);
+            var updateResult = enrichmentService.GetCourseEnrichment(ProviderInstCode, UcasCourseCode, Email);
+            updateResult.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(aboutCourseUpdatedText);
             updateResult.LastPublishedTimestampUtc.Should().BeNull();
             //publish
-            var publishResults = enrichmentService.PublishInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
+            var publishResults = enrichmentService.PublishCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode, Email);
             publishResults.Should().BeTrue();
-            var publishRecord = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
+            var publishRecord = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode, Email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
             //test save again after publish
-            enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
-            var updateResult2 = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
-            updateResult2.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
-            updateResult2.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
+            enrichmentService.SaveCourseEnrichment(model, ProviderInstCode.ToLower(), UcasCourseCode, Email);
+            var updateResult2 = enrichmentService.GetCourseEnrichment(ProviderInstCode, UcasCourseCode, Email);
+            updateResult2.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(aboutCourseText);
             updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
             updateResult2.LastPublishedTimestampUtc.ToString().Should().BeEquivalentTo(publishRecord.LastPublishedTimestampUtc.ToString());
             //check number of records generated from this
-            var draftCount = Context.InstitutionEnrichments.Count(x => x.Status == EnumStatus.Draft);
-            var publishedCount = Context.InstitutionEnrichments.Count(x => x.Status == EnumStatus.Published);
+            var draftCount = Context.CourseEnrichments.Count(x => x.Status == EnumStatus.Draft);
+            var publishedCount = Context.CourseEnrichments.Count(x => x.Status == EnumStatus.Published);
             publishedCount.Should().Be(1);
             draftCount.Should().Be(1);
         }
         [Test]
         [TestCase("eqweqw", "qweqweq")]
-        public void Test_SaveInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
+        public void Test_SaveCourseEnrichment_should_return_invalid_operation_exception(string instCode, string email)
         {
-            const string trainWithDisabilityText = "TrainWithDisabilily Text";
-            const string trainWithUsText = "TrainWithUs Text";
-            const string instDesc = "school1 description enrichement";
+            const string aboutCourseText = "About Course Text";
 
             var enrichmentService = new EnrichmentService(Context);
-            var model = new UcasInstitutionEnrichmentPostModel
+            var model = new CourseEnrichmentModel
             {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityText,
-                    TrainWithUs = trainWithUsText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
+                AboutCourse = aboutCourseText,
             };
-
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.SaveInstitutionEnrichment(model, instCode, email));
+            Assert.Throws<InvalidOperationException>(() => enrichmentService.SaveCourseEnrichment(model, instCode, UcasCourseCode, email));
         }
         [Test]
         [TestCase("", "")]
         [TestCase(null, null)]
-        public void Test_SaveInstitutionEnrichment_should__argument_exception(string instCode, string email)
+        public void Test_SaveCourseEnrichment_should__argument_exception(string instCode, string email)
         {
-            const string trainWithDisabilityText = "TrainWithDisabilily Text";
-            const string trainWithUsText = "TrainWithUs Text";
-            const string instDesc = "school1 description enrichement";
+            const string aboutCourseText = "About Course Text";
 
             var enrichmentService = new EnrichmentService(Context);
-            var model = new UcasInstitutionEnrichmentPostModel
+            var model = new CourseEnrichmentModel
             {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityText,
-                    TrainWithUs = trainWithUsText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
+                AboutCourse = aboutCourseText,
             };
 
-            Assert.Throws<ArgumentException>(() => enrichmentService.SaveInstitutionEnrichment(model, instCode, email));
+            Assert.Throws<ArgumentException>(() => enrichmentService.SaveCourseEnrichment(model, instCode, UcasCourseCode, email));
         }
         [Test]
         [TestCase("eqweqw", "qweqweq")]
-        public void Test_GetInstitutionEnrichment_should_error(string instCode, string email)
+        public void Test_GetCourseEnrichment_should_error(string instCode, string email)
         {
             var enrichmentService = new EnrichmentService(Context);
 
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetInstitutionEnrichment(instCode, email));
+            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetCourseEnrichment(instCode, UcasCourseCode, email));
         }
         [Test]
         [TestCase("eqweqw", "qweqweq")]
-        public void Test_PublishInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
+        public void Test_PublishCourseEnrichment_should_return_invalid_operation_exception(string instCode, string email)
         {
             var enrichmentService = new EnrichmentService(Context);
 
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.PublishInstitutionEnrichment(instCode, email));
+            Assert.Throws<InvalidOperationException>(() => enrichmentService.PublishCourseEnrichment(instCode, UcasCourseCode, email));
         }
         [Test]
         [TestCase("", "")]
         [TestCase(null, null)]
-        public void Test_PublishInstitutionEnrichment_should_argument_exception(string instCode, string email)
+        public void Test_PublishCourseEnrichment_should_argument_exception(string instCode, string email)
         {
             var enrichmentService = new EnrichmentService(Context);
-            Assert.Throws<ArgumentException>(() => enrichmentService.PublishInstitutionEnrichment(instCode, email));
-        }
-        [Test]
-        public void Test_PublishInstitutionEnrichment_should_return_false()
-        {
-            Context.InstitutionEnrichments.RemoveRange(Context.InstitutionEnrichments);
-            Context.Save();
-
-            var enrichmentService = new EnrichmentService(Context);
-            var publishResults = enrichmentService.PublishInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
-            publishResults.Should().BeFalse();
-
+            Assert.Throws<ArgumentException>(() => enrichmentService.PublishCourseEnrichment(instCode, UcasCourseCode, email));
         }
 
         [Test]
         public void EnrichmentDataSurvivesDeleteAndRecreate()
         {
+            const string aboutCourseText = "About Course Text";
             // Arrange
             var enrichmentService = new EnrichmentService(Context);
             var dataService = new DataService(Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
-            var sourceModel = new UcasInstitutionEnrichmentPostModel
+            var sourceModel = new CourseEnrichmentModel
             {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithUs = "Oh the grand old Duke of York",
-                    TrainWithDisability = "He had 10,000 men",
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = "He marched them up to the top of the hill"
-                        }
-                    }
-                },
+                AboutCourse = aboutCourseText,
             };
-            enrichmentService.SaveInstitutionEnrichment(sourceModel, _ucasInstitution.InstCode, Email);
+            enrichmentService.SaveCourseEnrichment(sourceModel, _ucasInstitution.InstCode, UcasCourseCode, Email);
 
             // Act
             var ucasPayload = new UcasPayload
@@ -318,14 +238,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             dataService.ProcessUcasPayload(ucasPayload);
 
             // Assert
-            var res = enrichmentService.GetInstitutionEnrichment(_ucasInstitution.InstCode, Email);
-            res.EnrichmentModel.TrainWithUs.Should().Be(sourceModel.EnrichmentModel.TrainWithUs);
-            res.EnrichmentModel.TrainWithDisability.Should().Be(sourceModel.EnrichmentModel.TrainWithDisability);
-            res.EnrichmentModel.AccreditingProviderEnrichments.Should().HaveCount(1);
-            res.EnrichmentModel.AccreditingProviderEnrichments.Should().HaveSameCount(sourceModel.EnrichmentModel.AccreditingProviderEnrichments);
-            res.EnrichmentModel.AccreditingProviderEnrichments[0].Description.Should().Be(sourceModel.EnrichmentModel.AccreditingProviderEnrichments[0].Description);
-            res.EnrichmentModel.AccreditingProviderEnrichments[0].UcasInstitutionCode.Should().Be(sourceModel.EnrichmentModel.AccreditingProviderEnrichments[0].UcasInstitutionCode);
+            var res = enrichmentService.GetCourseEnrichment(_ucasInstitution.InstCode, UcasCourseCode, Email);
+            res.EnrichmentModel.AboutCourse.Should().Be(sourceModel.AboutCourse);
         }
-
     }
 }
