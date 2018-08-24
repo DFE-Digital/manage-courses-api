@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ManageCourses.Api.Model;
+﻿using GovUk.Education.ManageCourses.Api.Model;
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
@@ -11,5 +7,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
         UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email);
         void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email);
         bool PublishInstitutionEnrichment(string instCode, string email);
+        UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email);
+        void SaveCourseEnrichment(CourseEnrichmentModel model, string instCode, string ucasCourseCode, string email);
+        bool PublishCourseEnrichment(string instCode, string ucasCourseCode, string email);
     }
 }

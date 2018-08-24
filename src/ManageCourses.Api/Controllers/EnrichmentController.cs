@@ -60,8 +60,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Route("institution/{ucasInstitutionCode}/course/{ucasCourseCode}")]
         public UcasCourseEnrichmentGetModel GetCourse(string ucasInstitutionCode, string ucasCourseCode)
         {
-            // todo: return _service.GetCourseEnrichment(ucasCourseCode, User.Identity.Name);
-            return new UcasCourseEnrichmentGetModel();
+            return _service.GetCourseEnrichment(ucasInstitutionCode, ucasCourseCode, User.Identity.Name);
         }
         /// <summary>
         /// saves a draft enrichment record (upsert)
@@ -73,7 +72,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Route("institution/{ucasInstitutionCode}/course/{ucasCourseCode}")]
         public void SaveCourse(string ucasInstitutionCode, string ucasCourseCode, [FromBody] CourseEnrichmentModel model)
         {
-            // todo: _service.SaveCourseEnrichment(model, ucasCourseCode, User.Identity.Name);
+            _service.SaveCourseEnrichment(model, ucasInstitutionCode, ucasCourseCode, User.Identity.Name);
         }
 
         /// <summary>
@@ -85,8 +84,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Route("institution/{ucasInstitutionCode}/course/{ucasCourseCode}/publish")]
         public void PublishCourse(string ucasInstitutionCode, string ucasCourseCode)
         {
-            //TODO send to search and compare
-            // todo: return _service.PublishCourseEnrichment(ucasCourseCode, User.Identity.Name);
+            _service.PublishCourseEnrichment(ucasInstitutionCode, ucasCourseCode, User.Identity.Name);
         }
     }
 }
