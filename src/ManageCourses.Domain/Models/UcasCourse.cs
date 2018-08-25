@@ -18,7 +18,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string VacStatus { get; set; }
         public string HasBeenPublished { get; set; }
 
-
         public UcasInstitution UcasInstitution { get; set; }
         public UcasInstitution AccreditingProviderInstitution { get; set; }
         public UcasCampus UcasCampus { get; set; }

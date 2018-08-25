@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain.Models;
 
 namespace GovUk.Education.ManageCourses.Api.Data
 {
@@ -12,7 +13,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         void ProcessReferencePayload(ReferenceDataPayload payload);
         Course GetCourse(string email, string instCode, string ucasCode);
         InstitutionCourses GetCourses(string email, string instCode);
-
+        UcasInstitution GetUcasInstitutionForUser(string name, string instCode);
     }
 }
     
