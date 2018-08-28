@@ -94,48 +94,71 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void Test_CourseEnrichment_And_Publishing_Workflow()
         {
-            const string aboutCourseText = "About Course Text";
-            const string aboutCourseUpdatedText = "About Course Text updated";
-
             var enrichmentService = new EnrichmentService(Context);
-            var model = new CourseEnrichmentModel
+
+            //test saving sparse model
+            var sourceModel = new CourseEnrichmentModel
             {
-                AboutCourse =aboutCourseText,
+                AboutCourse = "About Course Text",
             };
-            //test save
-            enrichmentService.SaveCourseEnrichment(model, ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
+            enrichmentService.SaveCourseEnrichment(sourceModel, ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
+
+            //test saving full model
+            sourceModel.InterviewProcess = "eg InterviewProcess";
+            sourceModel.HowSchoolPlacementsWork = "eg HowSchoolPlacementsWork";
+            sourceModel.CourseLength = "eg CourseLength";
+            sourceModel.FeeUkEu = 1.234m;
+            sourceModel.FeeInternational = 42000.24m;
+            sourceModel.SalaryDetails = "eg SalaryDetails";
+            sourceModel.FeeDetails = "eg FeeDetails";
+            sourceModel.FinancialSupport = "eg FinancialSupport";
+            sourceModel.Qualifications = "eg Qualifications";
+            sourceModel.PersonalQualities = "eg PersonalQualities";
+            sourceModel.OtherRequirements = "eg OtherRequirements";
+            enrichmentService.SaveCourseEnrichment(sourceModel, ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
 
             //test get
             var result = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
-
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
-            result.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(aboutCourseText);
+            result.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(sourceModel.AboutCourse);
+            result.EnrichmentModel.InterviewProcess.Should().BeEquivalentTo(sourceModel.InterviewProcess);
+            result.EnrichmentModel.HowSchoolPlacementsWork.Should().BeEquivalentTo(sourceModel.HowSchoolPlacementsWork);
+            result.EnrichmentModel.CourseLength.Should().BeEquivalentTo(sourceModel.CourseLength);
+            result.EnrichmentModel.FeeUkEu.Should().Be(sourceModel.FeeUkEu);
+            result.EnrichmentModel.FeeInternational.Should().Be(sourceModel.FeeInternational);
+            result.EnrichmentModel.SalaryDetails.Should().BeEquivalentTo(sourceModel.SalaryDetails);
+            result.EnrichmentModel.FeeDetails.Should().BeEquivalentTo(sourceModel.FeeDetails);
+            result.EnrichmentModel.FinancialSupport.Should().BeEquivalentTo(sourceModel.FinancialSupport);
+            result.EnrichmentModel.Qualifications.Should().BeEquivalentTo(sourceModel.Qualifications);
+            result.EnrichmentModel.PersonalQualities.Should().BeEquivalentTo(sourceModel.PersonalQualities);
+            result.EnrichmentModel.OtherRequirements.Should().BeEquivalentTo(sourceModel.OtherRequirements);
             result.LastPublishedTimestampUtc.Should().BeNull();
             result.Status.Should().BeEquivalentTo(EnumStatus.Draft);
 
             //test update
-            var updatedmodel = new CourseEnrichmentModel
-            {
-                AboutCourse = aboutCourseUpdatedText,
-            };
+            sourceModel.AboutCourse = "About Course Text updated";
 
-            enrichmentService.SaveCourseEnrichment(updatedmodel, ProviderInstCode.ToLower(), UcasCourseCode, Email);
+            enrichmentService.SaveCourseEnrichment(sourceModel, ProviderInstCode.ToLower(), UcasCourseCode, Email);
             var updateResult = enrichmentService.GetCourseEnrichment(ProviderInstCode, UcasCourseCode, Email);
-            updateResult.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(aboutCourseUpdatedText);
+            updateResult.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(sourceModel.AboutCourse);
             updateResult.LastPublishedTimestampUtc.Should().BeNull();
+
             //publish
             var publishResults = enrichmentService.PublishCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode, Email);
             publishResults.Should().BeTrue();
             var publishRecord = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode, Email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
+
             //test save again after publish
-            enrichmentService.SaveCourseEnrichment(model, ProviderInstCode.ToLower(), UcasCourseCode, Email);
+            enrichmentService.SaveCourseEnrichment(sourceModel, ProviderInstCode.ToLower(), UcasCourseCode, Email);
             var updateResult2 = enrichmentService.GetCourseEnrichment(ProviderInstCode, UcasCourseCode, Email);
-            updateResult2.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(aboutCourseText);
+            updateResult2.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(sourceModel.AboutCourse);
+            updateResult2.EnrichmentModel.OtherRequirements.Should().BeEquivalentTo(sourceModel.OtherRequirements);
             updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
             updateResult2.LastPublishedTimestampUtc.ToString().Should().BeEquivalentTo(publishRecord.LastPublishedTimestampUtc.ToString());
+
             //check number of records generated from this
             var draftCount = Context.CourseEnrichments.Count(x => x.Status == EnumStatus.Draft);
             var publishedCount = Context.CourseEnrichments.Count(x => x.Status == EnumStatus.Published);
