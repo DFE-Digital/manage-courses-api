@@ -678,5 +678,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 .Select(x => x.SubjectDescription).ToList();
             return subjects;
         }
+
+        public UcasInstitution GetUcasInstitutionForUser(string name, string instCode)
+        {
+            return _context.GetUcasInstitution(name, instCode);
+        }
     }
 }

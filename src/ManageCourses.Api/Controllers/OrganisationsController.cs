@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,6 +31,23 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             return organisation;
         }
+
+        /// <summary>
+        /// Gets UCAS Institution data by Institution Code
+        /// </summary>
+        /// <returns>a single UcasInstitution object</returns>
+        [Authorize]
+        [HttpGet]
+        [Route("{instCode}/ucas")]
+        public UcasInstitution GetUcasInstitution(string instCode)
+        {
+            var name = this.User.Identity.Name;
+            var organisation = _dataService.GetUcasInstitutionForUser(name, instCode);
+
+            return organisation;
+        }
+
+
         /// <summary>
         /// Gets a list of organisations for the user
         /// </summary>

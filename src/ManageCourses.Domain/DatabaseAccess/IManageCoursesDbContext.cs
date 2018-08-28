@@ -55,5 +55,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
         IQueryable<McUser> GetMcUsers(string email);
         void Save();
+        UcasInstitution GetUcasInstitution(string name, string instCode);
     }
 }
