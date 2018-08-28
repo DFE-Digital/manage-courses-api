@@ -342,11 +342,13 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public UcasInstitution GetUcasInstitution(string name, string instCode)
         {
             return UcasInstitutions.FromSql(@"
-                SELECT i.* from ucas_institution i
-                JOIN mc_organisation_institution oi on i.inst_code = oi.institution_code
-                JOIN mc_organisation_user ou on oi.org_id = ou.org_id
-                WHERE lower(ou.email) = lower(@email)",
-                new NpgsqlParameter("email", name)).FirstOrDefault();
+                    SELECT i.* from ucas_institution i
+                    JOIN mc_organisation_institution oi on i.inst_code = oi.institution_code
+                    JOIN mc_organisation_user ou on oi.org_id = ou.org_id
+                    WHERE lower(ou.email) = lower(@email)",
+                    new NpgsqlParameter("email", name))
+                .Include(x => x.UcasCampuses)
+                .FirstOrDefault();
         }
 
         public void AddUcasCourse(UcasCourse course)
@@ -357,6 +359,5 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         {
             SaveChanges();
         }
-
     }
 }
