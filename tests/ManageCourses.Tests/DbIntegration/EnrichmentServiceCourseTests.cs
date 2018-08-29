@@ -164,7 +164,20 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var publishedCount = Context.CourseEnrichments.Count(x => x.Status == EnumStatus.Published);
             publishedCount.Should().Be(1);
             draftCount.Should().Be(1);
+
+            // test saving & loading a different course in the same institution
+            var nextCourseModel = new CourseEnrichmentModel
+            {
+                AboutCourse = "Some other course",
+            };
+            const string otherCourseCode = "D0H";
+            enrichmentService.SaveCourseEnrichment(nextCourseModel, ProviderInstCode.ToLower(), otherCourseCode, Email);
+            var nextCourseGet = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), otherCourseCode, Email);
+            nextCourseGet.Should().NotBeNull();
+            nextCourseGet.EnrichmentModel.Should().NotBeNull();
+            nextCourseGet.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(nextCourseModel.AboutCourse);
         }
+
         [Test]
         [TestCase("eqweqw", "qweqweq")]
         public void Test_SaveCourseEnrichment_should_return_invalid_operation_exception(string instCode, string email)
