@@ -151,7 +151,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             var userInst = ValidateUserOrg(email, instCode);
 
-            var enrichmentDraftRecord = _context.CourseEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+            var enrichmentDraftRecord = _context.CourseEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ucasCourseCode.ToLower() == ie.UcasCourseCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
 
             var content = JsonConvert.SerializeObject(model, _jsonSerializerSettings);
 
