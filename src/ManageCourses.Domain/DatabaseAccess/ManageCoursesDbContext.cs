@@ -347,7 +347,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     JOIN mc_organisation_user ou on oi.org_id = ou.org_id
                     WHERE lower(ou.email) = lower(@email)",
                     new NpgsqlParameter("email", name))
-                .Include(x => x.UcasCampuses)
                 .FirstOrDefault();
         }
 
