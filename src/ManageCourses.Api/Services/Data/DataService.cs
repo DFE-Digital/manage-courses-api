@@ -35,7 +35,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         public void ProcessUcasPayload(UcasPayload payload)
         {
             var allInstitutions = payload.Institutions.ToList();
-            
+
             _logger.LogWarning("Beginning UCAS import");
             _logger.LogInformation($"Upserting {allInstitutions.Count()} institutions");
             int processed = 0;
@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 // note: this does not perform a delete of existing institutions
 
                 var instRes = AttemptTransaction(inst.InstCode, "upsert institution entity", () => UpsertInstitution(inst));
-                
+
                 var deleted = AttemptTransaction(inst.InstCode, "delete for replace", () => DeleteForInstitution(inst.InstCode));
                 var added = AttemptTransaction(inst.InstCode, "insert", () => AddForInstitution(inst.InstCode, payload));
 
@@ -53,29 +53,29 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
                     AttemptTransaction(inst.InstCode, "restore", () => AddForInstitution(inst.InstCode, deleted));
                 }
-                if(++processed % 100 == 0) 
+                if (++processed % 100 == 0)
                 {
                     _logger.LogInformation($"Upserted {processed} institutions so far");
-                }            
+                }
             }
-            _logger.LogWarning("Completed UCAS import");  
+            _logger.LogWarning("Completed UCAS import");
         }
-        
-        private UcasPayload AttemptTransaction(string instCode, string operationName, Func<UcasPayload> performActions) 
+
+        private UcasPayload AttemptTransaction(string instCode, string operationName, Func<UcasPayload> performActions)
         {
             var transaction = (_context as DbContext).Database.BeginTransaction();
             try
             {
                 var res = performActions();
-                
+
                 (_context as DbContext).SaveChanges();
                 transaction.Commit();
                 return res;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _logger.LogError(e, $"Import failed to update ({operationName}) Institution {instCode}");
-                
+
                 transaction.Rollback();
 
                 foreach (var entry in (_context as DbContext).ChangeTracker.Entries().ToList())
@@ -99,17 +99,17 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         private UcasPayload UpsertInstitution(UcasInstitution newValues)
         {
             var entity = _context.UcasInstitutions.FirstOrDefault(x => string.Equals(x.InstCode, newValues.InstCode, StringComparison.InvariantCultureIgnoreCase));
-            if (entity == null) 
+            if (entity == null)
             {
                 // insert
                 _context.UcasInstitutions.Add(newValues);
-                return new UcasPayload  { Institutions = new List<UcasInstitution> { newValues } };
+                return new UcasPayload { Institutions = new List<UcasInstitution> { newValues } };
 
             }
             else
             {
                 // update
-                entity.UpdateWith(newValues);                
+                entity.UpdateWith(newValues);
                 return new UcasPayload { Institutions = new List<UcasInstitution> { entity } };
             }
         }
@@ -117,7 +117,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
         private UcasPayload DeleteForInstitution(string instCode)
         {
-            var toDelete = new UcasPayload() 
+            var toDelete = new UcasPayload()
             {
                 NoteTexts = _context.UcasNoteTexts.Where(c => c.InstCode == instCode).ToList(),
                 CourseNotes = _context.UcasCourseNotes.Where(c => c.InstCode == instCode).ToList(),
@@ -132,14 +132,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             _context.UcasCourses.RemoveRange(toDelete.Courses);
             _context.CourseCodes.RemoveRange(_context.CourseCodes.Where(c => c.InstCode == instCode));
             _context.UcasCampuses.RemoveRange(toDelete.Campuses);
-            
+
             return toDelete;
         }
 
         private UcasPayload AddForInstitution(string instCode, UcasPayload payload)
         {
-            
-            foreach(var campus in payload.Campuses.Where(c => c.InstCode == instCode))
+
+            foreach (var campus in payload.Campuses.Where(c => c.InstCode == instCode))
             {
                 _context.AddUcasCampus(
                     new UcasCampus
@@ -155,26 +155,28 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                         TelNo = campus.TelNo,
                         Email = campus.Email,
                         RegionCode = campus.RegionCode
-                    });                
+                    });
             }
 
             var courseCodes = payload.Courses.Where(c => c.InstCode == instCode)
-                .Select(c => new CourseCode(){
+                .Select(c => new CourseCode()
+                {
                     CrseCode = c.CrseCode,
                     InstCode = c.InstCode
                 }).Distinct(new CourseCodeEquivalencyComparer());
 
             foreach (var course in courseCodes)
             {
-                _context.CourseCodes.Add(new CourseCode{
+                _context.CourseCodes.Add(new CourseCode
+                {
                     CrseCode = course.CrseCode,
                     InstCode = course.InstCode
                 });
-            }            
+            }
 
 
             foreach (var course in payload.Courses.Where(c => c.InstCode == instCode))
-            {            
+            {
                 // copy props to prevent changing id
                 _context.AddUcasCourse(new UcasCourse
                 {
@@ -234,7 +236,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             }
             return payload;
         }
-        
+
         public UserOrganisation GetOrganisationForUser(string email, string instCode)
         {
             var org = GetUserOrganisation(email, instCode);
@@ -351,19 +353,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         public InstitutionCourses GetCourses(string email, string instCode)
         {
             var returnCourses = new InstitutionCourses();
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(instCode)) { return returnCourses; }
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(instCode))
+            {
+                return returnCourses;
+            }
 
-            try
-            {
-                var courseRecords = _context.GetUcasCourseRecordsByInstCode(instCode, email);
-                var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
-                returnCourses = LoadCourses(courseRecords, enrichmentMetadata);
-            }
-            catch (Exception e)
-            {
-                //log the exception and return empty object
-                _logger.LogCritical(e, "Error in GetCourses(): InstCode={0}", instCode);
-            }
+            var courseRecords = _context.GetUcasCourseRecordsByInstCode(instCode, email);
+            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
+            returnCourses = LoadCourses(courseRecords, enrichmentMetadata);
             return returnCourses;
         }
         private InstitutionCourses LoadCourses(IReadOnlyList<UcasCourse> courseRecords, IList<UcasCourseEnrichmentGetModel> enrichmentMetadata)
@@ -377,7 +374,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 returnCourses.Courses = new List<Course>();
                 foreach (var courseCode in courseRecords.Select(c => c.CrseCode).Distinct())
                 {
-                    returnCourses.Courses.Add(LoadCourse(courseRecords.Where(c => c.CrseCode == courseCode).ToList(),enrichmentMetadata));
+                    returnCourses.Courses.Add(LoadCourse(courseRecords.Where(c => c.CrseCode == courseCode).ToList(), enrichmentMetadata));
                 }
             }
 
@@ -390,7 +387,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             if (courseRecords.Count > 0)
             {
                 var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical institution info so just get the first one
-                
+
                 var bestEnrichment = enrichmentMetadata.SingleOrDefault(x => x.InstCode == organisationCourseRecord.InstCode && x.CourseCode == organisationCourseRecord.CrseCode);
 
                 returnCourse.InstCode = organisationCourseRecord.InstCode;
