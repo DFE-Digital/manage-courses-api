@@ -574,7 +574,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     UcasCode = userOrganisation.InstitutionCode,
                     TotalCourses = userOrganisation.UcasInstitution.UcasCourses.Select(c => c.CrseCode).Distinct()
                         .Count(),
-                    EnrichmentWorkflowStatus = enrichment.Status
+                    EnrichmentWorkflowStatus = enrichment?.Status
                 };
             }
 
