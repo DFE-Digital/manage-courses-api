@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
@@ -15,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         private Mock<IManageCoursesDbContext> _contextMock;
         private Mock<IEnrichmentService> _enrichmentServiceMock;
         private Mock<IDataHelper> _dataHelperMock;
-        private DataService _dataService;
+        private IDataService _dataService;
 
         [SetUp]
         public void SetUp()
@@ -27,10 +29,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         }
 
         /// <summary>
-        /// Test status generation with no org enrichment present
+        /// Test status generation variations
         /// </summary>
         [Test]
-        public void Test_Initial_OrgStatus()
+        public void Test_OrgStatus()
         {
             const string email = "roger@example.org";
             const string instCode = "BAT4";
@@ -38,9 +40,24 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             {
                 UcasInstitution = new UcasInstitution(),
             });
+
+            // test blank
             var org = _dataService.GetOrganisationForUser(email, instCode);
             org.Should().NotBeNull();
-            org.EnrichmentWorkflowStatus.Should().BeNull();
+            org.EnrichmentWorkflowStatus.Should().BeNull("there's no enrichment present");
+
+            // test draft
+            var ucasInstitutionEnrichmentGetModel = new UcasInstitutionEnrichmentGetModel { Status = EnumStatus.Draft };
+            _enrichmentServiceMock.Setup(e => e.GetInstitutionEnrichment(instCode, email)).Returns(ucasInstitutionEnrichmentGetModel);
+            var enrichedOrg = _dataService.GetOrganisationForUser(email, instCode);
+            enrichedOrg.Should().NotBeNull();
+            enrichedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
+
+            // test published
+            ucasInstitutionEnrichmentGetModel.Status = EnumStatus.Published;
+            var publishedOrg = _dataService.GetOrganisationForUser(email, instCode);
+            publishedOrg.Should().NotBeNull();
+            publishedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
         }
     }
 }
