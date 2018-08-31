@@ -563,6 +563,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         private UserOrganisation GetUserOrganisation(string email, string instCode)
         {
             var userOrganisation = _context.GetUserOrganisation(email, instCode);
+            var enrichment = _enrichmentService.GetInstitutionEnrichment(instCode, email);
+
             if (userOrganisation != null)
             {
                 return new UserOrganisation()
@@ -571,7 +573,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     OrganisationName = userOrganisation.UcasInstitution.InstFull,
                     UcasCode = userOrganisation.InstitutionCode,
                     TotalCourses = userOrganisation.UcasInstitution.UcasCourses.Select(c => c.CrseCode).Distinct()
-                        .Count()
+                        .Count(),
+                    EnrichmentWorkflowStatus = enrichment.Status
                 };
             }
 
