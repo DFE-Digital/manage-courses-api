@@ -32,11 +32,15 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             ValidateUserOrg(email, instCode);
 
-            var enrichment = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower())
+            instCode = instCode.ToUpper(); 
+
+            var enrichment = _context.InstitutionEnrichments
+                .Where(ie => ie.InstCode == instCode)
                 .OrderByDescending(x => x.Id)
                 .Include(e => e.CreatedByUser)
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
+
             var enrichmentToReturn = Convert(enrichment);
 
             return enrichmentToReturn;
@@ -54,8 +58,13 @@ namespace GovUk.Education.ManageCourses.Api.Services
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
         {
             var userInst = ValidateUserOrg(email, instCode);
+            
+            instCode = instCode.ToUpper();
 
-            var enrichmentDraftRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+            var enrichmentDraftRecord = _context.InstitutionEnrichments
+                .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefault();
 
             var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
 
@@ -69,7 +78,11 @@ namespace GovUk.Education.ManageCourses.Api.Services
             else
             {
                 //insert
-                var enrichmentPublishRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Published).OrderByDescending(x => x.Id).FirstOrDefault();
+                var enrichmentPublishRecord = _context.InstitutionEnrichments
+                    .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Published)
+                    .OrderByDescending(x => x.Id)
+                    .FirstOrDefault();
+
                 DateTime? lastPublishedDate = null;
                 if (enrichmentPublishRecord != null)
                 {
@@ -101,7 +114,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var returnBool = false;
             var userInst = ValidateUserOrg(email, instCode);
 
-            var enrichmentDraftRecord = _context.InstitutionEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+            instCode = instCode.ToUpper();
+
+            var enrichmentDraftRecord = _context.InstitutionEnrichments
+                .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefault();
 
             if (enrichmentDraftRecord != null)
             {
@@ -171,7 +189,13 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         {
             var userInst = ValidateUserOrg(email, instCode);
 
-            var enrichmentDraftRecord = _context.CourseEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ucasCourseCode.ToLower() == ie.UcasCourseCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+            instCode = instCode.ToUpper();
+            ucasCourseCode = ucasCourseCode.ToUpper();
+
+            var enrichmentDraftRecord = _context.CourseEnrichments
+                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
+                .OrderByDescending(x => x.Id)
+                .FirstOrDefault();
 
             var content = JsonConvert.SerializeObject(model, _jsonSerializerSettings);
 
@@ -185,8 +209,11 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             else
             {
                 //insert
-                // todo: make this EF friendly
-                var enrichmentPublishRecord = _context.CourseEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ucasCourseCode.ToLower() == ie.UcasCourseCode.ToLower() && ie.Status == EnumStatus.Published).OrderByDescending(x => x.Id).FirstOrDefault();
+                var enrichmentPublishRecord = _context.CourseEnrichments
+                    .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Published)
+                    .OrderByDescending(x => x.Id)
+                    .FirstOrDefault();
+
                 DateTime? lastPublishedDate = null;
                 if (enrichmentPublishRecord != null)
                 {
@@ -220,8 +247,11 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             var returnBool = false;
             var userInst = ValidateUserOrg(email, instCode);
 
-            // todo: make this EF friendly
-            var enrichmentDraftRecord = _context.CourseEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ucasCourseCode.ToLower() == ie.UcasCourseCode.ToLower() && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+            instCode = instCode.ToUpper();
+            ucasCourseCode = ucasCourseCode.ToUpper();
+
+            var enrichmentDraftRecord = _context.CourseEnrichments
+                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
 
             if (enrichmentDraftRecord != null)
             {
