@@ -1,10 +1,12 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -59,5 +61,27 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             publishedOrg.Should().NotBeNull();
             publishedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
         }
+
+        [Test]
+        public void Test_CourseStatus()
+        {
+            const string email = "rabbit@example.org";
+            const string instCode = "BAT5";
+            const string ucasCourseCode = "VEG1";
+            _contextMock.Setup(c => c.GetUcasCourseRecordsByUcasCode(instCode, ucasCourseCode, email))
+                .Returns(new List<UcasCourse>
+                {
+                    new UcasCourse(),
+                });
+            var enrichmentList = new List<UcasCourseEnrichmentGetModel>();
+            _enrichmentServiceMock.Setup(e => e.GetCourseEnrichmentMetadata(instCode, email)).Returns(enrichmentList);
+            //var ucasCourseSubjects = new DbSet<UcasCourseSubject>();
+            var ucasCourseSubjects = new Mock<DbSet<UcasCourseSubject>>();
+            _contextMock.SetupGet(c => c.UcasCourseSubjects).Returns(ucasCourseSubjects.Object);
+            var cs = _dataService.GetCourse(email, instCode, ucasCourseCode);
+            cs.Should().NotBeNull("this course has been mocked");
+            cs.EnrichmentWorkflowStatus.Should().BeNull("course enrichment doesn't exist");
+        }
     }
 }
+
