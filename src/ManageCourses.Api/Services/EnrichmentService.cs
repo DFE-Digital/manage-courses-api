@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
@@ -119,22 +120,41 @@ namespace GovUk.Education.ManageCourses.Api.Services
         /// gets the latest enrichment record regardless of the status
         /// </summary>
         /// <param name="instCode">institution code for the enrichment</param>
-        /// <param name="ucasCourseCode"></param>
+        /// <param name="ucasCourseCode">can be null</param>
         /// <param name="email">email of the user</param>
         /// <returns>An enrichment object with the enrichment data (if found). Nul if not found</returns>
         public UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email)
         {
             ValidateUserOrg(email, instCode);
 
-            // todo: make this EF friendly
-            var enrichment = _context.CourseEnrichments.Where(ie => instCode.ToLower() == ie.InstCode.ToLower() && ucasCourseCode.ToLower() == ie.UcasCourseCode.ToLower())
+            instCode = instCode.ToUpper();
+            ucasCourseCode = ucasCourseCode.ToUpper();
+
+            var enrichment = _context.CourseEnrichments
+                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode)
                 .OrderByDescending(x => x.Id)
                 .Include(e => e.CreatedByUser)
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
+
             var enrichmentToReturn = Convert(enrichment);
 
             return enrichmentToReturn;
+        }
+
+        public IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email)
+        {        
+            ValidateUserOrg(email, instCode);
+
+            instCode = instCode.ToUpper();
+
+            var enrichments = _context.CourseEnrichments.FromSql(@"
+SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_pubished_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
+FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY inst_code, ucas_course_code) top_id
+INNER JOIN course_enrichment b on top_id.id = b.id")
+                .Where(e => e.InstCode == instCode);
+
+            return enrichments.Select(x => Convert(x)).ToList();
         }
 
         /// <summary>
@@ -260,6 +280,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
             enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser.Id;
             enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
             enrichmentToReturn.Status = source.Status;
+            enrichmentToReturn.InstCode = source.InstCode;
+            enrichmentToReturn.CourseCode = source.UcasCourseCode;
             return enrichmentToReturn;
         }
 

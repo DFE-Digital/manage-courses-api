@@ -15,12 +15,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
     public class DataService : IDataService
     {
         private readonly IManageCoursesDbContext _context;
+        IEnrichmentService _enrichmentService;
         private readonly IDataHelper _dataHelper;
         private readonly ILogger _logger;
 
-        public DataService(IManageCoursesDbContext context, IDataHelper dataHelper, ILogger<DataService> logger)
+        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, IDataHelper dataHelper, ILogger<DataService> logger)
         {
             _context = context;
+            _enrichmentService = enrichmentService;
             _dataHelper = dataHelper;
             _logger = logger;
         }
@@ -331,12 +333,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         {
 
             var courseRecords = _context.GetUcasCourseRecordsByUcasCode(instCode, ucasCode, email);
+            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
 
             if (courseRecords.Count == 0)
             {
                 return null;
             }
-            var course = LoadCourse(courseRecords);
+            var course = LoadCourse(courseRecords, enrichmentMetadata);
             return course;
         }
         /// <summary>
@@ -353,7 +356,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             try
             {
                 var courseRecords = _context.GetUcasCourseRecordsByInstCode(instCode, email);
-                returnCourses = LoadCourses(courseRecords);
+                var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
+                returnCourses = LoadCourses(courseRecords, enrichmentMetadata);
             }
             catch (Exception e)
             {
@@ -362,7 +366,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             }
             return returnCourses;
         }
-        private InstitutionCourses LoadCourses(IReadOnlyList<UcasCourse> courseRecords)
+        private InstitutionCourses LoadCourses(IReadOnlyList<UcasCourse> courseRecords, IList<UcasCourseEnrichmentGetModel> enrichmentMetadata)
         {
             var returnCourses = new InstitutionCourses();
             if (courseRecords.Count > 0)
@@ -373,19 +377,22 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 returnCourses.Courses = new List<Course>();
                 foreach (var courseCode in courseRecords.Select(c => c.CrseCode).Distinct())
                 {
-                    returnCourses.Courses.Add(LoadCourse(courseRecords.Where(c => c.CrseCode == courseCode).ToList()));
+                    returnCourses.Courses.Add(LoadCourse(courseRecords.Where(c => c.CrseCode == courseCode).ToList(),enrichmentMetadata));
                 }
             }
 
             return returnCourses;
 
         }
-        private Course LoadCourse(IReadOnlyList<UcasCourse> courseRecords)
+        private Course LoadCourse(IReadOnlyList<UcasCourse> courseRecords, IList<UcasCourseEnrichmentGetModel> enrichmentMetadata)
         {
             var returnCourse = new Course();
             if (courseRecords.Count > 0)
             {
                 var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical institution info so just get the first one
+                
+                var bestEnrichment = enrichmentMetadata.SingleOrDefault(x => x.InstCode == organisationCourseRecord.InstCode && x.CourseCode == organisationCourseRecord.CrseCode);
+
                 returnCourse.InstCode = organisationCourseRecord.InstCode;
                 returnCourse.CourseCode = organisationCourseRecord.CrseCode;
                 returnCourse.AccreditingProviderId = organisationCourseRecord.AccreditingProvider;
@@ -406,6 +413,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
                 returnCourse.Subjects = string.Join(", ", subjects);
                 returnCourse.Schools = GetSchoolsData(courseRecords);
+                returnCourse.EnrichmentWorkflowStatus = bestEnrichment?.Status;
             }
 
             return returnCourse;

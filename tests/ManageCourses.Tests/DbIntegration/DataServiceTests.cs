@@ -30,7 +30,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected override void Setup()
         {
             var mockLogger = new Mock<ILogger<DataService>>();
-            DataService = new DataService(Context, new UserDataHelper(), mockLogger.Object);
+            var mockEnrichmentService = new Mock<IEnrichmentService>();
+            DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object);
         }
 
         [Test]

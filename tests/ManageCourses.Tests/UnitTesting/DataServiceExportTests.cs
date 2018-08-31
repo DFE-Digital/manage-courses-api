@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers;
@@ -19,8 +20,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [OneTimeSetUp]
         public void Setup()
         {
-            _dbContext = TestHelper.GetFakeData(EnumTestType.DataService);
-            _dataService = new DataService(_dbContext, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            _dbContext = TestHelper.GetFakeData(EnumTestType.DataService);            
+            var mockEnrichmentService = new Mock<IEnrichmentService>();
+            _dataService = new DataService(_dbContext, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_email_should_return_loaded_object()

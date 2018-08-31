@@ -269,7 +269,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             // Arrange
             var enrichmentService = new EnrichmentService(Context);
-            var dataService = new DataService(Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            var dataService = new DataService(Context, enrichmentService, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
             var sourceModel = new UcasInstitutionEnrichmentPostModel
             {
                 EnrichmentModel = new InstitutionEnrichmentModel
