@@ -167,7 +167,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             instCode = instCode.ToUpper();
 
             var enrichments = _context.CourseEnrichments.FromSql(@"
-SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_pubished_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
+SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
 FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY inst_code, ucas_course_code) top_id
 INNER JOIN course_enrichment b on top_id.id = b.id")
                 .Where(e => e.InstCode == instCode);
