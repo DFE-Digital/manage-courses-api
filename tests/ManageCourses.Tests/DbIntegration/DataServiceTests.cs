@@ -31,6 +31,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var mockLogger = new Mock<ILogger<DataService>>();
             var mockEnrichmentService = new Mock<IEnrichmentService>();
+            mockEnrichmentService.Setup(x => x.GetCourseEnrichmentMetadata(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<UcasCourseEnrichmentGetModel>());
             DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object);
         }
 
