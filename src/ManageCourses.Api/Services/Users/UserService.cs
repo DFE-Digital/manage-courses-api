@@ -47,14 +47,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             LogLogin(mcUser);
             UpdateMcUserFromSignIn(mcUser, userDetails);
 
-            if (!_context.McSessions.Any(x => x.AccessToken == accessToken && x.CreatedUtc > DateTime.UtcNow.AddMinutes(-30)))
+            if (!_context.McSessions.Any(x => x.AccessToken == accessToken && x.CreatedUtc > _clock.UtcNow.AddMinutes(-30)))
             {
                 _context.McSessions.Add(new McSession{
                     AccessToken = accessToken,
                     McUser = mcUser,
                     Email = mcUser.Email,
                     Subject = userDetails.Subject,
-                    CreatedUtc = DateTime.UtcNow
+                    CreatedUtc = _clock.UtcNow
                 });
             }
 
