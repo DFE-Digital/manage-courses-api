@@ -45,10 +45,11 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
             try
             {
-                var userDetails = GetJsonUserDetails(accessToken);
+                var userDetails = GetJsonUserDetailsFromDatabase(accessToken) ?? GetJsonUserDetailsFromOauth(accessToken);
+                
                 try
                 {
-                    await _userService.UserSignedInAsync(userDetails);
+                    await _userService.UserSignedInAsync(accessToken, userDetails);
                 }
                 catch (McUserNotFoundException)
                 {
@@ -73,7 +74,26 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
         }
 
-        private JsonUserDetails GetJsonUserDetails(string accessToken)
+        private JsonUserDetails GetJsonUserDetailsFromDatabase(string accessToken)
+        {
+            var dateCutoff = DateTime.UtcNow.AddMinutes(-30);
+            var session = _manageCoursesDbContext.McSessions
+                .Where(x => x.AccessToken == accessToken && x.CreatedUtc > dateCutoff)
+                .SingleOrDefault();
+
+            if (session == null)
+            {
+                return null;
+            }
+            
+            return new JsonUserDetails
+            {
+                Email = session.Email,
+                Subject = session.Subject
+            };
+        }
+
+        private JsonUserDetails GetJsonUserDetailsFromOauth(string accessToken)
         {
             var responsesString = "";
 
