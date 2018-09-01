@@ -98,7 +98,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
         private UcasPayload UpsertInstitution(UcasInstitution newValues)
         {
-            var entity = _context.UcasInstitutions.FirstOrDefault(x => string.Equals(x.InstCode, newValues.InstCode, StringComparison.InvariantCultureIgnoreCase));
+            newValues.InstCode = newValues.InstCode.ToUpperInvariant();
+            var entity = _context.UcasInstitutions.FirstOrDefault(x => x.InstCode == newValues.InstCode);
             if (entity == null)
             {
                 // insert
@@ -525,6 +526,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         private Organisation GetOrganisation(string email, string ucasCode)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(ucasCode)) return null;
+            ucasCode = ucasCode.ToUpperInvariant();
 
             var mcUsers = _context.McUsers.ByEmail(email)
                 .Include("McOrganisationUsers.McOrganisation.McOrganisationInstitutions.UcasInstitution").ToList();
@@ -533,7 +535,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 ou => ou.McOrganisationUsers.SelectMany(oi => oi.McOrganisation.McOrganisationInstitutions)).ToList();
 
             var mcOrganisationInstitution = mcOrganisationInstitutions.SingleOrDefault(
-                oi => ucasCode.Equals(oi.UcasInstitution.InstCode, StringComparison.InvariantCultureIgnoreCase));
+                oi => oi.InstitutionCode == ucasCode);
 
             if (mcOrganisationInstitution == null) return null;
 

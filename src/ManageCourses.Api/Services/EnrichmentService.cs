@@ -32,7 +32,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpper(); 
+            instCode = instCode.ToUpperInvariant(); 
 
             var enrichment = _context.InstitutionEnrichments
                 .Where(ie => ie.InstCode == instCode)
@@ -59,7 +59,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             var userInst = ValidateUserOrg(email, instCode);
             
-            instCode = instCode.ToUpper();
+            instCode = instCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments
                 .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
@@ -90,7 +90,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 }
                 var enrichment = new InstitutionEnrichment
                 {
-                    InstCode = userInst.UcasInstitution.InstCode,
+                    InstCode = userInst.UcasInstitutionCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
@@ -114,7 +114,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var returnBool = false;
             var userInst = ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpper();
+            instCode = instCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments
                 .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
@@ -145,8 +145,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpper();
-            ucasCourseCode = ucasCourseCode.ToUpper();
+            instCode = instCode.ToUpperInvariant();
+            ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichment = _context.CourseEnrichments
                 .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode)
@@ -164,7 +164,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {        
             ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpper();
+            instCode = instCode.ToUpperInvariant();
 
             var enrichments = _context.CourseEnrichments.FromSql(@"
 SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
@@ -189,8 +189,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         {
             var userInst = ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpper();
-            ucasCourseCode = ucasCourseCode.ToUpper();
+            instCode = instCode.ToUpperInvariant();
+            ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.CourseEnrichments
                 .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
@@ -221,7 +221,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                 }
                 var enrichment = new CourseEnrichment
                 {
-                    InstCode = userInst.UcasInstitution.InstCode,
+                    InstCode = userInst.UcasInstitutionCode,
                     UcasCourseCode = ucasCourseCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
@@ -247,8 +247,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             var returnBool = false;
             var userInst = ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpper();
-            ucasCourseCode = ucasCourseCode.ToUpper();
+            instCode = instCode.ToUpperInvariant();
+            ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.CourseEnrichments
                 .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
@@ -271,21 +271,20 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided."); }
             if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
 
-            var user = _context.McUsers.ByEmail(email)
-                .Include(x => x.McOrganisationUsers)
-                .ThenInclude(x => x.McOrganisation)
-                .ThenInclude(x => x.McOrganisationInstitutions)
-                .ThenInclude(x => x.UcasInstitution)
-                .Single();
+            instCode = instCode.ToUpperInvariant();
+            email = email.ToLowerInvariant();
 
-            var institution = user.McOrganisationUsers
-                .SelectMany(ou => ou.McOrganisation.McOrganisationInstitutions)
-                .Single(i => instCode.ToLower() == i.InstitutionCode.ToLower()).UcasInstitution;//should throw an error if the user doesn't have acces to the inst or the inst doesn't exist
+            var inst = _context.McOrganisationIntitutions.Single(x => x.InstitutionCode == instCode); //should throw an error if  the inst doesn't exist
+            
+            var orgUser = _context.McOrganisationUsers
+                .Where(x => x.Email == email && x.OrgId == inst.OrgId)
+                .Include(x=> x.McUser)
+                .Single(); //should throw an error if the user doesn't have acces to the inst
 
             var returnUserInst = new UserInstitution
             {
-                McUser = user,
-                UcasInstitution = institution
+                McUser = orgUser.McUser,
+                UcasInstitutionCode = instCode
             };
 
             return returnUserInst;
