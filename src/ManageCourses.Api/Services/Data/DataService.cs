@@ -382,7 +382,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             return returnCourses;
 
         }
-        private Course LoadCourse(IReadOnlyList<UcasCourse> courseRecords, IList<UcasCourseEnrichmentGetModel> enrichmentMetadata)
+        private Course LoadCourse(IReadOnlyList<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata)
         {
             var returnCourse = new Course();
             if (courseRecords.Count > 0)
