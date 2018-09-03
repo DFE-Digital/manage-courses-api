@@ -1,10 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
     public class UcasInstitution
-    {        
+    {
+        public UcasInstitution()
+        {
+            UcasCourses = new List<UcasCourse>();
+        }
+
         public void UpdateWith(UcasInstitution inst)
         {
             InstName = inst.InstName;
@@ -22,7 +26,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
             Scitt = inst.Scitt;
             SchemeMember = inst.SchemeMember;
         }
-
 
         public int Id { get; set; }
         public string InstCode { get; set; }
@@ -48,6 +51,5 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public ICollection<UcasCourseSubject> UcasCourseSubjects { get; set; }
         public ICollection<UcasCampus> UcasCampuses { get; set; }
         public ICollection<CourseCode> CourseCodes { get; set; }
-
     }
 }

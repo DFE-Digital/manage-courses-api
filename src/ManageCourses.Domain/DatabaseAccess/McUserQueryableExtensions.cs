@@ -8,12 +8,14 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
     {
         /// <summary>
         /// Case insensitive filter for users by email address.
+        /// This relies on the convention that all emails are lower case in the database.null
         /// This should be used for all lookups by email even for OrganisationUser to keep logic consistent.
         /// Follow this with .SingleOrDefault to get an actuall McUser object (don't forget to check for nulls!).
         /// </summary>
         public static IQueryable<McUser> ByEmail(this IQueryable<McUser> mcUsers, string email)
         {
-            return mcUsers.Where(user => string.Equals(user.Email, email, StringComparison.InvariantCultureIgnoreCase));
+            var emailLower = email == null ? null : email.ToLowerInvariant();
+            return mcUsers.Where(user => user.Email == emailLower);
         }
     }
 }

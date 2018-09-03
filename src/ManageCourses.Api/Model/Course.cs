@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Domain.Models;
 
 namespace GovUk.Education.ManageCourses.Api.Model
 {
@@ -21,6 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string Subjects { get; set; }
         public string StudyMode { get; set; }
         public string AgeRange { get; set; }
+        public EnumStatus? EnrichmentWorkflowStatus { get; set; }
         public IEnumerable<School> Schools { get; set; }
     }
 }

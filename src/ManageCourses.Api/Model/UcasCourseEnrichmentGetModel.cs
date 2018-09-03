@@ -16,5 +16,7 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public int CreatedByUserId { get; set; }//TODO should be a user object however it causes an error 
         public int UpdatedByUserId { get; set; }//TODO should be a user object however it causes an error 
         public EnumStatus Status { get; set; }
+        public string InstCode { get; set; }
+        public string CourseCode { get; set; }
     }
 }

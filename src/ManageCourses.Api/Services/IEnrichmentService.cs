@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ManageCourses.Api.Model;
+﻿using System.Collections.Generic;
+using GovUk.Education.ManageCourses.Api.Model;
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
@@ -10,5 +11,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
         UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email);
         void SaveCourseEnrichment(CourseEnrichmentModel model, string instCode, string ucasCourseCode, string email);
         bool PublishCourseEnrichment(string instCode, string ucasCourseCode, string email);
+        IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email);        
     }
 }

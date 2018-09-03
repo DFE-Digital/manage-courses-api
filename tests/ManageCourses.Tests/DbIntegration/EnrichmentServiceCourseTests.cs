@@ -96,6 +96,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var enrichmentService = new EnrichmentService(Context);
 
+            var courseEnrichment = enrichmentService.GetCourseEnrichment(ProviderInstCode, UcasCourseCode.ToLower(), Email);
+            courseEnrichment.Should().BeNull("we haven't enriched this course yet");
+            var emptyMetadata = enrichmentService.GetCourseEnrichmentMetadata(ProviderInstCode, Email);
+            emptyMetadata.Count.Should().Be(0, "we haven't enriched any courses yet");
+
             //test saving sparse model
             var sourceModel = new CourseEnrichmentModel
             {
@@ -118,6 +123,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             enrichmentService.SaveCourseEnrichment(sourceModel, ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
 
             //test get
+            var courseEnrichmentMetadata = enrichmentService.GetCourseEnrichmentMetadata(ProviderInstCode, Email);
+            courseEnrichmentMetadata.Count.Should().Be(1, "we have enriched one course");
+            courseEnrichmentMetadata.Single().Status.Should().Be(EnumStatus.Draft);
             var result = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode.ToLower(), Email);
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
@@ -147,6 +155,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             //publish
             var publishResults = enrichmentService.PublishCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode, Email);
             publishResults.Should().BeTrue();
+            var publishedMetadata = enrichmentService.GetCourseEnrichmentMetadata(ProviderInstCode, Email);
+            publishedMetadata.Count.Should().Be(1, "we have enriched one course");
+            publishedMetadata.Single().Status.Should().Be(EnumStatus.Published);
             var publishRecord = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode, Email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
@@ -172,6 +183,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
             const string otherCourseCode = "D0H";
             enrichmentService.SaveCourseEnrichment(nextCourseModel, ProviderInstCode.ToLower(), otherCourseCode, Email);
+            var twoCourseMetadata = enrichmentService.GetCourseEnrichmentMetadata(ProviderInstCode, Email);
+            twoCourseMetadata.Count.Should().Be(2, "we have enriched two courses in this institution");
             var nextCourseGet = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), otherCourseCode, Email);
             nextCourseGet.Should().NotBeNull();
             nextCourseGet.EnrichmentModel.Should().NotBeNull();
@@ -237,7 +250,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const string aboutCourseText = "About Course Text";
             // Arrange
             var enrichmentService = new EnrichmentService(Context);
-            var dataService = new DataService(Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            var dataService = new DataService(Context, enrichmentService, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
             var sourceModel = new CourseEnrichmentModel
             {
                 AboutCourse = aboutCourseText,

@@ -91,7 +91,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         /// This test ensures that the status is always correct at the right point in the workflow
         /// </summary>
         [Test]
-        public void Test_InstitutionEnrichment_workflow_should_not_error()
+        public void Test_InstitutionEnrichment_And_Publishing_Workflow()
         {
             const string trainWithDisabilityText = "TrainWithDisabilily Text";
             const string trainWithUsText = "TrainWithUs Text";
@@ -116,6 +116,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     }
                 }
             };
+
+            var emptyEnrichment = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
+            emptyEnrichment.Should().BeNull("we haven't enriched the institution data yet");
+
             //test save
             enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
 
@@ -269,7 +273,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             // Arrange
             var enrichmentService = new EnrichmentService(Context);
-            var dataService = new DataService(Context, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            var dataService = new DataService(Context, enrichmentService, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
             var sourceModel = new UcasInstitutionEnrichmentPostModel
             {
                 EnrichmentModel = new InstitutionEnrichmentModel

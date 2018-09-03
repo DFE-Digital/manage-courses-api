@@ -282,15 +282,16 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         {
             InstitutionEnrichments.Add(institutionEnrichment);
         }
+
         public List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
         {
-            var ucasCourses = UcasCourses.FromSql(
-                    $"select c.* from ucas_course c " +
-                    $"join mc_organisation_institution oi on oi.institution_code=c.inst_code " +
-                    $"join mc_organisation_user ou on ou.org_id=oi.org_id " +
-                    $"where lower(c.inst_code)=lower(@instCode) " +
-                    $"and lower(c.crse_code)=lower(@ucasCode) " +
-                    $"and lower(ou.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
+            var ucasCourses = UcasCourses.FromSql(@"
+                    select c.* from ucas_course c
+                    join mc_organisation_institution oi on oi.institution_code=c.inst_code 
+                    join mc_organisation_user ou on ou.org_id=oi.org_id 
+                    where lower(c.inst_code)=lower(@instCode) 
+                    and lower(c.crse_code)=lower(@ucasCode) 
+                    and lower(ou.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
                 .Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
                 .Include(x => x.AccreditingProviderInstitution)

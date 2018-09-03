@@ -156,3 +156,7 @@ Make your changes to the model, then from command prompt:
 
 If this doesn't work try running the sln in Visual Studio.
 
+### Rollback / down migration
+
+    cd src\ManageCourses.Domain\
+    dotnet ef --startup-project ..\ManageCourses.Api database update [previous migration name]

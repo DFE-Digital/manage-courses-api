@@ -20,7 +20,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     public class DataServiceTests : DbIntegrationTestBase
     {
         public IDataService DataService;
-        private const string InstCode1 = "InstCode_1";
+        private const string InstCode1 = "INSTCODE_1";
 
         private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
@@ -30,7 +30,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected override void Setup()
         {
             var mockLogger = new Mock<ILogger<DataService>>();
-            DataService = new DataService(Context, new UserDataHelper(), mockLogger.Object);
+            var mockEnrichmentService = new Mock<IEnrichmentService>();
+            mockEnrichmentService.Setup(x => x.GetCourseEnrichmentMetadata(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(new List<UcasCourseEnrichmentGetModel>());
+            DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object);
         }
 
         [Test]
@@ -152,7 +155,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             //make dodgy
             import.Courses = import.Courses.Concat(new List<UcasCourse>
             {
-                new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "Foo"}
+                new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "FOO"}
             }).ToList();
 
             DataService.ProcessUcasPayload(import);
@@ -454,7 +457,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     new UcasCourse
                     {
                         InstCode = InstCode1,
-                        CrseCode = "CourseCode_1",
+                        CrseCode = "COURSECODE_1",
                         Status = "N",
                     }
                 }
