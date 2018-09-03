@@ -242,15 +242,15 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnName("created_utc");
 
-                    b.Property<string>("Email")
-                        .HasColumnName("email");
+                    b.Property<int?>("McUserId")
+                        .HasColumnName("mc_user_id");
 
                     b.Property<string>("Subject")
                         .HasColumnName("subject");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email");
+                    b.HasIndex("McUserId");
 
                     b.HasIndex("AccessToken", "CreatedUtc");
 
@@ -657,9 +657,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 {
                     b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "McUser")
                         .WithMany("Sessions")
-                        .HasForeignKey("Email")
-                        .HasPrincipalKey("Email")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("McUserId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.NctlOrganisation", b =>

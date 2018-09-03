@@ -127,9 +127,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             modelBuilder.Entity<McSession>()
                 .HasOne(x => x.McUser)
                 .WithMany(u => u.Sessions)
-                .HasForeignKey(x => x.Email)
-                .HasPrincipalKey(u => u.Email)
-                .OnDelete(DeleteBehavior.SetNull);
+                .OnDelete(DeleteBehavior.Cascade);
             
             modelBuilder.Entity<McSession>()
                 .HasIndex(x => new {x.AccessToken, x.CreatedUtc});

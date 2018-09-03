@@ -17,24 +17,24 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
                     access_token = table.Column<string>(nullable: true),
                     created_utc = table.Column<DateTime>(nullable: false),
-                    email = table.Column<string>(nullable: true),
+                    mc_user_id = table.Column<int>(nullable: true),
                     subject = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_mc_session", x => x.id);
                     table.ForeignKey(
-                        name: "FK_mc_session_mc_user_email",
-                        column: x => x.email,
+                        name: "FK_mc_session_mc_user_mc_user_id",
+                        column: x => x.mc_user_id,
                         principalTable: "mc_user",
-                        principalColumn: "email",
-                        onDelete: ReferentialAction.SetNull);
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_mc_session_email",
+                name: "IX_mc_session_mc_user_id",
                 table: "mc_session",
-                column: "email");
+                column: "mc_user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_mc_session_access_token_created_utc",

@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
 {
@@ -78,6 +79,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
         {
             var dateCutoff = DateTime.UtcNow.AddMinutes(-30);
             var session = _manageCoursesDbContext.McSessions
+                .Include(x => x.McUser)
                 .Where(x => x.AccessToken == accessToken && x.CreatedUtc > dateCutoff)
                 .SingleOrDefault();
 
@@ -88,7 +90,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             
             return new JsonUserDetails
             {
-                Email = session.Email,
+                Email = session.McUser.Email,
                 Subject = session.Subject
             };
         }

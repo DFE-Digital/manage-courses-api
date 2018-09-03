@@ -52,7 +52,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
                 _context.McSessions.Add(new McSession{
                     AccessToken = accessToken,
                     McUser = mcUser,
-                    Email = mcUser.Email,
                     Subject = userDetails.Subject,
                     CreatedUtc = _clock.UtcNow
                 });

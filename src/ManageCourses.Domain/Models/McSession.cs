@@ -9,8 +9,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     {
         public int Id { get; set; }
 
-        public string Email { get; set; }
-
         public McUser McUser { get; set; }
 
         public string AccessToken { get; set; }
