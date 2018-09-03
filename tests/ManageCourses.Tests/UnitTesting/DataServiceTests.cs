@@ -62,6 +62,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             publishedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
         }
 
+        [Ignore("wip")] // todo: finish off course status coverage in a new PR
         [Test]
         public void Test_CourseStatus()
         {
