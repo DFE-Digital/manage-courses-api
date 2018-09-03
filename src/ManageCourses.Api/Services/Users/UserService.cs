@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Middleware;
@@ -25,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public async Task UserSignedInAsync(JsonUserDetails userDetails)
+        public async Task UserSignedInAsync(string accessToken, JsonUserDetails userDetails)
         {
             var mcUser = await _context.McUsers.SingleOrDefaultAsync(u => u.SignInUserId == userDetails.Subject);
             if (mcUser == null)
@@ -44,6 +46,17 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             }
             LogLogin(mcUser);
             UpdateMcUserFromSignIn(mcUser, userDetails);
+
+            if (!_context.McSessions.Any(x => x.AccessToken == accessToken && x.CreatedUtc > _clock.UtcNow.AddMinutes(-30)))
+            {
+                _context.McSessions.Add(new McSession{
+                    AccessToken = accessToken,
+                    McUser = mcUser,
+                    Subject = userDetails.Subject,
+                    CreatedUtc = _clock.UtcNow
+                });
+            }
+
             _context.Save();
             SendWelcomeEmail(mcUser);
         }

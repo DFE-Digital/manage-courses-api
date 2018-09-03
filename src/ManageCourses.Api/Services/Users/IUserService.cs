@@ -13,8 +13,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         /// Implementation will handle workflow actions
         /// that need to happen off the back of this.
         /// </summary>
+        /// <param name="accessToken">The OAuth AccessToken</param>
         /// <param name="userDetails">Details from DfE Sign-in</param>
         /// <returns></returns>
-        Task UserSignedInAsync(JsonUserDetails userDetails);
+        Task UserSignedInAsync(string accessToken, JsonUserDetails userDetails);
     }
 }

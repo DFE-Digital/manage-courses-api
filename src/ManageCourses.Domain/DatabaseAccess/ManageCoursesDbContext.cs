@@ -123,6 +123,15 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
             modelBuilder.Entity<InstitutionEnrichment>()
                 .HasIndex(x => x.InstCode);
+                
+            modelBuilder.Entity<McSession>()
+                .HasOne(x => x.McUser)
+                .WithMany(u => u.Sessions)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<McSession>()
+                .HasIndex(x => new {x.AccessToken, x.CreatedUtc});
+
 
             base.OnModelCreating(modelBuilder);
         }
@@ -154,6 +163,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<AccessRequest> AccessRequests { get; set; }
         public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
+        public DbSet<McSession> McSessions { get;  set; }
 
         public IList<UcasCourse> GetAllUcasCourses()
         {

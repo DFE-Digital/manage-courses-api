@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -70,7 +71,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 GivenName = "The",
                 Subject = "673535D4-3CB3-4A1D-B1F0-B0FFB787CECF",
             };
-            Func<Task> signIn = async () => { await _userService.UserSignedInAsync(unknownUser); };
+            Func<Task> signIn = async () => { await _userService.UserSignedInAsync("abc", unknownUser); };
             signIn.Should().Throw<McUserNotFoundException>($"{unknownUser.Email} / {unknownUser.Subject} does not exist in McUsers");
         }
 
@@ -92,7 +93,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             // test a realistic journey, validating the state of the data at each step
 
             // bob signs in for the first time
-            _userService.UserSignedInAsync(userDetails1);
+            _userService.UserSignedInAsync("abc", userDetails1);
             // check user data updated from claims and timestamps have been set
             CheckUserDataUpdated(_testUserBob, userDetails1);
             _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
@@ -119,10 +120,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 FamilyName = "Charlton the legend",
                 Subject = bobSubject,
             };
-            _userService.UserSignedInAsync(userDetails2); // would throw if it couldn't find the McUser entry
+            _userService.UserSignedInAsync("def", userDetails2); // would throw if it couldn't find the McUser entry
             // check user data updated from claims and timestamps have been set
             CheckUserDataUpdated(_testUserBob, userDetails2);
             _testUserBob.LastLoginDateUtc.Should().Be(secondSignInTime);
+            _testUserBob.Sessions.Count.Should().Be(2);
+            _testUserBob.Sessions.Single(x => x.AccessToken == "abc").Subject.Should().Be(bobSubject);
+            _testUserBob.Sessions.Single(x => x.AccessToken == "abc").CreatedUtc.Should().Be(firstSignInTime);
+            _testUserBob.Sessions.Single(x => x.AccessToken == "def").Subject.Should().Be(bobSubject);            
+            _testUserBob.Sessions.Single(x => x.AccessToken == "def").CreatedUtc.Should().Be(secondSignInTime);
             // check original timestamps have not been altered
             _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
             _testUserBob.WelcomeEmailDateUtc.Should().Be(firstSignInTime);
