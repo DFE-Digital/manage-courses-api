@@ -356,8 +356,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     SELECT i.* from ucas_institution i
                     JOIN mc_organisation_institution oi on i.inst_code = oi.institution_code
                     JOIN mc_organisation_user ou on oi.org_id = ou.org_id
-                    WHERE lower(ou.email) = lower(@email)",
-                    new NpgsqlParameter("email", name))
+                    WHERE lower(ou.email) = lower(@email)
+                    AND lower(i.inst_code) = lower(@instcode)",
+                    new NpgsqlParameter("email", name),
+                    new NpgsqlParameter("instcode", instCode))
                 .FirstOrDefault();
         }
 
