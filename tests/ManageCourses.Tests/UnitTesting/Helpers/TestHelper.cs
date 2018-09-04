@@ -127,6 +127,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
             DbContext.McOrganisationIntitutions.Add(new McOrganisationInstitution { InstitutionCode = multiInst2.InstCode, OrgId = multiInstOrg.OrgId });
 
             AddCampuses();
+            AddSubjects();
             AddProviderCourses();
             AddNonProviderCourses();
             DbContext.Save();
@@ -271,6 +272,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
             DbContext.AddUcasCampus(new UcasCampus { Addr1 = "Atkins Road", Addr2 = "London", Addr3 = "", Addr4 = "", Email = "", CampusCode = "4", CampusName = "La Retraite RomanCatholic Girl's School", InstCode = UcasInstCodeWithProviders, Postcode = "SW12 OAB", RegionCode = "01", TelNo = "" });
             DbContext.AddUcasCampus(new UcasCampus { Addr1 = "Parkham Street", Addr2 = "Battersea", Addr3 = "London", Addr4 = "", Email = "", CampusCode = "3", CampusName = "Saint John Bosco College", InstCode = UcasInstCodeWithProviders, Postcode = "SW11 3DQ", RegionCode = "01", TelNo = "" });
             DbContext.AddUcasCampus(new UcasCampus { Addr1 = "Hollydale Road", Addr2 = "Nunhead", Addr3 = "London", Addr4 = "", Email = "", CampusCode = "T", CampusName = "St Thomas The Apostle", InstCode = UcasInstCodeWithProviders, Postcode = "SE15 SEB", RegionCode = "01", TelNo = "" });
+
+        }
+
+        private void AddSubjects()
+        {
             DbContext.AddUcasSubject(new UcasSubject { SubjectCode = "C1", SubjectDescription = "Biology", TitleMatch = "Biology" });
             DbContext.AddUcasSubject(new UcasSubject { SubjectCode = "F0", SubjectDescription = "Science", TitleMatch = "Science" });
         }
