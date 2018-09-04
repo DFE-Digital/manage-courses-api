@@ -3,27 +3,25 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace GovUk.Education.ManageCourses.Tests.UnitTesting
+namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 {
     [TestFixture]
-    class DataServiceExportTests
+    class DataServiceExportTests : DbIntegrationTestBase
     {
-        private ManageCoursesDbContext _dbContext;
         private DataService _dataService;
 
-        [OneTimeSetUp]
-        public void Setup()
+        protected override void Setup()
         {
-            _dbContext = TestHelper.GetFakeData(EnumTestType.DataService);            
+            TestHelper.BuildFakeDataForService(Context);
             var mockEnrichmentService = new Mock<IEnrichmentService>();
-            _dataService = new DataService(_dbContext, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            _dataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
+
         [Test]
         public void GetCoursesForUserOrganisation_with_email_should_return_loaded_object()
         {

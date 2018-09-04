@@ -21,22 +21,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
 
         public static string OrgUcasCodeNoProviders { get; } = "B20";
 
-        public static ManageCoursesDbContext GetFakeData(EnumTestType testType)
+        public static ManageCoursesDbContext GetFakeData()
         {
-            SetupContext();
-            switch (testType)
-            {
-                case EnumTestType.DataService:
-                    BuildFakeDataForService();
-                    break;
-                case EnumTestType.DataHelper:
-                    BuildFakeDataForHelper();
-                    break;
-            }
+            SetupInMemoryContext();
+            BuildFakeDataForHelper();
             return _dbContext;
         }
 
-        private static void SetupContext()
+        private static void SetupInMemoryContext()
         {
             var optionsBuilder = new DbContextOptionsBuilder<ManageCoursesDbContext>();
             optionsBuilder.UseInMemoryDatabase("dbInMemory");
@@ -55,16 +47,17 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
             });
             _dbContext.Save();
         }
-        private static void BuildFakeDataForService()
+
+        public static void BuildFakeDataForService(ManageCoursesDbContext context)
         {
-            _dbContext.McUsers.AddRange(new List<McUser>
+            context.McUsers.AddRange(new List<McUser>
             {
                 new McUser { Email = OrgWithNoProviderEmail },
                 new McUser { Email = OrgWithProviderEmail },
                 new McUser { Email = UserWithMultipleOrganisationsEmail },
                 new McUser { Email = UserWithMultipleOrganisationUcasCodesEmail }
             });
-            _dbContext.Save(); // for some reason McUsers isn't populated for reading until this is run. ¯\_(ツ)_/¯
+            context.Save(); // for some reason McUsers isn't populated for reading until this is run. ¯\_(ツ)_/¯
 
             var testDataVariations = new List<FakeDataParameters>//two types of organisations
             {
@@ -129,30 +122,30 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
 
             foreach (var testDataEntry in testDataVariations)
             {
-                var mcUser = _dbContext.GetMcUsers(testDataEntry.Email).Single();
+                var mcUser = context.GetMcUsers(testDataEntry.Email).Single();
 
-                if (_dbContext.McOrganisations.FirstOrDefault(o => o.OrgId == testDataEntry.OrgId) == null)
+                if (context.McOrganisations.FirstOrDefault(o => o.OrgId == testDataEntry.OrgId) == null)
                 {
-                    _dbContext.AddMcOrganisation(new McOrganisation { Name = testDataEntry.OrgName, OrgId = testDataEntry.OrgId });
+                    context.AddMcOrganisation(new McOrganisation { Name = testDataEntry.OrgName, OrgId = testDataEntry.OrgId });
                 }
 
-                if (_dbContext.UcasInstitutions.FirstOrDefault(i => i.InstCode == testDataEntry.InstitutionCode) == null)
+                if (context.UcasInstitutions.FirstOrDefault(i => i.InstCode == testDataEntry.InstitutionCode) == null)
                 {
-                    _dbContext.AddUcasInstitution(new UcasInstitution { InstCode = testDataEntry.InstitutionCode, InstFull = testDataEntry.InstitutionName });
+                    context.AddUcasInstitution(new UcasInstitution { InstCode = testDataEntry.InstitutionCode, InstFull = testDataEntry.InstitutionName });
                 }
 
-                _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = testDataEntry.InstitutionCode, OrgId = testDataEntry.OrgId });
-                _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = testDataEntry.Email, OrgId = testDataEntry.OrgId, McUser = mcUser });
+                context.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = testDataEntry.InstitutionCode, OrgId = testDataEntry.OrgId });
+                context.AddMcOrganisationUser(new McOrganisationUser { Email = testDataEntry.Email, OrgId = testDataEntry.OrgId, McUser = mcUser });
 
                 AddProviders(testDataEntry.ProviderCodes, testDataEntry.InstitutionName);
-                _dbContext.Save();
+                context.Save();
             }
 
             AddProviderCourses();
             AddNonProviderCourses();
             AddCampuses();
 
-            _dbContext.Save();
+            context.Save();
 
         }
 
