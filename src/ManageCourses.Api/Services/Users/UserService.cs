@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Exceptions;
@@ -33,7 +32,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             if (mcUser == null)
             {
                 // fall back to email address for users where we don't yet know their sign-in id
-                mcUser = await _context.McUsers.ByEmail(userDetails.Email).SingleOrDefaultAsync();
+                mcUser = await _context.GetMcUsers(userDetails.Email).SingleOrDefaultAsync();
                 if (mcUser != null)
                 {
                     // record the sign-in id and use that in future
@@ -49,7 +48,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
 
             if (!_context.McSessions.Any(x => x.AccessToken == accessToken && x.CreatedUtc > _clock.UtcNow.AddMinutes(-30)))
             {
-                _context.McSessions.Add(new McSession{
+                _context.McSessions.Add(new McSession
+                {
                     AccessToken = accessToken,
                     McUser = mcUser,
                     Subject = userDetails.Subject,

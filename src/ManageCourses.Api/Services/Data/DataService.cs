@@ -7,7 +7,6 @@ using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.EqualityComparers;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Data
@@ -528,7 +527,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(ucasCode)) return null;
             ucasCode = ucasCode.ToUpperInvariant();
 
-            var mcUsers = _context.McUsers.ByEmail(email)
+            var mcUsers = _context.GetMcUsers(email)
                 .Include("McOrganisationUsers.McOrganisation.McOrganisationInstitutions.UcasInstitution").ToList();
 
             var mcOrganisationInstitutions = mcUsers.SelectMany(

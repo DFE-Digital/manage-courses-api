@@ -1,47 +1,46 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
-namespace GovUk.Education.ManageCourses.Tests.UnitTesting
+namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 {
     [TestFixture]
-    class DataServiceExportTests
+    class DataServiceExportTests : DbIntegrationTestBase
     {
-        private ManageCoursesDbContext _dbContext;
         private DataService _dataService;
 
-        [OneTimeSetUp]
-        public void Setup()
+        protected override void Setup()
         {
-            _dbContext = TestHelper.GetFakeData(EnumTestType.DataService);            
+            new TestHelper(Context).BuildFakeDataForService();
             var mockEnrichmentService = new Mock<IEnrichmentService>();
-            _dataService = new DataService(_dbContext, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            _dataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
+
         [Test]
         public void GetCoursesForUserOrganisation_with_email_should_return_loaded_object()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders);
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders);
 
             Assert.True(result.ProviderCourses.Count == 3);
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_lower_case_ucas_code_should_return_loaded_object()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToLower());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToLower());
 
             Assert.True(result.ProviderCourses.Count == 3);
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_upper_case_ucas_code_should_return_loaded_object()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToUpper());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToUpper());
 
             Assert.True(result.ProviderCourses.Count == 3);
         }
@@ -53,56 +52,65 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase("idontexist@nowhere.com")]
         public void GetCoursesForUserOrganisation_should_return_empty_object(string email)
         {
-            var result = _dataService.GetCoursesForUserOrganisation(email, TestHelper.OrgUcasCodeWithProviders);
+            var result = _dataService.GetCoursesForUserOrganisation(email, TestHelper.UcasInstCodeWithProviders);
 
             Assert.True(result.ProviderCourses.Count == 0);
         }
         [Test]
         public void GetCoursesForUserOrganisation_should_return_providers()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders);
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders);
 
             Assert.True(result.ProviderCourses.All(x => !string.IsNullOrWhiteSpace(x.AccreditingProviderId)));
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_lower_case_ucas_code_should_return_providers()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToLower());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToLower());
 
             Assert.True(result.ProviderCourses.All(x => !string.IsNullOrWhiteSpace(x.AccreditingProviderId)));
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_upper_case_ucas_code_should_return_providers()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToUpper());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToUpper());
 
             Assert.True(result.ProviderCourses.All(x => !string.IsNullOrWhiteSpace(x.AccreditingProviderId)));
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_lower_case_ucas_code_should_return_course_details()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToLower());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToLower());
 
-            Assert.True(result.ProviderCourses.Select(CheckCourseDetails).All(y => y));
+            foreach (var providerCourse in result.ProviderCourses)
+            {
+                CheckCourseDetails(providerCourse);
+            }
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_upper_case_ucas_code_should_return_course_details()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToUpper());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToUpper());
 
-            Assert.True(result.ProviderCourses.Select(CheckCourseDetails).All(y => y));
+            foreach (var providerCourse in result.ProviderCourses)
+            {
+                CheckCourseDetails(providerCourse);
+            }
         }
         [Test]
         public void GetCoursesForUserOrganisation_should_return_course_details()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders);
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders);
 
-            Assert.True(result.ProviderCourses.Select(CheckCourseDetails).All(y => y));
+            foreach (var providerCourse in result.ProviderCourses)
+            {
+                CheckCourseDetails(providerCourse);
+            }
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_lower_case_ucas_code_should_return_course_variants()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToLower());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToLower());
 
             //use multiple asserts rather then the flattened assert above as this is easier to debug
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
@@ -112,7 +120,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void GetCoursesForUserOrganisation_with_upper_case_ucas_code_should_return_course_variants()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToUpper());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToUpper());
 
             //use multiple asserts rather then the flattened assert above as this is easier to debug
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
@@ -122,7 +130,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void GetCoursesForUserOrganisation_with_lower_case_ucas_code_should_return_campuses()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToLower());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToLower());
 
             Assert.True(CheckCampuses(result.ProviderCourses[0].CourseDetails[0].Variants[0]));
             Assert.True(CheckCampuses(result.ProviderCourses[1].CourseDetails[0].Variants[0]));
@@ -131,7 +139,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void GetCoursesForUserOrganisation_with_upper_case_ucas_code_should_return_campuses()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithProviderEmail, TestHelper.OrgUcasCodeWithProviders.ToUpper());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToUpper());
 
             Assert.True(CheckCampuses(result.ProviderCourses[0].CourseDetails[0].Variants[0]));
             Assert.True(CheckCampuses(result.ProviderCourses[1].CourseDetails[0].Variants[0]));
@@ -140,41 +148,40 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void GetCoursesForUserOrganisation_should_not_return_providers()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithNoProviderEmail, TestHelper.OrgUcasCodeNoProviders);
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailNoProvider, TestHelper.UcasInstCodeNoProviders);
 
-            Assert.True(result.ProviderCourses.Count == 1);
-            Assert.True(string.IsNullOrWhiteSpace(result.ProviderCourses[0].AccreditingProviderId));
-            Assert.True(result.ProviderCourses[0].CourseDetails.Count == 19);
+            result.ProviderCourses.Count.Should().Be(1);
+            result.ProviderCourses[0].AccreditingProviderId.Should().BeNullOrWhiteSpace();
+            result.ProviderCourses[0].CourseDetails.Count.Should().Be(19);
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_no_providers_and_lower_case_ucas_code_should_return_course_variants()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithNoProviderEmail, TestHelper.OrgUcasCodeNoProviders.ToLower());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailNoProvider, TestHelper.UcasInstCodeNoProviders.ToLower());
 
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_no_providers_and_upper_case_ucas_code_should_return_course_variants()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithNoProviderEmail, TestHelper.OrgUcasCodeNoProviders.ToUpper());
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailNoProvider, TestHelper.UcasInstCodeNoProviders.ToUpper());
 
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_no_providers_should_return_course_variants()
         {
-            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.OrgWithNoProviderEmail, TestHelper.OrgUcasCodeNoProviders);
+            var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailNoProvider, TestHelper.UcasInstCodeNoProviders);
 
             Assert.True(CheckVariants(result.ProviderCourses[0].CourseDetails[0]));
         }
 
         #region Data Checks
-        private bool CheckCourseDetails(ProviderCourse course)
+        private void CheckCourseDetails(ProviderCourse course)
         {
-            var returnBool = course.CourseDetails.Any(x => (!string.IsNullOrWhiteSpace(x.CourseTitle)) && (!string.IsNullOrWhiteSpace(x.AgeRange)));
-
-            return returnBool;
+            course.CourseDetails.Any(x => (!string.IsNullOrWhiteSpace(x.CourseTitle)) && (!string.IsNullOrWhiteSpace(x.AgeRange))).Should().BeTrue();
         }
+
         private bool CheckVariants(CourseDetail courseDetail)
         {
             var returnBool = courseDetail.Variants.Any(x =>
