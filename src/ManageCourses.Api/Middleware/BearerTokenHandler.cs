@@ -91,7 +91,9 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             return new JsonUserDetails
             {
                 Email = session.McUser.Email,
-                Subject = session.Subject
+                Subject = session.Subject,
+                GivenName = session.McUser.FirstName,
+                FamilyName = session.McUser.LastName
             };
         }
 

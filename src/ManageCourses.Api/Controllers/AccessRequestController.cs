@@ -27,16 +27,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public StatusCodeResult Index([FromBody] AccessRequest request) 
         {
             var requesterEmail = this.User.Identity.Name;
-            
-            try
-            {
-                _service.LogAccessRequest(request, requesterEmail);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }            
-        
+            _service.LogAccessRequest(request, requesterEmail);        
             return StatusCode(200);
             
         }
