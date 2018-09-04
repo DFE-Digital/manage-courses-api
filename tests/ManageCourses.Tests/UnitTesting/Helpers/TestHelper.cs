@@ -243,6 +243,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
         /// </summary>
         private void AddCampuses()
         {
+            DbContext.AddUcasCampus(new UcasCampus { Addr1 = "a1", Addr2 = "", Addr3 = "", Addr4 = "", Email = "", CampusCode = "", CampusName = "main no-provider campus", InstCode = UcasInstCodeNoProviders, Postcode = "aa1 1aa", RegionCode = "01", TelNo = "" });
+            DbContext.AddUcasCampus(new UcasCampus { Addr1 = "a1", Addr2 = "", Addr3 = "", Addr4 = "", Email = "", CampusCode = "S", CampusName = "somewhere", InstCode = UcasInstCodeNoProviders, Postcode = "aa1 1aa", RegionCode = "01", TelNo = "" });
+
             DbContext.AddUcasCampus(new UcasCampus { Addr1 = "Wobburn Road", Addr2 = "Croydon", Addr3 = "", Addr4 = "", Email = "", CampusCode = "S", CampusName = "St Mary's Catholic High School", InstCode = UcasInstCodeWithProviders, Postcode = "CR9 2EE", RegionCode = "01", TelNo = "" });
             DbContext.AddUcasCampus(new UcasCampus { Addr1 = "Winlaton Road", Addr2 = "Bromley", Addr3 = "", Addr4 = "", Email = "", CampusCode = "B", CampusName = "Bonus Pastor Catholic College", InstCode = UcasInstCodeWithProviders, Postcode = "BR1 5PZ", RegionCode = "02", TelNo = "" });
             DbContext.AddUcasCampus(new UcasCampus { Addr1 = "Belmont Grove", Addr2 = "Lewisham", Addr3 = "London", Addr4 = "", Email = "", CampusCode = "K", CampusName = "Christ The King Sixth Form College", InstCode = UcasInstCodeWithProviders, Postcode = "SE13 5GE", RegionCode = "01", TelNo = "" });
