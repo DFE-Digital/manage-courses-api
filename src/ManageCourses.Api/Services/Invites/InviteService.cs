@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Invites
 
         public void Invite(string email)
         {
-            var mcUser = _context.McUsers.ByEmail(email).SingleOrDefault();
+            var mcUser = _context.GetMcUsers(email).SingleOrDefault();
             if (mcUser == null)
             {
                 throw new McUserNotFoundException();

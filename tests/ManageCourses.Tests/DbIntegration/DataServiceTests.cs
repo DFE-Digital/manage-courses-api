@@ -5,7 +5,6 @@ using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
-using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -99,7 +98,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             foreach (var expected in userPayload.Users)
             {
-                var storedUser = Context.McUsers.ByEmail(expected.Email);
+                var storedUser = Context.GetMcUsers(expected.Email);
 
                 Assert.AreEqual(1, storedUser.Count());
                 Assert.AreEqual(expected.FirstName, storedUser.Single().FirstName);
@@ -448,7 +447,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             return new UcasPayload
             {
-                Institutions = new List<UcasInstitution> 
+                Institutions = new List<UcasInstitution>
                 {
                     new UcasInstitution { InstCode = InstCode1 }
                 },

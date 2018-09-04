@@ -129,8 +129,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
 
             foreach (var testDataEntry in testDataVariations)
             {
-                var mcUser = _dbContext.McUsers.ByEmail(testDataEntry.Email).Single();
-                
+                var mcUser = _dbContext.GetMcUsers(testDataEntry.Email).Single();
+
                 if (_dbContext.McOrganisations.FirstOrDefault(o => o.OrgId == testDataEntry.OrgId) == null)
                 {
                     _dbContext.AddMcOrganisation(new McOrganisation { Name = testDataEntry.OrgName, OrgId = testDataEntry.OrgId });
@@ -140,7 +140,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
                 {
                     _dbContext.AddUcasInstitution(new UcasInstitution { InstCode = testDataEntry.InstitutionCode, InstFull = testDataEntry.InstitutionName });
                 }
-                
+
                 _dbContext.AddMcOrganisationInstitution(new McOrganisationInstitution { InstitutionCode = testDataEntry.InstitutionCode, OrgId = testDataEntry.OrgId });
                 _dbContext.AddMcOrganisationUser(new McOrganisationUser { Email = testDataEntry.Email, OrgId = testDataEntry.OrgId, McUser = mcUser });
 
