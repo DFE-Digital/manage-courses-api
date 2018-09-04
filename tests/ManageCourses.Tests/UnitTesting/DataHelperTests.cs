@@ -16,7 +16,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [OneTimeSetUp]
         public void Setup()
         {
-            _dbContext = TestHelper.GetFakeData();            
+            var testHelper = new TestHelper();
+            testHelper.BuildFakeDataForHelper();
+            _dbContext = testHelper.DbContext;
         }
 
         [Test]

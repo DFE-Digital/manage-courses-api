@@ -17,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         protected override void Setup()
         {
-            TestHelper.BuildFakeDataForService(Context);
+            new TestHelper(Context).BuildFakeDataForService();
             var mockEnrichmentService = new Mock<IEnrichmentService>();
             _dataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
         }
