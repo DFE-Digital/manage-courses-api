@@ -82,21 +82,30 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToLower());
 
-            Assert.True(result.ProviderCourses.Select(CheckCourseDetails).All(y => y));
+            foreach (var providerCourse in result.ProviderCourses)
+            {
+                CheckCourseDetails(providerCourse);
+            }
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_upper_case_ucas_code_should_return_course_details()
         {
             var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders.ToUpper());
 
-            Assert.True(result.ProviderCourses.Select(CheckCourseDetails).All(y => y));
+            foreach (var providerCourse in result.ProviderCourses)
+            {
+                CheckCourseDetails(providerCourse);
+            }
         }
         [Test]
         public void GetCoursesForUserOrganisation_should_return_course_details()
         {
             var result = _dataService.GetCoursesForUserOrganisation(TestHelper.EmailWithProvider, TestHelper.UcasInstCodeWithProviders);
 
-            Assert.True(result.ProviderCourses.Select(CheckCourseDetails).All(y => y));
+            foreach (var providerCourse in result.ProviderCourses)
+            {
+                CheckCourseDetails(providerCourse);
+            }
         }
         [Test]
         public void GetCoursesForUserOrganisation_with_lower_case_ucas_code_should_return_course_variants()
@@ -168,12 +177,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         }
 
         #region Data Checks
-        private bool CheckCourseDetails(ProviderCourse course)
+        private void CheckCourseDetails(ProviderCourse course)
         {
-            var returnBool = course.CourseDetails.Any(x => (!string.IsNullOrWhiteSpace(x.CourseTitle)) && (!string.IsNullOrWhiteSpace(x.AgeRange)));
-
-            return returnBool;
+            course.CourseDetails.Any(x => (!string.IsNullOrWhiteSpace(x.CourseTitle)) && (!string.IsNullOrWhiteSpace(x.AgeRange))).Should().BeTrue();
         }
+
         private bool CheckVariants(CourseDetail courseDetail)
         {
             var returnBool = courseDetail.Variants.Any(x =>
