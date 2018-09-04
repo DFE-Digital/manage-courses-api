@@ -43,18 +43,18 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
             var templateValues = new Dictionary<string, dynamic>() {
                 {"request_id", accessRequest.Id},
 
-                {"requester_firstname", requester.FirstName},
-                {"requester_lastname", requester.LastName},
+                {"requester_firstname", requester.FirstName ?? "unknown"},
+                {"requester_lastname", requester.LastName ?? "unknown"},
                 {"requester_email", requester.Email},
                 {"requester_existingorgs", String.Join(", ", requester.McOrganisationUsers.Select(x => x.McOrganisation.Name))},
 
-                {"requested_firstname", accessRequest.FirstName},
-                {"requested_lastname", accessRequest.LastName},
+                {"requested_firstname", accessRequest.FirstName ?? "unknown"},
+                {"requested_lastname", accessRequest.LastName ?? "unknown"},
                 {"requested_email", accessRequest.EmailAddress},
-                {"requested_organisation", accessRequest.Organisation},
-                {"requested_reason", accessRequest.Reason},
+                {"requested_organisation", accessRequest.Organisation ?? "unknown"},
+                {"requested_reason", accessRequest.Reason ?? "unknown"},
 
-                {"requested_existingorgs", requestedOrNull == null ? "" : String.Join(", ", requestedOrNull.McOrganisationUsers.Select(x => x.McOrganisation.Name))}
+                {"requested_existingorgs", requestedOrNull == null ? "-" : String.Join(", ", requestedOrNull.McOrganisationUsers.Select(x => x.McOrganisation.Name))}
 
             };
 
