@@ -19,6 +19,7 @@ using NJsonSchema;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.Processors.Security;
+using Serilog;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -34,6 +35,9 @@ namespace GovUk.Education.ManageCourses.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging(loggingBuilder =>
+      	    loggingBuilder.AddSerilog(dispose: true));
+
             var mcConfig = new McConfig(Configuration);
             var connectionString = mcConfig.BuildConnectionString();
 
@@ -85,7 +89,7 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IDataHelper, UserDataHelper>();
 
             services.AddMvc(options =>
-                options.Filters.Add(typeof(AcceptTermsFilter))            
+                options.Filters.Add(typeof(AcceptTermsFilter))
             );
         }
 
