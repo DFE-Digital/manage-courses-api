@@ -30,7 +30,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasOne(ou => ou.McUser)
                 .WithMany(u => u.McOrganisationUsers)
                 .HasForeignKey(ou => ou.Email)
-                .HasPrincipalKey(u => u.Email);
+                .HasPrincipalKey(u => u.Email)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<McOrganisationUser>()
                 .HasOne(ou => ou.McOrganisation)
                 .WithMany(u => u.McOrganisationUsers)
