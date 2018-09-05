@@ -18,7 +18,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 column: "email",
                 principalTable: "mc_user",
                 principalColumn: "email",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade,
+                onUpdate: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -33,7 +34,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 column: "email",
                 principalTable: "mc_user",
                 principalColumn: "email",
-                onDelete: ReferentialAction.Restrict);
+                onDelete: ReferentialAction.Restrict,
+                onUpdate: ReferentialAction.Restrict);
         }
     }
 }
