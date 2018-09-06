@@ -74,7 +74,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
 
         private static void UpdateMcUserFromSignIn(McUser user, JsonUserDetails userDetails)
         {
-            //user.Email = userDetails.Email; // todo: update email address from sign-in. blocked by use of email as a foreign-key
+            user.Email = userDetails.Email;
             user.FirstName = userDetails.GivenName;
             user.LastName = userDetails.FamilyName;
         }
