@@ -152,9 +152,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             client.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(Email)).Wait();
 
-            var result = await client.Invite_IndexAsync(Email);
-
-            result.StatusCode.Should().Be(200);
+            // does not throw... nb. Assert.DoesNotThrow does not support async voids
+            await client.Invite_IndexAsync(Email);
         }
 
         [Test]

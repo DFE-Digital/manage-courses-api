@@ -24,12 +24,20 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("{instCode}")]
-        public UserOrganisation Get(string instCode)
+        [ProducesResponseType(typeof(UserOrganisation), 200)]
+        [ProducesResponseType(404)]
+        public ActionResult Get(string instCode)
         {
             var name = this.User.Identity.Name;
             var organisation = _dataService.GetOrganisationForUser(name, instCode);
-
-            return organisation;
+            if (organisation == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(organisation);
+            }
         }
 
         /// <summary>
@@ -39,21 +47,29 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("{instCode}/ucas")]
-        public UcasInstitution GetUcasInstitution(string instCode)
+        [ProducesResponseType(typeof(UcasInstitution), 200)]
+        [ProducesResponseType(404)]
+        public ActionResult GetUcasInstitution(string instCode)
         {
             var name = this.User.Identity.Name;
             var organisation = _dataService.GetUcasInstitutionForUser(name, instCode);
-
-            return organisation;
+            if (organisation == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(organisation);
+            }
         }
-
 
         /// <summary>
         /// Gets a list of organisations for the user
         /// </summary>
         /// <returns>a list of UserOrganisation objects</returns>
         [Authorize]
-        [HttpGet]
+        [HttpGet]        
+        [ProducesResponseType(typeof(IEnumerable<UserOrganisation>), 200)]
         public IEnumerable<UserOrganisation> GetAll()
         {
             var name = this.User.Identity.Name;

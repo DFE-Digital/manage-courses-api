@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
             var result = _inviteController.Index("foo@example.org");
 
             // assert
-            result.Should().BeOfType<BadRequestObjectResult>();
+            result.Should().BeOfType<BadRequestResult>();
         }
     }
 }
