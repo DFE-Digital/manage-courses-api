@@ -44,57 +44,56 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 return AuthenticateResult.NoResult();
             }
 
+            SubjectAndEmail subjectAndEmail = null;
             try
             {
-                var userDetails = GetJsonUserDetailsFromDatabase(accessToken) ?? GetJsonUserDetailsFromOauth(accessToken);
-                
-                try
+                subjectAndEmail = GetSubjectAndEmailFromDatabase(accessToken);
+                if (subjectAndEmail == null)
                 {
+                    var userDetails = GetJsonUserDetailsFromOauth(accessToken);
+                    subjectAndEmail = new SubjectAndEmail(userDetails.Subject, userDetails.Email);
                     await _userService.UserSignedInAsync(accessToken, userDetails);
                 }
-                catch (McUserNotFoundException)
-                {
-                    _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
-                    return AuthenticateResult.NoResult();
-                }
-
-                var identity = new ClaimsIdentity(
-                    new[] {
-                        new Claim (ClaimTypes.NameIdentifier, userDetails.Subject),
-                        new Claim (ClaimTypes.Email, userDetails.Email)
-                    }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
-
-                var princical = new ClaimsPrincipal(identity);
-                var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
-                _logger.LogDebug("User successfully signed in. SignIn-Id {0}", userDetails.Subject);
-                return AuthenticateResult.Success(ticket);
-            }
+            }               
+            catch (McUserNotFoundException)
+            {
+                _logger.LogWarning($"SignIn subject {subjectAndEmail?.Subject} not found in McUsers data");
+                return AuthenticateResult.NoResult();
+            }            
             catch (Exception ex)
             {
                 return AuthenticateResult.Fail(ex);
             }
+            
+            var identity = new ClaimsIdentity(
+                new[] {
+                    new Claim (ClaimTypes.NameIdentifier, subjectAndEmail.Subject),
+                    new Claim (ClaimTypes.Email, subjectAndEmail.Email)
+                }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
+
+            var princical = new ClaimsPrincipal(identity);
+            var ticket = new AuthenticationTicket(princical, BearerTokenDefaults.AuthenticationScheme);
+            _logger.LogDebug("User successfully signed in. SignIn-Id {0}", subjectAndEmail.Subject);
+            return AuthenticateResult.Success(ticket);            
         }
 
-        private JsonUserDetails GetJsonUserDetailsFromDatabase(string accessToken)
+        private SubjectAndEmail GetSubjectAndEmailFromDatabase(string accessToken)
         {
             var dateCutoff = DateTime.UtcNow.AddMinutes(-30);
             var session = _manageCoursesDbContext.McSessions
                 .Include(x => x.McUser)
                 .Where(x => x.AccessToken == accessToken && x.CreatedUtc > dateCutoff)
-                .SingleOrDefault();
+                .FirstOrDefault(); /*   There is an edge case where more than one record for a valid session 
+                                        could be added, e.g. when clock skew occurs between two authentications. 
+                                        Any of these overlapping records would qualify and the redundancy is quite harmless. 
+                                        So we use First, not Single, here. */
 
             if (session == null)
             {
                 return null;
             }
             
-            return new JsonUserDetails
-            {
-                Email = session.McUser.Email,
-                Subject = session.Subject,
-                GivenName = session.McUser.FirstName,
-                FamilyName = session.McUser.LastName
-            };
+            return new SubjectAndEmail(session.McUser.SignInUserId, session.McUser.Email);
         }
 
         private JsonUserDetails GetJsonUserDetailsFromOauth(string accessToken)
@@ -135,6 +134,18 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
 
             return base.HandleChallengeAsync(properties);
+        }
+
+        private class SubjectAndEmail
+        {
+            public string Subject {get; private set;}
+            public string Email {get; private set;}
+
+            public SubjectAndEmail(string subject, string email)
+            {
+                Subject = subject;
+                Email = email;
+            }
         }
     }
 }

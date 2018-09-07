@@ -125,9 +125,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             CheckUserDataUpdated(_testUserBob, userDetails2);
             _testUserBob.LastLoginDateUtc.Should().Be(secondSignInTime);
             _testUserBob.Sessions.Count.Should().Be(2);
-            _testUserBob.Sessions.Single(x => x.AccessToken == "abc").Subject.Should().Be(bobSubject);
             _testUserBob.Sessions.Single(x => x.AccessToken == "abc").CreatedUtc.Should().Be(firstSignInTime);
-            _testUserBob.Sessions.Single(x => x.AccessToken == "def").Subject.Should().Be(bobSubject);            
             _testUserBob.Sessions.Single(x => x.AccessToken == "def").CreatedUtc.Should().Be(secondSignInTime);
             // check original timestamps have not been altered
             _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);

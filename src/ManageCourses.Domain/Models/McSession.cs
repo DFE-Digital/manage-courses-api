@@ -15,8 +15,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public string AccessToken { get; set; }
 
-        public string Subject { get; set; }
-
         public DateTime CreatedUtc { get; set; }
     }
 }

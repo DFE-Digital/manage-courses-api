@@ -46,16 +46,12 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             LogLogin(mcUser);
             UpdateMcUserFromSignIn(mcUser, userDetails);
 
-            if (!_context.McSessions.Any(x => x.AccessToken == accessToken && x.CreatedUtc > _clock.UtcNow.AddMinutes(-30)))
+            _context.McSessions.Add(new McSession
             {
-                _context.McSessions.Add(new McSession
-                {
-                    AccessToken = accessToken,
-                    McUser = mcUser,
-                    Subject = userDetails.Subject,
-                    CreatedUtc = _clock.UtcNow
-                });
-            }
+                AccessToken = accessToken,
+                McUser = mcUser,
+                CreatedUtc = _clock.UtcNow
+            });
 
             _context.Save();
             SendWelcomeEmail(mcUser);
