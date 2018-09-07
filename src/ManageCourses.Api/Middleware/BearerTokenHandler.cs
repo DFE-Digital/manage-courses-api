@@ -50,9 +50,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 subjectAndEmail = GetSubjectAndEmailFromDatabase(accessToken);
                 if (subjectAndEmail == null)
                 {
-                    var userDetails = GetJsonUserDetailsFromOauth(accessToken);
-                    subjectAndEmail = new SubjectAndEmail(userDetails.Subject, userDetails.Email);
-                    await _userService.UserSignedInAsync(accessToken, userDetails);
+                    subjectAndEmail = await GetSubjectAndEmailFromOauth(accessToken);                    
                 }
             }               
             catch (McUserNotFoundException)
@@ -92,11 +90,13 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             {
                 return null;
             }
+
+            _userService.LogLogin(session.McUser);
             
             return new SubjectAndEmail(session.McUser.SignInUserId, session.McUser.Email);
         }
 
-        private JsonUserDetails GetJsonUserDetailsFromOauth(string accessToken)
+        private async Task<SubjectAndEmail> GetSubjectAndEmailFromOauth(string accessToken)
         {
             var responsesString = "";
 
@@ -120,7 +120,9 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 MissingMemberHandling = MissingMemberHandling.Ignore
             });
 
-            return userDetails;
+            await _userService.UserSignedInAsync(accessToken, userDetails);
+
+            return new SubjectAndEmail(userDetails.Subject, userDetails.Email);
         }
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties)

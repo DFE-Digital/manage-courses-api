@@ -75,7 +75,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             user.LastName = userDetails.FamilyName;
         }
 
-        private void LogLogin(McUser user)
+        /// <inheritdoc />
+        public void LogLogin(McUser user)
         {
             user.LastLoginDateUtc = _clock.UtcNow;
             if (user.FirstLoginDateUtc == null)
