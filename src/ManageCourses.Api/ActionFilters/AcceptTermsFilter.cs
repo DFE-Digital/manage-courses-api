@@ -48,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Api.ActionFilters
             }
             if (users.Count == 0)
             {
-                throw new InvalidOperationException($"user not found: {userEmail}");
+                throw new InvalidOperationException("user not found");
             }
             
             if(users[0].AcceptTermsDateUtc == null) 
