@@ -26,7 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public async Task UserSignedInAsync(string accessToken, JsonUserDetails userDetails)
+        public async Task<McUser> UserSignedInAsync(string accessToken, JsonUserDetails userDetails)
         {
             var mcUser = await _context.McUsers.SingleOrDefaultAsync(u => u.SignInUserId == userDetails.Subject);
             if (mcUser == null)
@@ -59,6 +59,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
 
             _context.Save();
             SendWelcomeEmail(mcUser);
+            return mcUser;
         }
 
         private void SendWelcomeEmail(McUser user)

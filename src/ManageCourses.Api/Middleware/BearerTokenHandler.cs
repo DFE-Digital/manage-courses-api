@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Users;
+using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ManageCourses.Api.Middleware
@@ -47,10 +48,11 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             try
             {
                 var userDetails = GetJsonUserDetailsFromDatabase(accessToken) ?? GetJsonUserDetailsFromOauth(accessToken);
-                
+
+                McUser mcUser;
                 try
                 {
-                    await _userService.UserSignedInAsync(accessToken, userDetails);
+                    mcUser = await _userService.UserSignedInAsync(accessToken, userDetails);
                 }
                 catch (McUserNotFoundException)
                 {
@@ -61,7 +63,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                 var identity = new ClaimsIdentity(
                     new[] {
                         new Claim (ClaimTypes.NameIdentifier, userDetails.Subject),
-                        new Claim (ClaimTypes.Email, userDetails.Email)
+                        new Claim (ClaimTypes.Email, mcUser.Email)
                     }, BearerTokenDefaults.AuthenticationScheme, ClaimTypes.Email, null);
 
                 var princical = new ClaimsPrincipal(identity);
