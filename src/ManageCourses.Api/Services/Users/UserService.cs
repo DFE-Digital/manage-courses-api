@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Middleware;
@@ -26,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public async Task UserSignedInAsync(string accessToken, JsonUserDetails userDetails)
+        public async Task<McUser> LoginAsync(JsonUserDetails userDetails)
         {
             var mcUser = await _context.McUsers.SingleOrDefaultAsync(u => u.SignInUserId == userDetails.Subject);
             if (mcUser == null)
@@ -43,9 +42,27 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             {
                 throw new McUserNotFoundException();
             }
-            LogLogin(mcUser);
             UpdateMcUserFromSignIn(mcUser, userDetails);
 
+            _context.Save();
+            return mcUser;
+        }
+
+        /// <inheritdoc />
+        public Task LoggedInAsync(McUser user)
+        {
+            user.LastLoginDateUtc = _clock.UtcNow;
+            if (user.FirstLoginDateUtc == null)
+            {
+                user.FirstLoginDateUtc = _clock.UtcNow;
+            }
+            SendWelcomeEmail(user);
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public Task CacheTokenAsync(string accessToken, McUser mcUser)
+        {
             _context.McSessions.Add(new McSession
             {
                 AccessToken = accessToken,
@@ -54,7 +71,27 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             });
 
             _context.Save();
-            SendWelcomeEmail(mcUser);
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public async Task<McUser> GetFromCacheAsync(string accessToken)
+        {
+            var dateCutoff = _clock.UtcNow.AddMinutes(-30);
+            var session = await _context.McSessions
+                .Include(x => x.McUser)
+                .FirstOrDefaultAsync(x => x.AccessToken == accessToken && x.CreatedUtc > dateCutoff);
+            /*  ^ There is an edge case where more than one record for a valid session 
+                could be added, e.g. when clock skew occurs between two authentications. 
+                Any of these overlapping records would qualify and the redundancy is quite harmless. 
+                So we use First, not Single, here. */
+
+            if (session == null)
+            {
+                return null;
+            }
+
+            return session.McUser;
         }
 
         private void SendWelcomeEmail(McUser user)
@@ -73,16 +110,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             //user.Email = userDetails.Email; // todo: update email address from sign-in. blocked by use of email as a foreign-key
             user.FirstName = userDetails.GivenName;
             user.LastName = userDetails.FamilyName;
-        }
-
-        /// <inheritdoc />
-        public void LogLogin(McUser user)
-        {
-            user.LastLoginDateUtc = _clock.UtcNow;
-            if (user.FirstLoginDateUtc == null)
-            {
-                user.FirstLoginDateUtc = _clock.UtcNow;
-            }
         }
     }
 }
