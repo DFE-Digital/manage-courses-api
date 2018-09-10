@@ -21,6 +21,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
             Addr4 = inst.Addr4;
             Postcode = inst.Postcode;
             ContactName = inst.ContactName;
+            Email = inst.Email;
+            Telephone = inst.Telephone;
             Url = inst.Url;
             YearCode = inst.YearCode;
             Scitt = inst.Scitt;
@@ -39,6 +41,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Addr4 { get; set; }
         public string Postcode { get; set; }
         public string ContactName { get; set; }
+        public string Email { get; set; }
+        public string Telephone { get; set; }
         public string Url { get; set; }
         public string YearCode { get; set; }
         public string Scitt { get; set; }
