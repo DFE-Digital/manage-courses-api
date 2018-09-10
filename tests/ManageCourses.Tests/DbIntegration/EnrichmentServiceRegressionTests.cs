@@ -142,18 +142,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context = ContextLoader.GetDbContext(Config);//refresh the context
         }
 
-        [Test]
-        //this tests the old code for null users which would break the enrichment service
-        public void TestGetInstitutionEnrichmentUsersAreNull()
-        {
-            //this is the old code before the fix
-            var enrichment = Context.InstitutionEnrichments
-                .Where(ie => ProviderInstCode.ToLower() == ie.InstCode.ToLower()).OrderByDescending(x => x.Id)
-                .FirstOrDefault();
-
-            enrichment.CreatedByUser.Should().BeNull();
-            enrichment.UpdatedByUser.Should().BeNull();
-        }
         /// <summary>
         /// This test breaks when the old code in the enrichment service is re-instated
         /// </summary>
