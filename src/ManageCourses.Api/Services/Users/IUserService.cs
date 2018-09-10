@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Domain.Models;
 
@@ -13,6 +14,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         /// Get the user from the claims.
         /// Updates stored user details with updated details in claims.
         /// </summary>
+        /// <exception cref="McUserNotFoundException"></exception>
         Task<McUser> GetAndUpdateUserAsync(JsonUserDetails userDetails);
 
         /// <summary>
