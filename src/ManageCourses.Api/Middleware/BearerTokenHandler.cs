@@ -46,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     var userDetails = await GetDetailsFromOAuthAsync(accessToken);
                     try
                     {
-                        mcUser = await _userService.LoginAsync(userDetails);
+                        mcUser = await _userService.GetAndUpdateUserAsync(userDetails);
                     }
                     catch (McUserNotFoundException ex)
                     {

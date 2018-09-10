@@ -13,7 +13,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         /// Get the user from the claims.
         /// Updates stored user details with updated details in claims.
         /// </summary>
-        Task<McUser> LoginAsync(JsonUserDetails userDetails);
+        Task<McUser> GetAndUpdateUserAsync(JsonUserDetails userDetails);
 
         /// <summary>
         /// Call this when a user signs in.

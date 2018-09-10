@@ -25,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public async Task<McUser> LoginAsync(JsonUserDetails userDetails)
+        public async Task<McUser> GetAndUpdateUserAsync(JsonUserDetails userDetails)
         {
             var mcUser = await _context.McUsers.SingleOrDefaultAsync(u => u.SignInUserId == userDetails.Subject);
             if (mcUser == null)
