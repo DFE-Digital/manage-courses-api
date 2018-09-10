@@ -24,12 +24,12 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         [Authorize]
         [HttpPost]
+        [ProducesResponseType(200)]
         public StatusCodeResult Index([FromBody] AccessRequest request) 
         {
             var requesterEmail = this.User.Identity.Name;
             _service.LogAccessRequest(request, requesterEmail);        
-            return StatusCode(200);
-            
+            return Ok();            
         }
     }
 }

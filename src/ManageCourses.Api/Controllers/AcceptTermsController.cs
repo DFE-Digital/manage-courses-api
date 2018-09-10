@@ -21,6 +21,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ExemptFromAcceptTerms]
         [HttpPost]        
         [Route("accept")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
         public IActionResult Index()
         {
             var email = this.HttpContext.User.Identity.Name;
@@ -32,7 +34,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             var user = context.GetMcUsers(email).SingleOrDefault();
             if (user == null)
             {
-                throw new InvalidOperationException($"AcceptTerms; User not found: {email}");
+                return NotFound();
             }
 
             user.AcceptTermsDateUtc = DateTime.UtcNow;

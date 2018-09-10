@@ -21,8 +21,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         [HttpPost]
-        [ExemptFromAcceptTerms]
-        public IActionResult Index(string email)
+        [ExemptFromAcceptTerms]                
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public StatusCodeResult Index(string email)
         {
             try
             {
@@ -31,7 +33,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             }
             catch (McUserNotFoundException)
             {
-                return BadRequest(new { error = "McUser not found" });
+                return BadRequest();
             }
         }
     }

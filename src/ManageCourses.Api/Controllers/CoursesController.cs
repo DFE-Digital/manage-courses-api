@@ -23,12 +23,21 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("{instCode}/course/{ucasCode}")]
-        public Course Get(string instCode, string ucasCode)
+        [ProducesResponseType(typeof(Course), 200)]
+        [ProducesResponseType(404)]
+        public ActionResult Get(string instCode, string ucasCode)
         {
             var name = this.User.Identity.Name;
             var course = _dataService.GetCourse(name, instCode, ucasCode);
 
-            return course;
+            if (course == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                return Ok(course);
+            }
         }
         /// <summary>
         /// Gets a list of course by Inst code
@@ -37,12 +46,20 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Authorize]
         [HttpGet]
         [Route("{instCode}")]
-        public InstitutionCourses GetAll(string instCode)
+        [ProducesResponseType(typeof(InstitutionCourses), 200)]
+        [ProducesResponseType(404)]
+        public ActionResult GetAll(string instCode)
         {
             var name = this.User.Identity.Name;
-            var course = _dataService.GetCourses(name, instCode);
 
-            return course;
+            if (_dataService.GetUcasInstitutionForUser(name, instCode) == null)
+            {
+                return NotFound();
+            };
+
+            var courses = _dataService.GetCourses(name, instCode);
+
+            return Ok(courses);
         }
     }
 }
