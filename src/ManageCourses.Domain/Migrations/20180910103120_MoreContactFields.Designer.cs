@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180910103120_MoreContactFields")]
+    partial class MoreContactFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,6 +245,9 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.Property<int>("McUserId")
                         .HasColumnName("mc_user_id");
+
+                    b.Property<string>("Subject")
+                        .HasColumnName("subject");
 
                     b.HasKey("Id");
 
