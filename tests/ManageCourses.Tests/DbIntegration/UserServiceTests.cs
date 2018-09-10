@@ -10,6 +10,7 @@ using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
 using GovUk.Education.ManageCourses.Api.Services.Users;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using NUnit.Framework;
 
@@ -71,12 +72,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 GivenName = "The",
                 Subject = "673535D4-3CB3-4A1D-B1F0-B0FFB787CECF",
             };
-            Func<Task> signIn = async () => { await _userService.UserSignedInAsync("abc", unknownUser); };
+            Func<Task> signIn = async () => { await _userService.GetAndUpdateUserAsync(unknownUser); };
             signIn.Should().Throw<McUserNotFoundException>($"{unknownUser.Email} / {unknownUser.Subject} does not exist in McUsers");
         }
 
+        /// <summary>
+        /// Test a realistic journey, validating the state of the data at each step
+        /// </summary>
         [Test]
-        public void SignInTest()
+        public async Task SignInTest()
         {
             var firstSignInTime = new DateTime(2017, 12, 31, 23, 59, 59);
             _mockTime = firstSignInTime;
@@ -90,10 +94,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Subject = bobSubject,
             };
 
-            // test a realistic journey, validating the state of the data at each step
-
             // bob signs in for the first time
-            _userService.UserSignedInAsync("abc", userDetails1);
+            var bob = await _userService.GetAndUpdateUserAsync(userDetails1);
+            await _userService.LoggedInAsync(bob);
             // check user data updated from claims and timestamps have been set
             CheckUserDataUpdated(_testUserBob, userDetails1);
             _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
@@ -120,21 +123,46 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 FamilyName = "Charlton the legend",
                 Subject = bobSubject,
             };
-            _userService.UserSignedInAsync("def", userDetails2); // would throw if it couldn't find the McUser entry
+            var bob2 = await _userService.GetAndUpdateUserAsync(userDetails2); // would throw if it couldn't find the McUser entry
+            await _userService.LoggedInAsync(bob2);
             // check user data updated from claims and timestamps have been set
             CheckUserDataUpdated(_testUserBob, userDetails2);
             _testUserBob.LastLoginDateUtc.Should().Be(secondSignInTime);
-            _testUserBob.Sessions.Count.Should().Be(2);
-            _testUserBob.Sessions.Single(x => x.AccessToken == "abc").Subject.Should().Be(bobSubject);
-            _testUserBob.Sessions.Single(x => x.AccessToken == "abc").CreatedUtc.Should().Be(firstSignInTime);
-            _testUserBob.Sessions.Single(x => x.AccessToken == "def").Subject.Should().Be(bobSubject);            
-            _testUserBob.Sessions.Single(x => x.AccessToken == "def").CreatedUtc.Should().Be(secondSignInTime);
             // check original timestamps have not been altered
             _testUserBob.FirstLoginDateUtc.Should().Be(firstSignInTime);
             _testUserBob.WelcomeEmailDateUtc.Should().Be(firstSignInTime);
 
             // check only one email was sent
             _mockWelcomeEmailService.Verify(x => x.Send(It.IsAny<WelcomeEmailModel>()), Times.Once);
+        }
+
+        [Test]
+        public async Task TestAccessTokenCaching()
+        {
+            const string token1 = "abc";
+            var firstSignInTime = new DateTime(2016, 11, 30, 22, 58, 58);
+            _mockTime = firstSignInTime;
+
+            await _userService.CacheTokenAsync(token1, _testUserBob);
+
+            // test some other token still returns null now there's some cache data
+            var unknownToken = "never-seen-before";
+            var uncachedUser = await _userService.GetFromCacheAsync(unknownToken);
+            uncachedUser.Should().BeNull($"Token '{unknownToken}' hasn't been seen before");
+
+            var cachedUser = await _userService.GetFromCacheAsync(token1);
+            cachedUser.Email.Should().Be(_testUserBob.Email, "bob has had an access token cached");
+
+            const string token2 = "def";
+            var secondSignInTime = _mockTime.AddHours(8);
+            _mockTime = secondSignInTime;
+
+            await _userService.CacheTokenAsync(token2, _testUserBob);
+
+            _testUserBob.Sessions.Count.Should().Be(2);
+            _testUserBob.Sessions.Single(x => x.AccessToken == token1).CreatedUtc.Should().Be(firstSignInTime);
+            _testUserBob.Sessions.Single(x => x.AccessToken == token2).CreatedUtc.Should().Be(secondSignInTime);
+
         }
 
         private void CheckUserDataUpdated(McUser mcUser, JsonUserDetails jsonUserDetails)
