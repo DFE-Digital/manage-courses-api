@@ -4,25 +4,37 @@ using System.Linq;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
-using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.Models;
-using Microsoft.Extensions.Logging;
-using Moq;
+using GovUk.Education.ManageCourses.Tests.TestUtilities;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 {
+    /// <summary>
+    ///
+    /// This test clas contains one test case (which would have exposed a bug when getting an enrichment record)
+    /// An error was thrown when a different user to the origin 'SavedBy' user tried to get the record.
+    /// This was because the SavedBy user and UpdateBy user objects were null in the result.
+    /// In order to re-create the bug I had to re-instate the old code and watch the test fail.
+    /// However this wasn't easy to re-create as the context was still holding on the the 2 users (which need to be setup for the same oranisation)
+    /// The answer was to initialise the database in the test setup with the enrichment reacords as well as the users/organisations etc.
+    /// Then refreshing the context before the query was run.
+    /// </summary>
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
     [Explicit]
-    public class EnrichmentServiceInstitutionTests : DbIntegrationTestBase
+    public class EnrichmentServiceRegressionTests : DbIntegrationTestBase
     {
         private UcasInstitution _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
 
         private const string Email = "12345@example.org";
+        private const string Email2 = "2345678@example.org";
+        private const string TrainWithDisabilityText = "TrainWithDisabilily Text";
+        private const string TrainWithUsText = "TrainWithUs Text";
 
         protected override void Setup()
         {
@@ -62,7 +74,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Email = Email,
             };
             Context.Add(user);
-
+            var user2 = new McUser
+            {
+                Email = Email2,
+            };
+            Context.Add(user);
+            //create the organisation and add user1 and user2 to it
             var org = new McOrganisation
             {
                 Name = "Bucks Mega Org",
@@ -72,6 +89,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     new McOrganisationUser
                     {
                         McUser = user,
+                    },
+                    new McOrganisationUser
+                    {
+                        McUser = user2,
                     },
                 },
                 McOrganisationInstitutions = new List<McOrganisationInstitution>
@@ -83,253 +104,72 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 }
             };
             Context.Add(org);
-
             Context.SaveChanges();
+            //now add the enrichment model with user1
+            var enrichmentModel = new InstitutionEnrichmentModel
+            {
+                TrainWithDisability = TrainWithDisabilityText,
+                TrainWithUs = TrainWithUsText,
+                AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
+                {
+                    new AccreditingProviderEnrichment
+                    {
+                        UcasInstitutionCode = AccreditingInstCode,
+                        Description = "xcvxcvxcv",
+                    }
+                }
+            };
+            var jsonSerializerSettings = new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore
+            };
+            var content = JsonConvert.SerializeObject(enrichmentModel, jsonSerializerSettings);
+
+            var enrichment = new InstitutionEnrichment
+            {
+                InstCode = ProviderInstCode,
+                CreatedTimestampUtc = DateTime.UtcNow,
+                UpdatedTimestampUtc = DateTime.UtcNow,
+                LastPublishedTimestampUtc = null,
+                CreatedByUser = user,
+                UpdatedByUser = user,
+                Status = EnumStatus.Draft,
+                JsonData = content,
+            };
+            Context.InstitutionEnrichments.Add(enrichment);
+            Context.SaveChanges();
+            Context = ContextLoader.GetDbContext(Config);//refresh the context
+        }
+
+        [Test]
+        //this tests the old code for null users which would break the enrichment service
+        public void TestGetInstitutionEnrichmentUsersAreNull()
+        {
+            //this is the old code before the fix
+            var enrichment = Context.InstitutionEnrichments
+                .Where(ie => ProviderInstCode.ToLower() == ie.InstCode.ToLower()).OrderByDescending(x => x.Id)
+                .FirstOrDefault();
+
+            enrichment.CreatedByUser.Should().BeNull();
+            enrichment.UpdatedByUser.Should().BeNull();
         }
         /// <summary>
-        /// This is a happy path test for all enrichment functionality.
-        /// This test ensures that the status is always correct at the right point in the workflow
+        /// This test breaks when the old code in the enrichment service is re-instated
         /// </summary>
         [Test]
-        public void Test_InstitutionEnrichment_And_Publishing_Workflow()
+        public void TestGetInstitutionEnrichmentWithDifferentUserFromSavedUser()
         {
-            const string trainWithDisabilityText = "TrainWithDisabilily Text";
-            const string trainWithUsText = "TrainWithUs Text";
-            const string trainWithDisabilityUpdatedText = "TrainWithDisabilily Text updated";
-            const string trainWithUsUpdatedText = "TrainWithUs Text updated";
-            const string instDesc = "school1 description enrichement";
-
+            //get a new context            
             var enrichmentService = new EnrichmentService(Context);
-            var model = new UcasInstitutionEnrichmentPostModel
-            {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityText,
-                    TrainWithUs = trainWithUsText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
-            };
-
-            var emptyEnrichment = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
-            emptyEnrichment.Should().BeNull("we haven't enriched the institution data yet");
-
-            //test save
-            enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
-
-            //test get
-            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
-
+            //test get the enrichment using user2
+            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email2);
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
-            result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
-            result.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
+            result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(TrainWithDisabilityText);
+            result.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(TrainWithUsText);
             result.LastPublishedTimestampUtc.Should().BeNull();
             result.Status.Should().BeEquivalentTo(EnumStatus.Draft);
-
-            //test update
-            var updatedmodel = new UcasInstitutionEnrichmentPostModel
-            {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityUpdatedText,
-                    TrainWithUs = trainWithUsUpdatedText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
-            };
-
-            enrichmentService.SaveInstitutionEnrichment(updatedmodel, ProviderInstCode.ToLower(), Email);
-            var updateResult = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
-            updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
-            updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
-            updateResult.LastPublishedTimestampUtc.Should().BeNull();
-            //publish
-            var publishResults = enrichmentService.PublishInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
-            publishResults.Should().BeTrue();
-            var publishRecord = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
-            publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
-            publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
-            //test save again after publish
-            enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
-            var updateResult2 = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
-            updateResult2.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
-            updateResult2.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
-            updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
-            updateResult2.LastPublishedTimestampUtc.ToString().Should().BeEquivalentTo(publishRecord.LastPublishedTimestampUtc.ToString());
-            //check number of records generated from this
-            var draftCount = Context.InstitutionEnrichments.Count(x => x.Status == EnumStatus.Draft);
-            var publishedCount = Context.InstitutionEnrichments.Count(x => x.Status == EnumStatus.Published);
-            publishedCount.Should().Be(1);
-            draftCount.Should().Be(1);
         }
-        [Test]
-        [TestCase("eqweqw", "qweqweq")]
-        public void Test_SaveInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
-        {
-            const string trainWithDisabilityText = "TrainWithDisabilily Text";
-            const string trainWithUsText = "TrainWithUs Text";
-            const string instDesc = "school1 description enrichement";
-
-            var enrichmentService = new EnrichmentService(Context);
-            var model = new UcasInstitutionEnrichmentPostModel
-            {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityText,
-                    TrainWithUs = trainWithUsText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
-            };
-
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.SaveInstitutionEnrichment(model, instCode, email));
-        }
-        [Test]
-        [TestCase("", "")]
-        [TestCase(null, null)]
-        public void Test_SaveInstitutionEnrichment_should__argument_exception(string instCode, string email)
-        {
-            const string trainWithDisabilityText = "TrainWithDisabilily Text";
-            const string trainWithUsText = "TrainWithUs Text";
-            const string instDesc = "school1 description enrichement";
-
-            var enrichmentService = new EnrichmentService(Context);
-            var model = new UcasInstitutionEnrichmentPostModel
-            {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityText,
-                    TrainWithUs = trainWithUsText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
-            };
-
-            Assert.Throws<ArgumentException>(() => enrichmentService.SaveInstitutionEnrichment(model, instCode, email));
-        }
-        [Test]
-        [TestCase("eqweqw", "qweqweq")]
-        public void Test_GetInstitutionEnrichment_should_error(string instCode, string email)
-        {
-            var enrichmentService = new EnrichmentService(Context);
-
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetInstitutionEnrichment(instCode, email));
-        }
-        [Test]
-        [TestCase("eqweqw", "qweqweq")]
-        public void Test_PublishInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
-        {
-            var enrichmentService = new EnrichmentService(Context);
-
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.PublishInstitutionEnrichment(instCode, email));
-        }
-        [Test]
-        [TestCase("", "")]
-        [TestCase(null, null)]
-        public void Test_PublishInstitutionEnrichment_should_argument_exception(string instCode, string email)
-        {
-            var enrichmentService = new EnrichmentService(Context);
-            Assert.Throws<ArgumentException>(() => enrichmentService.PublishInstitutionEnrichment(instCode, email));
-        }
-        [Test]
-        public void Test_PublishInstitutionEnrichment_should_return_false()
-        {
-            Context.InstitutionEnrichments.RemoveRange(Context.InstitutionEnrichments);
-            Context.Save();
-
-            var enrichmentService = new EnrichmentService(Context);
-            var publishResults = enrichmentService.PublishInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
-            publishResults.Should().BeFalse();
-
-        }
-
-        [Test]
-        public void EnrichmentDataSurvivesDeleteAndRecreate()
-        {
-            // Arrange
-            var enrichmentService = new EnrichmentService(Context);
-            var dataService = new DataService(Context, enrichmentService, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
-            var sourceModel = new UcasInstitutionEnrichmentPostModel
-            {
-                EnrichmentModel = new InstitutionEnrichmentModel
-                {
-                    TrainWithUs = "Oh the grand old Duke of York",
-                    TrainWithDisability = "He had 10,000 men",
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasInstitutionCode = AccreditingInstCode,
-                            Description = "He marched them up to the top of the hill"
-                        }
-                    }
-                },
-            };
-            enrichmentService.SaveInstitutionEnrichment(sourceModel, _ucasInstitution.InstCode, Email);
-
-            // Act
-            var ucasPayload = new UcasPayload
-            {
-                // todo: test with change of this institution: https://trello.com/c/e1FwXuYk/133-ucas-institutions-dont-get-updated-during-ucas-import
-                Institutions = new List<UcasInstitution>
-                {
-                    new UcasInstitution
-                    {
-                        InstCode = _ucasInstitution.InstCode,
-                        InstName = "Rebranded Institution",
-                    },
-                    new UcasInstitution
-                    {
-                        InstCode = AccreditingInstCode,
-                        InstName = "Rebranded Accrediting Institution",
-                    },
-                },
-                Courses = new List<UcasCourse>
-                {
-                    new UcasCourse
-                    {
-                        InstCode = _ucasInstitution.InstCode,
-                        CrseCode = "CC11",
-                        AccreditingProvider = AccreditingInstCode,
-                    },
-                },
-            };
-            dataService.ProcessUcasPayload(ucasPayload);
-
-            // Assert
-            var res = enrichmentService.GetInstitutionEnrichment(_ucasInstitution.InstCode, Email);
-            res.EnrichmentModel.TrainWithUs.Should().Be(sourceModel.EnrichmentModel.TrainWithUs);
-            res.EnrichmentModel.TrainWithDisability.Should().Be(sourceModel.EnrichmentModel.TrainWithDisability);
-            res.EnrichmentModel.AccreditingProviderEnrichments.Should().HaveCount(1);
-            res.EnrichmentModel.AccreditingProviderEnrichments.Should().HaveSameCount(sourceModel.EnrichmentModel.AccreditingProviderEnrichments);
-            res.EnrichmentModel.AccreditingProviderEnrichments[0].Description.Should().Be(sourceModel.EnrichmentModel.AccreditingProviderEnrichments[0].Description);
-            res.EnrichmentModel.AccreditingProviderEnrichments[0].UcasInstitutionCode.Should().Be(sourceModel.EnrichmentModel.AccreditingProviderEnrichments[0].UcasInstitutionCode);
-        }
-
     }
 }
