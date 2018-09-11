@@ -51,7 +51,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     {
                         mcUser = await _userService.GetAndUpdateUserAsync(userDetails);
                     }
-                    catch (McUserNotFoundException ex)
+                    catch (McUserNotFoundException)
                     {
                         _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
                         return AuthenticateResult.NoResult();
