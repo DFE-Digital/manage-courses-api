@@ -11,7 +11,7 @@ This repo provides a dotnet core solution containing:
 * A Domain to describe the managing course data.
 * Regression tests.
 
-The main client for this API and library is
+The main clients for this API and library are
 * https://github.com/DFE-Digital/manage-courses-ui
 * https://github.com/DFE-Digital/manage-courses-ucas-importer
 
@@ -21,35 +21,90 @@ It can be worked on in either VSCode or Visual Studio 2017 as preferred.
 
 The project follows https://semver.org/ version numbering.
 
-## Running the API locally
-
-In a windows command prompt:
-
-    cd src/ManageCourses.Api
-    dotnet run
-
-## Database
-
-There's a script for setting up a postgres user and database: `setup-pg-user.sh`
-
-## Config
+## Configuration
 
 An example of the config keys that are required for Secret Manager are available from:
 
 	src\ManageCourses.Api\appsettings.SecretManager_Example.json
-
-E.g.
-
-    dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST localhost
-    dotnet user-secrets set PG_DATABASE the-database (will be created if missing and sufficient rights, e.g. 'manage')
-    dotnet user-secrets set PG_USERNAME the-user-you-created
-    dotnet user-secrets set PG_PASSWORD the-password-you-set
 
 
 For additional details, refer to
 https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
 
 https://dfedigital.atlassian.net/wiki/spaces/BaT/pages/389349377/Manage+Courses+API
+
+
+## Getting started from scratch
+
+### Database setup
+
+```bash
+# from .\src\ManageCourses.Api>
+dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST the-host (ie localhost)
+
+dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_PORT the-port (ie 5432)
+
+dotnet user-secrets set PG_DATABASE the-database (will be created if missing and sufficient rights, e.g. 'manage')
+
+dotnet user-secrets set PG_USERNAME the-user-you-created
+
+dotnet user-secrets set PG_PASSWORD the-password-you-set
+```
+
+#### Create blank database via psql
+```bash
+# Connect to database server using 
+# [MANAGE_COURSES_POSTGRESQL_SERVICE_HOST]
+# [MANAGE_COURSES_POSTGRESQL_SERVICE_PORT] 
+# [PG_USERNAME] 
+
+psql -h MANAGE_COURSES_POSTGRESQL_SERVICE_HOST -p [MANAGE_COURSES_POSTGRESQL_SERVICE_PORT]  -U [PG_USERNAME]
+
+# Enter password using 
+# [PG_PASSWORD]
+
+# Execute sql command using 
+# [PG_DATABASE]
+CREATE DATABASE PG_DATABASE;
+```
+
+There's a script for setting up a postgres user and database: `setup-pg-user.sh`
+
+
+### Setup Email functionality
+
+```bash 
+# from .\src\ManageCourses.Api>
+dotnet user-secrets set email:user the-user-email-address
+```
+
+Values available from [GOV.​UK Notify](https://www.notifications.service.gov.uk/)
+```bash 
+# from .\src\ManageCourses.Api>
+dotnet user-secrets set email:template_id the-template-id
+dotnet user-secrets set email:api_key the-email-api-key
+dotnet user-secrets set email:welcome_template_id the-welcome-template-id
+```
+### Setup Authentication 
+
+#### [UI](https://github.com/DFE-Digital/manage-courses-ui) related
+```bash 
+# from .\src\ManageCourses.Api>
+dotnet user-secrets set auth:oidc:userinfo_endpoint the-oidc-userinfo-endpoint
+```
+
+#### [Importer](https://github.com/DFE-Digital/manage-courses-ucas-importer) related
+```bash 
+# from .\src\ManageCourses.Api>
+dotnet user-secrets set api:key the-api-key
+```
+
+## Running the API locally
+
+```bash
+# from .\src\ManageCourses.Api>
+dotnet run
+```
 
 ## Logging
 
