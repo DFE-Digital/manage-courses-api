@@ -73,8 +73,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Unhandled exception during bearer token authentication. SubjectId: {userDetails?.Subject ?? mcUser?.SignInUserId}", ex);
-                return AuthenticateResult.NoResult();
+                throw new Exception($"Unhandled exception during bearer token authentication. SubjectId: {userDetails?.Subject ?? mcUser?.SignInUserId}", ex);
             }
         }
 
