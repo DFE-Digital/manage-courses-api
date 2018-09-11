@@ -54,7 +54,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     catch (McUserNotFoundException)
                     {
                         _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
-                        return AuthenticateResult.NoResult();
+                        return AuthenticateResult.NoResult(); // this will 401 which is then explicitly handled by the UI
                     }
                     await _userService.CacheTokenAsync(accessToken, mcUser);
                 }
