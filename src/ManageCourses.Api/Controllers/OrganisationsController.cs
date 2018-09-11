@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -70,12 +71,17 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [Authorize]
         [HttpGet]        
         [ProducesResponseType(typeof(IEnumerable<UserOrganisation>), 200)]
-        public IEnumerable<UserOrganisation> GetAll()
+        [ProducesResponseType(401)]
+        public IActionResult GetAll()
         {
             var name = this.User.Identity.Name;
             var organisations = _dataService.GetOrganisationsForUser(name);
+            if (!organisations.Any())
+            {
+                return Unauthorized();
+            }
 
-            return organisations;
+            return Ok(organisations);
         }
     }
 }
