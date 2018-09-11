@@ -73,7 +73,9 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
             catch (Exception ex)
             {
-                throw new Exception($"Unhandled exception during bearer token authentication. SubjectId: {userDetails?.Subject ?? mcUser?.SignInUserId}", ex);
+                // todo: throw when https://trello.com/c/MjNZSdMt/55-bearer-token-handler-called-for-api-key-endpoints-timebox-30-mins is fixed (breaks tests that rely on api-key calls for setup, and probably all api-key calls)
+                //throw new Exception($"Unhandled exception during bearer token authentication. SubjectId: {userDetails?.Subject ?? mcUser?.SignInUserId}", ex);
+                return AuthenticateResult.Fail(ex);
             }
         }
 
