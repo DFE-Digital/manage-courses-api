@@ -6,6 +6,7 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Services.Users;
+using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -29,6 +30,8 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            JsonUserDetails userDetails = null;
+            McUser mcUser = null;
             try
             {
                 var accessToken = Request.GetAccessToken();
@@ -39,19 +42,19 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     return AuthenticateResult.NoResult();
                 }
 
-                var mcUser = await _userService.GetFromCacheAsync(accessToken);
+                mcUser = await _userService.GetFromCacheAsync(accessToken);
                 var cacheMiss = mcUser == null;
                 if (cacheMiss)
                 {
-                    var userDetails = await GetDetailsFromOAuthAsync(accessToken);
+                    userDetails = await GetDetailsFromOAuthAsync(accessToken);
                     try
                     {
                         mcUser = await _userService.GetAndUpdateUserAsync(userDetails);
                     }
-                    catch (McUserNotFoundException ex)
+                    catch (McUserNotFoundException)
                     {
                         _logger.LogWarning($"SignIn subject {userDetails.Subject} not found in McUsers data");
-                        return AuthenticateResult.Fail(ex);
+                        return AuthenticateResult.NoResult(); // this will 401 which is then explicitly handled by the UI
                     }
                     await _userService.CacheTokenAsync(accessToken, mcUser);
                 }
@@ -70,6 +73,8 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
             catch (Exception ex)
             {
+                // todo: throw when https://trello.com/c/MjNZSdMt/55-bearer-token-handler-called-for-api-key-endpoints-timebox-30-mins is fixed (breaks tests that rely on api-key calls for setup, and probably all api-key calls)
+                //throw new Exception($"Unhandled exception during bearer token authentication. SubjectId: {userDetails?.Subject ?? mcUser?.SignInUserId}", ex);
                 return AuthenticateResult.Fail(ex);
             }
         }
