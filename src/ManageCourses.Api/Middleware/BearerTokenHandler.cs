@@ -106,9 +106,10 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             // this method is not async because it's an override!!
 
             var authResult = HandleAuthenticateOnceSafeAsync().Result;
-            if (!authResult.Succeeded && authResult.Failure != null)
+            var authException = authResult.Failure;
+            if (!authResult.Succeeded && authException != null)
             {
-                _logger.LogDebug(authResult.Failure, "Failed challenge");
+                _logger.LogDebug(authException, "Failed challenge");
                 Context.Response.StatusCode = 404;
                 return Task.CompletedTask;
             }
