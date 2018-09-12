@@ -1,8 +1,7 @@
-using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -33,9 +32,8 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
                     return AuthenticateResult.Success(ticket);
                 }
-                else {
-                    return AuthenticateResult.Fail($"Invalid api key: {accessToken}");
-                }
+
+                return AuthenticateResult.Fail($"Invalid api key: {accessToken}");
             }
 
             return AuthenticateResult.NoResult();
@@ -43,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            var authResult = this.HandleAuthenticateOnceSafeAsync().Result;
+            var authResult = HandleAuthenticateOnceSafeAsync().Result;
             if (!authResult.Succeeded && authResult.Failure != null)
             {
                 Logger.LogDebug(authResult.Failure, "Failed challenge");
