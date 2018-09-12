@@ -1,15 +1,13 @@
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Middleware;
-using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Invites;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
 
-    [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+    [ApiTokenAuth]
     [Route("api/[controller]")]
     public class InviteController : Controller
     {
@@ -21,7 +19,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         [HttpPost]
-        [ExemptFromAcceptTerms]                
+        [ExemptFromAcceptTerms]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public StatusCodeResult Index(string email)

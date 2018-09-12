@@ -1,10 +1,8 @@
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
-using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Middleware;
-using Microsoft.AspNetCore.Authorization;
+using GovUk.Education.ManageCourses.Api.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -22,7 +20,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Exports the data.
         /// </summary>
         /// <returns>The exported data</returns>
-        [Authorize]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{ucasCode}")]
         public OrganisationCourses ExportByOrganisation(string ucasCode)
@@ -35,7 +33,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Imports the data.
         /// </summary>
-        [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+        [ApiTokenAuth]
         [ExemptFromAcceptTerms]
         [HttpPost]
         [Route("ucas")]
@@ -49,7 +47,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Imports the reference data.
         /// </summary>
-        [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+        [ApiTokenAuth]
         [ExemptFromAcceptTerms]
         [HttpPost]
         [Route("referencedata")]

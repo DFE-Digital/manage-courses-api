@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets an organisations by Institution Code
         /// </summary>
         /// <returns>a single UserOrganisation object</returns>
-        [Authorize]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}")]
         [ProducesResponseType(typeof(UserOrganisation), 200)]
@@ -45,7 +45,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets UCAS Institution data by Institution Code
         /// </summary>
         /// <returns>a single UcasInstitution object</returns>
-        [Authorize]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}/ucas")]
         [ProducesResponseType(typeof(UcasInstitution), 200)]
@@ -68,8 +68,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets a list of organisations for the user
         /// </summary>
         /// <returns>a list of UserOrganisation objects</returns>
-        [Authorize]
-        [HttpGet]        
+        [BearerTokenAuth]
+        [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserOrganisation>), 200)]
         [ProducesResponseType(401)]
         public IActionResult GetAll()

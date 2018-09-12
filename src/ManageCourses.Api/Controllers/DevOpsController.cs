@@ -1,7 +1,6 @@
 ﻿using System;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Middleware;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -13,7 +12,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     /// Use the actions in here to verify that various error conditions are correctly logged / alerted etc.
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+    [ApiTokenAuth]
     public class DevOpsController : Controller
     {
         /// <summary>
