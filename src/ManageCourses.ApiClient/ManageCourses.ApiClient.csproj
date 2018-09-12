@@ -12,7 +12,7 @@
     <GitVersionFile>$(ProjectDir)GitVersion.txt</GitVersionFile>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>GovUk.Education.ManageCourses.ApiClient</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
