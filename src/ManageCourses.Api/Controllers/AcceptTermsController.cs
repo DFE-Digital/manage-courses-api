@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
+using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             this.context = context;
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
         [ExemptFromAcceptTerms]
         [HttpPost]        
         [Route("accept")]

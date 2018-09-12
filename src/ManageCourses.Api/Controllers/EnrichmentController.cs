@@ -1,4 +1,5 @@
 using System;
+using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -6,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
     [Route("api/enrichment")]
     public class EnrichmentController : Controller
     {

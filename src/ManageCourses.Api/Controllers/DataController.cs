@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Exports the data.
         /// </summary>
         /// <returns>The exported data</returns>
-        [Authorize]
+        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
         [HttpGet]
         [Route("{ucasCode}")]
         public OrganisationCourses ExportByOrganisation(string ucasCode)

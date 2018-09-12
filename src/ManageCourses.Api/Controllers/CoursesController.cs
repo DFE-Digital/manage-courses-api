@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets a course by institution Ucas code
         /// </summary>
         /// <returns>a single course</returns>
-        [Authorize]
+        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
         [HttpGet]
         [Route("{instCode}/course/{ucasCode}")]
         [ProducesResponseType(typeof(Course), 200)]
@@ -43,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets a list of course by Inst code
         /// </summary>
         /// <returns>a single course</returns>
-        [Authorize]
+        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
         [HttpGet]
         [Route("{instCode}")]
         [ProducesResponseType(typeof(InstitutionCourses), 200)]

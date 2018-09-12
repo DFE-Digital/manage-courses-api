@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _service = accessRequestService;
         }
 
-        [Authorize]
+        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
         [HttpPost]
         [ProducesResponseType(200)]
         public StatusCodeResult Index([FromBody] AccessRequest request) 

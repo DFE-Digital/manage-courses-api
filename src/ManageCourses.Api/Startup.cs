@@ -36,7 +36,7 @@ namespace GovUk.Education.ManageCourses.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging(loggingBuilder =>
-      	    loggingBuilder.AddSerilog(dispose: true));
+                loggingBuilder.AddSerilog(dispose: true));
 
             var mcConfig = new McConfig(Configuration);
             var connectionString = mcConfig.BuildConnectionString();
@@ -52,17 +52,15 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddScoped<IManageCoursesDbContext>(provider => provider.GetService<ManageCoursesDbContext>());
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = BearerTokenDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = BearerTokenDefaults.AuthenticationScheme;
-            }).AddBearerToken(options =>
-            {
-                options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
-            }).AddBearerTokenApiKey(options =>
-            {
-                options.ApiKey = Configuration["api:key"];
-            });
+            services.AddAuthentication()
+                .AddBearerToken(options =>
+                {
+                    options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
+                })
+                .AddBearerTokenApiKey(options =>
+                {
+                    options.ApiKey = Configuration["api:key"];
+                });
 
             services.AddScoped<IDataService, DataService>();
             services.AddScoped<IUserService, UserService>();
