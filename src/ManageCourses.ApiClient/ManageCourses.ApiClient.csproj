@@ -51,8 +51,8 @@
       <clientBaseClass>$(namespace).ManageCoursesApiClientBase</clientBaseClass>
       <configurationClass>$(namespace).IManageCoursesApiClientConfiguration</configurationClass>
     </PropertyGroup>
-    <Exec Command="$(NSwagExe_Core20) webapi2swagger /ReferencePaths:$(NugetPackageRoot) /assembly:@(_ResolvedProjectReferencePaths, ',') /controller:GovUk.Education.ManageCourses.Api.Controllers.* /output:$(OutDir)swagger.json" />
-    <Exec Command="$(NSwagExe_Core20) swagger2csclient /InjectHttpClient:true /input:$(OutDir)swagger.json /output:$(OutputSwaggerGeneration) /classname:$(classname) /namespace:$(namespace) /clientBaseClass:$(clientBaseClass) /configurationClass:$(configurationClass) /OperationGenerationMode:SingleClientFromOperationId " />
+    <Exec Command="$(NSwagExe_Core21) webapi2swagger /ReferencePaths:$(NugetPackageRoot) /assembly:@(_ResolvedProjectReferencePaths, ',') /controller:GovUk.Education.ManageCourses.Api.Controllers.* /output:$(OutDir)swagger.json" />
+    <Exec Command="$(NSwagExe_Core21) swagger2csclient /InjectHttpClient:true /input:$(OutDir)swagger.json /output:$(OutputSwaggerGeneration) /classname:$(classname) /namespace:$(namespace) /clientBaseClass:$(clientBaseClass) /configurationClass:$(configurationClass) /OperationGenerationMode:SingleClientFromOperationId " />
     <ItemGroup>
       <Compile Include="$(OutputSwaggerGeneration)" />
     </ItemGroup>
