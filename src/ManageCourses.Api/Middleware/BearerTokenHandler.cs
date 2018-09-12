@@ -6,7 +6,6 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Services.Users;
-using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -30,8 +29,6 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            JsonUserDetails userDetails = null;
-            McUser mcUser = null;
             try
             {
                 var accessToken = Request.GetAccessToken();
@@ -42,11 +39,11 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
                     return AuthenticateResult.NoResult();
                 }
 
-                mcUser = await _userService.GetFromCacheAsync(accessToken);
+                var mcUser = await _userService.GetFromCacheAsync(accessToken);
                 var cacheMiss = mcUser == null;
                 if (cacheMiss)
                 {
-                    userDetails = await GetDetailsFromOAuthAsync(accessToken);
+                    var userDetails = await GetDetailsFromOAuthAsync(accessToken);
                     try
                     {
                         mcUser = await _userService.GetAndUpdateUserAsync(userDetails);
@@ -73,8 +70,6 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
             catch (Exception ex)
             {
-                // todo: throw when https://trello.com/c/MjNZSdMt/55-bearer-token-handler-called-for-api-key-endpoints-timebox-30-mins is fixed (breaks tests that rely on api-key calls for setup, and probably all api-key calls)
-                //throw new Exception($"Unhandled exception during bearer token authentication. SubjectId: {userDetails?.Subject ?? mcUser?.SignInUserId}", ex);
                 return AuthenticateResult.Fail(ex);
             }
         }
@@ -108,17 +103,19 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            // this method is pretend-async because it's an override!!
+            // this method is not async because it's an override!!
 
             var authResult = HandleAuthenticateOnceSafeAsync().Result;
-            if (!authResult.Succeeded && authResult.Failure != null)
+            var authException = authResult.Failure;
+            if (authResult.Succeeded || authException == null)
             {
-                _logger.LogDebug(authResult.Failure, "Failed challenge");
-                Context.Response.StatusCode = 404;
-                return Task.CompletedTask;
+                return base.HandleChallengeAsync(properties);
             }
 
-            return base.HandleChallengeAsync(properties);
+            _logger.LogError(authException, "Failed bearer token challenge");
+            Context.Response.StatusCode = 404; // todo: return 500 if there's an exception, 401 otherwise
+            return Task.CompletedTask;
+
         }
     }
 }

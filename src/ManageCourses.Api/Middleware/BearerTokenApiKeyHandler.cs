@@ -1,8 +1,7 @@
-using System.Net.Http;
 using System.Security.Claims;
+using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -10,8 +9,11 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 {
     public class BearerTokenApiKeyHandler : AuthenticationHandler<BearerTokenApiKeyOptions>
     {
+        private ILogger<BearerTokenApiKeyHandler> _logger;
+
         public BearerTokenApiKeyHandler(IOptionsMonitor<BearerTokenApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
+            _logger = logger.CreateLogger<BearerTokenApiKeyHandler>();
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -33,9 +35,8 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
                     return AuthenticateResult.Success(ticket);
                 }
-                else {
-                    return AuthenticateResult.Fail($"Invalid api key: {accessToken}");
-                }
+
+                return AuthenticateResult.Fail($"Invalid api key: {accessToken}");
             }
 
             return AuthenticateResult.NoResult();
@@ -43,15 +44,19 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties)
         {
-            var authResult = this.HandleAuthenticateOnceSafeAsync().Result;
-            if (!authResult.Succeeded && authResult.Failure != null)
+            // this method is not async because it's an override!!
+
+            var authResult = HandleAuthenticateOnceSafeAsync().Result;
+            var authException = authResult.Failure;
+            if (authResult.Succeeded || authException == null)
             {
-                Logger.LogDebug(authResult.Failure, "Failed challenge");
-                Context.Response.StatusCode = 404;
-                return Task.CompletedTask;
+                return base.HandleChallengeAsync(properties);
             }
 
-            return base.HandleChallengeAsync(properties);
+            _logger.LogError(authException, "Failed api-key challenge");
+            Context.Response.StatusCode = 404; // todo: return 500 if there's an exception, 401 otherwise
+            return Task.CompletedTask;
+
         }
     }
 }
