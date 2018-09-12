@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets an organisations by Institution Code
         /// </summary>
         /// <returns>a single UserOrganisation object</returns>
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}")]
         [ProducesResponseType(typeof(UserOrganisation), 200)]
@@ -46,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets UCAS Institution data by Institution Code
         /// </summary>
         /// <returns>a single UcasInstitution object</returns>
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}/ucas")]
         [ProducesResponseType(typeof(UcasInstitution), 200)]
@@ -69,7 +69,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets a list of organisations for the user
         /// </summary>
         /// <returns>a list of UserOrganisation objects</returns>
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [HttpGet]        
         [ProducesResponseType(typeof(IEnumerable<UserOrganisation>), 200)]
         [ProducesResponseType(401)]

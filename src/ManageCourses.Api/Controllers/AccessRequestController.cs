@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _service = accessRequestService;
         }
 
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [HttpPost]
         [ProducesResponseType(200)]
         public StatusCodeResult Index([FromBody] AccessRequest request) 

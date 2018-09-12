@@ -18,7 +18,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             this.context = context;
         }
 
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [ExemptFromAcceptTerms]
         [HttpPost]        
         [Route("accept")]

@@ -13,7 +13,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     /// Use the actions in here to verify that various error conditions are correctly logged / alerted etc.
     /// </summary>
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+    [ApiTokenAuth]
     public class DevOpsController : Controller
     {
         /// <summary>

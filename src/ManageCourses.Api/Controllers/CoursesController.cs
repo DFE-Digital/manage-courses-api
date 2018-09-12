@@ -21,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets a course by institution Ucas code
         /// </summary>
         /// <returns>a single course</returns>
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}/course/{ucasCode}")]
         [ProducesResponseType(typeof(Course), 200)]
@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Gets a list of course by Inst code
         /// </summary>
         /// <returns>a single course</returns>
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}")]
         [ProducesResponseType(typeof(InstitutionCourses), 200)]

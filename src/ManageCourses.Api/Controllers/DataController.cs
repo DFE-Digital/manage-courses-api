@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// Exports the data.
         /// </summary>
         /// <returns>The exported data</returns>
-        [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+        [BearerTokenAuth]
         [HttpGet]
         [Route("{ucasCode}")]
         public OrganisationCourses ExportByOrganisation(string ucasCode)
@@ -35,7 +35,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Imports the data.
         /// </summary>
-        [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+        [ApiTokenAuth]
         [ExemptFromAcceptTerms]
         [HttpPost]
         [Route("ucas")]
@@ -49,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Imports the reference data.
         /// </summary>
-        [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+        [ApiTokenAuth]
         [ExemptFromAcceptTerms]
         [HttpPost]
         [Route("referencedata")]

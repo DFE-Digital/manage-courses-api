@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = BearerTokenDefaults.AuthenticationScheme)]
+    [BearerTokenAuth]
     [Route("api/enrichment")]
     public class EnrichmentController : Controller
     {

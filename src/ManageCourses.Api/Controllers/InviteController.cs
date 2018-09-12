@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
 
-    [Authorize(AuthenticationSchemes = BearerTokenApiKeyDefaults.AuthenticationScheme)]
+    [ApiTokenAuth]
     [Route("api/[controller]")]
     public class InviteController : Controller
     {
