@@ -107,14 +107,15 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
             var authResult = HandleAuthenticateOnceSafeAsync().Result;
             var authException = authResult.Failure;
-            if (!authResult.Succeeded && authException != null)
+            if (authResult.Succeeded || authException == null)
             {
-                _logger.LogError(authException, "Failed challenge");
-                Context.Response.StatusCode = 404;
-                return Task.CompletedTask;
+                return base.HandleChallengeAsync(properties);
             }
 
-            return base.HandleChallengeAsync(properties);
+            _logger.LogError(authException, "Failed challenge");
+            Context.Response.StatusCode = 404;
+            return Task.CompletedTask;
+
         }
     }
 }
