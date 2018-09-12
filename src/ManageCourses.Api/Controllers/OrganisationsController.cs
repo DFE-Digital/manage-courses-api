@@ -4,7 +4,6 @@ using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -70,7 +69,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// </summary>
         /// <returns>a list of UserOrganisation objects</returns>
         [BearerTokenAuth]
-        [HttpGet]        
+        [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<UserOrganisation>), 200)]
         [ProducesResponseType(401)]
         public IActionResult GetAll()

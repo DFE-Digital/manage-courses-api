@@ -3,11 +3,10 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
-{   
+{
     [Route("api/[controller]")]
     public class AcceptTermsController : Controller
     {
@@ -20,7 +19,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         [BearerTokenAuth]
         [ExemptFromAcceptTerms]
-        [HttpPost]        
+        [HttpPost]
         [Route("accept")]
         [ProducesResponseType(404)]
         [ProducesResponseType(200)]
@@ -39,10 +38,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             }
 
             user.AcceptTermsDateUtc = DateTime.UtcNow;
-            
+
             context.Save();
 
             return Ok();
-        } 
+        }
     }
 }

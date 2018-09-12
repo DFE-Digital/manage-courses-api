@@ -1,10 +1,8 @@
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
-using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Middleware;
-using Microsoft.AspNetCore.Authorization;
+using GovUk.Education.ManageCourses.Api.Model;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
