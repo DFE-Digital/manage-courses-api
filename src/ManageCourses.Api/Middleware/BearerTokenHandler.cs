@@ -109,7 +109,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             var authException = authResult.Failure;
             if (!authResult.Succeeded && authException != null)
             {
-                _logger.LogDebug(authException, "Failed challenge");
+                _logger.LogError(authException, "Failed challenge");
                 Context.Response.StatusCode = 404;
                 return Task.CompletedTask;
             }
