@@ -113,6 +113,8 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
+                //TODO move the CourseDetailsSections constants into SearchAndCompare.Domain.Models
+                // but this will work ftm
                 Name = "about this training programme",//CourseDetailsSections.AboutTheCourse,
                 Text = courseEnrichmentModel.AboutCourse
             });
