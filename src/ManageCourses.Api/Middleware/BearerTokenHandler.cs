@@ -113,7 +113,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             }
 
             _logger.LogError(authException, "Failed bearer token challenge");
-            Context.Response.StatusCode = 404;
+            Context.Response.StatusCode = 404; // todo: return 500 if there's an exception, 401 otherwise
             return Task.CompletedTask;
 
         }
