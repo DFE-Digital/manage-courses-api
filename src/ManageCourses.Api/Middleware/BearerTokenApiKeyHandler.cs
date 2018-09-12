@@ -9,8 +9,11 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 {
     public class BearerTokenApiKeyHandler : AuthenticationHandler<BearerTokenApiKeyOptions>
     {
+        private ILogger<BearerTokenApiKeyHandler> _logger;
+
         public BearerTokenApiKeyHandler(IOptionsMonitor<BearerTokenApiKeyOptions> options, ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
+            _logger = logger.CreateLogger<BearerTokenApiKeyHandler>();
         }
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
@@ -41,15 +44,19 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
 
         protected override Task HandleChallengeAsync(AuthenticationProperties properties)
         {
+            // this method is not async because it's an override!!
+
             var authResult = HandleAuthenticateOnceSafeAsync().Result;
-            if (!authResult.Succeeded && authResult.Failure != null)
+            var authException = authResult.Failure;
+            if (authResult.Succeeded || authException == null)
             {
-                Logger.LogDebug(authResult.Failure, "Failed challenge");
-                Context.Response.StatusCode = 404;
-                return Task.CompletedTask;
+                return base.HandleChallengeAsync(properties);
             }
 
-            return base.HandleChallengeAsync(properties);
+            _logger.LogError(authException, "Failed api-key challenge");
+            Context.Response.StatusCode = 404; // todo: return 500 if there's an exception, 401 otherwise
+            return Task.CompletedTask;
+
         }
     }
 }
