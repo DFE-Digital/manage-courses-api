@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -9,6 +10,16 @@ namespace GovUk.Education.ManageCourses.Api
         public McConfig(IConfiguration configuration)
         {
             _configuration = configuration;
+        }
+
+        public void Validate()
+        {
+            // evaluate all properties for side-effect of checking for missing values
+            string value;
+            value = PgServer;
+            value = PgDatabase;
+            value = PgUser;
+            value = PgPassword;
         }
 
         /// <summary>
@@ -30,11 +41,21 @@ namespace GovUk.Education.ManageCourses.Api
             return connectionString;
         }
 
-        private string PgServer => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"];
-        private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"];
-        private string PgDatabase => _configuration["PG_DATABASE"];
-        private string PgUser => _configuration["PG_USERNAME"];
-        private string PgPassword => _configuration["PG_PASSWORD"];
+        private string PgServer => GetRequired("MANAGE_COURSES_POSTGRESQL_SERVICE_HOST");
+        private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
+        private string PgDatabase => GetRequired("PG_DATABASE");
+        private string PgUser => GetRequired("PG_USERNAME");
+        private string PgPassword => GetRequired("PG_PASSWORD");
         private string PgSsl => _configuration["PG_SSL"];
+
+        private string GetRequired(string key)
+        {
+            var value = _configuration[key];
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new Exception($"Config value missing: '{key}'");
+            }
+            return value;
+        }
     }
 }
