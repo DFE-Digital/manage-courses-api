@@ -141,7 +141,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public async Task Invite()
         {
-            var accessToken = Config["api:key"];
+            var accessToken = TestConfig.ApiKey;
 
             var httpClient = new HttpClient();
 
@@ -214,7 +214,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
         private ManageCoursesApiClient BuildApiKeyClient(string apiKey = null)
         {
-            var apiKeyAccessToken = apiKey ?? Config["api:key"];
+            var apiKeyAccessToken = apiKey ?? TestConfig.ApiKey;
             var importClient = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), new HttpClient())
             {
                 BaseUrl = LocalWebHost.Address

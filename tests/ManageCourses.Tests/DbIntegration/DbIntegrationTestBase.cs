@@ -19,12 +19,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected IConfigurationRoot Config;
         protected DateTime MockTime;
         protected Mock<IClock> MockClock;
+        protected TestConfigReader TestConfig;
 
         [OneTimeSetUp]
         public virtual void BaseOneTimeSetUp()
         {
             Config = TestConfigBuilder.BuildTestConfig();
             Context = ContextLoader.GetDbContext(Config);
+            TestConfig = new TestConfigReader(Config);
             Context.Database.EnsureDeleted();
             Context.Database.Migrate();
             MockClock = new Mock<IClock>();
