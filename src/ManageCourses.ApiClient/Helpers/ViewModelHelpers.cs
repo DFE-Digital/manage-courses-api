@@ -31,6 +31,11 @@ namespace GovUk.Education.ManageCourses.ApiClient.Helpers
         {
             var result = "";
 
+            if (string.IsNullOrWhiteSpace(course.ProgramType))
+            {
+                return result;
+            }
+
             var route = course.ProgramType.ToLowerInvariant();
 
             switch (route)
