@@ -19,42 +19,22 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
         private readonly SimpleHttpBrowser _httpBrowser = new SimpleHttpBrowser();
 
-        public DfeSignInCommunicator(string dfeSignInDomain, string redirectUriHostAndPort, string clientId, string clientSecret)
+        public DfeSignInCommunicator(TestConfigReader config)
         {
-            if (string.IsNullOrEmpty(dfeSignInDomain))
-            {
-                throw new ArgumentException("required", nameof(dfeSignInDomain));
-            }
-
-            if (string.IsNullOrEmpty(redirectUriHostAndPort))
-            {
-                throw new ArgumentException("required", nameof(redirectUriHostAndPort));
-            }
-
-            if (string.IsNullOrEmpty(clientId))
-            {
-                throw new ArgumentException("required", nameof(clientId));
-            }
-
-            if (string.IsNullOrEmpty(clientSecret))
-            {
-                throw new ArgumentException("required", nameof(clientSecret));
-            }
-
-            _dfeSignInDomain = dfeSignInDomain;
-            _redirectUriHostAndPort = redirectUriHostAndPort;
-            _clientId = clientId;
-            _clientSecret = clientSecret;
+            _dfeSignInDomain = config.SignInHost;
+            _redirectUriHostAndPort = config.SignInRedirectHost;
+            _clientId = config.SignInClientId;
+            _clientSecret = config.SignInClientSecret;
         }
 
-        public async Task<string> GetAccessTokenAsync(string username, string password)
+        public async Task<string> GetAccessTokenAsync(TestConfigReader config)
         {
             var startUrl = $"https://{_dfeSignInDomain}/auth?redirect_uri=https://{_redirectUriHostAndPort}/auth/cb&scope=openid profile email&response_type=code&state=1238&client_id={_clientId}";
             var loginPage = await GetUrl(startUrl, true);
 
             var form1 = await PostForm(loginPage, new Dictionary<string, string>{
-                    {"username", username},
-                    {"password", password},
+                    {"username", config.SignInUsername},
+                    {"password", config.SignInPassword},
                 }, true);
 
             var form2 = await PostForm(form1, new Dictionary<string, string>(), false);
@@ -78,13 +58,13 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
                 string accessToken = JObject.Parse(json)["access_token"].Value<string>();
                 if (string.IsNullOrEmpty(accessToken))
                 {
-                    throw new Exception($"could not get access_token with settings: {_clientId}, {username}, {_clientSecret.Substring(0, 3)}, {password.Substring(0, 3)}");
+                    throw new Exception($"could not get access_token with settings: {_clientId}, {config.SignInUsername}, {_clientSecret.Substring(0, 3)}, {config.SignInPassword.Substring(0, 3)}");
                 }
                 return accessToken;
             }
             catch (JsonReaderException)
             {
-                throw new Exception($"could not get access_token with settings: {_clientId}, {username}, {_clientSecret.Substring(0, 3)}, {password.Substring(0, 3)}");
+                throw new Exception($"could not get access_token with settings: {_clientId}, {config.SignInUsername}, {_clientSecret.Substring(0, 3)}, {config.SignInPassword.Substring(0, 3)}");
             }
         }
 

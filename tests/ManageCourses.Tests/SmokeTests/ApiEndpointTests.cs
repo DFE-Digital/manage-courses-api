@@ -141,7 +141,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public async Task Invite()
         {
-            var accessToken = Config["api:key"];
+            var accessToken = TestConfig.ApiKey;
 
             var httpClient = new HttpClient();
 
@@ -193,18 +193,15 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
         private void SetupSmokeTestData()
         {
-            var dfeSignInConfig = GetSigninConfig(Config);
             var clientImport = BuildApiKeyClient();
-            clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(dfeSignInConfig["username"])).Wait();
+            clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(TestConfig.SignInUsername)).Wait();
             clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
         }
 
         private ManageCoursesApiClient BuildSigninAwareClient()
         {
-            var dfeSignInConfig = GetSigninConfig(Config);
-            var communicator = new DfeSignInCommunicator(dfeSignInConfig["host"], dfeSignInConfig["redirect_host"],
-                dfeSignInConfig["clientid"], dfeSignInConfig["clientsecret"]);
-            var accessToken = communicator.GetAccessTokenAsync(dfeSignInConfig["username"], dfeSignInConfig["password"]).Result;
+            var communicator = new DfeSignInCommunicator(TestConfig);
+            var accessToken = communicator.GetAccessTokenAsync(TestConfig).Result;
             var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient())
             {
                 BaseUrl = LocalWebHost.Address
@@ -214,17 +211,12 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
         private ManageCoursesApiClient BuildApiKeyClient(string apiKey = null)
         {
-            var apiKeyAccessToken = apiKey ?? Config["api:key"];
+            var apiKeyAccessToken = apiKey ?? TestConfig.ApiKey;
             var importClient = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), new HttpClient())
             {
                 BaseUrl = LocalWebHost.Address
             };
             return importClient;
-        }
-
-        private static IConfigurationSection GetSigninConfig(IConfiguration configuration)
-        {
-            return configuration.GetSection("credentials").GetSection("dfesignin");
         }
     }
 }
