@@ -21,13 +21,13 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         private const string Email = "feddie.krueger@example.org";
 
         [Test]
-        public void DataExport_WithEmptyCampus()
+        public async Task DataExport_WithEmptyCampus()
         {
             SetupSmokeTestData();
 
-            var apiClient = BuildSigninAwareClient();
+            var apiClient = await BuildSigninAwareClient();
 
-            var export = apiClient.Data_ExportByOrganisationAsync("ABC").Result;
+            var export = await apiClient.Data_ExportByOrganisationAsync("ABC");
 
             Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
             Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName, "OrganisationName should be retrieved");
@@ -70,7 +70,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         public async Task EnrichmentSaveTest()
         {
             SetupSmokeTestData();
-            var apiClient = BuildSigninAwareClient();
+            var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
             var model = new UcasInstitutionEnrichmentPostModel();
             model.EnrichmentModel = new InstitutionEnrichmentModel
@@ -84,7 +84,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         public async Task EnrichmentPublishTest()
         {
             SetupSmokeTestData();
-            var apiClient = BuildSigninAwareClient();
+            var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
             var model = new UcasInstitutionEnrichmentPostModel();
             model.EnrichmentModel = new InstitutionEnrichmentModel
@@ -102,7 +102,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         public async Task EnrichmentLoadTest()
         {
             SetupSmokeTestData();
-            var apiClient = BuildSigninAwareClient();
+            var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
             var model = new UcasInstitutionEnrichmentPostModel();
             model.EnrichmentModel = new InstitutionEnrichmentModel
@@ -121,7 +121,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         public async Task CourseEnrichmentRoundTrip()
         {
             SetupSmokeTestData();
-            var apiClient = BuildSigninAwareClient();
+            var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
             const string ucasCourseCode = "CC101";
             var postModel = new CourseEnrichmentModel
@@ -198,10 +198,10 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
         }
 
-        private ManageCoursesApiClient BuildSigninAwareClient()
+        private async Task<ManageCoursesApiClient> BuildSigninAwareClient()
         {
             var communicator = new DfeSignInCommunicator(TestConfig);
-            var accessToken = communicator.GetAccessTokenAsync(TestConfig).Result;
+            var accessToken = await communicator.GetAccessTokenAsync(TestConfig);
             var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient())
             {
                 BaseUrl = LocalWebHost.Address
