@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Api
 {
-    public class McConfig
+    public class DatabaseConfig
     {
         private const string PgDatabaseKey = "PG_DATABASE";
         private const string PgUsernameKey = "PG_USERNAME";
@@ -11,7 +11,7 @@ namespace GovUk.Education.ManageCourses.Api
 
         private readonly IConfiguration _configuration;
 
-        public McConfig(IConfiguration configuration)
+        public DatabaseConfig(IConfiguration configuration)
         {
             _configuration = configuration;
         }
