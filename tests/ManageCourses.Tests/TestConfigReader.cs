@@ -5,6 +5,8 @@ namespace GovUk.Education.ManageCourses.Tests
 {
     public class TestConfigReader
     {
+        const string SignInPrefix = "credentials:dfesignin:";
+
         private readonly IConfiguration _configuration;
 
         public TestConfigReader(IConfiguration configuration)
@@ -13,6 +15,13 @@ namespace GovUk.Education.ManageCourses.Tests
         }
 
         public string ApiKey => GetRequired("api:key");
+
+        public string SignInHost => GetRequired(SignInPrefix + "host");
+        public string SignInRedirectHost => GetRequired(SignInPrefix + "redirect_host");
+        public string SignInUsername => GetRequired(SignInPrefix + "username");
+        public string SignInClientId => GetRequired(SignInPrefix + "clientid");
+        public string SignInClientSecret => GetRequired(SignInPrefix + "clientsecret");
+        public string SignInPassword => GetRequired(SignInPrefix + "password");
 
         private string GetRequired(string key)
         {
