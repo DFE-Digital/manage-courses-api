@@ -67,7 +67,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
             (res as StatusCodeResult).StatusCode.Should().Be(200);
             context.VerifyAll();
             list[0].AcceptTermsDateUtc.Should().NotBeNull();
-            list[0].AcceptTermsDateUtc.Should().BeCloseTo(DateTime.UtcNow);
+            list[0].AcceptTermsDateUtc.Should().BeCloseTo(DateTime.UtcNow, precision: 100); // widened precision from 20 to 100 as was flapping locally
 
         }
         
