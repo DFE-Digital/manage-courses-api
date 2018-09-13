@@ -45,7 +45,7 @@ namespace GovUk.Education.ManageCourses.Api
         private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
         private string PgDatabase => GetRequired("PG_DATABASE");
         private string PgUser => GetRequired("PG_USERNAME");
-        private string PgPassword => GetRequired("PG_PASSWORD");
+        private string PgPassword => _configuration["PG_PASSWORD"];
         private string PgSsl => _configuration["PG_SSL"];
 
         private string GetRequired(string key)
