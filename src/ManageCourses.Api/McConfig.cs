@@ -15,11 +15,10 @@ namespace GovUk.Education.ManageCourses.Api
         public void Validate()
         {
             // evaluate all properties for side-effect of checking for missing values
-            string value;
-            value = PgServer;
-            value = PgDatabase;
-            value = PgUser;
-            value = PgPassword;
+            if (PgServer == null || PgDatabase == null || PgUser == null)
+            {
+                throw new Exception("Missing config. Should have been caught inside getter.");
+            }
         }
 
         /// <summary>
