@@ -57,21 +57,23 @@ namespace GovUk.Education.ManageCourses.ApiClient
                     IsSalaried = isSalaried
                 },
                 IncludesPgce = string.IsNullOrWhiteSpace(ucasCourseData.ProfpostFlag) ? IncludesPgce.No : IncludesPgce.Yes,
-                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools.Select(school =>
-                    new SearchAndCompare.Domain.Models.Campus
-                    {
-                        Name = school.LocationName,
-                        CampusCode = school.Code,
-                        Location = new Location
+                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools
+                    .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase))
+                    .Select(school =>
+                        new SearchAndCompare.Domain.Models.Campus
                         {
-                            Address = MapAddress(school),
+                            Name = school.LocationName,
+                            CampusCode = school.Code,
+                            Location = new Location
+                            {
+                                Address = MapAddress(school),
 
-                            // todo: still relevant?
-                            Latitude = 0,
-                            Longitude = 0
+                                // todo: still relevant?
+                                Latitude = 0,
+                                Longitude = 0
+                            }
                         }
-                    }
-                ).ToList()),
+                    ).ToList()),
                 CourseSubjects = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
                     ? new Collection<CourseSubject>()
                     : new Collection<CourseSubject>(ucasCourseData.Subjects.Split(", ").Select(subject =>
