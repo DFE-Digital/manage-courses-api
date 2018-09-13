@@ -5,6 +5,10 @@ namespace GovUk.Education.ManageCourses.Api
 {
     public class McConfig
     {
+        private const string PgDatabaseKey = "PG_DATABASE";
+        private const string PgUsernameKey = "PG_USERNAME";
+        private const string PgServerKey = "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST";
+
         private readonly IConfiguration _configuration;
 
         public McConfig(IConfiguration configuration)
@@ -12,13 +16,15 @@ namespace GovUk.Education.ManageCourses.Api
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Check all required config is present.
+        /// Intended to be run early to catch config problems at startup instead of during normal operation.
+        /// </summary>
         public void Validate()
         {
-            // evaluate all properties for side-effect of checking for missing values
-            if (PgServer == null || PgDatabase == null || PgUser == null)
-            {
-                throw new Exception("Missing config. Should have been caught inside getter.");
-            }
+            ValidateRequired(PgServerKey);
+            ValidateRequired(PgDatabaseKey);
+            ValidateRequired(PgUsernameKey);
         }
 
         /// <summary>
@@ -26,35 +32,27 @@ namespace GovUk.Education.ManageCourses.Api
         /// </summary>
         public string BuildConnectionString()
         {
-            var server = PgServer;
-            var port = PgPort;
-
-            var user = PgUser;
-            var pword = PgPassword;
-            var dbase = PgDatabase;
-
-            var sslDefault = "SSL Mode=Prefer;Trust Server Certificate=true";
-            var ssl = PgSsl ?? sslDefault;
-
-            var connectionString = $"Server={server};Port={port};Database={dbase};User Id={user};Password={pword};{ssl}";
+            var connectionString = $"Server={PgServer};Port={PgPort};Database={PgDatabase};User Id={PgUser};Password={PgPassword};{PgSsl}";
             return connectionString;
         }
 
-        private string PgServer => GetRequired("MANAGE_COURSES_POSTGRESQL_SERVICE_HOST");
+        private string PgServer => _configuration[PgServerKey];
         private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
-        private string PgDatabase => GetRequired("PG_DATABASE");
-        private string PgUser => GetRequired("PG_USERNAME");
+        private string PgDatabase => _configuration[PgDatabaseKey];
+        private string PgUser => _configuration[PgUsernameKey];
         private string PgPassword => _configuration["PG_PASSWORD"];
-        private string PgSsl => _configuration["PG_SSL"];
+        private string PgSsl => _configuration["PG_SSL"] ?? "SSL Mode=Prefer;Trust Server Certificate=true";
 
-        private string GetRequired(string key)
+        /// <summary>
+        /// Throws if null or whitespace
+        /// </summary>
+        /// <param name="key"></param>
+        private void ValidateRequired(string key)
         {
-            var value = _configuration[key];
-            if (string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(_configuration[key]))
             {
                 throw new Exception($"Config value missing: '{key}'");
             }
-            return value;
         }
     }
 }
