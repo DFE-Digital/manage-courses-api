@@ -55,8 +55,25 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                             Code = "SCH",
                             ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
                             FullTimeVacancies = "",
-                            PartTimeVacancies = ""
-                        }
+                            PartTimeVacancies = "",
+                            Status = "r"
+                        },
+
+                        new School
+                        {
+                            LocationName = "NotIncludedSchool.Name",
+                            Address1 = "NotIncludedSchool.Address1",
+                            Address2 = "NotIncludedSchool.Address2",
+                            Address3 = "NotIncludedSchool.Address3",
+                            Address4 = "NotIncludedSchool.Address4",
+                            PostCode = "NotIncludedSchool.PostCode",
+                            Code = "SCHNI",
+                            ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
+                            FullTimeVacancies = "",
+                            PartTimeVacancies = "",
+                            Status = "d"
+                        },
+
                     }
                 },
 
