@@ -29,44 +29,28 @@ namespace GovUk.Education.ManageCourses.ApiClient.Helpers
         }
         public static string GetRoute(this Course course)
         {
-            var result = "";
+            if (string.IsNullOrWhiteSpace(course.ProgramType))
+            {
+                return "";
+            }
 
             var route = course.ProgramType.ToLowerInvariant();
 
             switch (route)
             {
                 case "he":
-                {
-                    result = "Higher education programme";
-                    break;
-                }
+                    return "Higher education programme";
                 case "sd":
-                {
-                    result = "School Direct training programme";
-                    break;
-                }
+                    return "School Direct training programme";                
                 case "ss":
-                {
-                    result = "School Direct (salaried) training programme";
-                    break;
-                }
+                    return "School Direct (salaried) training programme";
                 case "sc":
-                {
-                    result = "SCITT programme";
-                    break;
-                }
+                    return "SCITT programme";
                 case "ta":
-                {
-                    result = "PG Teaching Apprenticeship";
-                    break;
-                }
+                    return "PG Teaching Apprenticeship";
                 default:
-                {
-                    break;
-                }
+                    return "";
             }
-
-            return result;
         }
         private static string GetStudyModeText(string studyMode)
         {
