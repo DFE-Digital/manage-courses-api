@@ -103,6 +103,10 @@ namespace GovUk.Education.ManageCourses.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.SetSecurityHeaders();
+            }
 
             // Enable the Swagger UI middleware and the Swagger generator
             app.UseSwaggerUi3(typeof(Startup).GetTypeInfo().Assembly, settings =>
