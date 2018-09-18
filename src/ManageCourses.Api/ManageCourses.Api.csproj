@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <RootNamespace>GovUk.Education.ManageCourses.Api</RootNamespace>
@@ -8,6 +8,7 @@
     <DocumentationFile>bin\Debug\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="DFE.SearchAndCompare.Domain" Version="0.6.2-beta" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.8" />
     <PackageReference Include="Notify" Version="2.0.1" />

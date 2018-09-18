@@ -24,7 +24,6 @@
     <Compile Remove="$(OutputSwaggerGeneration)" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DFE.SearchAndCompare.Domain" Version="0.6.2-beta" />
     <PackageReference Include="GitInfo" Version="2.0.11">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
