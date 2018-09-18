@@ -12,7 +12,7 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
         /// </summary>
         public static ManageCoursesDbContext GetDbContext(IConfiguration config)
         {
-            var mcConfig = new McConfig(config);
+            var mcConfig = new DatabaseConfig(config);
             mcConfig.Validate();
             var connectionString = mcConfig.BuildConnectionString();
 
