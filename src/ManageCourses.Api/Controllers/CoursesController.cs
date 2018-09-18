@@ -11,14 +11,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class CoursesController : Controller
     {
         private readonly IDataService _dataService;
-        private readonly IPublishService _publishService;
-        private IEnrichmentService _enrichmentservice;
-
-        public CoursesController(IDataService dataService, IPublishService publishService, IEnrichmentService enrichmentservice)
+         public CoursesController(IDataService dataService)
         {
             _dataService = dataService;
-            _publishService = publishService;
-            _enrichmentservice = enrichmentservice;
         }
 
         /// <summary>
@@ -65,57 +60,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             var courses = _dataService.GetCourses(name, instCode);
 
             return Ok(courses);
-        }
-        /// <summary>
-        /// Publishes a single course
-        /// </summary>
-        /// <returns>boolean indicating success/failure</returns>
-        [BearerTokenAuth]
-        [HttpPost]
-        [Route("publish/{instCode}/{courseCode}")]
-        [ProducesResponseType(typeof(bool), 200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public ActionResult Publish(string instCode, string courseCode)
-        {
-            var name = this.User.Identity.Name;
-
-            var result = _publishService.PublishCourse(instCode, courseCode, name);
-
-            return Ok(result);
-        }
-        /// <summary>
-        /// Gets a generated Search and Compare course
-        /// </summary>
-        /// <returns>a single course</returns>
-        [BearerTokenAuth]
-        [HttpGet]
-        [Route("searchandcompare/{instCode}/{courseCode}")]
-        [ProducesResponseType(typeof(SearchAndCompare.Domain.Models.Course), 200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public ActionResult GetSearchAndCompareCourse(string instCode, string courseCode)
-        {
-            var name = this.User.Identity.Name;
-            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode))
-            {
-                return NotFound();
-            }
-
-            var courseMapper = new CourseMapper();
-
-            var ucasInstData = _dataService.GetUcasInstitutionForUser(name, instCode);
-            var orgEnrichmentData = _enrichmentservice.GetInstitutionEnrichment(instCode, name);
-            var ucasCourseData = _dataService.GetCourse(name, instCode, courseCode);
-            var courseEnrichmentData = _enrichmentservice.GetCourseEnrichment(instCode, courseCode, name);
-
-            var course = courseMapper.MapToSearchAndCompareCourse(
-                ucasInstData,
-                ucasCourseData,
-                orgEnrichmentData?.EnrichmentModel,
-                courseEnrichmentData?.EnrichmentModel);
-
-            return Ok(course);
         }
     }
 }

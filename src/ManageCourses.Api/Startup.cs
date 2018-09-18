@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
@@ -11,6 +13,7 @@ using GovUk.Education.ManageCourses.Api.Services.Invites;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.Api.Services.Users;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.SearchAndCompare.Domain.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -65,6 +68,8 @@ namespace GovUk.Education.ManageCourses.Api
                 {
                     options.ApiKey = Configuration["api:key"];
                 });
+            
+            //services.AddScoped<ISearchAndCompareApi, SearchAndCompareApi>();
             services.AddScoped<IPublishService, PublishService>();
             services.AddScoped<ICourseMapper, CourseMapper>();
             services.AddScoped<IDataService, DataService>();
@@ -88,6 +93,15 @@ namespace GovUk.Education.ManageCourses.Api
                  ));
             });
 
+            services.AddScoped<ISearchAndCompareApi>(provider => {
+                var apiKey = Configuration["snc:api:key"];
+                var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+
+                var apiUri = Configuration["snc:api:url"];
+
+                return new SearchAndCompareApi(httpClient, apiUri);
+            });
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
             services.AddScoped<IDataHelper, UserDataHelper>();
 

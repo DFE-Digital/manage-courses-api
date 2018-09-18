@@ -11,13 +11,16 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
     public class PublishService : IPublishService
     {
         private readonly ISearchAndCompareApi _api;
-        private ICourseMapper _courseMapper;
+        private readonly ICourseMapper _courseMapper;
         private readonly IDataService _dataService;
         private readonly IEnrichmentService _enrichmentService;
 
-        public PublishService(ISearchAndCompareApi api)
+        public PublishService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService)
         {
             _api = api;
+            _courseMapper = courseMapper;
+            _dataService = dataService;
+            _enrichmentService = enrichmentService;
         }
         /// <summary>
         /// Publishes a course to search and Compare with no authorisation email
