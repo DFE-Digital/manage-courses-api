@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<AccessRequest> AccessRequests { get; set; }
         DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         DbSet<CourseEnrichment> CourseEnrichments { get; set; }
-        DbSet<McSession> McSessions { get;  set; }
+        DbSet<McSession> McSessions { get; set; }
 
         IList<UcasCourse> GetAllUcasCourses();
         IList<UcasInstitution> GetAllUcasInstitutions();
@@ -51,6 +51,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         void AddInstitutionEnrichment(InstitutionEnrichment institutionEnrichment);
         void AddMcUser(McUser user);
         List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email);
+        List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode);
         List<UcasCourse> GetUcasCourseRecordsByInstCode(string instCode, string email);
         IQueryable<McOrganisationInstitution> GetUserOrganisations(string email);
         McOrganisationInstitution GetUserOrganisation(string email, string instCode);
@@ -58,5 +59,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         IQueryable<McUser> GetMcUsers(string email);
         void Save();
         UcasInstitution GetUcasInstitution(string name, string instCode);
+        UcasInstitution GetUcasInstitution(string instCode);
     }
 }

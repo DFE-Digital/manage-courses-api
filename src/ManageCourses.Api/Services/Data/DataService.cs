@@ -344,6 +344,21 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             var course = LoadCourse(courseRecords, enrichmentMetadata);
             return course;
         }
+
+        public Course GetCourse(string instCode, string ucasCode)
+        {
+            var courseRecords = _context.GetUcasCourseRecordsByUcasCode(instCode, ucasCode);
+            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode);
+
+            if (courseRecords.Count == 0)
+            {
+                return null;
+            }
+            var course = LoadCourse(courseRecords, enrichmentMetadata);
+            return course;
+
+        }
+
         /// <summary>
         /// returns an InstitutionCourses object for a specified institution with the required courses mapped to a user email address
         /// </summary>
@@ -691,6 +706,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         public UcasInstitution GetUcasInstitutionForUser(string name, string instCode)
         {
             return _context.GetUcasInstitution(name, instCode);
+        }
+
+        public UcasInstitution GetUcasInstitution(string instCode)
+        {
+            return _context.GetUcasInstitution(instCode);
         }
     }
 }

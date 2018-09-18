@@ -300,6 +300,25 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
             return ucasCourses;
         }
+
+        public List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode)
+        {
+            var ucasCourses = UcasCourses.FromSql(@"
+                    select c.* from ucas_course c
+                    join mc_organisation_institution oi on oi.institution_code=c.inst_code 
+                    join mc_organisation_user ou on ou.org_id=oi.org_id 
+                    where lower(c.inst_code)=lower(@instCode) 
+                    and lower(c.crse_code)=lower(@ucasCode) 
+                    and lower(ou.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode))
+                .Include(x => x.UcasInstitution)
+                .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
+                .Include(x => x.AccreditingProviderInstitution)
+                .Include(x => x.UcasCampus)
+                .ToList();
+
+            return ucasCourses;
+        }
+
         public List<UcasCourse> GetUcasCourseRecordsByInstCode(string instCode, string email)
         {
             var ucasCourses = UcasCourses.FromSql(
@@ -359,6 +378,17 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     WHERE lower(ou.email) = lower(@email)
                     AND lower(i.inst_code) = lower(@instcode)",
                     new NpgsqlParameter("email", name),
+                    new NpgsqlParameter("instcode", instCode))
+                .FirstOrDefault();
+        }
+
+        public UcasInstitution GetUcasInstitution(string instCode)
+        {
+            return UcasInstitutions.FromSql(@"
+                    SELECT i.* from ucas_institution i
+                    JOIN mc_organisation_institution oi on i.inst_code = oi.institution_code
+                    JOIN mc_organisation_user ou on oi.org_id = ou.org_id
+                    WHERE lower(i.inst_code) = lower(@instcode)",
                     new NpgsqlParameter("instcode", instCode))
                 .FirstOrDefault();
         }

@@ -8,6 +8,7 @@ using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Config;
 using GovUk.Education.ManageCourses.Api.Services.Invites;
+using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.Api.Services.Users;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Builder;
@@ -64,7 +65,8 @@ namespace GovUk.Education.ManageCourses.Api
                 {
                     options.ApiKey = Configuration["api:key"];
                 });
-
+            services.AddScoped<IPublishService, PublishService>();
+            services.AddScoped<ICourseMapper, CourseMapper>();
             services.AddScoped<IDataService, DataService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IInviteService, InviteService>();
