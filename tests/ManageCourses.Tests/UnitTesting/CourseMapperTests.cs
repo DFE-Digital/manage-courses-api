@@ -40,7 +40,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     ProgramType = "SS", // school direct salaried
                     Name = "Course.Name",
                     ProfpostFlag = "T", // QTS+PGCE
-                    Subjects = "Maths, Physics",
+                    Subjects = "Mathematics, Physics",
                     StudyMode = "B",
                     Schools = new ObservableCollection<School>
                     {
@@ -130,7 +130,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
 
             res.CourseSubjects.Count.Should().Be(2);
-            res.CourseSubjects.Any(x => x.Subject.Name == "Maths").Should().BeTrue();
+            res.CourseSubjects.Any(x => x.Subject.Name == "Mathematics").Should().BeTrue();
             res.CourseSubjects.Any(x => x.Subject.Name == "Physics").Should().BeTrue();
 
             res.Fees.Uk.Should().Be(123);
