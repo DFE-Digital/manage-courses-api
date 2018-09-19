@@ -53,17 +53,17 @@ dotnet user-secrets set PG_PASSWORD the-password-you-set
 
 #### Create blank database via psql
 ```bash
-# Connect to database server using 
+# Connect to database server using
 # [MANAGE_COURSES_POSTGRESQL_SERVICE_HOST]
-# [MANAGE_COURSES_POSTGRESQL_SERVICE_PORT] 
-# [PG_USERNAME] 
+# [MANAGE_COURSES_POSTGRESQL_SERVICE_PORT]
+# [PG_USERNAME]
 
 psql -h MANAGE_COURSES_POSTGRESQL_SERVICE_HOST -p [MANAGE_COURSES_POSTGRESQL_SERVICE_PORT]  -U [PG_USERNAME]
 
-# Enter password using 
+# Enter password using
 # [PG_PASSWORD]
 
-# Execute sql command using 
+# Execute sql command using
 # [PG_DATABASE]
 CREATE DATABASE PG_DATABASE;
 ```
@@ -73,31 +73,40 @@ There's a script for setting up a postgres user and database: `setup-pg-user.sh`
 
 ### Setup Email functionality
 
-```bash 
+```bash
 # from .\src\ManageCourses.Api>
 dotnet user-secrets set email:user the-user-email-address
 ```
 
 Values available from [GOV.​UK Notify](https://www.notifications.service.gov.uk/)
-```bash 
+```bash
 # from .\src\ManageCourses.Api>
 dotnet user-secrets set email:template_id the-template-id
 dotnet user-secrets set email:api_key the-email-api-key
 dotnet user-secrets set email:welcome_template_id the-welcome-template-id
 ```
-### Setup Authentication 
+### Setup Authentication
 
 #### [UI](https://github.com/DFE-Digital/manage-courses-ui) related
-```bash 
+```bash
 # from .\src\ManageCourses.Api>
 dotnet user-secrets set auth:oidc:userinfo_endpoint the-oidc-userinfo-endpoint
 ```
 
 #### [Importer](https://github.com/DFE-Digital/manage-courses-ucas-importer) related
-```bash 
+```bash
 # from .\src\ManageCourses.Api>
 dotnet user-secrets set api:key the-api-key
 ```
+
+#### [Search And Compare Api](https://github.com/DFE-Digital/search-and-compare-api) related
+```bash
+# from .\src\ManageCourses.Api>
+dotnet user-secrets set snc:api:key the-search-and-compare-api-key
+dotnet user-secrets set snc:api:url the-search-and-compare-api-url
+```
+
+
 
 ## Running the API locally
 
