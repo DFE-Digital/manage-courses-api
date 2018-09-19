@@ -42,7 +42,7 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddLogging(loggingBuilder =>
                 loggingBuilder.AddSerilog(dispose: true));
 
-            var mcConfig = new DatabaseConfig(Configuration);
+            var mcConfig = new McConfig(Configuration);
             mcConfig.Validate();
             var connectionString = mcConfig.BuildConnectionString();
 

@@ -13,7 +13,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MissingThrows()
         {
             var config = new Mock<IConfiguration>(); // none of the config mocked
-            var mcConfig = new DatabaseConfig(config.Object);
+            var mcConfig = new McConfig(config.Object);
             Assert.Throws<Exception>(mcConfig.Validate);
         }
 
@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             var config = new Mock<IConfiguration>(); // none of the config mocked
             config.SetupGet(c => c[It.IsAny<string>()]).Returns("   ");
-            var mcConfig = new DatabaseConfig(config.Object);
+            var mcConfig = new McConfig(config.Object);
             Assert.Throws<Exception>(mcConfig.Validate);
         }
 
@@ -32,7 +32,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var config = new Mock<IConfiguration>();
             //config.SetupGet(c => c["MANAGE_COURSES_POSTGRESQL_SERVICE_HOST"]).Returns("hello");
             config.SetupGet(c => c[It.IsAny<string>()]).Returns("hello");
-            var mcConfig = new DatabaseConfig(config.Object);
+            var mcConfig = new McConfig(config.Object);
             mcConfig.Validate();
         }
     }
