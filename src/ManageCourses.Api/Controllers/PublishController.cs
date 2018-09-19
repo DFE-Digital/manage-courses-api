@@ -4,6 +4,7 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -30,11 +31,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult Publish(string instCode, string courseCode)
+        public async Task<ActionResult> Publish(string instCode, string courseCode)
         {
             var name = this.User.Identity.Name;
 
-            var result = _publishService.PublishCourse(instCode, courseCode, name);
+            var result = await _publishService.PublishCourse(instCode, courseCode, name);
 
             return Ok(result);
         }
