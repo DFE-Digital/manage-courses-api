@@ -62,11 +62,11 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddAuthentication()
                 .AddBearerToken(options =>
                 {
-                    options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
+                    options.UserinfoEndpoint = mcConfig.SignInUserInfoEndpoint;
                 })
                 .AddBearerTokenApiKey(options =>
                 {
-                    options.ApiKey = Configuration["api:key"];
+                    options.ApiKey = mcConfig.ApiKey;
                 });
             
             //services.AddScoped<ISearchAndCompareApi, SearchAndCompareApi>();
@@ -86,10 +86,10 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IAccessRequestService>(provider =>
             {
                 return new AccessRequestService(provider.GetService<IManageCoursesDbContext>(),
-                 new EmailServiceFactory(Configuration["email:api_key"])
+                 new EmailServiceFactory(mcConfig.EmailApiKey)
                  .MakeAccessRequestEmailService(
-                     Configuration["email:template_id"],
-                     Configuration["email:user"]
+                     mcConfig.EmailTemplateId,
+                     mcConfig.EmailUser
                  ));
             });
 
