@@ -56,7 +56,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         public async Task<bool> PublishCourse(string instCode, string courseCode, string email)
         {
             var courses = new List<Course>();
-            var ucasInstData = _dataService.GetUcasInstitutionForUser(instCode, email);
+            var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
             var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email);
             var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
             var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
