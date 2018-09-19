@@ -39,35 +39,76 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 return NotFound();
             }
 
+            var requestedEmail = request.EmailAddress.ToLower();
+
             // if a user gets recreated, this breaks the FK relation to mcUser, so we try to 
             // recover by finding the new user by email
-            var requesterEmail = (request.Requester?.Email ?? request.RequesterEmail).ToLower();            
-            var requesterUser = request.Requester ?? _context.McUsers.Include(x => x.McOrganisationUsers).SingleOrDefault(x => x.Email == requesterEmail);
-            var requestedEmail = request.EmailAddress.ToLower();
+            var requesterUser = request.Requester ?? _context.McUsers.Include(x => x.McOrganisationUsers).SingleOrDefault(x => x.Email == request.RequesterEmail);
 
             if (requesterUser == null)
             {
                 return NotFound();
             }
-            
-            var existingTargetUser = _context.McUsers
-                .Include(x => x.McOrganisationUsers)
-                .SingleOrDefault(x => x.Email == requestedEmail); // throws if email is ambiguous
 
-            if(existingTargetUser == null)
+            UpdateAccessRights(requestedEmail, request.FirstName, request.LastName, requesterUser);
+
+            request.Status = RequestStatus.Completed;
+
+            _context.Save();
+            return Ok();
+        }
+
+        [HttpPost("manual-access-request")]
+        [ApiTokenAuth]
+        [ExemptFromAcceptTerms]
+        public IActionResult ActionManualActionRequest(string requesterEmail, string targetEmail, string firstName, string lastName)
+        {
+            requesterEmail = requesterEmail.ToLower();
+            var requesterUser = _context.McUsers.SingleOrDefault(x => x.Email == requesterEmail);
+            if (requesterUser == null)
+            {
+                return NotFound();
+            }
+
+            _context.AccessRequests.Add(new AccessRequest {
+                RequestDateUtc = DateTime.UtcNow,
+                RequesterEmail = requesterEmail,
+                Requester = requesterUser,
+                FirstName = firstName,
+                LastName = lastName,
+                EmailAddress = targetEmail,
+                Reason = "Manual action (BAT)",
+                Status = RequestStatus.Completed
+            });
+
+            UpdateAccessRights(targetEmail, firstName, lastName, requesterUser);
+            
+            _context.Save();
+            return Ok();
+        }
+
+        private void UpdateAccessRights(string requestedEmail, string firstName, string lastName, McUser requesterUser)
+        {
+            var requesterEmail = requesterUser.Email.ToLower();
+
+            var existingTargetUser = _context.McUsers
+                            .Include(x => x.McOrganisationUsers)
+                            .SingleOrDefault(x => x.Email == requestedEmail); // throws if email is ambiguous
+
+            if (existingTargetUser == null)
             {
                 // insert
-                _context.McUsers.Add(new McUser {
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
+                _context.McUsers.Add(new McUser
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
                     Email = requestedEmail,
                     InviteDateUtc = DateTime.Now,
                     McOrganisationUsers = new Collection<McOrganisationUser>(
-                            requesterUser.McOrganisationUsers.Select(x => new McOrganisationUser {
-                                Email = requesterEmail,
+                            requesterUser.McOrganisationUsers.Select(x => new McOrganisationUser
+                            {
                                 OrgId = x.OrgId
-                            }).ToList()                        
-                    )
+                            }).ToList())
                 });
             }
             else
@@ -75,22 +116,16 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 // update
                 foreach (var organisationUser in requesterUser.McOrganisationUsers)
                 {
-                    if(!existingTargetUser.McOrganisationUsers.Any(x => x.OrgId == organisationUser.OrgId))
+                    if (!existingTargetUser.McOrganisationUsers.Any(x => x.OrgId == organisationUser.OrgId))
                     {
-                        existingTargetUser.McOrganisationUsers.Add(new McOrganisationUser{
+                        existingTargetUser.McOrganisationUsers.Add(new McOrganisationUser
+                        {
                             Email = existingTargetUser.Email,
                             OrgId = organisationUser.OrgId
                         });
                     }
                 }
             }
-
-            // updating the properties of tracked objects lines up a database update for these fields 
-            request.Status = RequestStatus.Completed;
-
-            // don't forget to save to the database
-            _context.Save();
-            return Ok();
         }
     }
 }
