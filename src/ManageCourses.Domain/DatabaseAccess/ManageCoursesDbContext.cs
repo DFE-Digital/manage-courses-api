@@ -308,8 +308,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     join mc_organisation_institution oi on oi.institution_code=c.inst_code 
                     join mc_organisation_user ou on ou.org_id=oi.org_id 
                     where lower(c.inst_code)=lower(@instCode) 
-                    and lower(c.crse_code)=lower(@ucasCode) 
-                    and lower(ou.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode))
+                    and lower(c.crse_code)=lower(@ucasCode)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode))
                 .Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
                 .Include(x => x.AccreditingProviderInstitution)

@@ -358,6 +358,17 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             return course;
 
         }
+        /// <summary>
+        /// Gets a list of all existing courses regardless of email
+        /// Each course holds only basic course info like inst code and course code
+        /// </summary>
+        /// <returns></returns>
+        public List<Course> GetAllCourses()
+        {
+            var courseRecords = _context.UcasCourses;
+
+            return courseRecords.Select(course => LoadCourse(course)).ToList();
+        }
 
         /// <summary>
         /// returns an InstitutionCourses object for a specified institution with the required courses mapped to a user email address
@@ -377,6 +388,24 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
             returnCourses = LoadCourses(courseRecords, enrichmentMetadata);
             return returnCourses;
+        }
+        /// <summary>
+        /// This is only used to get a list of existing courses and their basic data in order to publish from the data import
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        private Course LoadCourse(UcasCourse source)
+        {
+            return new Course
+            {
+                AccreditingProviderId = source.AccreditingProvider,
+                AgeRange = source.Age,
+                CourseCode = source.CrseCode,
+                Name = source.CrseTitle,
+                ProfpostFlag = source.ProfpostFlag,
+                ProgramType = source.ProgramType,
+                InstCode = source.InstCode,
+            };
         }
         private InstitutionCourses LoadCourses(IReadOnlyList<UcasCourse> courseRecords, IList<UcasCourseEnrichmentGetModel> enrichmentMetadata)
         {

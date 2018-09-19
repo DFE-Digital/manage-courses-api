@@ -2,6 +2,7 @@ using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -10,10 +11,12 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class DataController : Controller
     {
         private readonly IDataService _dataService;
+        private readonly IPublishService _publishService;
 
-        public DataController(IDataService dataService)
+        public DataController(IDataService dataService, IPublishService publishService)
         {
             _dataService = dataService;
+            _publishService = publishService;
         }
 
         /// <summary>
@@ -40,10 +43,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public void Import([FromBody] UcasPayload payload)
         {
             _dataService.ProcessUcasPayload(payload);
-
-            //TODO return Ok/Fail in action result
+            PublishCourses();
         }
-
         /// <summary>
         /// Imports the reference data.
         /// </summary>
@@ -56,6 +57,15 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _dataService.ProcessReferencePayload(payload);
 
             //TODO return Ok/Fail in action result
+        }
+
+        private void PublishCourses()
+        {
+            foreach (var course in _dataService.GetAllCourses())
+            {
+                _publishService.PublishCourse(course.InstCode, course.CourseCode);
+                break;//just one for the moment
+            }
         }
     }
 }

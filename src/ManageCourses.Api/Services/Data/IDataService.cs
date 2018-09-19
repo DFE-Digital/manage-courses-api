@@ -13,6 +13,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         void ProcessReferencePayload(ReferenceDataPayload payload);
         Course GetCourse(string email, string instCode, string ucasCode);
         Course GetCourse(string instCode, string ucasCode);
+        List<Course> GetAllCourses();
         InstitutionCourses GetCourses(string email, string instCode);
         UcasInstitution GetUcasInstitutionForUser(string name, string instCode);
         UcasInstitution GetUcasInstitution(string instCode);
