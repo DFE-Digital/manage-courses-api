@@ -58,7 +58,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             var courses = new List<Course>();
             var ucasInstData = _dataService.GetUcasInstitutionForUser(instCode, email);
             var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email);
-            var ucasCourseData = _dataService.GetCourse(instCode, courseCode, email);
+            var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
             var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
 
             var course = _courseMapper.MapToSearchAndCompareCourse(
