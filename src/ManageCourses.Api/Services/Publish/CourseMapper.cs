@@ -3,25 +3,38 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using GovUk.Education.ManageCourses.Api.Model;
-using GovUk.Education.ManageCourses.Api.Services.Publish.Helpers;
-using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.ApiClient.Helpers;
 using GovUk.Education.SearchAndCompare.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using GovUk.Education.SearchAndCompare.Domain.Models.Joins;
-using Course = GovUk.Education.ManageCourses.Api.Model.Course;
 
-namespace GovUk.Education.ManageCourses.Api.Services.Publish
+
+namespace GovUk.Education.ManageCourses.ApiClient
 {
     public class CourseMapper : ICourseMapper
     {
-        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
+        private SubjectMapper subjectMapper = new SubjectMapper();
+
+        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(ApiClient.UcasInstitution ucasInstData, ApiClient.Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
-            ucasInstData = ucasInstData ?? new UcasInstitution();
-            ucasCourseData = ucasCourseData ?? new Course();
+            ucasInstData = ucasInstData ?? new ApiClient.UcasInstitution();
+            ucasCourseData = ucasCourseData ?? new ApiClient.Course();
             ucasCourseData.Schools = ucasCourseData.Schools ?? new ObservableCollection<School>();
             orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
+
+            var subjectStrings = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
+                ? new string[]{}
+                : subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
+
+            var subjects = new Collection<CourseSubject>(subjectStrings.Select(subject =>
+                new CourseSubject
+                {
+                    Subject = new Subject
+                    {
+                        Name = subject
+                    }
+                }).ToList());
 
             var provider = new SearchAndCompare.Domain.Models.Provider
             {
@@ -76,31 +89,21 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                             }
                         }
                     ).ToList()),
-                CourseSubjects = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
-                    ? new Collection<CourseSubject>()
-                    : new Collection<CourseSubject>(ucasCourseData.Subjects.Split(", ").Select(subject =>
-                        new CourseSubject
-                        {
-                            Subject = new Subject
-                            {
-                                Name = subject
-                            }
-
-                        }).ToList()),
+                CourseSubjects = subjects,
                 Fees = fees,
 
                 IsSalaried = isSalaried,
 
                 ContactDetails = new Contact
                 {
-                    Phone = ucasInstData.Telephone, 
-                    Email = ucasInstData.Email,
+                    Phone = null, // ???
+                    Fax = null, // ???
+                    Email = null, // ???
                     Website = ucasInstData.Url,
                     Address = MapAddress(ucasInstData)
                 },
 
-                ApplicationsAcceptedFrom = ucasCourseData.Schools.Select(x =>
-                {
+                ApplicationsAcceptedFrom = ucasCourseData.Schools.Select(x => {
                     DateTime parsed;
                     return DateTime.TryParse(x.ApplicationsAcceptedFrom, out parsed) ? (DateTime?)parsed : null;
                 }).Where(x => x != null && x.HasValue)

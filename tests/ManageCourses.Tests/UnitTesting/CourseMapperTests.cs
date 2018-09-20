@@ -4,11 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using FluentAssertions;
-using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using NUnit.Framework;
-using UcasInstitution = GovUk.Education.ManageCourses.Domain.Models.UcasInstitution;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
@@ -34,66 +32,66 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     InstFull = "My institution"
                 },
 
-                new Api.Model.Course
+                new Course
                 {
                     CourseCode = "CourseCode",
                     AccreditingProviderId = "ACC123",
                     AccreditingProviderName = "AccreditingProviderName",
                     ProgramType = "SS", // school direct salaried
-                        Name = "Course.Name",
+                    Name = "Course.Name",
                     ProfpostFlag = "T", // QTS+PGCE
-                        Subjects = "Maths, Physics",
+                    Subjects = "Mathematics, Physics",
                     StudyMode = "B",
-                    Schools = new ObservableCollection<Api.Model.School>
+                    Schools = new ObservableCollection<School>
                     {
-                            new Api.Model.School
-                            {
-                                LocationName = "School.Name",
-                                Address1 = "School.Address1",
-                                Address2 = "School.Address2",
-                                Address3 = "School.Address3",
-                                Address4 = "School.Address4",
-                                PostCode = "School.PostCode",
-                                Code = "SCH",
-                                ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
-                                FullTimeVacancies = "",
-                                PartTimeVacancies = "",
-                                Status = "r"
-                            },
+                        new School
+                        {
+                            LocationName = "School.Name",
+                            Address1 = "School.Address1",
+                            Address2 = "School.Address2",
+                            Address3 = "School.Address3",
+                            Address4 = "School.Address4",
+                            PostCode = "School.PostCode",
+                            Code = "SCH",
+                            ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
+                            FullTimeVacancies = "",
+                            PartTimeVacancies = "",
+                            Status = "r"
+                        },
 
-                            new Api.Model.School
-                            {
-                                LocationName = "NotIncludedSchool.Name",
-                                Address1 = "NotIncludedSchool.Address1",
-                                Address2 = "NotIncludedSchool.Address2",
-                                Address3 = "NotIncludedSchool.Address3",
-                                Address4 = "NotIncludedSchool.Address4",
-                                PostCode = "NotIncludedSchool.PostCode",
-                                Code = "SCHNI",
-                                ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
-                                FullTimeVacancies = "",
-                                PartTimeVacancies = "",
-                                Status = "d"
-                            },
+                        new School
+                        {
+                            LocationName = "NotIncludedSchool.Name",
+                            Address1 = "NotIncludedSchool.Address1",
+                            Address2 = "NotIncludedSchool.Address2",
+                            Address3 = "NotIncludedSchool.Address3",
+                            Address4 = "NotIncludedSchool.Address4",
+                            PostCode = "NotIncludedSchool.PostCode",
+                            Code = "SCHNI",
+                            ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
+                            FullTimeVacancies = "",
+                            PartTimeVacancies = "",
+                            Status = "d"
+                        },
 
                     }
                 },
 
-                new Api.Model.InstitutionEnrichmentModel
+                new InstitutionEnrichmentModel
                 {
                     TrainWithUs = "TrainWithUs",
                     TrainWithDisability = "TrainWithDisability",
-                    AccreditingProviderEnrichments = new ObservableCollection<Api.Model.AccreditingProviderEnrichment>
+                    AccreditingProviderEnrichments = new ObservableCollection<AccreditingProviderEnrichment>
                     {
-                            new Api.Model.AccreditingProviderEnrichment
-                            {
-                                UcasInstitutionCode = "ACC123",
-                                Description = "AccreditingProviderDescription"
-                            }
+                        new AccreditingProviderEnrichment
+                        {
+                            UcasInstitutionCode = "ACC123",
+                            Description = "AccreditingProviderDescription"
+                        }
                     }
                 },
 
-                new Api.Model.CourseEnrichmentModel
+                new CourseEnrichmentModel
                 {
                     AboutCourse = "AboutCourse",
                     InterviewProcess = "InterviewProcess",
@@ -122,7 +120,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.Route.Name.Should().Be("School Direct (salaried) training programme");
             res.Route.IsSalaried.Should().Be(true);
 
-            res.IncludesPgce.Should().Be(SearchAndCompare.Domain.Models.Enums.IncludesPgce.Yes);
+            res.IncludesPgce.Should().Be(IncludesPgce.Yes);
             res.IsSalaried.Should().BeTrue();
 
             res.Campuses.Count.Should().Be(1);
@@ -132,7 +130,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
 
             res.CourseSubjects.Count.Should().Be(2);
-            res.CourseSubjects.Any(x => x.Subject.Name == "Maths").Should().BeTrue();
+            res.CourseSubjects.Any(x => x.Subject.Name == "Mathematics").Should().BeTrue();
             res.CourseSubjects.Any(x => x.Subject.Name == "Physics").Should().BeTrue();
 
             res.Fees.Uk.Should().Be(123);
@@ -144,8 +142,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.ApplicationsAcceptedFrom.Should().Be(new System.DateTime(2018, 10, 16));
 
-            res.FullTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
-            res.PartTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
+            res.FullTime.Should().Be(VacancyStatus.Vacancies);
+            res.PartTime.Should().Be(VacancyStatus.Vacancies);
         }
 
         [Test]
