@@ -61,6 +61,33 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
             Context.McUsers.Include(x => x.McOrganisationUsers).Last().McOrganisationUsers.Count().Should().Be(1);
         }
 
+        [Test]
+        public void ActionManualAccessRequest()
+        {
+            SaveExampleDataToContext();
+            var controller = new AdminController(Context);
+
+            controller.ActionManualActionRequest("requester@example.com", "joe@bloggs.com", "Joe", "Bloggs");
+
+            Context.AccessRequests.Count().Should().Be(2);
+            var ar = Context.AccessRequests.Where(x => x.Status == AccessRequest.RequestStatus.Completed).Single();
+            
+            ar.RequesterEmail.Should().Be("requester@example.com");
+            ar.EmailAddress.Should().Be("joe@bloggs.com");
+            ar.FirstName.Should().Be("Joe");
+            ar.LastName.Should().Be("Bloggs");
+            ar.Reason.Should().Be("Manual action (BAT)");
+            
+            Context.McUsers.Count().Should().Be(2);
+            
+            var recipient = Context.McUsers.Single(x => x.Email == "joe@bloggs.com");
+
+            recipient.FirstName.Should().Be("Joe");
+            recipient.LastName.Should().Be("Bloggs");
+            recipient.McOrganisationUsers.Single().OrgId.Should().Be("123");
+            recipient.McOrganisationUsers.Single().McOrganisation.Name.Should().Be("TheOrg");
+        }
+
         private void SaveExampleDataToContext()
         {
             var user = new McUser
