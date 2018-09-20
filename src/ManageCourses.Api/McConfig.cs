@@ -8,7 +8,13 @@ namespace GovUk.Education.ManageCourses.Api
         private const string PgDatabaseKey = "PG_DATABASE";
         private const string PgUsernameKey = "PG_USERNAME";
         private const string PgServerKey = "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST";
-
+        private const string SignInUserInfoEndpointConfigKey = "auth:oidc:userinfo_endpoint";
+        private const string ApiKeyConfigKey = "api:key";
+        private const string EmailApiKeyConfigKey = "email:api_key";
+        private const string EmailTemplateIdConfigKey = "email:template_id";
+        private const string EmailUserConfigKey = "email:user";
+        private const string SearchAndCompareApiKeyConfigKey = "snc:api:key";
+        private const string SearchAndCompareApiUrlConfigKey = "snc:api:url";
         private readonly IConfiguration _configuration;
 
         public McConfig(IConfiguration configuration)
@@ -25,13 +31,13 @@ namespace GovUk.Education.ManageCourses.Api
             ValidateRequired(PgServerKey);
             ValidateRequired(PgDatabaseKey);
             ValidateRequired(PgUsernameKey);
-            ValidateRequired(SignInUserInfoEndpoint);
-            ValidateRequired(ApiKey);
-            ValidateRequired(EmailApiKey);
-            ValidateRequired(EmailTemplateId);
-            ValidateRequired(EmailUser);
-            ValidateRequired(SearchAndCompareApiKey);
-            ValidateRequired(SearchAndCompareApiUrl);
+            ValidateRequired(SignInUserInfoEndpointConfigKey);
+            ValidateRequired(ApiKeyConfigKey);
+            //ValidateRequired(EmailApiKeyConfigKey);
+            //ValidateRequired(EmailTemplateIdConfigKey);
+            //ValidateRequired(EmailUserConfigKey);
+            ValidateRequired(SearchAndCompareApiKeyConfigKey);
+            ValidateRequired(SearchAndCompareApiUrlConfigKey);
         }
 
         /// <summary>
@@ -44,14 +50,13 @@ namespace GovUk.Education.ManageCourses.Api
             return connectionString;
         }
 
-        public string SignInUserInfoEndpoint => _configuration["auth:oidc:userinfo_endpoint"];
-        public string ApiKey => _configuration["api:key"];
-        public string EmailApiKey => _configuration["email:api_key"];
-        public string EmailTemplateId => _configuration["email:template_id"];
-        public string EmailUser => _configuration["email:user"];
-        public string SearchAndCompareApiKey => _configuration["snc:api:key"];
-        public string SearchAndCompareApiUrl => _configuration["snc:api:url"];
-
+        public string SignInUserInfoEndpoint => _configuration[SignInUserInfoEndpointConfigKey];
+        public string ApiKey => _configuration[ApiKeyConfigKey];
+        public string EmailApiKey => _configuration[EmailApiKeyConfigKey];
+        public string EmailTemplateId => _configuration[EmailTemplateIdConfigKey];
+        public string EmailUser => _configuration[EmailUserConfigKey];
+        public string SearchAndCompareApiKey => _configuration[SearchAndCompareApiKeyConfigKey];
+        public string SearchAndCompareApiUrl => _configuration[SearchAndCompareApiUrlConfigKey];
         private string PgServer => _configuration[PgServerKey];
         private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
         private string PgDatabase => _configuration[PgDatabaseKey];
