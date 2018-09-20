@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using GovUk.Education.ManageCourses.ApiClient.Helpers;
+using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Api.Services.Publish.Helpers;
+using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using GovUk.Education.SearchAndCompare.Domain.Models.Joins;
+using Course = GovUk.Education.ManageCourses.Api.Model.Course;
 
 
-namespace GovUk.Education.ManageCourses.ApiClient
+namespace GovUk.Education.ManageCourses.Api.Services.Publish
 {
     public class CourseMapper : ICourseMapper
     {
         private SubjectMapper subjectMapper = new SubjectMapper();
-
-        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(ApiClient.UcasInstitution ucasInstData, ApiClient.Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
+        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
-            ucasInstData = ucasInstData ?? new ApiClient.UcasInstitution();
-            ucasCourseData = ucasCourseData ?? new ApiClient.Course();
+            ucasInstData = ucasInstData ?? new UcasInstitution();
+            ucasCourseData = ucasCourseData ?? new Course();
             ucasCourseData.Schools = ucasCourseData.Schools ?? new ObservableCollection<School>();
             orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
@@ -96,9 +98,9 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
                 ContactDetails = new Contact
                 {
-                    Phone = null, // ???
+                    Phone = ucasInstData.Telephone,
                     Fax = null, // ???
-                    Email = null, // ???
+                    Email = ucasInstData.Email,
                     Website = ucasInstData.Url,
                     Address = MapAddress(ucasInstData)
                 },

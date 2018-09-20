@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using FluentAssertions;
+using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using NUnit.Framework;
+using UcasInstitution = GovUk.Education.ManageCourses.Domain.Models.UcasInstitution;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
@@ -32,7 +34,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     InstFull = "My institution"
                 },
 
-                new Course
+                new Api.Model.Course
                 {
                     CourseCode = "CourseCode",
                     AccreditingProviderId = "ACC123",
@@ -42,9 +44,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     ProfpostFlag = "T", // QTS+PGCE
                     Subjects = "Mathematics, Physics",
                     StudyMode = "B",
-                    Schools = new ObservableCollection<School>
+                    Schools = new ObservableCollection<Api.Model.School>
                     {
-                        new School
+                        new Api.Model.School
                         {
                             LocationName = "School.Name",
                             Address1 = "School.Address1",
@@ -59,7 +61,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                             Status = "r"
                         },
 
-                        new School
+                        new Api.Model.School
                         {
                             LocationName = "NotIncludedSchool.Name",
                             Address1 = "NotIncludedSchool.Address1",
@@ -77,13 +79,13 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     }
                 },
 
-                new InstitutionEnrichmentModel
+                new Api.Model.InstitutionEnrichmentModel
                 {
                     TrainWithUs = "TrainWithUs",
                     TrainWithDisability = "TrainWithDisability",
-                    AccreditingProviderEnrichments = new ObservableCollection<AccreditingProviderEnrichment>
+                    AccreditingProviderEnrichments = new ObservableCollection<Api.Model.AccreditingProviderEnrichment>
                     {
-                        new AccreditingProviderEnrichment
+                        new Api.Model.AccreditingProviderEnrichment
                         {
                             UcasInstitutionCode = "ACC123",
                             Description = "AccreditingProviderDescription"
@@ -91,7 +93,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     }
                 },
 
-                new CourseEnrichmentModel
+                new Api.Model.CourseEnrichmentModel
                 {
                     AboutCourse = "AboutCourse",
                     InterviewProcess = "InterviewProcess",
@@ -120,7 +122,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.Route.Name.Should().Be("School Direct (salaried) training programme");
             res.Route.IsSalaried.Should().Be(true);
 
-            res.IncludesPgce.Should().Be(IncludesPgce.Yes);
+            res.IncludesPgce.Should().Be(SearchAndCompare.Domain.Models.Enums.IncludesPgce.Yes);
             res.IsSalaried.Should().BeTrue();
 
             res.Campuses.Count.Should().Be(1);
@@ -142,8 +144,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.ApplicationsAcceptedFrom.Should().Be(new System.DateTime(2018, 10, 16));
 
-            res.FullTime.Should().Be(VacancyStatus.Vacancies);
-            res.PartTime.Should().Be(VacancyStatus.Vacancies);
+            res.FullTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
+            res.PartTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
         }
 
         [Test]
