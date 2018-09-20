@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Api
 {
-    public class DatabaseConfig
+    public class McConfig
     {
         private const string PgDatabaseKey = "PG_DATABASE";
         private const string PgUsernameKey = "PG_USERNAME";
@@ -11,7 +11,7 @@ namespace GovUk.Education.ManageCourses.Api
 
         private readonly IConfiguration _configuration;
 
-        public DatabaseConfig(IConfiguration configuration)
+        public McConfig(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -25,6 +25,13 @@ namespace GovUk.Education.ManageCourses.Api
             ValidateRequired(PgServerKey);
             ValidateRequired(PgDatabaseKey);
             ValidateRequired(PgUsernameKey);
+            ValidateRequired(SignInUserInfoEndpoint);
+            ValidateRequired(ApiKey);
+            ValidateRequired(EmailApiKey);
+            ValidateRequired(EmailTemplateId);
+            ValidateRequired(EmailUser);
+            ValidateRequired(SearchAndCompareApiKey);
+            ValidateRequired(SearchAndCompareApiUrl);
         }
 
         /// <summary>
@@ -36,6 +43,14 @@ namespace GovUk.Education.ManageCourses.Api
             var connectionString = $"Server={PgServer};Port={PgPort};Database={PgDatabase};User Id={PgUser};Password={PgPassword};{PgSsl}";
             return connectionString;
         }
+
+        public string SignInUserInfoEndpoint => _configuration["auth:oidc:userinfo_endpoint"];
+        public string ApiKey => _configuration["api:key"];
+        public string EmailApiKey => _configuration["email:api_key"];
+        public string EmailTemplateId => _configuration["email:template_id"];
+        public string EmailUser => _configuration["email:user"];
+        public string SearchAndCompareApiKey => _configuration["snc:api:key"];
+        public string SearchAndCompareApiUrl => _configuration["snc:api:url"];
 
         private string PgServer => _configuration[PgServerKey];
         private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
