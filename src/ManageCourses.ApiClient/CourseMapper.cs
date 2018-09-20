@@ -13,6 +13,8 @@ namespace GovUk.Education.ManageCourses.ApiClient
 {
     public class CourseMapper : ICourseMapper
     {
+        private SubjectMapper subjectMapper = new SubjectMapper();
+
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(ApiClient.UcasInstitution ucasInstData, ApiClient.Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
             ucasInstData = ucasInstData ?? new ApiClient.UcasInstitution();
@@ -20,6 +22,19 @@ namespace GovUk.Education.ManageCourses.ApiClient
             ucasCourseData.Schools = ucasCourseData.Schools ?? new ObservableCollection<School>();
             orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
+
+            var subjectStrings = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
+                ? new string[]{}
+                : subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
+
+            var subjects = new Collection<CourseSubject>(subjectStrings.Select(subject =>
+                new CourseSubject
+                {
+                    Subject = new Subject
+                    {
+                        Name = subject
+                    }
+                }).ToList());
 
             var provider = new SearchAndCompare.Domain.Models.Provider
             {
@@ -74,17 +89,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                             }
                         }
                     ).ToList()),
-                CourseSubjects = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
-                    ? new Collection<CourseSubject>()
-                    : new Collection<CourseSubject>(ucasCourseData.Subjects.Split(", ").Select(subject =>
-                        new CourseSubject
-                        {
-                            Subject = new Subject
-                            {
-                                Name = subject
-                            }
-
-                        }).ToList()),
+                CourseSubjects = subjects,
                 Fees = fees,
 
                 IsSalaried = isSalaried,
