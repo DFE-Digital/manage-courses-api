@@ -30,6 +30,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <returns></returns>
         public async Task<bool> PublishCourse(string instCode, string courseCode)
         {
+            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode))
+            {
+                return false;
+            }
+
             var courses = new List<Course>();
             var ucasInstData = _dataService.GetUcasInstitution(instCode);
             var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode);
@@ -55,6 +60,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <returns></returns>
         public async Task<bool> PublishCourse(string instCode, string courseCode, string email)
         {
+            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
             var courses = new List<Course>();
             var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
             var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email);
