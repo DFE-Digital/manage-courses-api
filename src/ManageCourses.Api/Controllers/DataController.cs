@@ -61,11 +61,14 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         private void PublishCourses()
         {
-            foreach (var course in _dataService.GetAllCourses())
-            {
-                _publishService.PublishCourse(course.InstCode, course.CourseCode);
-                break;//just one for the moment
-            }
+            var courses = _dataService.GetAllCourses();
+
+            _publishService.PublishCourses(courses);
+            // foreach (var course in _dataService.GetAllCourses())
+            // {
+            //     _publishService.PublishCourse(course.InstCode, course.CourseCode);
+            //     break;//just one for the moment
+            // }
         }
     }
 }

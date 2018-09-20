@@ -22,6 +22,30 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             _dataService = dataService;
             _enrichmentService = enrichmentService;
         }
+
+
+        public async Task<bool> PublishCourses(IList<Api.Model.Course> courses)
+        {
+            var payload = courses.Select(course => {
+                var instCode = course.InstCode;
+                var courseCode = course.CourseCode;
+                var ucasInstData = _dataService.GetUcasInstitution(instCode);
+                var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode);
+                var ucasCourseData = _dataService.GetCourse(instCode, courseCode);
+                var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode);
+
+                return _courseMapper.MapToSearchAndCompareCourse(
+                    ucasInstData,
+                    ucasCourseData,
+                    orgEnrichmentData?.EnrichmentModel,
+                    courseEnrichmentData?.EnrichmentModel);
+                });
+
+            var result = await _api.SaveCoursesAsync(payload.ToList());
+
+            return result;
+
+        }
         /// <summary>
         /// Publishes a course to search and Compare with no authorisation email
         /// </summary>
