@@ -7,16 +7,17 @@ namespace GovUk.Education.ManageCourses.Api
 {
     public class McConfig
     {
-        private const string PgDatabaseKey = "PG_DATABASE";
-        private const string PgUsernameKey = "PG_USERNAME";
-        private const string PgServerKey = "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST";
-        private const string SignInUserInfoEndpointConfigKey = "auth:oidc:userinfo_endpoint";
-        private const string ApiKeyConfigKey = "api:key";
-        private const string EmailApiKeyConfigKey = "email:api_key";
-        private const string EmailTemplateIdConfigKey = "email:template_id";
-        private const string EmailUserConfigKey = "email:user";
-        private const string SearchAndCompareApiKeyConfigKey = "snc:api:key";
-        private const string SearchAndCompareApiUrlConfigKey = "snc:api:url";
+        private const string ConfigKeyForPgDatabase = "PG_DATABASE";
+        private const string ConfigKeyForPgUsername = "PG_USERNAME";
+        private const string ConfigKeyForPgServer = "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST";
+        private const string ConfigKeyForSignInUserInfoEndpoint = "auth:oidc:userinfo_endpoint";
+        private const string ConfigKeyForApiKey = "api:key";
+        private const string ConfigKeyForEmailApiKey = "email:api_key";
+        private const string ConfigKeyForEmailTemplateId = "email:template_id";
+        private const string ConfigKeyForEmailUser = "email:user";
+        private const string ConfigKeyForSearchAndCompareApiKey = "snc:api:key";
+        private const string ConfigKeyForSearchAndCompareApiUrl = "snc:api:url";
+
         private readonly IConfiguration _configuration;
 
         public McConfig(IConfiguration configuration)
@@ -32,25 +33,25 @@ namespace GovUk.Education.ManageCourses.Api
         {
             var requiredKeys = new List<string>
             {
-                PgServerKey,
-                PgDatabaseKey,
-                PgUsernameKey,
-                SignInUserInfoEndpointConfigKey,
-                ApiKeyConfigKey,
-                SearchAndCompareApiKeyConfigKey,
-                SearchAndCompareApiUrlConfigKey,
+                ConfigKeyForPgServer,
+                ConfigKeyForPgDatabase,
+                ConfigKeyForPgUsername,
+                ConfigKeyForSignInUserInfoEndpoint,
+                ConfigKeyForApiKey,
+                ConfigKeyForSearchAndCompareApiKey,
+                ConfigKeyForSearchAndCompareApiUrl,
             };
 
             var emailKeys = new List<string>
             {
-                EmailApiKeyConfigKey,
-                EmailTemplateIdConfigKey,
-                EmailUserConfigKey,
+                ConfigKeyForEmailApiKey,
+                ConfigKeyForEmailTemplateId,
+                ConfigKeyForEmailUser,
             };
 
             var invalidKeys = requiredKeys.Where(k => string.IsNullOrWhiteSpace(_configuration[k])).ToList();
 
-            // Email config is optional, if missing emails will not be sent and a warning emitted by the app instead
+            // Email config is optional, if email config missing emails will not be sent and instead a warning emitted by the app
             if (emailKeys.Any(ek => !string.IsNullOrWhiteSpace(_configuration[ek])))
             {
                 // add missing keys from email set to error list
@@ -74,18 +75,18 @@ namespace GovUk.Education.ManageCourses.Api
             return connectionString;
         }
 
-        public string SignInUserInfoEndpoint => _configuration[SignInUserInfoEndpointConfigKey];
-        public string ApiKey => _configuration[ApiKeyConfigKey];
-        public string EmailApiKey => _configuration[EmailApiKeyConfigKey];
-        public string EmailTemplateId => _configuration[EmailTemplateIdConfigKey];
-        public string EmailUser => _configuration[EmailUserConfigKey];
-        public string SearchAndCompareApiKey => _configuration[SearchAndCompareApiKeyConfigKey];
-        public string SearchAndCompareApiUrl => _configuration[SearchAndCompareApiUrlConfigKey];
+        public string SignInUserInfoEndpoint => _configuration[ConfigKeyForSignInUserInfoEndpoint];
+        public string ApiKey => _configuration[ConfigKeyForApiKey];
+        public string EmailApiKey => _configuration[ConfigKeyForEmailApiKey];
+        public string EmailTemplateId => _configuration[ConfigKeyForEmailTemplateId];
+        public string EmailUser => _configuration[ConfigKeyForEmailUser];
+        public string SearchAndCompareApiKey => _configuration[ConfigKeyForSearchAndCompareApiKey];
+        public string SearchAndCompareApiUrl => _configuration[ConfigKeyForSearchAndCompareApiUrl];
 
-        private string PgServer => _configuration[PgServerKey];
+        private string PgServer => _configuration[ConfigKeyForPgServer];
         private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
-        private string PgDatabase => _configuration[PgDatabaseKey];
-        private string PgUser => _configuration[PgUsernameKey];
+        private string PgDatabase => _configuration[ConfigKeyForPgDatabase];
+        private string PgUser => _configuration[ConfigKeyForPgUsername];
         private string PgPassword => _configuration["PG_PASSWORD"];
         private string PgSsl => _configuration["PG_SSL"] ?? "SSL Mode=Prefer;Trust Server Certificate=true";
     }
