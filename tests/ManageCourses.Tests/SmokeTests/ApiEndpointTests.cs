@@ -128,7 +128,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var result = await apiClient.Publish_GetSearchAndCompareCourseAsync(ucasInstitutionCode, ucasCourseCode);
 
-            //result.ProgrammeCode.Should().BeEquivalentTo(ucasCourseCode);
+            result.ProgrammeCode.Should().BeEquivalentTo(ucasCourseCode);
             result.Provider.ProviderCode.Should().BeEquivalentTo(ucasInstitutionCode);
         }
         [Test]
