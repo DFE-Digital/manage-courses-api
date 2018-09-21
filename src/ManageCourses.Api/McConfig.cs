@@ -65,9 +65,9 @@ namespace GovUk.Education.ManageCourses.Api
         private string PgSsl => _configuration["PG_SSL"] ?? "SSL Mode=Prefer;Trust Server Certificate=true";
 
         /// <summary>
-        /// Throws if null or whitespace
+        /// Throws if null or whitespace config value for this key is blank or missing.
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The config key to check</param>
         private void ValidateRequired(string key)
         {
             if (string.IsNullOrWhiteSpace(_configuration[key]))
