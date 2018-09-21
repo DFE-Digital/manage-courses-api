@@ -32,29 +32,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
         {
             ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpperInvariant();
+            instCode = instCode.ToUpperInvariant(); 
 
-            var enrichment = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode)
-                .OrderByDescending(x => x.Id)
-                .Include(e => e.CreatedByUser)
-                .Include(e => e.UpdatedByUser)
-                .FirstOrDefault();
-
-            var enrichmentToReturn = Convert(enrichment);
-
-            return enrichmentToReturn;
-        }
-        /// <summary>
-        /// gets the latest enrichment record regardless of the status
-        /// </summary>
-        /// <param name="instCode">institution code for the enrichment</param>
-        /// <returns>An enrichment object with the enrichment data (if found). Nul if not found</returns>
-        public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode)
-        {
-            instCode = instCode.ToUpperInvariant();
-
-            //TODO put this into a single method
             var enrichment = _context.InstitutionEnrichments
                 .Where(ie => ie.InstCode == instCode)
                 .OrderByDescending(x => x.Id)
@@ -79,7 +58,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
         {
             var userInst = ValidateUserOrg(email, instCode);
-
+            
             instCode = instCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments
@@ -181,48 +160,16 @@ namespace GovUk.Education.ManageCourses.Api.Services
             return enrichmentToReturn;
         }
 
-        public UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode)
-        {
-            instCode = instCode.ToUpperInvariant();
-            ucasCourseCode = ucasCourseCode.ToUpperInvariant();
-
-            var enrichment = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode)
-                .OrderByDescending(x => x.Id)
-                .Include(e => e.CreatedByUser)
-                .Include(e => e.UpdatedByUser)
-                .FirstOrDefault();
-
-            var enrichmentToReturn = Convert(enrichment);
-
-            return enrichmentToReturn;
-        }
-
         public IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email)
-        {
+        {        
             ValidateUserOrg(email, instCode);
 
-            //TODO put this into a single method
             instCode = instCode.ToUpperInvariant();
 
             var enrichments = _context.CourseEnrichments.FromSql(@"
-            SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
-            FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY inst_code, ucas_course_code) top_id
-            INNER JOIN course_enrichment b on top_id.id = b.id")
-                .Where(e => e.InstCode == instCode);
-
-            return enrichments.Select(x => Convert(x)).ToList();
-        }
-
-        public IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode)
-        {
-            //TODO put this into a single method
-            instCode = instCode.ToUpperInvariant();
-
-            var enrichments = _context.CourseEnrichments.FromSql(@"
-            SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
-            FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY inst_code, ucas_course_code) top_id
-            INNER JOIN course_enrichment b on top_id.id = b.id")
+SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
+FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY inst_code, ucas_course_code) top_id
+INNER JOIN course_enrichment b on top_id.id = b.id")
                 .Where(e => e.InstCode == instCode);
 
             return enrichments.Select(x => Convert(x)).ToList();
@@ -328,10 +275,10 @@ namespace GovUk.Education.ManageCourses.Api.Services
             email = email.ToLowerInvariant();
 
             var inst = _context.McOrganisationIntitutions.Single(x => x.InstitutionCode == instCode); //should throw an error if  the inst doesn't exist
-
+            
             var orgUser = _context.McOrganisationUsers
                 .Where(x => x.Email == email && x.OrgId == inst.OrgId)
-                .Include(x => x.McUser)
+                .Include(x=> x.McUser)
                 .Single(); //should throw an error if the user doesn't have acces to the inst
 
             var returnUserInst = new UserInstitution
