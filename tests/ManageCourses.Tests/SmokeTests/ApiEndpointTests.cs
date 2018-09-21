@@ -119,7 +119,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
-            const string ucasCourseCode = "CC101";
+            const string ucasCourseCode = "XYZ";
             var postModel = new CourseEnrichmentModel
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
