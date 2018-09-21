@@ -67,6 +67,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             var requesterUser = _context.McUsers
                 .Include(x=>x.McOrganisationUsers)
                 .SingleOrDefault(x => x.Email == requesterEmail);
+
+            if (string.IsNullOrWhiteSpace(requesterEmail) || string.IsNullOrWhiteSpace(targetEmail))
+            {
+                return BadRequest();
+            }
                 
             if (requesterUser == null)
             {
