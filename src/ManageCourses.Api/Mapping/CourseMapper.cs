@@ -12,7 +12,7 @@ using GovUk.Education.SearchAndCompare.Domain.Models.Joins;
 using Course = GovUk.Education.ManageCourses.Api.Model.Course;
 
 
-namespace GovUk.Education.ManageCourses.Api.Services.Publish
+namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class CourseMapper : ICourseMapper
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GovUk.Education.ManageCourses.Api.Services.Publish
+namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class SubjectMapper
     {

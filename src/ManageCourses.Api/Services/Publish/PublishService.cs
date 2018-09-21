@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.SearchAndCompare.Domain.Client;
 using GovUk.Education.SearchAndCompare.Domain.Models;
 

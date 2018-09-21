@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.AccessRequests;
@@ -69,7 +70,6 @@ namespace GovUk.Education.ManageCourses.Api
                     options.ApiKey = mcConfig.ApiKey;
                 });
             
-            //services.AddScoped<ISearchAndCompareApi, SearchAndCompareApi>();
             services.AddScoped<IPublishService, PublishService>();
             services.AddScoped<ICourseMapper, CourseMapper>();
             services.AddScoped<IDataService, DataService>();

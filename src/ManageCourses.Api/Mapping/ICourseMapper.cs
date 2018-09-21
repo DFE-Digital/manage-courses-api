@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
 
-namespace GovUk.Education.ManageCourses.Api.Services.Publish
+namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public interface ICourseMapper
     {

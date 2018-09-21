@@ -5,6 +5,7 @@ using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Api.Mapping;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
