@@ -31,16 +31,17 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> Publish(string instCode, string courseCode)
+        public async Task<ActionResult> PublishToSearchAndCompare(string instCode, string courseCode)
         {
             var name = this.User.Identity.Name;
 
-            var result = await _publishService.PublishCourse(instCode, courseCode, name);
+            var result = await _publishService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
 
             return Ok(result);
         }
         /// <summary>
-        /// Gets a generated Search and Compare course
+        /// Gets a generated Search and Compare course object used for Publish (to Search and Compare) and Preview
+        /// This will return and unpublished (draft) record when called from Preview
         /// </summary>
         /// <returns>a single course</returns>
         [BearerTokenAuth]

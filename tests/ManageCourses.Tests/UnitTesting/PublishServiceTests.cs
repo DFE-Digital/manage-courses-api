@@ -32,27 +32,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         }
 
         [Test]
-        public void PublishEnrichedCourseHappyPathTest()
-        {
-            _dataServiceMock.Setup(x => x.GetUcasInstitution(InstitutionCode)).Returns(new UcasInstitution
-            {
-                AccreditedUcasCourses =
-                    new List<UcasCourse> { new UcasCourse { InstCode = InstitutionCode, CrseCode = CourseCode } }
-            });
-            _dataServiceMock.Setup(x => x.GetCourse(InstitutionCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, InstCode = InstitutionCode });
-
-            _enrichmentServiceMock.Setup(x => x.GetInstitutionEnrichment(InstitutionCode))
-                .Returns(new UcasInstitutionEnrichmentGetModel());
-            _enrichmentServiceMock.Setup(x => x.GetCourseEnrichment(InstitutionCode, CourseCode))
-                .Returns(new UcasCourseEnrichmentGetModel { CourseCode = CourseCode, InstCode = InstitutionCode });
-            _searchAndCompareApiMock.Setup(x => x.SaveCoursesAsync(It.IsAny<List<SearchAndCompare.Domain.Models.Course>>())).ReturnsAsync(true);
-
-            var result = _publishService.PublishCourse(InstitutionCode, CourseCode).Result;
-
-            result.Should().BeTrue();
-        }
-        [Test]
         public void PublishEnrichedCourseWithEmailHappyPathTest()
         {
             var email = "tester@example.com";
@@ -70,24 +49,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 .Returns(new UcasCourseEnrichmentGetModel { CourseCode = CourseCode, InstCode = InstitutionCode });
             _searchAndCompareApiMock.Setup(x => x.SaveCoursesAsync(It.IsAny<List<SearchAndCompare.Domain.Models.Course>>())).ReturnsAsync(true);
 
-            var result = _publishService.PublishCourse(InstitutionCode, CourseCode, email).Result;
-
-            result.Should().BeTrue();
-        }
-        [Test]
-        public void PublishBasicCourseHappyPathTest()
-        {
-            _dataServiceMock.Setup(x => x.GetUcasInstitution(InstitutionCode)).Returns(new UcasInstitution
-            {
-                AccreditedUcasCourses =
-                    new List<UcasCourse> { new UcasCourse { InstCode = InstitutionCode, CrseCode = CourseCode } }
-            });
-            _dataServiceMock.Setup(x => x.GetCourse(InstitutionCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, InstCode = InstitutionCode });
-
-            _searchAndCompareApiMock.Setup(x => x.SaveCoursesAsync(It.IsAny<List<SearchAndCompare.Domain.Models.Course>>())).ReturnsAsync(true);
-
-            var result = _publishService.PublishCourse(InstitutionCode, CourseCode).Result;
+            var result = _publishService.SaveSingleCourseToSearchAndCompare(InstitutionCode, CourseCode, email).Result;
 
             result.Should().BeTrue();
         }
@@ -105,25 +67,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             _searchAndCompareApiMock.Setup(x => x.SaveCoursesAsync(It.IsAny<List<SearchAndCompare.Domain.Models.Course>>())).ReturnsAsync(true);
 
-            var result = _publishService.PublishCourse(InstitutionCode, CourseCode, email).Result;
+            var result = _publishService.SaveSingleCourseToSearchAndCompare(InstitutionCode, CourseCode, email).Result;
 
             result.Should().BeTrue();
-        }
-        [Test]
-        [TestCase("", "")]
-        [TestCase("123", "")]
-        [TestCase("", "234")]
-        [TestCase("  ", "      ")]
-        [TestCase("123  ", "      ")]
-        [TestCase("  ", "234   ")]
-        [TestCase(null, null)]
-        [TestCase("123", null)]
-        [TestCase(null, "234")]
-        public void PublishCourseInvalidParametersTest(string instCode, string courseCode)
-        {
-            var result = _publishService.PublishCourse(instCode, courseCode).Result;
-
-            result.Should().BeFalse();
         }
 
         [TestCase("", "", "")]
@@ -140,7 +86,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase(null, null, "email@qwe.com")]
         public void PublishCourseWithEmailInvalidParametersTest(string instCode, string courseCode, string email)
         {
-            var result = _publishService.PublishCourse(instCode, courseCode, email).Result;
+            var result = _publishService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, email).Result;
 
             result.Should().BeFalse();
         }

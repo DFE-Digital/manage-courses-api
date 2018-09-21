@@ -110,8 +110,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             };
             await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
 
-            var result = await apiClient.Publish_PublishAsync(ucasInstitutionCode, ucasCourseCode);
-            result.Should().BeTrue();
+//            var result = await apiClient(ucasInstitutionCode, ucasCourseCode);
+//            result.Should().BeTrue();
         }
         [Test]
         public async Task GetSearchAndCompareCourseTest()

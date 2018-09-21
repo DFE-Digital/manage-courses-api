@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
+using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -43,7 +45,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public void Import([FromBody] UcasPayload payload)
         {
             _dataService.ProcessUcasPayload(payload);
-            PublishCourses();
         }
         /// <summary>
         /// Imports the reference data.
@@ -57,15 +58,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             _dataService.ProcessReferencePayload(payload);
 
             //TODO return Ok/Fail in action result
-        }
-
-        private void PublishCourses()
-        {
-            foreach (var course in _dataService.GetAllCourses())
-            {
-                _publishService.PublishCourse(course.InstCode, course.CourseCode);
-                break;//just one for the moment
-            }
         }
     }
 }
