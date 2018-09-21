@@ -88,6 +88,16 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
             recipient.McOrganisationUsers.Single().McOrganisation.Name.Should().Be("TheOrg");
         }
 
+        [Test]
+        public void ActionManualAccessRequest_BadRequest()
+        {
+            SaveExampleDataToContext();
+            var res = new AdminController(Context).ActionManualActionRequest("", "", "Joe", "Bloggs");
+
+            (res as StatusCodeResult).StatusCode.Should().Be(400);
+            Context.AccessRequests.Count().Should().Be(1);
+        }
+
         private void SaveExampleDataToContext()
         {
             var user = new McUser
