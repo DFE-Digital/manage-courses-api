@@ -44,5 +44,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var mcConfig = new McConfig(config.Object);
             Assert.Throws<Exception>(mcConfig.Validate);
         }
+
+        [Test]
+        public void ValidWithoutEmailConfig()
+        {
+            var config = new Mock<IConfiguration>();
+            config.SetupGet(c => c[It.IsRegex("^(?!email:).*")]).Returns("hello");
+            var mcConfig = new McConfig(config.Object);
+            mcConfig.Validate();
+        }
     }
 }
