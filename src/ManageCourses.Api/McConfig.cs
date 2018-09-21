@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ManageCourses.Api
@@ -28,16 +30,38 @@ namespace GovUk.Education.ManageCourses.Api
         /// </summary>
         public void Validate()
         {
-            ValidateRequired(PgServerKey);
-            ValidateRequired(PgDatabaseKey);
-            ValidateRequired(PgUsernameKey);
-            ValidateRequired(SignInUserInfoEndpointConfigKey);
-            ValidateRequired(ApiKeyConfigKey);
-            ValidateRequired(EmailApiKeyConfigKey);
-            ValidateRequired(EmailTemplateIdConfigKey);
-            ValidateRequired(EmailUserConfigKey);
-            ValidateRequired(SearchAndCompareApiKeyConfigKey);
-            ValidateRequired(SearchAndCompareApiUrlConfigKey);
+            var requiredKeys = new List<string>
+            {
+                PgServerKey,
+                PgDatabaseKey,
+                PgUsernameKey,
+                SignInUserInfoEndpointConfigKey,
+                ApiKeyConfigKey,
+                SearchAndCompareApiKeyConfigKey,
+                SearchAndCompareApiUrlConfigKey,
+            };
+
+            var emailKeys = new List<string>
+            {
+                EmailApiKeyConfigKey,
+                EmailTemplateIdConfigKey,
+                EmailUserConfigKey,
+            };
+
+            var invalidKeys = requiredKeys.Where(k => string.IsNullOrWhiteSpace(_configuration[k])).ToList();
+
+            // Email config is optional, if missing emails will not be sent and a warning emitted by the app instead
+            if (emailKeys.Any(ek => !string.IsNullOrWhiteSpace(_configuration[ek])))
+            {
+                // add missing keys from email set to error list
+                invalidKeys.AddRange(emailKeys.Where(ek => string.IsNullOrWhiteSpace(_configuration[ek])));
+            }
+
+            if (invalidKeys.Any())
+            {
+                throw new Exception(
+                    $"Missing config keys: {string.Join(", ", invalidKeys)}\n- note that email config is optional but if any email key is set then all email keys must be set.");
+            }
         }
 
         /// <summary>
@@ -57,23 +81,12 @@ namespace GovUk.Education.ManageCourses.Api
         public string EmailUser => _configuration[EmailUserConfigKey];
         public string SearchAndCompareApiKey => _configuration[SearchAndCompareApiKeyConfigKey];
         public string SearchAndCompareApiUrl => _configuration[SearchAndCompareApiUrlConfigKey];
+
         private string PgServer => _configuration[PgServerKey];
         private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
         private string PgDatabase => _configuration[PgDatabaseKey];
         private string PgUser => _configuration[PgUsernameKey];
         private string PgPassword => _configuration["PG_PASSWORD"];
         private string PgSsl => _configuration["PG_SSL"] ?? "SSL Mode=Prefer;Trust Server Certificate=true";
-
-        /// <summary>
-        /// Throws if null or whitespace config value for this key is blank or missing.
-        /// </summary>
-        /// <param name="key">The config key to check</param>
-        private void ValidateRequired(string key)
-        {
-            if (string.IsNullOrWhiteSpace(_configuration[key]))
-            {
-                throw new Exception($"Config value missing: '{key}'");
-            }
-        }
     }
 }
