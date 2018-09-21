@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Model;
 
-namespace GovUk.Education.ManageCourses.Api.Services.Publish.Helpers
+namespace GovUk.Education.ManageCourses.Api.Helpers
 {
     public static class CourseHelpers
     {
