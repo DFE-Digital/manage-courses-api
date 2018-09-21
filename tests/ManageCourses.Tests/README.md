@@ -4,6 +4,8 @@
 
 Requires all the same config as the main api project because it fires up a captive api host.
 
+Don't set the email config keys.
+
 ## Smoke
 
 These test the API HTTP endpoints with a real client, with the API running in a
