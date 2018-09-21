@@ -14,8 +14,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManageCourses.Tests", "test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CFA02597-E2C6-4F09-BC95-5DF91FD6ABDA}"
 	ProjectSection(SolutionItems) = preProject
+		.deployment = .deployment
 		.gitignore = .gitignore
+		.travis.yml = .travis.yml
+		LICENSE = LICENSE
+		nuget.config = nuget.config
 		README.md = README.md
+		travis-build.sh = travis-build.sh
+		travis-nuget-deploy.sh = travis-nuget-deploy.sh
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManageCourses.ApiClient", "src\ManageCourses.ApiClient\ManageCourses.ApiClient.csproj", "{0633820A-7391-439C-A8D2-8A2B31A1D6B2}"
