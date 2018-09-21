@@ -64,7 +64,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public IActionResult ActionManualActionRequest(string requesterEmail, string targetEmail, string firstName, string lastName)
         {
             requesterEmail = requesterEmail.ToLower();
-            var requesterUser = _context.McUsers.SingleOrDefault(x => x.Email == requesterEmail);
+            var requesterUser = _context.McUsers
+                .Include(x=>x.McOrganisationUsers)
+                .SingleOrDefault(x => x.Email == requesterEmail);
+                
             if (requesterUser == null)
             {
                 return NotFound();
