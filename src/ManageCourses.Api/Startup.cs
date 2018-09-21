@@ -93,14 +93,11 @@ namespace GovUk.Education.ManageCourses.Api
                  ));
             });
 
-            services.AddScoped<ISearchAndCompareApi>(provider => {
-                var apiKey = Configuration["snc:api:key"];
+            services.AddScoped<ISearchAndCompareApi>(provider =>
+            {
                 var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-
-                var apiUri = Configuration["snc:api:url"];
-
-                return new SearchAndCompareApi(httpClient, apiUri);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", mcConfig.SearchAndCompareApiKey);
+                return new SearchAndCompareApi(httpClient, mcConfig.SearchAndCompareApiUrl);
             });
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
             services.AddScoped<IDataHelper, UserDataHelper>();
