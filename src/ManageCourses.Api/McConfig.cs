@@ -33,9 +33,9 @@ namespace GovUk.Education.ManageCourses.Api
             ValidateRequired(PgUsernameKey);
             ValidateRequired(SignInUserInfoEndpointConfigKey);
             ValidateRequired(ApiKeyConfigKey);
-            //ValidateRequired(EmailApiKeyConfigKey);
-            //ValidateRequired(EmailTemplateIdConfigKey);
-            //ValidateRequired(EmailUserConfigKey);
+            ValidateRequired(EmailApiKeyConfigKey);
+            ValidateRequired(EmailTemplateIdConfigKey);
+            ValidateRequired(EmailUserConfigKey);
             ValidateRequired(SearchAndCompareApiKeyConfigKey);
             ValidateRequired(SearchAndCompareApiUrlConfigKey);
         }
