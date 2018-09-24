@@ -294,6 +294,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     and lower(ou.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
                 .Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
+                .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
                 .Include(x => x.AccreditingProviderInstitution)
                 .Include(x => x.UcasCampus)
                 .ToList();
@@ -310,6 +311,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     $"and lower(ou.email)=lower(@email) order by c.crse_title", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
                 .Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
+                .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
                 .Include(x => x.AccreditingProviderInstitution)
                 .Include(x => x.UcasCampus)
                 .ToList();
