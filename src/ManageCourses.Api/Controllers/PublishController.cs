@@ -1,11 +1,10 @@
-﻿using GovUk.Education.ManageCourses.Api.Data;
+﻿using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Middleware;
-using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using GovUk.Education.ManageCourses.Api.Mapping;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -13,13 +12,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class PublishController : Controller
     {
         private readonly IDataService _dataService;
-        private readonly ISearchAndCompareService _publishService;
+        private readonly ISearchAndCompareService _searchAndCompareService;
         private readonly IEnrichmentService _enrichmentservice;
 
-        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ISearchAndCompareService publishService)
+        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ISearchAndCompareService searchAndCompareService)
         {
             _dataService = dataService;
-            _publishService = publishService;
+            _searchAndCompareService = searchAndCompareService;
             _enrichmentservice = enrichmentservice;
         }
         /// <summary>
@@ -38,7 +37,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             var enrichmentResult =  _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
 
-            await _publishService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
+            await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
 
             return Ok(enrichmentResult);
         }
