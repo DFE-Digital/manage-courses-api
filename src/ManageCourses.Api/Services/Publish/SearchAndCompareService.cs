@@ -37,7 +37,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                 return false;
             }
 
-            var courses = new List<Course>();
             var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
             var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email);
             var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
@@ -48,9 +47,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                 ucasCourseData,
                 orgEnrichmentData?.EnrichmentModel,
                 courseEnrichmentData?.EnrichmentModel);
-            courses.Add(course);
 
-            var result = await _api.SaveCoursesAsync(courses);//TODO think about logging failure
+            var programmeCode = course.ProgrammeCode;
+            var providerCode = course.Provider.ProviderCode;
+
+            var result = await _api.SaveCourseAsync(course);//TODO think about logging failure
 
             return result;
         }
