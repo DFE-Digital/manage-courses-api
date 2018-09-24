@@ -6,6 +6,7 @@ using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.SearchAndCompare.Domain.Client;
 using GovUk.Education.SearchAndCompare.Domain.Models;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Publish
 {
@@ -15,13 +16,15 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         private readonly ICourseMapper _courseMapper;
         private readonly IDataService _dataService;
         private readonly IEnrichmentService _enrichmentService;
+        private readonly ILogger _logger;
 
-        public SearchAndCompareService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService)
+        public SearchAndCompareService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService, ILogger<SearchAndCompareService> logger)
         {
             _api = api;
             _courseMapper = courseMapper;
             _dataService = dataService;
             _enrichmentService = enrichmentService;
+            _logger = logger;
         }
          /// <summary>
         /// Published a course to Search and Compare using the email address of the user
@@ -31,29 +34,41 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <param name="email">email of the user</param>
         /// <returns></returns>
         public async Task<bool> SaveSingleCourseToSearchAndCompare(string instCode, string courseCode, string email)
-        {
+         {
             if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
-            {
-                return false;
+             {
+                 return false;
+             }
+             var returnBool = false;
+             try
+             {
+                 var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
+                 var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email);
+                 var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
+                 var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
+
+                 var course = _courseMapper.MapToSearchAndCompareCourse(
+                     ucasInstData,
+                     ucasCourseData,
+                     orgEnrichmentData?.EnrichmentModel,
+                     courseEnrichmentData?.EnrichmentModel);
+
+                 if (course.IsValid())
+                 {
+                     returnBool = await _api.SaveCourseAsync(course);
+                 }
+
+                 if (!returnBool)
+                 {
+                     _logger.LogError($"Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
+                 }
             }
+            catch (Exception e)
+             {
+                 _logger.LogError(e, $"Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
+             }
 
-            var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-            var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email);
-            var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
-            var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
-
-            var course = _courseMapper.MapToSearchAndCompareCourse(
-                ucasInstData,
-                ucasCourseData,
-                orgEnrichmentData?.EnrichmentModel,
-                courseEnrichmentData?.EnrichmentModel);
-
-            var programmeCode = course.ProgrammeCode;
-            var providerCode = course.Provider.ProviderCode;
-
-            var result = await _api.SaveCourseAsync(course);//TODO think about logging failure
-
-            return result;
+             return returnBool;
         }
     }
 }
