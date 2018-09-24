@@ -41,6 +41,10 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .FirstOrDefault();
 
             var enrichmentToReturn = _converter.Convert(enrichment);
+            if (enrichmentToReturn == null)
+            {
+                return null;
+            }
             
             var useUcasContact = 
                 string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Email) &&
