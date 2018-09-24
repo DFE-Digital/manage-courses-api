@@ -19,5 +19,14 @@ namespace GovUk.Education.ManageCourses.Api.Model
         /// Enrichment data for all of the accrediting providers for the courses this institution offers.
         /// </summary>
         public IList<AccreditingProviderEnrichment> AccreditingProviderEnrichments { get; set; }
+
+        public string Email { get; set; }
+        public string Telephone { get; set; }
+        public string Website { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string Address4 { get; set; }
+        public string Postcode { get; set; }
     }
 }

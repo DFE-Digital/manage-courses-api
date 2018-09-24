@@ -41,6 +41,36 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .FirstOrDefault();
 
             var enrichmentToReturn = _converter.Convert(enrichment);
+            if (enrichmentToReturn == null)
+            {
+                return null;
+            }
+            
+            var useUcasContact = 
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Email) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Telephone) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Website) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address1) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address2) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address4) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address3) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Postcode);
+
+            if (useUcasContact)
+            {
+                var ucasInst = _context.UcasInstitutions.SingleOrDefault(x => x.InstCode == instCode);
+                if (ucasInst != null)
+                {
+                    enrichmentToReturn.EnrichmentModel.Email = ucasInst.Email;
+                    enrichmentToReturn.EnrichmentModel.Telephone = ucasInst.Telephone;
+                    enrichmentToReturn.EnrichmentModel.Website = ucasInst.Url;
+                    enrichmentToReturn.EnrichmentModel.Address1 = ucasInst.Addr1;
+                    enrichmentToReturn.EnrichmentModel.Address2 = ucasInst.Addr2;
+                    enrichmentToReturn.EnrichmentModel.Address3 = ucasInst.Addr3;
+                    enrichmentToReturn.EnrichmentModel.Address4 = ucasInst.Addr4;
+                    enrichmentToReturn.EnrichmentModel.Postcode = ucasInst.Postcode;
+                }
+            }
 
             return enrichmentToReturn;
         }
