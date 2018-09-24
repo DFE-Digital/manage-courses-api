@@ -89,10 +89,20 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
         }
 
         [Test]
-        public void ActionManualAccessRequest_BadRequest()
+        public void ActionManualAccessRequest_EmptyEmailBadRequest()
         {
             SaveExampleDataToContext();
             var res = new AdminController(Context).ActionManualActionRequest("", "", "Joe", "Bloggs");
+
+            (res as StatusCodeResult).StatusCode.Should().Be(400);
+            Context.AccessRequests.Count().Should().Be(1);
+        }
+
+        [Test]
+        public void ActionManualAccessRequest_NullEmailBadRequest()
+        {
+            SaveExampleDataToContext();
+            var res = new AdminController(Context).ActionManualActionRequest(null, null, "Joe", "Bloggs");
 
             (res as StatusCodeResult).StatusCode.Should().Be(400);
             Context.AccessRequests.Count().Should().Be(1);
