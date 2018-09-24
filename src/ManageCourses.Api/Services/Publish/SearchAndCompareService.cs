@@ -53,10 +53,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                      orgEnrichmentData?.EnrichmentModel,
                      courseEnrichmentData?.EnrichmentModel);
 
-                 if (course.IsValid())
-                 {
+                 //if (course.IsValid())
+                 //{
                      returnBool = await _api.SaveCourseAsync(course);
-                 }
+                 //}
 
                  if (!returnBool)
                  {

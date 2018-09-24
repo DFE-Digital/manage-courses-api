@@ -4,9 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using FluentAssertions;
-using GovUk.Education.ManageCourses.ApiClient;
-using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
+using GovUk.Education.ManageCourses.Api.Mapping;
+using GovUk.Education.ManageCourses.Api.Model;
 using NUnit.Framework;
+using UcasInstitution = GovUk.Education.ManageCourses.Domain.Models.UcasInstitution;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
@@ -37,7 +38,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.Route.Name.Should().Be("School Direct (salaried) training programme");
             res.Route.IsSalaried.Should().Be(true);
 
-            res.IncludesPgce.Should().Be(IncludesPgce.Yes);
+            res.IncludesPgce.Should().Be(SearchAndCompare.Domain.Models.Enums.IncludesPgce.Yes);
             res.IsSalaried.Should().BeTrue();
 
             res.Campuses.Count.Should().Be(1);
@@ -59,8 +60,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.ApplicationsAcceptedFrom.Should().Be(new System.DateTime(2018, 10, 16));
 
-            res.FullTime.Should().Be(VacancyStatus.Vacancies);
-            res.PartTime.Should().Be(VacancyStatus.Vacancies);
+            res.FullTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
+            res.PartTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
         }        
 
         [Test]

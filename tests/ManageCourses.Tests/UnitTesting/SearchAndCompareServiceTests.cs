@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
@@ -11,6 +10,7 @@ using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Client;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 
@@ -23,6 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         private Mock<IDataService> _dataServiceMock;
         private ISearchAndCompareService _searchAndCompareService;
         private Mock<IHttpClient> _httpMock;
+        private Mock<ILogger<SearchAndCompareService>> _loggerMock;
         private const string InstitutionCode = "123";
         private const string CourseCode = "234";
 
@@ -35,10 +36,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             _dataServiceMock = new Mock<IDataService>();
 
+            _loggerMock = new Mock<ILogger<SearchAndCompareService>>();
             _httpMock = new Mock<IHttpClient>();
             var searchAndCompareApi = new SearchAndCompareApi(_httpMock.Object, sncUrl);
 
-            _searchAndCompareService = new SearchAndCompareService(searchAndCompareApi, new CourseMapper(), _dataServiceMock.Object, _enrichmentServiceMock.Object);
+            _searchAndCompareService = new SearchAndCompareService(searchAndCompareApi, new CourseMapper(), _dataServiceMock.Object, _enrichmentServiceMock.Object, _loggerMock.Object);
         }
 
         [Test]
