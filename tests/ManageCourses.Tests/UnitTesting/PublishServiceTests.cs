@@ -17,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
     {
         private Mock<IEnrichmentService> _enrichmentServiceMock;
         private Mock<IDataService> _dataServiceMock;
-        private IPublishService _publishService;
+        private ISearchAndCompareService _publishService;
         private Mock<ISearchAndCompareApi> _searchAndCompareApiMock;
         private const string InstitutionCode = "123";
         private const string CourseCode = "234";
@@ -29,7 +29,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             _searchAndCompareApiMock = new Mock<ISearchAndCompareApi>();
             _dataServiceMock = new Mock<IDataService>();
 
-            _publishService = new PublishService(_searchAndCompareApiMock.Object, new CourseMapper(), _dataServiceMock.Object, _enrichmentServiceMock.Object);
+            _publishService = new SearchAndCompareService(_searchAndCompareApiMock.Object, new CourseMapper(), _dataServiceMock.Object, _enrichmentServiceMock.Object);
         }
 
         [Test]

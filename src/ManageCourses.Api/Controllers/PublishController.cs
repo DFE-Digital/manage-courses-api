@@ -13,10 +13,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class PublishController : Controller
     {
         private readonly IDataService _dataService;
-        private readonly IPublishService _publishService;
+        private readonly ISearchAndCompareService _publishService;
         private readonly IEnrichmentService _enrichmentservice;
 
-        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, IPublishService publishService)
+        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ISearchAndCompareService publishService)
         {
             _dataService = dataService;
             _publishService = publishService;
@@ -36,9 +36,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         {
             var name = this.User.Identity.Name;
 
-            var result = await _publishService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
+            var enrichmentResult =  _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
 
-            return Ok(result);
+            await _publishService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
+
+            return Ok(enrichmentResult);
         }
         /// <summary>
         /// Gets a generated Search and Compare course object used for Publish (to Search and Compare) and Preview

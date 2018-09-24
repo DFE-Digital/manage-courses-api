@@ -9,14 +9,14 @@ using GovUk.Education.SearchAndCompare.Domain.Models;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Publish
 {
-    public class PublishService : IPublishService
+    public class SearchAndCompareService : ISearchAndCompareService
     {
         private readonly ISearchAndCompareApi _api;
         private readonly ICourseMapper _courseMapper;
         private readonly IDataService _dataService;
         private readonly IEnrichmentService _enrichmentService;
 
-        public PublishService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService)
+        public SearchAndCompareService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService)
         {
             _api = api;
             _courseMapper = courseMapper;
@@ -49,7 +49,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                 orgEnrichmentData?.EnrichmentModel,
                 courseEnrichmentData?.EnrichmentModel);
             courses.Add(course);
-            var result = await _api.SaveCoursesAsync(courses);
+
+            var result = await _api.SaveCoursesAsync(courses);//TODO think about logging failure
 
             return result;
         }

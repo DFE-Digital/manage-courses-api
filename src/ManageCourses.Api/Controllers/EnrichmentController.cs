@@ -91,20 +91,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             return HandleVoid(() => _service.SaveCourseEnrichment(model, ucasInstitutionCode, ucasCourseCode, User.Identity.Name));
         }
 
-        /// <summary>
-        /// sets the status of the latest draft record to 'published'
-        /// </summary>
-        /// <param name="ucasInstitutionCode"></param>
-        /// <param name="ucasCourseCode">Course code that relates to the Ucas Course</param>
-        [HttpPost]
-        [Route("institution/{ucasInstitutionCode}/course/{ucasCourseCode}/publish")]
-        [ProducesResponseType(typeof(bool), 200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public ActionResult PublishCourse(string ucasInstitutionCode, string ucasCourseCode)
-        {
-            return Handle(() => _service.PublishCourseEnrichment(ucasInstitutionCode, ucasCourseCode, User.Identity.Name));
-        }
 
         private ActionResult HandleVoid(Action toHandle)
         {
