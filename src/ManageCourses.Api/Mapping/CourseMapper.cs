@@ -25,6 +25,15 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
 
+            var useUcasContact = 
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Email) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Website) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address1) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address2) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address3) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address4) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Postcode);
+
             var subjectStrings = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
                 ? new string[]{}
                 : subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
@@ -98,11 +107,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
                 ContactDetails = new Contact
                 {
-                    Phone = ucasInstData.Telephone,
-                    Fax = null, // ???
-                    Email = ucasInstData.Email,
-                    Website = ucasInstData.Url,
-                    Address = MapAddress(ucasInstData)
+                    Phone = useUcasContact ? ucasInstData.Telephone : orgEnrichmentModel.Telephone,
+                    Email = useUcasContact ? ucasInstData.Email : orgEnrichmentModel.Email,
+                    Website = useUcasContact ? ucasInstData.Url : orgEnrichmentModel.Website,
+                    Address = useUcasContact ? MapAddress(ucasInstData) :  MapAddress(orgEnrichmentModel)
                 },
 
                 ApplicationsAcceptedFrom = ucasCourseData.Schools.Select(x => {
@@ -256,7 +264,22 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             return addressFragments.Any()
                 ? String.Join("\n", addressFragments) + "\n" + postCode
                 : postCode;
-        }
+        }        
 
+        private string MapAddress(InstitutionEnrichmentModel orgEnrichmentModel)
+        {
+            var addressFragments = new List<string>{
+                orgEnrichmentModel.Address1,
+                orgEnrichmentModel.Address2,
+                orgEnrichmentModel.Address3,
+                orgEnrichmentModel.Address4
+            }.Where(x => !string.IsNullOrWhiteSpace(x));
+
+            var postCode = orgEnrichmentModel.Postcode ?? "";
+
+            return addressFragments.Any()
+                ? String.Join("\n", addressFragments) + "\n" + postCode
+                : postCode;
+        }
     }
 }

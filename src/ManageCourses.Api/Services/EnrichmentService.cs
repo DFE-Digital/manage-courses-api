@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -12,16 +13,14 @@ namespace GovUk.Education.ManageCourses.Api.Services
     public class EnrichmentService : IEnrichmentService
     {
         private IManageCoursesDbContext _context;
-        private JsonSerializerSettings _jsonSerializerSettings;
+        private EnrichmentConverter _converter;
+
         public EnrichmentService(IManageCoursesDbContext context)
         {
             _context = context;
-            _jsonSerializerSettings = new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore
-            };
+            _converter = new EnrichmentConverter();
         }
+        
         /// <summary>
         /// gets the latest enrichment record regardless of the status
         /// </summary>
@@ -41,7 +40,37 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
 
-            var enrichmentToReturn = Convert(enrichment);
+            var enrichmentToReturn = _converter.Convert(enrichment);
+            if (enrichmentToReturn == null)
+            {
+                return null;
+            }
+            
+            var useUcasContact = 
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Email) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Telephone) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Website) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address1) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address2) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address4) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address3) &&
+                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Postcode);
+
+            if (useUcasContact)
+            {
+                var ucasInst = _context.UcasInstitutions.SingleOrDefault(x => x.InstCode == instCode);
+                if (ucasInst != null)
+                {
+                    enrichmentToReturn.EnrichmentModel.Email = ucasInst.Email;
+                    enrichmentToReturn.EnrichmentModel.Telephone = ucasInst.Telephone;
+                    enrichmentToReturn.EnrichmentModel.Website = ucasInst.Url;
+                    enrichmentToReturn.EnrichmentModel.Address1 = ucasInst.Addr1;
+                    enrichmentToReturn.EnrichmentModel.Address2 = ucasInst.Addr2;
+                    enrichmentToReturn.EnrichmentModel.Address3 = ucasInst.Addr3;
+                    enrichmentToReturn.EnrichmentModel.Address4 = ucasInst.Addr4;
+                    enrichmentToReturn.EnrichmentModel.Postcode = ucasInst.Postcode;
+                }
+            }
 
             return enrichmentToReturn;
         }
@@ -58,7 +87,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
         {
             var userInst = ValidateUserOrg(email, instCode);
-            
+
             instCode = instCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments
@@ -66,7 +95,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
-            var content = JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
+            string content = _converter.ConvertToJson(model);
 
             if (enrichmentDraftRecord != null)
             {
@@ -103,6 +132,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             }
             _context.Save();
         }
+
         /// <summary>
         /// Changes the status of the latest draft record to published
         /// </summary>
@@ -155,7 +185,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
 
-            var enrichmentToReturn = Convert(enrichment);
+            var enrichmentToReturn = _converter.Convert(enrichment);
 
             return enrichmentToReturn;
         }
@@ -172,7 +202,7 @@ FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROU
 INNER JOIN course_enrichment b on top_id.id = b.id")
                 .Where(e => e.InstCode == instCode);
 
-            return enrichments.Select(x => Convert(x)).ToList();
+            return enrichments.Select(x => _converter.Convert(x)).ToList();
         }
 
         /// <summary>
@@ -197,7 +227,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
-            var content = JsonConvert.SerializeObject(model, _jsonSerializerSettings);
+            string content = _converter.ConvertToJson(model);
 
             if (enrichmentDraftRecord != null)
             {
@@ -235,6 +265,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             }
             _context.Save();
         }
+
 
         /// <summary>
         /// Changes the status of the latest draft record to published
@@ -288,52 +319,6 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             };
 
             return returnUserInst;
-        }
-
-        /// <summary>
-        /// maps enrichment data from the data object to the returned enrichment model
-        /// </summary>
-        /// <param name="source">enrichment data object</param>
-        /// <returns>enrichment model with enrichment data (if found). Null if there is no source record</returns>
-        private UcasCourseEnrichmentGetModel Convert(CourseEnrichment source)
-        {
-            if (source == null) return null;
-
-            var enrichmentToReturn = new UcasCourseEnrichmentGetModel();
-            var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<CourseEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
-
-            enrichmentToReturn.EnrichmentModel = enrichmentModel;
-            enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
-            enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
-            enrichmentToReturn.CreatedByUserId = source.CreatedByUser?.Id ?? 0;
-            enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser?.Id ?? 0;
-            enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
-            enrichmentToReturn.Status = source.Status;
-            enrichmentToReturn.InstCode = source.InstCode;
-            enrichmentToReturn.CourseCode = source.UcasCourseCode;
-            return enrichmentToReturn;
-        }
-
-        /// <summary>
-        /// maps enrichment data from the data object to the returned enrichment model
-        /// </summary>
-        /// <param name="source">enrichment data object</param>
-        /// <returns>enrichment model with enrichment data (if found). Null if there is no source record</returns>
-        private UcasInstitutionEnrichmentGetModel Convert(InstitutionEnrichment source)
-        {
-            if (source == null) return null;
-
-            var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
-            var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<InstitutionEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
-
-            enrichmentToReturn.EnrichmentModel = enrichmentModel;
-            enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
-            enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
-            enrichmentToReturn.CreatedByUserId = source.CreatedByUser.Id;
-            enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser.Id;
-            enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
-            enrichmentToReturn.Status = source.Status;
-            return enrichmentToReturn;
         }
     }
 }

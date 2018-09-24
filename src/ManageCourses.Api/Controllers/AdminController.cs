@@ -63,8 +63,16 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ExemptFromAcceptTerms]
         public IActionResult ActionManualActionRequest(string requesterEmail, string targetEmail, string firstName, string lastName)
         {
+            if (string.IsNullOrWhiteSpace(requesterEmail) || string.IsNullOrWhiteSpace(targetEmail))
+            {
+                return BadRequest();
+            }
+
             requesterEmail = requesterEmail.ToLower();
-            var requesterUser = _context.McUsers.SingleOrDefault(x => x.Email == requesterEmail);
+            var requesterUser = _context.McUsers
+                .Include(x=>x.McOrganisationUsers)
+                .SingleOrDefault(x => x.Email == requesterEmail);
+
             if (requesterUser == null)
             {
                 return NotFound();

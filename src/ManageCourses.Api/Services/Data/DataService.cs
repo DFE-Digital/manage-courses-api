@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.EqualityComparers;
@@ -13,6 +14,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 {
     public class DataService : IDataService
     {
+        private readonly CourseLoader _courseLoader;
         private readonly IManageCoursesDbContext _context;
         IEnrichmentService _enrichmentService;
         private readonly IDataHelper _dataHelper;
@@ -24,6 +26,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             _enrichmentService = enrichmentService;
             _dataHelper = dataHelper;
             _logger = logger;
+            _courseLoader = new CourseLoader();
         }
 
         #region Import
@@ -341,7 +344,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 return null;
             }
-            var course = LoadCourse(courseRecords, enrichmentMetadata);
+            var course = _courseLoader.LoadCourse(courseRecords, enrichmentMetadata);
             return course;
         }
         /// <summary>
@@ -360,86 +363,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
             var courseRecords = _context.GetUcasCourseRecordsByInstCode(instCode, email);
             var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
-            returnCourses = LoadCourses(courseRecords, enrichmentMetadata);
+            returnCourses = _courseLoader.LoadCourses(courseRecords, enrichmentMetadata);
             return returnCourses;
         }
-        private InstitutionCourses LoadCourses(IReadOnlyList<UcasCourse> courseRecords, IList<UcasCourseEnrichmentGetModel> enrichmentMetadata)
-        {
-            var returnCourses = new InstitutionCourses();
-            if (courseRecords.Count > 0)
-            {
-                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical institution info so just get the first one
-                returnCourses.InstitutionName = organisationCourseRecord.UcasInstitution.InstFull;
-                returnCourses.InstitutionCode = organisationCourseRecord.InstCode;
-                returnCourses.Courses = new List<Course>();
-                foreach (var courseCode in courseRecords.Select(c => c.CrseCode).Distinct())
-                {
-                    returnCourses.Courses.Add(LoadCourse(courseRecords.Where(c => c.CrseCode == courseCode).ToList(), enrichmentMetadata));
-                }
-            }
-
-            return returnCourses;
-
-        }
-        private Course LoadCourse(IReadOnlyList<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata)
-        {
-            var returnCourse = new Course();
-            if (courseRecords.Count > 0)
-            {
-                var organisationCourseRecord = courseRecords[0];//all the records in the list hold identical institution info so just get the first one
-
-                var bestEnrichment = enrichmentMetadata.SingleOrDefault(x => x.InstCode == organisationCourseRecord.InstCode && x.CourseCode == organisationCourseRecord.CrseCode);
-
-                returnCourse.InstCode = organisationCourseRecord.InstCode;
-                returnCourse.CourseCode = organisationCourseRecord.CrseCode;
-                returnCourse.AccreditingProviderId = organisationCourseRecord.AccreditingProvider;
-                if (organisationCourseRecord.AccreditingProviderInstitution != null)
-                {
-                    returnCourse.AccreditingProviderName = organisationCourseRecord.AccreditingProviderInstitution.InstFull;
-                }
-                returnCourse.AgeRange = organisationCourseRecord.Age;
-                returnCourse.Name = organisationCourseRecord.CrseTitle;
-                returnCourse.ProgramType = organisationCourseRecord.ProgramType;
-                returnCourse.ProfpostFlag = organisationCourseRecord.ProfpostFlag;
-                returnCourse.StudyMode = organisationCourseRecord.Studymode;
-                var subjects = _context.UcasSubjects
-                    .Join(_context.UcasCourseSubjects, s => s.SubjectCode, cs => cs.SubjectCode,
-                        (s, cs) => new { s.SubjectDescription, cs.CrseCode, cs.InstCode })
-                    .Where(x => x.CrseCode == organisationCourseRecord.CrseCode && x.InstCode == organisationCourseRecord.InstCode)
-                    .Select(x => x.SubjectDescription).ToList();
-
-                returnCourse.Subjects = string.Join(", ", subjects);
-                returnCourse.Schools = GetSchoolsData(courseRecords);
-                returnCourse.EnrichmentWorkflowStatus = bestEnrichment?.Status;
-            }
-
-            return returnCourse;
-        }
-        private IEnumerable<School> GetSchoolsData(IEnumerable<UcasCourse> courseRecords)
-        {
-            var schools = courseRecords.Select(courseRecord => new School
-            {
-                LocationName = courseRecord.UcasCampus.CampusName,
-                Address1 = courseRecord.UcasCampus.Addr1,
-                Address2 = courseRecord.UcasCampus.Addr2,
-                Address3 = courseRecord.UcasCampus.Addr3,
-                Address4 = courseRecord.UcasCampus.Addr4,
-                PostCode = courseRecord.UcasCampus.Postcode,
-                ApplicationsAcceptedFrom = courseRecord.CrseOpenDate,
-                Code = courseRecord.UcasCampus.CampusCode,
-                Status = courseRecord.Status,
-            }).ToList();
-            //look for the main site and move it to the top of the list
-            var main = schools.FirstOrDefault(s => s.Code == "-");
-            if (main != null)
-            {
-                schools.Remove(main);
-                schools.Insert(0, main);
-            }
-
-            return schools;
-        }
-
+        
         private void ResetReferenceSchema()
         {
             // clear out the existing data            
