@@ -53,7 +53,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 returnCourse.ProgramType = organisationCourseRecord.ProgramType;
                 returnCourse.ProfpostFlag = organisationCourseRecord.ProfpostFlag;
                 returnCourse.StudyMode = organisationCourseRecord.Studymode;
-                var subjects = organisationCourseRecord.UcasInstitution.UcasCourseSubjects
+                var subjects = organisationCourseRecord.CourseCode.UcasCourseSubjects
                     .Select(x => x.UcasSubject.SubjectDescription).ToList();
 
                 returnCourse.Subjects = string.Join(", ", subjects);
