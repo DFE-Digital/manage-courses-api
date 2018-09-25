@@ -13,9 +13,9 @@ console.log(data.length);
 var options = {
 	method: "POST",
 	json: data,
-	url: argv[2] + "/api/courses",
+	url: process.argv[2] + "/api/courses",
 	headers: {		
-		"Authorization": "Bearer " + argv[3],
+		"Authorization": "Bearer " + process.argv[3],
 		"Content-Type": "application/json"		
 	}
 };
