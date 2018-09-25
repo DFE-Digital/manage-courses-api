@@ -6,7 +6,6 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
@@ -20,18 +19,22 @@ namespace GovUk.Education.ManageCourses.Api.Services
             _context = context;
             _converter = new EnrichmentConverter();
         }
-        
+
         /// <summary>
-        /// gets the latest enrichment record regardless of the status
+        /// Gets the latest enrichment record if any regardless of the status.
+        /// If there is no contact data then it will be pre-populated from the Ucas data.
         /// </summary>
         /// <param name="instCode">institution code for the enrichment</param>
         /// <param name="email">email of the user</param>
-        /// <returns>An enrichment object with the enrichment data (if found). Nul if not found</returns>
+        /// <returns>
+        /// An enrichment object with the enrichment data.
+        /// If there is nothing in the db then an empty record with Ucas contact details will be returned.
+        /// </returns>
         public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email)
         {
             ValidateUserOrg(email, instCode);
 
-            instCode = instCode.ToUpperInvariant(); 
+            instCode = instCode.ToUpperInvariant();
 
             var enrichment = _context.InstitutionEnrichments
                 .Where(ie => ie.InstCode == instCode)
@@ -40,40 +43,39 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
 
-            var enrichmentToReturn = _converter.Convert(enrichment);
-            if (enrichmentToReturn == null)
-            {
-                return null;
-            }
-            
-            var useUcasContact = 
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Email) &&
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Telephone) &&
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Website) &&
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address1) &&
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address2) &&
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address4) &&
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Address3) &&
-                string.IsNullOrWhiteSpace(enrichmentToReturn.EnrichmentModel.Postcode);
+            var enrichmentGetModel = _converter.Convert(enrichment) ?? new UcasInstitutionEnrichmentGetModel();
+
+            var enrichmentModel = enrichmentGetModel.EnrichmentModel;
+
+            var useUcasContact =
+                string.IsNullOrWhiteSpace(enrichmentModel.Email) &&
+                string.IsNullOrWhiteSpace(enrichmentModel.Telephone) &&
+                string.IsNullOrWhiteSpace(enrichmentModel.Website) &&
+                string.IsNullOrWhiteSpace(enrichmentModel.Address1) &&
+                string.IsNullOrWhiteSpace(enrichmentModel.Address2) &&
+                string.IsNullOrWhiteSpace(enrichmentModel.Address4) &&
+                string.IsNullOrWhiteSpace(enrichmentModel.Address3) &&
+                string.IsNullOrWhiteSpace(enrichmentModel.Postcode);
 
             if (useUcasContact)
             {
                 var ucasInst = _context.UcasInstitutions.SingleOrDefault(x => x.InstCode == instCode);
                 if (ucasInst != null)
                 {
-                    enrichmentToReturn.EnrichmentModel.Email = ucasInst.Email;
-                    enrichmentToReturn.EnrichmentModel.Telephone = ucasInst.Telephone;
-                    enrichmentToReturn.EnrichmentModel.Website = ucasInst.Url;
-                    enrichmentToReturn.EnrichmentModel.Address1 = ucasInst.Addr1;
-                    enrichmentToReturn.EnrichmentModel.Address2 = ucasInst.Addr2;
-                    enrichmentToReturn.EnrichmentModel.Address3 = ucasInst.Addr3;
-                    enrichmentToReturn.EnrichmentModel.Address4 = ucasInst.Addr4;
-                    enrichmentToReturn.EnrichmentModel.Postcode = ucasInst.Postcode;
+                    enrichmentModel.Email = ucasInst.Email;
+                    enrichmentModel.Telephone = ucasInst.Telephone;
+                    enrichmentModel.Website = ucasInst.Url;
+                    enrichmentModel.Address1 = ucasInst.Addr1;
+                    enrichmentModel.Address2 = ucasInst.Addr2;
+                    enrichmentModel.Address3 = ucasInst.Addr3;
+                    enrichmentModel.Address4 = ucasInst.Addr4;
+                    enrichmentModel.Postcode = ucasInst.Postcode;
                 }
             }
 
-            return enrichmentToReturn;
+            return enrichmentGetModel;
         }
+
         /// <summary>
         /// This is an upsert.
         /// If a draft record exists then update it.
@@ -191,7 +193,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         }
 
         public IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email)
-        {        
+        {
             ValidateUserOrg(email, instCode);
 
             instCode = instCode.ToUpperInvariant();
@@ -306,10 +308,10 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             email = email.ToLowerInvariant();
 
             var inst = _context.McOrganisationIntitutions.Single(x => x.InstitutionCode == instCode); //should throw an error if  the inst doesn't exist
-            
+
             var orgUser = _context.McOrganisationUsers
                 .Where(x => x.Email == email && x.OrgId == inst.OrgId)
-                .Include(x=> x.McUser)
+                .Include(x => x.McUser)
                 .Single(); //should throw an error if the user doesn't have acces to the inst
 
             var returnUserInst = new UserInstitution
