@@ -103,9 +103,9 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
             ucasNeedsMentionInTitle = new Dictionary<string, Regex>
             {
-                {"humanities", new Regex("humanities")},
-                {"science", new Regex("(?<!social |computer )science")},
-                {"modern studies", new Regex("modern studies")}            
+                {"humanities", new Regex("humanities", RegexOptions.Compiled)},
+                {"science", new Regex("(?<!social |computer )science", RegexOptions.Compiled)},
+                {"modern studies", new Regex("modern studies", RegexOptions.Compiled)}            
             };
 
             ucasFurtherEducation = new string[] 
