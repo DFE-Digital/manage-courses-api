@@ -16,6 +16,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil.Duplicated
     public class CourseMapper
     {
         private SubjectMapper subjectMapper = new SubjectMapper();
+
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
             ucasInstData = ucasInstData ?? new UcasInstitution();
@@ -23,6 +24,15 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil.Duplicated
             ucasCourseData.Schools = ucasCourseData.Schools ?? new ObservableCollection<School>();
             orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
+
+            var useUcasContact = 
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Email) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Website) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address1) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address2) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address3) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address4) &&
+                string.IsNullOrWhiteSpace(orgEnrichmentModel.Postcode);
 
             var subjectStrings = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
                 ? new string[]{}
@@ -97,11 +107,10 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil.Duplicated
 
                 ContactDetails = new Contact
                 {
-                    Phone = ucasInstData.Telephone,
-                    Fax = null, // ???
-                    Email = ucasInstData.Email,
-                    Website = ucasInstData.Url,
-                    Address = MapAddress(ucasInstData)
+                    Phone = useUcasContact ? ucasInstData.Telephone : orgEnrichmentModel.Telephone,
+                    Email = useUcasContact ? ucasInstData.Email : orgEnrichmentModel.Email,
+                    Website = useUcasContact ? ucasInstData.Url : orgEnrichmentModel.Website,
+                    Address = useUcasContact ? MapAddress(ucasInstData) :  MapAddress(orgEnrichmentModel)
                 },
 
                 ApplicationsAcceptedFrom = ucasCourseData.Schools.Select(x => {
@@ -255,7 +264,22 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil.Duplicated
             return addressFragments.Any()
                 ? String.Join("\n", addressFragments) + "\n" + postCode
                 : postCode;
-        }
+        }        
 
+        private string MapAddress(InstitutionEnrichmentModel orgEnrichmentModel)
+        {
+            var addressFragments = new List<string>{
+                orgEnrichmentModel.Address1,
+                orgEnrichmentModel.Address2,
+                orgEnrichmentModel.Address3,
+                orgEnrichmentModel.Address4
+            }.Where(x => !string.IsNullOrWhiteSpace(x));
+
+            var postCode = orgEnrichmentModel.Postcode ?? "";
+
+            return addressFragments.Any()
+                ? String.Join("\n", addressFragments) + "\n" + postCode
+                : postCode;
+        }
     }
 }
