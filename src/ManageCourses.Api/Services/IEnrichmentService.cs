@@ -11,6 +11,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email);
         void SaveCourseEnrichment(CourseEnrichmentModel model, string instCode, string ucasCourseCode, string email);
         bool PublishCourseEnrichment(string instCode, string ucasCourseCode, string email);
-        IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email);        
+        IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email);
+        InstitutionEnrichmentModel GetPublishableInstitutionEnrichmentModel(string instCode, string email);
     }
 }

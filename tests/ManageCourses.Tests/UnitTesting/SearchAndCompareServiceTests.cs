@@ -56,12 +56,12 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             _dataServiceMock.Setup(x => x.GetCourse(email, InstitutionCode, CourseCode))
                 .Returns(new Course { CourseCode = CourseCode, InstCode = InstitutionCode, ProgramType = "SD", Subjects = "History", Name = "History"});
 
-            _enrichmentServiceMock.Setup(x => x.GetInstitutionEnrichment(InstitutionCode, email))
-                .Returns(new UcasInstitutionEnrichmentGetModel());
+            _enrichmentServiceMock.Setup(x => x.GetPublishableInstitutionEnrichmentModel(InstitutionCode, email))
+                .Returns(new InstitutionEnrichmentModel());
 
             var enrichmentModel = new CourseEnrichmentModel {FeeDetails = "It's gonna cost you", FeeInternational = (Decimal)123.5, FeeUkEu = (Decimal)234.5};
             _enrichmentServiceMock.Setup(x => x.GetCourseEnrichment(InstitutionCode, CourseCode, email))
-                .Returns(new UcasCourseEnrichmentGetModel { CourseCode = CourseCode, InstCode = InstitutionCode, EnrichmentModel = enrichmentModel});
+                .Returns(new UcasCourseEnrichmentGetModel { CourseCode = CourseCode, InstCode = InstitutionCode, EnrichmentModel = enrichmentModel, Status = EnumStatus.Published});
             _httpMock.Setup(x => x.PostAsync(It.Is<Uri>(y => y.AbsoluteUri == $"{sncUrl}/courses/{InstitutionCode}/{CourseCode}"), It.IsAny<StringContent>())).ReturnsAsync(
                 new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.OK
@@ -72,6 +72,29 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             result.Should().BeTrue();
             _httpMock.VerifyAll();
+        }
+        [Test]
+        public void PublishEnrichedCourseWithEmailDraftTest()
+        {
+            var email = "tester@example.com";
+            _dataServiceMock.Setup(x => x.GetUcasInstitutionForUser(email, InstitutionCode)).Returns(new UcasInstitution
+            {
+                InstCode = InstitutionCode,
+                AccreditedUcasCourses =
+                    new List<UcasCourse> { new UcasCourse { InstCode = InstitutionCode, CrseCode = CourseCode, ProgramType = "SD", CrseTitle = "History" } }
+            });
+            _dataServiceMock.Setup(x => x.GetCourse(email, InstitutionCode, CourseCode))
+                .Returns(new Course { CourseCode = CourseCode, InstCode = InstitutionCode, ProgramType = "SD", Subjects = "History", Name = "History" });
+
+            _enrichmentServiceMock.Setup(x => x.GetPublishableInstitutionEnrichmentModel(InstitutionCode, email))
+                .Returns(new InstitutionEnrichmentModel());
+
+            var enrichmentModel = new CourseEnrichmentModel { FeeDetails = "It's gonna cost you", FeeInternational = (Decimal)123.5, FeeUkEu = (Decimal)234.5 };
+            _enrichmentServiceMock.Setup(x => x.GetCourseEnrichment(InstitutionCode, CourseCode, email))
+                .Returns(new UcasCourseEnrichmentGetModel { CourseCode = CourseCode, InstCode = InstitutionCode, EnrichmentModel = enrichmentModel, Status = EnumStatus.Draft });
+            var result = _searchAndCompareService.SaveSingleCourseToSearchAndCompare(InstitutionCode, CourseCode, email).Result;
+
+            result.Should().BeFalse();
         }
 
         [Test][Ignore("This test will fail atm. Revisit when we start publishing basic courses from here")]

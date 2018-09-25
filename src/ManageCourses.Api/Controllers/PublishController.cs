@@ -57,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             var name = this.User.Identity.Name;
             if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode))
             {
-                return NotFound();
+                return BadRequest();
             }
 
             var courseMapper = new CourseMapper();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
+using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Client;
 using GovUk.Education.SearchAndCompare.Domain.Models;
 using Microsoft.Extensions.Logging;
@@ -43,29 +44,36 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
              try
              {
                  var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-                 var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email);
+                 var orgEnrichmentData = _enrichmentService.GetPublishableInstitutionEnrichmentModel(instCode, email);
                  var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
                  var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
 
-                 var course = _courseMapper.MapToSearchAndCompareCourse(
-                     ucasInstData,
-                     ucasCourseData,
-                     orgEnrichmentData?.EnrichmentModel,
-                     courseEnrichmentData?.EnrichmentModel);
-
-                 if (course.IsValid(true))
+                 if (courseEnrichmentData.Status.Equals(EnumStatus.Published))
                  {
-                     returnBool = await _api.SaveCourseAsync(course);
-                 }
+                     var course = _courseMapper.MapToSearchAndCompareCourse(
+                         ucasInstData,
+                         ucasCourseData,
+                         orgEnrichmentData,
+                         courseEnrichmentData?.EnrichmentModel);
 
-                 if (!returnBool)
+                     if (course.IsValid(true))
+                     {
+                         returnBool = await _api.SaveCourseAsync(course);
+                     }
+
+                     if (!returnBool)
+                     {
+                         _logger.LogError($"Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
+                     }
+                }
+                else
                  {
-                     _logger.LogError($"Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
-                 }
+                    _logger.LogError($"Save course to search and compare failed for course because the course status was draft: {courseCode}, Institution: {instCode}");
+                }
             }
             catch (Exception e)
              {
-                 _logger.LogError(e, $"Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
+                 _logger.LogError(e, $"An unexpected error occured. Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
              }
 
              return returnBool;
