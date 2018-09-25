@@ -90,11 +90,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                             CampusCode = school.Code,
                             Location = new Location
                             {
-                                Address = MapAddress(school),
-
-                                // todo: still relevant?
-                                Latitude = 0,
-                                Longitude = 0
+                                Address = MapAddress(school)
                             }
                         }
                     ).ToList()),
