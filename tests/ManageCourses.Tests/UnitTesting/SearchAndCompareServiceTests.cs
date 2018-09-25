@@ -17,7 +17,7 @@ using NUnit.Framework;
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
-    public class PublishServiceTests
+    public class SearchAndCompareServiceTests
     {
         private Mock<IEnrichmentService> _enrichmentServiceMock;
         private Mock<IDataService> _dataServiceMock;
