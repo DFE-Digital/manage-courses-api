@@ -35,11 +35,15 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var insts = context.UcasInstitutions.ToDictionary(x => x.InstCode);
 
             var courseEnrichments = context.CourseEnrichments
+                .Include(x => x.CreatedByUser)
+                .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.UcasCourseCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
 
             var orgEnrichments = context.InstitutionEnrichments
+                .Include(x => x.CreatedByUser)
+                .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.InstCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
