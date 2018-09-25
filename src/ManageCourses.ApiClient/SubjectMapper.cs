@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text.RegularExpressions;
 
 namespace GovUk.Education.ManageCourses.ApiClient
 {
@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
         private static string[] ucasMflWelsh;
         private static string[] ucasDesignAndTech;
         private static string[] ucasDirectTranslationSecondary;
-        private static string[] ucasNeedsMentionInTitle;
+        private static Dictionary<string,Regex> ucasNeedsMentionInTitle;
         private static string[] ucasUnexpected;
 
         private static IDictionary<string,string> ucasRename;
@@ -101,11 +101,11 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 "social science"
             };
 
-            ucasNeedsMentionInTitle = new string[] 
+            ucasNeedsMentionInTitle = new Dictionary<string, Regex>
             {
-                "humanities",
-                "science",
-                "modern studies"            
+                {"humanities", new Regex("humanities")},
+                {"science", new Regex("(?<!social |computer )science")},
+                {"modern studies", new Regex("modern studies")}            
             };
 
             ucasFurtherEducation = new string[] 
@@ -182,6 +182,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 {"art / art & design", "art and design"},
                 {"business education", "business studies"},
                 {"computer studies", "computing"},
+                {"science", "balanced science"},
                 {"dance and performance", "dance"},
                 {"drama and theatre studies", "drama"},
                 {"social science", "social sciences"}
@@ -328,9 +329,9 @@ namespace GovUk.Education.ManageCourses.ApiClient
             }
 
             //  needs mention
-            foreach(var ucasSubject in ucasSubjects.Intersect(ucasNeedsMentionInTitle))
+            foreach(var ucasSubject in ucasSubjects.Intersect(ucasNeedsMentionInTitle.Keys))
             {
-                if (courseTitle.IndexOf(ucasSubject) > -1)
+                if (ucasNeedsMentionInTitle[ucasSubject].IsMatch(courseTitle))
                 {
                     secondarySubjects.Add(MapToSubjectName(ucasSubject));
                 }
