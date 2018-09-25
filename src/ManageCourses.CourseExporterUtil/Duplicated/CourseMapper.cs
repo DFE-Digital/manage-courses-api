@@ -15,7 +15,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil.Duplicated
 {
     public class CourseMapper
     {
-        private SubjectMapper subjectMapper = new SubjectMapper();
+        private GovUk.Education.ManageCourses.ApiClient.SubjectMapper subjectMapper = new GovUk.Education.ManageCourses.ApiClient.SubjectMapper();
 
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
