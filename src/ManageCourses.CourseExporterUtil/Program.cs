@@ -68,6 +68,12 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                     continue;
                 }
 
+                if (!mappedCourse.CourseSubjects.Any())
+                {
+                    // only publish courses we could map to one or more subjects.
+                    continue;
+                }
+
                 // hacks - remove when coursemapper refactor has completed
                 mappedCourse.ProviderLocation = new Location { Address = mappedCourse.ContactDetails.Address };
                 mappedCourse.Fees = mappedCourse.Fees ?? new Fees();
