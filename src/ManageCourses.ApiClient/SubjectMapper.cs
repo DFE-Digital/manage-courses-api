@@ -228,7 +228,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 .Concat(ucasMflOther);
 
             var ucasPrimaryScienceSpecialisation = new string[] {"science"}            
-                .Concat(ucasMathemtics)
                 .Concat(ucasPhysics)
                 .Concat(ucasScienceFields);
 

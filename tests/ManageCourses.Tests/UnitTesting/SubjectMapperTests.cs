@@ -31,6 +31,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase("Computer science", "computer studies, science", "Computing")] // here science is used as a category
         [TestCase("Computer science with Science", "computer studies, science", "Computing, Balanced science")] // here, it is explicit
 
+        [TestCase("Primary with Mathematics", "primary, mathematics", "Primary, Primary with mathematics")] // bug fix test: accidentally included maths in the list of sciences
         public void MapToSearchAndCompareCourse(string courseTitle, string commaSeparatedUcasSubjects, string commaSeparatedExpectedSubjects)
         {
             var expected = commaSeparatedExpectedSubjects.Split(", ");
