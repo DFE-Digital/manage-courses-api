@@ -70,6 +70,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
             var mappedCourse = new SearchAndCompare.Domain.Models.Course
             {
                 Duration = MapCourseLength(courseEnrichmentModel.CourseLength),
+                StartDate = ucasCourseData.StartDate,
                 Name = ucasCourseData.Name,
                 ProgrammeCode = ucasCourseData.CourseCode,
                 Provider = provider,

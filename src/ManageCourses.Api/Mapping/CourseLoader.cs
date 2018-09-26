@@ -53,6 +53,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 returnCourse.ProgramType = organisationCourseRecord.ProgramType;
                 returnCourse.ProfpostFlag = organisationCourseRecord.ProfpostFlag;
                 returnCourse.StudyMode = organisationCourseRecord.Studymode;
+                returnCourse.StartDate = DateTime.TryParse($"{organisationCourseRecord.StartYear} {organisationCourseRecord.StartMonth}", out DateTime startDate) ? (DateTime?) startDate : null;
                 var subjects = organisationCourseRecord.CourseCode.UcasCourseSubjects
                     .Select(x => x.UcasSubject.SubjectDescription).ToList();
 
