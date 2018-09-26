@@ -22,9 +22,11 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 returnCourses.InstitutionName = organisationCourseRecord.UcasInstitution.InstFull;
                 returnCourses.InstitutionCode = organisationCourseRecord.InstCode;
                 returnCourses.Courses = new List<Course>();
-                foreach (var courseCode in courseRecords.Select(c => c.CrseCode).Distinct())
+                var courseRecordGroupings = courseRecords.GroupBy(x => x.CrseCode);
+                var enrichmentGroupings = enrichmentMetadata.ToLookup(x => x.CourseCode);
+                foreach (var grouping in courseRecordGroupings)
                 {
-                    returnCourses.Courses.Add(LoadCourse(courseRecords.Where(c => c.CrseCode == courseCode).ToList(), enrichmentMetadata));
+                    returnCourses.Courses.Add(LoadCourse(grouping.ToList(), enrichmentGroupings[grouping.Key] ?? new List<UcasCourseEnrichmentGetModel>()));
                 }
             }
 
