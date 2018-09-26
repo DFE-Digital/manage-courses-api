@@ -23,16 +23,20 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
         {   
             var context = GetContext();
 
+            Console.WriteLine("Retrieve courses");
+
             var ucasCourses = context.UcasCourses.Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
                 .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
                 .Include(x => x.AccreditingProviderInstitution)
                 .Include(x => x.UcasCampus)
                 .ToList();
-
-            var courses = new CourseLoader().LoadCourses(ucasCourses, new List<UcasCourseEnrichmentGetModel>());
-
+        
+            Console.WriteLine("Retrieve institutions");
             var insts = context.UcasInstitutions.ToDictionary(x => x.InstCode);
+
+            
+            Console.WriteLine("Retrieve enrichments");
 
             var courseEnrichments = context.CourseEnrichments
                 .Include(x => x.CreatedByUser)
@@ -48,10 +52,16 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .ToLookup(x => x.InstCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
 
+            Console.WriteLine("Load courses");
+            var courses = new CourseLoader().LoadCourses(ucasCourses, new List<UcasCourseEnrichmentGetModel>());
+            
+
             var courseMapper = new CourseMapper();
             var converter = new EnrichmentConverter();
 
             var mappedCourses = new List<SearchAndCompare.Domain.Models.Course>();
+
+            Console.WriteLine("Combine courses with institution and enrichment data");
 
             foreach(var c in courses.Courses)
             {
@@ -70,6 +80,8 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
                 if (!mappedCourse.CourseSubjects.Any())
                 {
+
+                    Console.WriteLine($"failed to assign subject to {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
                 }
@@ -82,6 +94,8 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 mappedCourses.Add(mappedCourse);
             } 
 
+            Console.WriteLine("Saving to JSON");
+
             var asJson = JsonConvert.SerializeObject(mappedCourses, new JsonSerializerSettings
             {
                 MissingMemberHandling = MissingMemberHandling.Ignore,
@@ -89,6 +103,8 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             });
 
             System.IO.File.WriteAllText("out.json", asJson);
+
+            Console.WriteLine("Done");
         }
 
         private static ManageCoursesDbContext GetContext()
