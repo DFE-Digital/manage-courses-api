@@ -32,6 +32,12 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase("Computer science with Science", "computer studies, science", "Computing, Balanced science")] // here, it is explicit
 
         [TestCase("Primary with Mathematics", "primary, mathematics", "Primary, Primary with mathematics")] // bug fix test: accidentally included maths in the list of sciences
+        
+        [TestCase("Mfl", "languages", "Modern languages (other)")]
+        [TestCase("Latin", "latin", "Classics")] // latin and classics have been merged
+        [TestCase("Primary (geo)", "primary, geography", "Primary, Primary with history and geography")] // Primary with hist/geo have beeen merged
+        [TestCase("Primary (history)", "primary, history", "Primary, Primary with history and geography")] // Primary with hist/geo have beeen merged
+
         public void MapToSearchAndCompareCourse(string courseTitle, string commaSeparatedUcasSubjects, string commaSeparatedExpectedSubjects)
         {
             var expected = commaSeparatedExpectedSubjects.Split(", ");
