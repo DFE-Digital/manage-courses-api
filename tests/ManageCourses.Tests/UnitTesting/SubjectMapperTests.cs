@@ -21,12 +21,17 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         // examples of how the title is considered when adding additional subjects
         [TestCase("Physics",   "physics, secondary, science, english", "Physics")]  
         [TestCase("Physics with English",   "physics, secondary, science, english", "Physics, English")] 
-        [TestCase("Physics with Science",   "physics, secondary, science, english", "Physics, Science")]
-        [TestCase("Physics with Science and English",   "physics, secondary, science, english", "Physics, Science, English")]
+        [TestCase("Physics with Science",   "physics, secondary, science, english", "Physics, Balanced science")]
+        [TestCase("Physics with Science and English",   "physics, secondary, science, english", "Physics, Balanced science, English")]
 
         [TestCase("Further ed",             "further education, numeracy", "Further education")] // further education examplpe
         [TestCase("MFL (Chinese)",          "secondary, languages, languages (asian), chinese", "Mandarin")] // a rename
         [TestCase("",                       "secondary, welsh", "Welsh")] // an example of welsh, which only triggers if nothing else goes
+
+        [TestCase("Computer science", "computer studies, science", "Computing")] // here science is used as a category
+        [TestCase("Computer science with Science", "computer studies, science", "Computing, Balanced science")] // here, it is explicit
+
+        [TestCase("Primary with Mathematics", "primary, mathematics", "Primary, Primary with mathematics")] // bug fix test: accidentally included maths in the list of sciences
         public void MapToSearchAndCompareCourse(string courseTitle, string commaSeparatedUcasSubjects, string commaSeparatedExpectedSubjects)
         {
             var expected = commaSeparatedExpectedSubjects.Split(", ");
