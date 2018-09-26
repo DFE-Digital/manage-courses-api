@@ -27,6 +27,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
         private static string[] ucasMathemtics;
         private static string[] ucasPhysics;
         private static string[] ucasScienceFields;
+        private static string[] ucasClassics;
         private static string[] ucasMflMain;
         private static string[] ucasMflOther;
         private static string[] ucasMflWelsh;
@@ -57,8 +58,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 "french",
                 "german",
                 "italian",
-                "japanese",
-                "latin",              
+                "japanese",          
                 "russian",
                 "spanish"
             };
@@ -89,12 +89,17 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 "engineering"
             };
 
+            ucasClassics = new string[]
+            {
+                "classics",
+                "latin"
+            };
+
             ucasDirectTranslationSecondary = new string[]
             {
                 "art / art & design",
                 "business education",
                 "citizenship",
-                "classics",
                 "communication and media studies",
                 "computer studies",                
                 "dance and performance",
@@ -260,22 +265,18 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 .Concat(ucasPhysics)
                 .Concat(ucasScienceFields);
 
+            var ucasPrimaryHistGeoSpecialisation = new string[] {"geography", "history"};
+
             // Does the subject list mention English?
             if(ucasSubjects.Intersect(ucasEnglish).Any())
             {
                 primarySubjects.Add("Primary with English");
             }
 
-            // Does the subject list mention geography?
-            if(ucasSubjects.Contains("geography"))
+            // Does the subject list mention geography or history?
+            if(ucasSubjects.Intersect(ucasPrimaryHistGeoSpecialisation).Any())
             {
-                primarySubjects.Add("Primary with geography");
-            }
-
-            // Does the subject list mention history?
-            if(ucasSubjects.Contains("history"))
-            {
-                primarySubjects.Add("Primary with history");
+                primarySubjects.Add("Primary with history and geography");
             }
 
             // Does the subject list mention maths?
@@ -332,6 +333,12 @@ namespace GovUk.Education.ManageCourses.ApiClient
             {
                 secondarySubjects.Add("Design and technology");
             }
+
+            // Does the subject list mention Classics?            
+            if (ucasSubjects.Intersect(ucasClassics).Any())
+            {
+                secondarySubjects.Add("Classics");
+            }
             
 
             // Does the subject list mention Mandarin Chinese
@@ -345,12 +352,12 @@ namespace GovUk.Education.ManageCourses.ApiClient
             {
                 secondarySubjects.Add(MapToSubjectName(ucasSubject));
             }
+            
             //  Does the subject list mention languages but hasn't already been covered?
             if (ucasSubjects.Intersect(ucasLanguageCat).Any() && !ucasSubjects.Intersect(ucasMflMandarin).Any() && !ucasSubjects.Intersect(ucasMflMain).Any())
             {
-                secondarySubjects.Add("Modern language (other)");
-            }
-            
+                secondarySubjects.Add("Modern languages (other)");
+            }            
 
             // Does the subject list mention one or more sciences?
             foreach(var ucasSubject in ucasSubjects.Intersect(ucasScienceFields))
