@@ -17,6 +17,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Status { get; set; }
         public string VacStatus { get; set; }
         public string HasBeenPublished { get; set; }
+        public string StartYear { get; set; }
+        public string StartMonth { get; set; }
 
         public UcasInstitution UcasInstitution { get; set; }
         public UcasInstitution AccreditingProviderInstitution { get; set; }
