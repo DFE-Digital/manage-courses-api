@@ -118,7 +118,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
 
             var emptyEnrichment = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
-            emptyEnrichment.Should().BeNull("we haven't enriched the institution data yet");
+            emptyEnrichment.Status.Should().Be(EnumStatus.Draft, "no enrichments saved yet");
 
             //test save
             enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);

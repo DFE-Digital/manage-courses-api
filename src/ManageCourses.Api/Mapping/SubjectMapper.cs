@@ -1,9 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using System.Text.RegularExpressions;
 namespace GovUk.Education.ManageCourses.Api.Mapping
 {
+    /// <summary>
+    /// This maps a list of of UCAS subjects to our interpretation of subjects.
+    /// UCAS subjects are a pretty loose tagging system where individual tags don't always
+    /// represent the subjects you will be able to teach but also categories (such as "secundary", "foreign languages" etc)
+    /// there is also duplication ("chinese" vs "mandarin") and ambiguity 
+    /// (does "science" = Balanced science, a category, or Primary with science?)
+    /// 
+    /// This takes this list of tags and the course title and applies heuristics to determine
+    /// which subjects you will be allowed to teach when you graduate, making the subjects more suitable for searching.
+    /// </summary>
     public class SubjectMapper
     {
         private static string[] ucasEnglish;
@@ -16,12 +26,13 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
         private static string[] ucasMathemtics;
         private static string[] ucasPhysics;
         private static string[] ucasScienceFields;
+        private static string[] ucasClassics;
         private static string[] ucasMflMain;
         private static string[] ucasMflOther;
         private static string[] ucasMflWelsh;
         private static string[] ucasDesignAndTech;
         private static string[] ucasDirectTranslationSecondary;
-        private static string[] ucasNeedsMentionInTitle;
+        private static Dictionary<string,Regex> ucasNeedsMentionInTitle;
         private static string[] ucasUnexpected;
 
         private static IDictionary<string,string> ucasRename;
@@ -46,8 +57,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 "french",
                 "german",
                 "italian",
-                "japanese",
-                "latin",              
+                "japanese",          
                 "russian",
                 "spanish"
             };
@@ -78,12 +88,17 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 "engineering"
             };
 
+            ucasClassics = new string[]
+            {
+                "classics",
+                "latin"
+            };
+
             ucasDirectTranslationSecondary = new string[]
             {
                 "art / art & design",
                 "business education",
                 "citizenship",
-                "classics",
                 "communication and media studies",
                 "computer studies",                
                 "dance and performance",
@@ -100,11 +115,11 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 "social science"
             };
 
-            ucasNeedsMentionInTitle = new string[] 
+            ucasNeedsMentionInTitle = new Dictionary<string, Regex>
             {
-                "humanities",
-                "science",
-                "modern studies"            
+                {"humanities", new Regex("humanities", RegexOptions.Compiled)},
+                {"science", new Regex("(?<!social |computer )science", RegexOptions.Compiled)},
+                {"modern studies", new Regex("modern studies", RegexOptions.Compiled)}            
             };
 
             ucasFurtherEducation = new string[] 
@@ -181,11 +196,26 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 {"art / art & design", "art and design"},
                 {"business education", "business studies"},
                 {"computer studies", "computing"},
+                {"science", "balanced science"},
                 {"dance and performance", "dance"},
                 {"drama and theatre studies", "drama"},
                 {"social science", "social sciences"}
             };
         }
+
+        /// <summary> 
+        /// This maps a list of of UCAS subjects to our interpretation of subjects.
+        /// UCAS subjects are a pretty loose tagging system where individual tags don't always
+        /// represent the subjects you will be able to teach but also categories (such as "secundary", "foreign languages" etc)
+        /// there is also duplication ("chinese" vs "mandarin") and ambiguity 
+        /// (does "science" = Balanced science, a category, or Primary with science?)
+        /// 
+        /// This takes this list of tags and the course title and applies heuristics to determine
+        /// which subjects you will be allowed to teach when you graduate, making the subjects more suitable for searching.
+        /// </summary>
+        /// <param name="courseTitle">The name of the course</param>
+        /// <param name="ucasSubjects">The subject tags from UCAS</param>
+        /// <returns>An enumerable of all the subjects the course should be findable by.</returns>
         public IEnumerable<string> GetSubjectList(string courseTitle, IEnumerable<string> ucasSubjects)
         {            
             ucasSubjects = ucasSubjects.Select(x => x.ToLowerInvariant().Trim());
@@ -197,19 +227,24 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 throw new ArgumentException("found unsupported subject name");
             }            
             
-            // Primary?
+            // If the subject indicates that it's primary, do not associate it with any
+            // Secondary subjects (that happens a lot in UCAS data). Instead, mark it as primary
+            // and additionally test for specialisations (e.g. Pimary with mathematics)
+            // note a course can cover multiple specialisations, e.g. Primary with geography and Primary with history
             else if (ucasSubjects.Intersect(ucasPrimary).Any())
             {
                 return MapToPrimarySubjects(ucasSubjects);
             }
             
-            // further education?
+            // If the subject indicates that it's in the Further Education space, 
+            // just assign Further education to it and do not associate it with any
+            // secondary subjects
             else if (ucasSubjects.Intersect(ucasFurtherEducation).Any())
             {
                 return new List<string>() { "Further education" };                
             }
 
-            // now we're in secondary world
+            // The most common case is when the course is teaching secondary subjects.
             else
             {
                 return MapToSecondarySubjects(courseTitle, ucasSubjects);
@@ -226,40 +261,42 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 .Concat(ucasMflOther);
 
             var ucasPrimaryScienceSpecialisation = new string[] {"science"}            
-                .Concat(ucasMathemtics)
                 .Concat(ucasPhysics)
                 .Concat(ucasScienceFields);
 
+            var ucasPrimaryHistGeoSpecialisation = new string[] {"geography", "history"};
+
+            // Does the subject list mention English?
             if(ucasSubjects.Intersect(ucasEnglish).Any())
             {
                 primarySubjects.Add("Primary with English");
             }
 
-            if(ucasSubjects.Contains("geography"))
+            // Does the subject list mention geography or history?
+            if(ucasSubjects.Intersect(ucasPrimaryHistGeoSpecialisation).Any())
             {
-                primarySubjects.Add("Primary with geography");
+                primarySubjects.Add("Primary with history and geography");
             }
 
-            if(ucasSubjects.Contains("history"))
-            {
-                primarySubjects.Add("Primary with history");
-            }
-
+            // Does the subject list mention maths?
             if(ucasSubjects.Intersect(ucasMathemtics).Any())
             {
                 primarySubjects.Add("Primary with mathematics");
             }
 
+            // Does the subject list mention any mfl subject?
             if(ucasSubjects.Intersect(ucasPrimaryLanguageSpecialisation).Any())
             {
                 primarySubjects.Add("Primary with modern languages");
             }            
 
+            // Does the subject list mention PE?
             if(ucasSubjects.Contains("physical education"))
             {
                 primarySubjects.Add("Primary with physical education");
             }
 
+            // Does the subject list mention science?
             if(ucasSubjects.Intersect(ucasPrimaryScienceSpecialisation).Any())
             {
                 primarySubjects.Add("Primary with science");
@@ -272,70 +309,77 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
         {
             var secondarySubjects = new List<string>();
 
-            //  maths
+            // Does the subject list mention maths?
             if (ucasSubjects.Intersect(ucasMathemtics).Any())
             {
                 secondarySubjects.Add("Mathematics");
             }
 
-            //  physics
+            // Does the subject list mention physics?
             if (ucasSubjects.Intersect(ucasPhysics).Any())
             {
                 secondarySubjects.Add("Physics");
             }
 
-            //  ict
+            // Does the subject list mention ICT?
             if (ucasSubjects.Intersect(ucasIct).Any())
             {
                 secondarySubjects.Add("Information and communication technology (ICT)");
             }
 
-            //  dt
+            // Does the subject list mention D&T?
             if (ucasSubjects.Intersect(ucasDesignAndTech).Any())
             {
                 secondarySubjects.Add("Design and technology");
             }
 
-            //  mfl other
-            if (ucasSubjects.Intersect(ucasLanguageCat).Any() && !ucasSubjects.Intersect(ucasMflMandarin).Any() && !ucasSubjects.Intersect(ucasMflMain).Any())
+            // Does the subject list mention Classics?            
+            if (ucasSubjects.Intersect(ucasClassics).Any())
             {
-                secondarySubjects.Add("Modern language (other)");
+                secondarySubjects.Add("Classics");
             }
+            
 
-            // mfl - mandarin chinese
+            // Does the subject list mention Mandarin Chinese
             if (ucasSubjects.Intersect(ucasMflMandarin).Any())
             {
                 secondarySubjects.Add("Mandarin");
             }
 
-            //  mfl
+            //  Does the subject list mention a mainstream foreign language
             foreach(var ucasSubject in ucasSubjects.Intersect(ucasMflMain))
             {
                 secondarySubjects.Add(MapToSubjectName(ucasSubject));
             }
+            
+            //  Does the subject list mention languages but hasn't already been covered?
+            if (ucasSubjects.Intersect(ucasLanguageCat).Any() && !ucasSubjects.Intersect(ucasMflMandarin).Any() && !ucasSubjects.Intersect(ucasMflMain).Any())
+            {
+                secondarySubjects.Add("Modern languages (other)");
+            }            
 
-            //  sciences
+            // Does the subject list mention one or more sciences?
             foreach(var ucasSubject in ucasSubjects.Intersect(ucasScienceFields))
             {
                 secondarySubjects.Add(MapToSubjectName(ucasSubject));
             }
 
-            //  direct translation
+            // Does the subject list mention a subject we are happy to translate directly?
             foreach(var ucasSubject in ucasSubjects.Intersect(ucasDirectTranslationSecondary))
             {
                 secondarySubjects.Add(MapToSubjectName(ucasSubject));
             }
 
-            //  needs mention
-            foreach(var ucasSubject in ucasSubjects.Intersect(ucasNeedsMentionInTitle))
+            // Does the subject list mention a subject we are happy to translate if the course title contains a mention?
+            foreach(var ucasSubject in ucasSubjects.Intersect(ucasNeedsMentionInTitle.Keys))
             {
-                if (courseTitle.IndexOf(ucasSubject) > -1)
+                if (ucasNeedsMentionInTitle[ucasSubject].IsMatch(courseTitle))
                 {
                     secondarySubjects.Add(MapToSubjectName(ucasSubject));
                 }
             }
 
-            //  english (check title if not only one ambiguous)
+            // Does the subject list mention english, and it's mentioned in the title (or it's the only subject we know for this course)?
             if (ucasSubjects.Intersect(ucasEnglish).Any())
             {
                 if (!secondarySubjects.Any() || courseTitle.IndexOf("english") > -1)
