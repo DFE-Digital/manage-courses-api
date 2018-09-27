@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-
-namespace GovUk.Education.ManageCourses.ApiClient
+namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     /// <summary>
     /// This maps a list of of UCAS subjects to our interpretation of subjects.

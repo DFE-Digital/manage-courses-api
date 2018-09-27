@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ManageCourses.Api.Model;
 
-namespace GovUk.Education.ManageCourses.ApiClient.Helpers
+namespace GovUk.Education.ManageCourses.Api.Helpers
 {
-    public static class ViewModelHelpers
+    public static class CourseHelpers
     {
         public static string GetCourseVariantType(this Course course)
         {
@@ -41,7 +43,7 @@ namespace GovUk.Education.ManageCourses.ApiClient.Helpers
                 case "he":
                     return "Higher education programme";
                 case "sd":
-                    return "School Direct training programme";                
+                    return "School Direct training programme";
                 case "ss":
                     return "School Direct (salaried) training programme";
                 case "sc":

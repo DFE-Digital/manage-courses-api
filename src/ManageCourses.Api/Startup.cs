@@ -1,6 +1,9 @@
-﻿using System.Reflection;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.AccessRequests;
@@ -8,8 +11,10 @@ using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Config;
 using GovUk.Education.ManageCourses.Api.Services.Invites;
+using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.Api.Services.Users;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.SearchAndCompare.Domain.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +43,7 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddLogging(loggingBuilder =>
                 loggingBuilder.AddSerilog(dispose: true));
 
-            var mcConfig = new DatabaseConfig(Configuration);
+            var mcConfig = new McConfig(Configuration);
             mcConfig.Validate();
             var connectionString = mcConfig.BuildConnectionString();
 
@@ -58,13 +63,15 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddAuthentication()
                 .AddBearerToken(options =>
                 {
-                    options.UserinfoEndpoint = Configuration["auth:oidc:userinfo_endpoint"];
+                    options.UserinfoEndpoint = mcConfig.SignInUserInfoEndpoint;
                 })
                 .AddBearerTokenApiKey(options =>
                 {
-                    options.ApiKey = Configuration["api:key"];
+                    options.ApiKey = mcConfig.ApiKey;
                 });
-
+            
+            services.AddScoped<ISearchAndCompareService, SearchAndCompareService>();
+            services.AddScoped<ICourseMapper, CourseMapper>();
             services.AddScoped<IDataService, DataService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IInviteService, InviteService>();
@@ -79,13 +86,19 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IAccessRequestService>(provider =>
             {
                 return new AccessRequestService(provider.GetService<IManageCoursesDbContext>(),
-                 new EmailServiceFactory(Configuration["email:api_key"])
+                 new EmailServiceFactory(mcConfig.EmailApiKey)
                  .MakeAccessRequestEmailService(
-                     Configuration["email:template_id"],
-                     Configuration["email:user"]
+                     mcConfig.EmailTemplateId,
+                     mcConfig.EmailUser
                  ));
             });
 
+            services.AddScoped<ISearchAndCompareApi>(provider =>
+            {
+                var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", mcConfig.SearchAndCompareApiKey);
+                return new SearchAndCompareApi(httpClient, mcConfig.SearchAndCompareApiUrl);
+            });
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
             services.AddScoped<IDataHelper, UserDataHelper>();
 

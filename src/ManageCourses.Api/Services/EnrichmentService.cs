@@ -26,19 +26,26 @@ namespace GovUk.Education.ManageCourses.Api.Services
         /// </summary>
         /// <param name="instCode">institution code for the enrichment</param>
         /// <param name="email">email of the user</param>
+        /// <param name="publishableOnly">if there is a draft enrichment then get the ucas contact details</param>
         /// <returns>
         /// An enrichment object with the enrichment data.
         /// If there is nothing in the db then an empty record with Ucas contact details will be returned.
         /// </returns>
-        public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email)
+        public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email, bool publishableOnly)
         {
             ValidateUserOrg(email, instCode);
 
             instCode = instCode.ToUpperInvariant();
 
-            var enrichment = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode)
-                .OrderByDescending(x => x.Id)
+            var enrichmentsQuery = _context.InstitutionEnrichments
+                .Where(ie => ie.InstCode == instCode);
+
+            if (publishableOnly)
+            {
+                enrichmentsQuery = enrichmentsQuery.Where(ie => ie.Status == EnumStatus.Published);
+            }
+
+            var enrichment = enrichmentsQuery.OrderByDescending(x => x.Id)
                 .Include(e => e.CreatedByUser)
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
@@ -75,7 +82,6 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             return enrichmentGetModel;
         }
-
         /// <summary>
         /// This is an upsert.
         /// If a draft record exists then update it.
