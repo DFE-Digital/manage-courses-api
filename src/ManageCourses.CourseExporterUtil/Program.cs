@@ -42,7 +42,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.CreatedByUser)
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
-                .ToLookup(x => x.UcasCourseCode)
+                .ToLookup(x => x.InstCode + "_@@_" + x.UcasCourseCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
 
             var orgEnrichments = context.InstitutionEnrichments
@@ -69,7 +69,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                     insts[c.InstCode],
                     c,
                     converter.Convert(orgEnrichments.GetValueOrDefault(c.InstCode))?.EnrichmentModel,
-                    converter.Convert(courseEnrichments.GetValueOrDefault(c.CourseCode))?.EnrichmentModel
+                    converter.Convert(courseEnrichments.GetValueOrDefault(c.InstCode + "_@@_" + c.CourseCode))?.EnrichmentModel
                 );
 
                 if (!mappedCourse.Campuses.Any())
@@ -81,7 +81,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 if (!mappedCourse.CourseSubjects.Any())
                 {
 
-                    Console.WriteLine($"failed to assign subject to {c.Name}. UCAS tags: {c.Subjects}");
+                    Console.WriteLine($"failed to assign subject to [{c.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
                 }
