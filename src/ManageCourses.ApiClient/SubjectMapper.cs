@@ -21,7 +21,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
         private static string[] ucasMflMandarin;
         private static string[] ucasFurtherEducation;
         private static string[] ucasPrimary;
-        private static string[] ucasIct;
         private static string[] ucasLanguageCat;
         private static string[] ucasOther;
         private static string[] ucasMathemtics;
@@ -139,11 +138,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 "upper primary",
                 "primary",
                 "lower primary"
-            };
-
-            ucasIct = new string[] {
-                "information communication technology",
-                "information technology"
             };
 
             ucasLanguageCat = new string[] 
@@ -320,12 +314,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
             if (ucasSubjects.Intersect(ucasPhysics).Any())
             {
                 secondarySubjects.Add("Physics");
-            }
-
-            // Does the subject list mention ICT?
-            if (ucasSubjects.Intersect(ucasIct).Any())
-            {
-                secondarySubjects.Add("Information and communication technology (ICT)");
             }
 
             // Does the subject list mention D&T?

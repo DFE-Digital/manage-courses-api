@@ -59,7 +59,8 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 };
 
             var routeName = ucasCourseData.GetRoute();
-            var isSalaried = string.Equals(ucasCourseData?.ProgramType, "ss", StringComparison.InvariantCultureIgnoreCase);
+            var isSalaried = string.Equals(ucasCourseData?.ProgramType, "ss", StringComparison.InvariantCultureIgnoreCase)
+                          || string.Equals(ucasCourseData?.ProgramType, "ta", StringComparison.InvariantCultureIgnoreCase);
             var fees = courseEnrichmentModel.FeeUkEu.HasValue ? new Fees
             {
                 Uk = (int)(courseEnrichmentModel.FeeUkEu ?? 0),
