@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Data;
@@ -76,7 +77,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             GetCoursesForUser_isNull(TestUserEmail1, null);
             GetCoursesForUser_isNull(TestUserEmail2, null);
             GetCoursesForUser_isNull(TestUserEmail3, OrgId1);
-        }
+        }        
 
         [Test]
         public void RepeatImportsArePossible()
@@ -457,7 +458,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         InstCode = InstCode1,
                         CrseCode = "COURSECODE_1",
-                        Status = "N",
+                        Status = "N"
                     }
                 }
             };

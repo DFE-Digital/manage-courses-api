@@ -196,7 +196,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     Publish = course.Publish,
                     Status = course.Status,
                     VacStatus = course.VacStatus,
-                    HasBeenPublished = course.HasBeenPublished
+                    HasBeenPublished = course.HasBeenPublished,
+                    StartYear = course.StartYear,
+                    StartMonth = course.StartMonth
                 });
             }
             foreach (var courseSubject in payload.CourseSubjects.Where(c => c.InstCode == instCode))
