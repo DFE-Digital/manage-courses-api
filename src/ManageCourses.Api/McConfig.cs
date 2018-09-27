@@ -84,7 +84,7 @@ namespace GovUk.Education.ManageCourses.Api
         public string SearchAndCompareApiUrl => _configuration[ConfigKeyForSearchAndCompareApiUrl];
 
         private string PgServer => _configuration[ConfigKeyForPgServer];
-        private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5001";
+        private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
         private string PgDatabase => _configuration[ConfigKeyForPgDatabase];
         private string PgUser => _configuration[ConfigKeyForPgUsername];
         private string PgPassword => _configuration["PG_PASSWORD"];
