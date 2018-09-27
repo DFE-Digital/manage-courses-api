@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
              try
              {
                  var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-                 var orgEnrichmentData = _enrichmentService.GetPublishableInstitutionEnrichmentModel(instCode, email);
+                 var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email, true);
                  var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
                  var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
 
@@ -53,7 +53,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                      var course = _courseMapper.MapToSearchAndCompareCourse(
                          ucasInstData,
                          ucasCourseData,
-                         orgEnrichmentData,
+                         orgEnrichmentData.EnrichmentModel,
                          courseEnrichmentData?.EnrichmentModel);
 
                      if (course.IsValid(true))

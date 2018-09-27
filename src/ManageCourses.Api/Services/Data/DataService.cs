@@ -488,7 +488,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         private UserOrganisation GetUserOrganisation(string email, string instCode)
         {
             var userOrganisation = _context.GetUserOrganisation(email, instCode);
-            var enrichment = _enrichmentService.GetInstitutionEnrichment(instCode, email);
+            var enrichment = _enrichmentService.GetInstitutionEnrichment(instCode, email, false);
 
             if (userOrganisation != null)
             {

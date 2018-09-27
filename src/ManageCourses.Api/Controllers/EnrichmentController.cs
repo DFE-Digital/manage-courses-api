@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(404)]
         public ActionResult GetInstitution(string ucasInstitutionCode)
         {
-            return Handle(() => _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name));
+            return Handle(() => _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name, false));
         }
 
         /// <summary>
