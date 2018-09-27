@@ -22,8 +22,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 returnCourses.InstitutionName = organisationCourseRecord.UcasInstitution.InstFull;
                 returnCourses.InstitutionCode = organisationCourseRecord.InstCode;
                 returnCourses.Courses = new List<Course>();
-                var courseRecordGroupings = courseRecords.GroupBy(x => x.CrseCode);
-                var enrichmentGroupings = enrichmentMetadata.ToLookup(x => x.CourseCode);
+
+                // nb - this separator uses characters that are never used in inst codes - thus avoiding ambiguity
+                var courseRecordGroupings = courseRecords.GroupBy(x => x.InstCode + "_@@_" + x.CrseCode);
+                var enrichmentGroupings = enrichmentMetadata.ToLookup(x => x.InstCode + "_@@_" + x.CourseCode);
                 foreach (var grouping in courseRecordGroupings)
                 {
                     returnCourses.Courses.Add(LoadCourse(grouping.ToList(), enrichmentGroupings[grouping.Key] ?? new List<UcasCourseEnrichmentGetModel>()));
