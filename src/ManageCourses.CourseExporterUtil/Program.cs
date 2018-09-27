@@ -7,7 +7,6 @@ using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
-using GovUk.Education.ManageCourses.CourseExporterUtil.Duplicated;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Models;
@@ -117,7 +116,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .AddEnvironmentVariables()
                 .Build();
 
-            var mcConfig = new DatabaseConfig(config);
+            var mcConfig = new McConfig(config);
             mcConfig.Validate();
             var connectionString = mcConfig.BuildConnectionString();           
         
