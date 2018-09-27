@@ -50,7 +50,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             // test draft
             var ucasInstitutionEnrichmentGetModel = new UcasInstitutionEnrichmentGetModel { Status = EnumStatus.Draft };
-            _enrichmentServiceMock.Setup(e => e.GetInstitutionEnrichment(instCode, email)).Returns(ucasInstitutionEnrichmentGetModel);
+            _enrichmentServiceMock.Setup(e => e.GetInstitutionEnrichment(instCode, email, false))
+                .Returns(ucasInstitutionEnrichmentGetModel);
             var enrichedOrg = _dataService.GetOrganisationForUser(email, instCode);
             enrichedOrg.Should().NotBeNull();
             enrichedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");

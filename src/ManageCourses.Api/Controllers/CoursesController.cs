@@ -1,6 +1,8 @@
 ﻿using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Api.Services;
+using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
@@ -9,8 +11,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class CoursesController : Controller
     {
         private readonly IDataService _dataService;
-
-        public CoursesController(IDataService dataService)
+         public CoursesController(IDataService dataService)
         {
             _dataService = dataService;
         }
