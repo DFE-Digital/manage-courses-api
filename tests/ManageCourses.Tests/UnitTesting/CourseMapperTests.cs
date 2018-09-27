@@ -13,10 +13,46 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
     [TestFixture]
     public class CourseMapperTests
     {
+        private ICourseMapper mapper = new CourseMapper();
+
+        [Test]
+        public void MapToSearchAndCompareCourse_ProviderLocation()
+        {
+            var res = mapper.MapToSearchAndCompareCourse(
+                GenerateUcasInstitution(),
+                GenearteUcasCourse(),
+                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateCourseEnrichmentModel()
+            );
+
+            res.ProviderLocation.Should().NotBeNull();
+            res.ProviderLocation.Address.Should().NotBeNull();
+            res.ContactDetails.Address.Should().NotBeNull();
+            res.ProviderLocation.Address.Should().Be(res.ContactDetails.Address);
+        }
+
+        [Test]
+        public void MapToSearchAndCompareCourse_Fees()
+        {
+            var courseEnrichmentModel = GenerateCourseEnrichmentModel();
+            courseEnrichmentModel.FeeUkEu = null;
+
+            var res = mapper.MapToSearchAndCompareCourse(
+                GenerateUcasInstitution(),
+                GenearteUcasCourse(),
+                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                courseEnrichmentModel
+            );
+
+            res.Fees.Should().NotBeNull();
+            res.Fees.Eu.Should().Be(0);
+            res.Fees.International.Should().Be(0);
+            res.Fees.Uk.Should().Be(0);
+        }
+
         [Test]
         public void MapToSearchAndCompareCourse()
         {
-            var mapper = new CourseMapper();
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
@@ -61,12 +97,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.FullTime.Should().Be(VacancyStatus.Vacancies);
             res.PartTime.Should().Be(VacancyStatus.Vacancies);
-        }        
+        }
 
         [Test]
         public void MapToSearchAndCompareCourse_Nulls()
         {
-            var mapper = new CourseMapper();
             Assert.DoesNotThrow(() => mapper.MapToSearchAndCompareCourse(null, null, null, null));
         }
 
@@ -79,14 +114,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             instEnrichment.Website = "https://overridden.com";
 
-            instEnrichment.Address1 = "Overridden1";            
+            instEnrichment.Address1 = "Overridden1";
             //nb Address2 is optional
             instEnrichment.Address3 = "Overridden3";
             instEnrichment.Address4 = "Overridden4";
-            
+
             instEnrichment.Postcode = "OverriddenPostcode";
 
-            var res = new CourseMapper().MapToSearchAndCompareCourse(
+            var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 instEnrichment,

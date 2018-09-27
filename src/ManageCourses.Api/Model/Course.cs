@@ -22,6 +22,7 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string Subjects { get; set; }
         public string StudyMode { get; set; }
         public string AgeRange { get; set; }
+        public DateTime? StartDate { get; set; }
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
         public IEnumerable<School> Schools { get; set; }
     }

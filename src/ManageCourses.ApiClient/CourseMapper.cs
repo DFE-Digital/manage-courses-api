@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
             orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
 
-            var useUcasContact = 
+            var useUcasContact =
                 string.IsNullOrWhiteSpace(orgEnrichmentModel.Email) &&
                 string.IsNullOrWhiteSpace(orgEnrichmentModel.Website) &&
                 string.IsNullOrWhiteSpace(orgEnrichmentModel.Address1) &&
@@ -65,11 +65,14 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 Uk = (int)(courseEnrichmentModel.FeeUkEu ?? 0),
                 Eu = (int)(courseEnrichmentModel.FeeUkEu ?? 0),
                 International = (int)(courseEnrichmentModel.FeeInternational ?? 0),
-            } : null;
+            } : new Fees();
 
+            var address = useUcasContact ? MapAddress(ucasInstData) :  MapAddress(orgEnrichmentModel);
             var mappedCourse = new SearchAndCompare.Domain.Models.Course
             {
+                ProviderLocation = new Location { Address = address},
                 Duration = MapCourseLength(courseEnrichmentModel.CourseLength),
+                StartDate = ucasCourseData.StartDate,
                 Name = ucasCourseData.Name,
                 ProgrammeCode = ucasCourseData.CourseCode,
                 Provider = provider,
@@ -104,7 +107,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                     Phone = useUcasContact ? ucasInstData.Telephone : orgEnrichmentModel.Telephone,
                     Email = useUcasContact ? ucasInstData.Email : orgEnrichmentModel.Email,
                     Website = useUcasContact ? ucasInstData.Url : orgEnrichmentModel.Website,
-                    Address = useUcasContact ? MapAddress(ucasInstData) :  MapAddress(orgEnrichmentModel)
+                    Address = address
                 },
 
                 ApplicationsAcceptedFrom = ucasCourseData.Schools.Select(x => {
