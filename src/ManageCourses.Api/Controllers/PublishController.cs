@@ -31,16 +31,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> PublishCourse(string instCode, string courseCode, bool sendToSearchAndCompare)
+        public async Task<ActionResult> PublishToSearchAndCompare(string instCode, string courseCode)
         {
             var name = this.User.Identity.Name;
 
-            var enrichmentResult =  _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
+            var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
 
-            if (sendToSearchAndCompare)
-            {
-                await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
-            }            
+            //await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
 
             return Ok(enrichmentResult);
         }
