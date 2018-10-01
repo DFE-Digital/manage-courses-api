@@ -17,7 +17,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
     public class CourseMapper : ICourseMapper
     {
         private SubjectMapper subjectMapper = new SubjectMapper();
-        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
+
+        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel, bool isPgde)
         {
             ucasInstData = ucasInstData ?? new UcasInstitution();
             ucasCourseData = ucasCourseData ?? new Course();
@@ -46,6 +47,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                         Name = subject
                     }
                 }).ToList());
+            var isFurtherEducation = subjects.Any(c =>
+                c.Subject.Name.Equals("Further education", StringComparison.InvariantCultureIgnoreCase));
 
             var provider = new SearchAndCompare.Domain.Models.Provider
             {
@@ -86,7 +89,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     Name = routeName,
                     IsSalaried = isSalaried
                 },
-                IncludesPgce = new QualificationMapper().MapQualification(ucasCourseData.ProfpostFlag, false),
+                IncludesPgce = new QualificationMapper().MapQualification(ucasCourseData.ProfpostFlag, isFurtherEducation, isPgde),
                 Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools
                     .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>

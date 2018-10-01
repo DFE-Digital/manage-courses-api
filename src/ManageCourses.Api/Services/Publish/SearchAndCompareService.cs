@@ -54,7 +54,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                          ucasInstData,
                          ucasCourseData,
                          orgEnrichmentData.EnrichmentModel,
-                         courseEnrichmentData?.EnrichmentModel);
+                         courseEnrichmentData?.EnrichmentModel,
+                         false); // todo: load from pgde-whitelister-thing
 
                      if (course.IsValid(true))
                      {

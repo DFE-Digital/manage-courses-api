@@ -75,7 +75,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 ucasInstData,
                 ucasCourseData,
                 orgEnrichmentData?.EnrichmentModel,
-                courseEnrichmentData?.EnrichmentModel);
+                courseEnrichmentData?.EnrichmentModel,
+                false); // todo: load from pgde-whitelister-thing
 
             return Ok(course);
         }

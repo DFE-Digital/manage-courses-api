@@ -23,7 +23,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 GenerateInstitutionEnrichmentWithoutContactDetails(),
-                GenerateCourseEnrichmentModel()
+                GenerateCourseEnrichmentModel(),
+                false
             );
 
             res.ProviderLocation.Should().NotBeNull();
@@ -42,7 +43,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 GenerateInstitutionEnrichmentWithoutContactDetails(),
-                courseEnrichmentModel
+                courseEnrichmentModel,
+                false
             );
 
             res.Fees.Should().NotBeNull();
@@ -58,7 +60,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 GenerateInstitutionEnrichmentWithoutContactDetails(),
-                GenerateCourseEnrichmentModel()
+                GenerateCourseEnrichmentModel(),
+                false
             );
 
             res.Duration.Should().Be("1 year");
@@ -103,7 +106,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void MapToSearchAndCompareCourse_Nulls()
         {
-            Assert.DoesNotThrow(() => mapper.MapToSearchAndCompareCourse(null, null, null, null));
+            Assert.DoesNotThrow(() => mapper.MapToSearchAndCompareCourse(null, null, null, null, false));
         }
 
         [Test]
@@ -126,7 +129,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 instEnrichment,
-                GenerateCourseEnrichmentModel()
+                GenerateCourseEnrichmentModel(),
+                false
             );
 
             res.ContactDetails.Address.Should().Be("Overridden1\nOverridden3\nOverridden4\nOverriddenPostcode");
