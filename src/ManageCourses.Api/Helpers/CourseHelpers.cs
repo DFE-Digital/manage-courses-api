@@ -3,14 +3,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 
 namespace GovUk.Education.ManageCourses.Api.Helpers
 {
     public static class CourseHelpers
     {
-        public static string GetCourseVariantType(this Course course)
+        public static string GetCourseVariantType(this Course course, IncludesPgce mappedQualification)
         {
-            var result = string.IsNullOrWhiteSpace(course.ProfpostFlag) ? "QTS" : "PGCE with QTS";
+            string result;
+            
+            switch(mappedQualification)
+            {
+                case IncludesPgce.No:
+                    result = "QTS";
+                    break;
+                case IncludesPgce.Yes:
+                    result = "PGCE with QTS";
+                    break;
+                case IncludesPgce.QtlsWithPgce:
+                    result = "PGCE";
+                    break;
+                case IncludesPgce.QtlsWithPgde:
+                    result = "PGDE";
+                    break;
+                case IncludesPgce.QtsWithPgde:
+                    result = "PGDE with QTS";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(mappedQualification)} is unknown value: {mappedQualification}");
+            }
 
             if ((!string.IsNullOrWhiteSpace(result)) && string.Equals(course.StudyMode, "B", StringComparison.InvariantCultureIgnoreCase))
             {
