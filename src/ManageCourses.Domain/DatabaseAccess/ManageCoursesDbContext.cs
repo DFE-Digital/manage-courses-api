@@ -164,6 +164,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
         public DbSet<McSession> McSessions { get;  set; }
+        public DbSet<PgdeCourse> PgdeCourses { get; set; }
 
         public IList<UcasCourse> GetAllUcasCourses()
         {

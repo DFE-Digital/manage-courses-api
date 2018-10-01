@@ -38,9 +38,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             _loggerMock = new Mock<ILogger<SearchAndCompareService>>();
             _httpMock = new Mock<IHttpClient>();
+            var pgdeMock = new Mock<IPgdeWhitelist>();
             var searchAndCompareApi = new SearchAndCompareApi(_httpMock.Object, sncUrl);
 
-            _searchAndCompareService = new SearchAndCompareService(searchAndCompareApi, new CourseMapper(), _dataServiceMock.Object, _enrichmentServiceMock.Object, _loggerMock.Object);
+            _searchAndCompareService = new SearchAndCompareService(searchAndCompareApi, new CourseMapper(), _dataServiceMock.Object, _enrichmentServiceMock.Object, _loggerMock.Object, pgdeMock.Object);
         }
 
         [Test]
