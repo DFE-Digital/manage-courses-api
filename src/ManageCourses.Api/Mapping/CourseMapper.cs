@@ -86,7 +86,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     Name = routeName,
                     IsSalaried = isSalaried
                 },
-                IncludesPgce = new QualificationMapper().MapQualification(ucasCourseData.ProfpostFlag),
+                IncludesPgce = new QualificationMapper().MapQualification(ucasCourseData.ProfpostFlag, false),
                 Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools
                     .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
