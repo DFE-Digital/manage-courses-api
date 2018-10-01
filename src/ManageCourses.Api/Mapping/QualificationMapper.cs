@@ -6,12 +6,12 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
     {
         public IncludesPgce MapQualification(string profpostFlag, bool isFurtherEducationCourse)
         {
-            var isPg = !string.IsNullOrWhiteSpace(profpostFlag);
             if (isFurtherEducationCourse)
             {
-                return isPg ? IncludesPgce.QtlsWithPgce : IncludesPgce.QtlsOnly;
+                return IncludesPgce.QtlsWithPgce;
             }
 
+            var isPg = !string.IsNullOrWhiteSpace(profpostFlag);
             return isPg ? IncludesPgce.Yes : IncludesPgce.No;
         }
     }

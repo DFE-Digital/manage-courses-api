@@ -25,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapsFurtherEducationToQtls()
         {
             var includesPgce = new QualificationMapper().MapQualification("", true);
-            includesPgce.Should().Be(IncludesPgce.QtlsOnly, "this is a further education course");
+            includesPgce.Should().Be(IncludesPgce.QtlsWithPgce, "this is a further education course, and we assume that these are always PGCE");
         }
 
         [Test]
