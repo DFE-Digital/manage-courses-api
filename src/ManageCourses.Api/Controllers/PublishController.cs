@@ -14,13 +14,16 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         private readonly IDataService _dataService;
         private readonly ISearchAndCompareService _searchAndCompareService;
         private readonly IEnrichmentService _enrichmentservice;
+        private readonly IPgdeWhitelist _pgdeWhitelist;
 
-        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ISearchAndCompareService searchAndCompareService)
+        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ISearchAndCompareService searchAndCompareService, IPgdeWhitelist pgdeWhitelist)
         {
             _dataService = dataService;
             _searchAndCompareService = searchAndCompareService;
+            _pgdeWhitelist = pgdeWhitelist;
             _enrichmentservice = enrichmentservice;
         }
+
         /// <summary>
         /// Publishes a single course
         /// </summary>
@@ -35,9 +38,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         {
             var name = this.User.Identity.Name;
 
-            var enrichmentResult =  _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
+            var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
 
-            await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
+            //await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
 
             return Ok(enrichmentResult);
         }
@@ -71,11 +74,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 return NotFound();
             }
 
+            var isPgde = _pgdeWhitelist.IsPgde(instCode, courseCode);
             var course = courseMapper.MapToSearchAndCompareCourse(
                 ucasInstData,
                 ucasCourseData,
                 orgEnrichmentData?.EnrichmentModel,
-                courseEnrichmentData?.EnrichmentModel);
+                courseEnrichmentData?.EnrichmentModel,
+                isPgde);
 
             return Ok(course);
         }

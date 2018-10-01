@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using GovUk.Education.ManageCourses.Api.Helpers;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -16,8 +15,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class CourseMapper : ICourseMapper
     {
-        private SubjectMapper subjectMapper = new SubjectMapper();
-        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
+        private readonly SubjectMapper _subjectMapper = new SubjectMapper();
+        private readonly QualificationMapper _qualificationMapper = new QualificationMapper();
+
+        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel, bool isPgde)
         {
             ucasInstData = ucasInstData ?? new UcasInstitution();
             ucasCourseData = ucasCourseData ?? new Course();
@@ -36,7 +37,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
             var subjectStrings = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
                 ? new string[]{}
-                : subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
+                : _subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
 
             var subjects = new Collection<CourseSubject>(subjectStrings.Select(subject =>
                 new CourseSubject
@@ -46,6 +47,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                         Name = subject
                     }
                 }).ToList());
+            var isFurtherEducation = subjects.Any(c =>
+                c.Subject.Name.Equals("Further education", StringComparison.InvariantCultureIgnoreCase));
+
+            var mappedQualification = _qualificationMapper.MapQualification(ucasCourseData.ProfpostFlag, isFurtherEducation, isPgde);
 
             var provider = new SearchAndCompare.Domain.Models.Provider
             {
@@ -86,7 +91,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     Name = routeName,
                     IsSalaried = isSalaried
                 },
-                IncludesPgce = string.IsNullOrWhiteSpace(ucasCourseData.ProfpostFlag) ? IncludesPgce.No : IncludesPgce.Yes,
+                IncludesPgce = mappedQualification,
                 Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools
                     .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
@@ -123,7 +128,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 FullTime = ucasCourseData.StudyMode == "P" ? VacancyStatus.NA : VacancyStatus.Vacancies,
                 PartTime = ucasCourseData.StudyMode == "F" ? VacancyStatus.NA : VacancyStatus.Vacancies,
 
-                Mod = ucasCourseData.GetCourseVariantType(),
+                Mod = ucasCourseData.GetCourseVariantType(mappedQualification),
             };
 
             mappedCourse.DescriptionSections = new Collection<CourseDescriptionSection>();

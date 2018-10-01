@@ -18,15 +18,18 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         private readonly IDataService _dataService;
         private readonly IEnrichmentService _enrichmentService;
         private readonly ILogger _logger;
+        private readonly IPgdeWhitelist _pgdeWhitelist;
 
-        public SearchAndCompareService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService, ILogger<SearchAndCompareService> logger)
+        public SearchAndCompareService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService, ILogger<SearchAndCompareService> logger, IPgdeWhitelist pgdeWhitelist)
         {
             _api = api;
             _courseMapper = courseMapper;
             _dataService = dataService;
             _enrichmentService = enrichmentService;
             _logger = logger;
+            _pgdeWhitelist = pgdeWhitelist;
         }
+
          /// <summary>
         /// Published a course to Search and Compare using the email address of the user
         /// </summary>
@@ -48,13 +51,15 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                  var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
                  var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
 
+                 var isPgde = _pgdeWhitelist.IsPgde(instCode, courseCode);
                  if (courseEnrichmentData.Status.Equals(EnumStatus.Published))
                  {
                      var course = _courseMapper.MapToSearchAndCompareCourse(
                          ucasInstData,
                          ucasCourseData,
                          orgEnrichmentData.EnrichmentModel,
-                         courseEnrichmentData?.EnrichmentModel);
+                         courseEnrichmentData?.EnrichmentModel,
+                         isPgde);
 
                      if (course.IsValid(true))
                      {
