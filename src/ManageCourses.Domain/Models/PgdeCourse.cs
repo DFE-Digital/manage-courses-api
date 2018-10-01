@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
     /// <summary>
@@ -6,7 +8,9 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     public class PgdeCourse
     {
         public int Id { get; set; }
+        [Required]
         public string InstCode { get; set; }
+        [Required]
         public string CourseCode { get; set; }
     }
 }
