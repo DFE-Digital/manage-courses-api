@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using GovUk.Education.ManageCourses.Api.Helpers;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -16,7 +15,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class CourseMapper : ICourseMapper
     {
-        private SubjectMapper subjectMapper = new SubjectMapper();
+        private readonly SubjectMapper _subjectMapper = new SubjectMapper();
+        private readonly QualificationMapper _qualificationMapper = new QualificationMapper();
 
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel, bool isPgde)
         {
@@ -37,7 +37,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
             var subjectStrings = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
                 ? new string[]{}
-                : subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
+                : _subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
 
             var subjects = new Collection<CourseSubject>(subjectStrings.Select(subject =>
                 new CourseSubject
@@ -89,7 +89,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     Name = routeName,
                     IsSalaried = isSalaried
                 },
-                IncludesPgce = new QualificationMapper().MapQualification(ucasCourseData.ProfpostFlag, isFurtherEducation, isPgde),
+                IncludesPgce = _qualificationMapper.MapQualification(ucasCourseData.ProfpostFlag, isFurtherEducation, isPgde),
                 Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools
                     .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
