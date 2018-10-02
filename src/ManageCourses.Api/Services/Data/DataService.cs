@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             _enrichmentService = enrichmentService;
             _dataHelper = dataHelper;
             _logger = logger;
-            this._pgdeWhitelist = pgdeWhitelist;
+            _pgdeWhitelist = pgdeWhitelist;
             _courseLoader = new CourseLoader();
         }
 
