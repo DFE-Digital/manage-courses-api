@@ -197,6 +197,17 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             };
         }
 
+        /// <summary>
+        /// Checks whether the list of ucas subjects indicates a further education (FE) course
+        /// </summary>
+        /// <param name="subjects">The list of UCAS subjects associated with the course</param>
+        /// <returns>true if the course seems to be further education, false otherwise</returns>
+        public bool IsFurtherEducation(IEnumerable<string> subjects)
+        {
+            subjects = subjects.Select(x => x.ToLowerInvariant().Trim());
+            return subjects.Intersect(ucasFurtherEducation).Any();
+        }
+
         /// <summary> 
         /// This maps a list of of UCAS subjects to our interpretation of subjects.
         /// UCAS subjects are a pretty loose tagging system where individual tags don't always

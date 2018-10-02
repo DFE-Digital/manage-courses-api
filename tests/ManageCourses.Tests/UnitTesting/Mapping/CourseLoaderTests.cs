@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 
         private static Course LoadCourse(CourseLoader sut, UcasCourse course)
         {
-            return sut.LoadCourse(new List<UcasCourse> { course }, new List<UcasCourseEnrichmentGetModel>());
+            return sut.LoadCourse(new List<UcasCourse> { course }, new List<UcasCourseEnrichmentGetModel>(), false);
         }
 
         private static UcasCourse GetBlankUcasCourse()

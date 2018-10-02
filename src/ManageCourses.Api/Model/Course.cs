@@ -21,7 +21,17 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string AccreditingProviderName { get; set; }
         public string Subjects { get; set; }
         public string StudyMode { get; set; }
-        public string AgeRange { get; set; }
+        public string AgeRange { get; set; }        
+        public CourseQualification Qualification { get; set; }
+
+        /// <summary>
+        /// This describes the course in how it differs to other courses with similar titles and subjects.
+        /// Information may include
+        ///  - The qualification
+        ///  - whether it's salaried or an apprenticeship
+        ///  - whether it's full-time and/or part time
+        /// </summary>
+        public string TypeDescription { get; set; }
         public DateTime? StartDate { get; set; }
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
         public IEnumerable<School> Schools { get; set; }

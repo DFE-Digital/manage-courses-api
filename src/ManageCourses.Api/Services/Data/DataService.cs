@@ -19,13 +19,15 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         IEnrichmentService _enrichmentService;
         private readonly IDataHelper _dataHelper;
         private readonly ILogger _logger;
+        private readonly IPgdeWhitelist _pgdeWhitelist;
 
-        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, IDataHelper dataHelper, ILogger<DataService> logger)
+        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, IDataHelper dataHelper, ILogger<DataService> logger, IPgdeWhitelist pgdeWhitelist)
         {
             _context = context;
             _enrichmentService = enrichmentService;
             _dataHelper = dataHelper;
             _logger = logger;
+            _pgdeWhitelist = pgdeWhitelist;
             _courseLoader = new CourseLoader();
         }
 
@@ -346,7 +348,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 return null;
             }
-            var course = _courseLoader.LoadCourse(courseRecords, enrichmentMetadata);
+            
+            var isPgde = _pgdeWhitelist.IsPgde(instCode, ucasCode);
+
+            var course = _courseLoader.LoadCourse(courseRecords, enrichmentMetadata, isPgde);
             return course;
         }
         /// <summary>
@@ -365,7 +370,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
             var courseRecords = _context.GetUcasCourseRecordsByInstCode(instCode, email);
             var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
-            returnCourses = _courseLoader.LoadCourses(courseRecords, enrichmentMetadata);
+            var pgdeCourses = _pgdeWhitelist.ForInstitution(instCode);
+            returnCourses = _courseLoader.LoadCourses(courseRecords, enrichmentMetadata, pgdeCourses);
             return returnCourses;
         }
         

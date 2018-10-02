@@ -51,15 +51,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                  var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
                  var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
 
-                 var isPgde = _pgdeWhitelist.IsPgde(instCode, courseCode);
                  if (courseEnrichmentData.Status.Equals(EnumStatus.Published))
                  {
                      var course = _courseMapper.MapToSearchAndCompareCourse(
                          ucasInstData,
                          ucasCourseData,
                          orgEnrichmentData.EnrichmentModel,
-                         courseEnrichmentData?.EnrichmentModel,
-                         isPgde);
+                         courseEnrichmentData?.EnrichmentModel);
 
                      if (course.IsValid(true))
                      {

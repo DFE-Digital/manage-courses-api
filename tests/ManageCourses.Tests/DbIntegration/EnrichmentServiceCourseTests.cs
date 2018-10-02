@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
@@ -249,8 +250,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const string aboutCourseText = "About Course Text";
             // Arrange
-            var enrichmentService = new EnrichmentService(Context);
-            var dataService = new DataService(Context, enrichmentService, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            var enrichmentService = new EnrichmentService(Context);            
+            var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
+            mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
+            var dataService = new DataService(Context, enrichmentService, new UserDataHelper(), new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
             var sourceModel = new CourseEnrichmentModel
             {
                 AboutCourse = aboutCourseText,
