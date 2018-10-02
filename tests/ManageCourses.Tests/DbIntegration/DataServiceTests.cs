@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
@@ -33,7 +34,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var mockEnrichmentService = new Mock<IEnrichmentService>();
             mockEnrichmentService.Setup(x => x.GetCourseEnrichmentMetadata(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<UcasCourseEnrichmentGetModel>());
-            DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object);
+                
+            var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
+            mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
+            DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object, mockPdgeWhitelist.Object);
         }
 
         [Test]

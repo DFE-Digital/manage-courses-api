@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
+using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -20,7 +22,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             new TestHelper(Context).BuildFakeDataForService();
             var mockEnrichmentService = new Mock<IEnrichmentService>();
-            _dataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object);
+            var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
+            mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
+            _dataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
         }
 
         [Test]
