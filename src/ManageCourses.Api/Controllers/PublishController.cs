@@ -40,7 +40,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
 
-            //await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
+            await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
 
             return Ok(enrichmentResult);
         }
