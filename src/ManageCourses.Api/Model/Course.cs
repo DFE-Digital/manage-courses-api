@@ -21,7 +21,9 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string AccreditingProviderName { get; set; }
         public string Subjects { get; set; }
         public string StudyMode { get; set; }
-        public string AgeRange { get; set; }
+        public string AgeRange { get; set; }        
+        public CourseQualification Qualification { get; set; }
+        public string TypeDescription { get; set; }
         public DateTime? StartDate { get; set; }
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
         public IEnumerable<School> Schools { get; set; }

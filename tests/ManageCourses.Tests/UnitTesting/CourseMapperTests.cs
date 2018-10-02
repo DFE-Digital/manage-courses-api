@@ -23,8 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 GenerateInstitutionEnrichmentWithoutContactDetails(),
-                GenerateCourseEnrichmentModel(),
-                false
+                GenerateCourseEnrichmentModel()
             );
 
             res.ProviderLocation.Should().NotBeNull();
@@ -43,8 +42,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 GenerateInstitutionEnrichmentWithoutContactDetails(),
-                courseEnrichmentModel,
-                false
+                courseEnrichmentModel
             );
 
             res.Fees.Should().NotBeNull();
@@ -60,8 +58,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 GenerateInstitutionEnrichmentWithoutContactDetails(),
-                GenerateCourseEnrichmentModel(),
-                false
+                GenerateCourseEnrichmentModel()
             );
 
             res.Duration.Should().Be("1 year");
@@ -106,7 +103,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void MapToSearchAndCompareCourse_Nulls()
         {
-            Assert.DoesNotThrow(() => mapper.MapToSearchAndCompareCourse(null, null, null, null, false));
+            Assert.DoesNotThrow(() => mapper.MapToSearchAndCompareCourse(null, null, null, null));
         }
 
         [Test]
@@ -129,8 +126,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 GenerateUcasInstitution(),
                 GenearteUcasCourse(),
                 instEnrichment,
-                GenerateCourseEnrichmentModel(),
-                false
+                GenerateCourseEnrichmentModel()
             );
 
             res.ContactDetails.Address.Should().Be("Overridden1\nOverridden3\nOverridden4\nOverriddenPostcode");
@@ -180,6 +176,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             {
                 CourseCode = "CourseCode",
                 AccreditingProviderId = "ACC123",
+                Qualification = CourseQualification.QtsWithPgce,
                 AccreditingProviderName = "AccreditingProviderName",
                 ProgramType = "SS", // school direct salaried
                 Name = "Course.Name",
