@@ -51,10 +51,10 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .ToLookup(x => x.InstCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
             
-            var pgdeCourses = context.PgdeCourses.Select(x => x.InstCode + "_@@_" + x.CourseCode).ToList();
+            var pgdeCourses = context.PgdeCourses.ToList();
 
             Console.WriteLine("Load courses");
-            var courses = new CourseLoader().LoadCourses(ucasCourses, new List<UcasCourseEnrichmentGetModel>());
+            var courses = new CourseLoader().LoadCourses(ucasCourses, new List<UcasCourseEnrichmentGetModel>(), pgdeCourses);
             
 
             var courseMapper = new CourseMapper();
@@ -70,8 +70,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                     insts[c.InstCode],
                     c,
                     converter.Convert(orgEnrichments.GetValueOrDefault(c.InstCode))?.EnrichmentModel,
-                    converter.Convert(courseEnrichments.GetValueOrDefault(c.InstCode + "_@@_" + c.CourseCode))?.EnrichmentModel,
-                    pgdeCourses.Contains(c.InstCode + "_@@_" + c.CourseCode)
+                    converter.Convert(courseEnrichments.GetValueOrDefault(c.InstCode + "_@@_" + c.CourseCode))?.EnrichmentModel
                 );
 
                 if (!mappedCourse.Campuses.Any())
