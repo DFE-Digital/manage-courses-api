@@ -41,6 +41,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase("Primary (history)", "primary, history", "Primary, Primary with history and geography")] // Primary with hist/geo have beeen merged
 
         [TestCase("Computing", "secondary, computer studies, information communication technology", "Computing")] // no ICT
+
+        [TestCase("Mandarin and ESOL", "mandarin, english as a second or other language", "Mandarin, English as a second or other language")] // secondary ESOL
+        [TestCase("PCET ESOL", "further education, english as a second or other language", "Further education")] // secondary ESOL
+
         public void MapToSearchAndCompareCourse(string courseTitle, string commaSeparatedUcasSubjects, string commaSeparatedExpectedSubjects)
         {
             var expected = commaSeparatedExpectedSubjects.Split(", ");
