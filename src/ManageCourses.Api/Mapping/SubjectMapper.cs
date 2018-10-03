@@ -52,7 +52,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             };
 
             ucasMflMain = new string[] 
-            {              
+            {                            
+                "english as a second or other language",  
                 "french",
                 "german",
                 "italian",
@@ -123,11 +124,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
             ucasFurtherEducation = new string[] 
             {
-                "english as a second or other language",
                 "further education",
                 "higher education",
-                "literacy",
-                "numeracy",
                 "post-compulsory"
             };
 
