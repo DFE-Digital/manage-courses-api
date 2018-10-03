@@ -178,24 +178,30 @@ namespace GovUk.Education.ManageCourses.Api.Services
         /// <param name="instCode">institution code for the enrichment</param>
         /// <param name="ucasCourseCode">can be null</param>
         /// <param name="email">email of the user</param>
+        /// <param name="publishableOnly">if there is a draft enrichment then get the ucas contact details</param>
         /// <returns>An enrichment object with the enrichment data (if found). Nul if not found</returns>
-        public UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email)
+        public UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email, bool publishableOnly)
         {
             ValidateUserOrg(email, instCode);
-
             instCode = instCode.ToUpperInvariant();
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
-            var enrichment = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode)
-                .OrderByDescending(x => x.Id)
+            var enrichmentsQuery = _context.CourseEnrichments
+                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode);
+
+            if (publishableOnly)
+            {
+                enrichmentsQuery = enrichmentsQuery.Where(ie => ie.Status == EnumStatus.Published);
+            }
+
+            var enrichment = enrichmentsQuery.OrderByDescending(x => x.Id)
                 .Include(e => e.CreatedByUser)
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
 
-            var enrichmentToReturn = _converter.Convert(enrichment);
+            var enrichmentGetModel = _converter.Convert(enrichment) ?? new UcasCourseEnrichmentGetModel();
 
-            return enrichmentToReturn;
+            return enrichmentGetModel;
         }
 
         public IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email)
