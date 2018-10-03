@@ -52,7 +52,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             };
 
             ucasMflMain = new string[] 
-            {              
+            {                            
+                "english as a second or other language",  
                 "french",
                 "german",
                 "italian",
@@ -123,11 +124,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
             ucasFurtherEducation = new string[] 
             {
-                "english as a second or other language",
                 "further education",
                 "higher education",
-                "literacy",
-                "numeracy",
                 "post-compulsory"
             };
 
@@ -195,6 +193,17 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 {"drama and theatre studies", "drama"},
                 {"social science", "social sciences"}
             };
+        }
+
+        /// <summary>
+        /// Checks whether the list of ucas subjects indicates a further education (FE) course
+        /// </summary>
+        /// <param name="subjects">The list of UCAS subjects associated with the course</param>
+        /// <returns>true if the course seems to be further education, false otherwise</returns>
+        public bool IsFurtherEducation(IEnumerable<string> subjects)
+        {
+            subjects = subjects.Select(x => x.ToLowerInvariant().Trim());
+            return subjects.Intersect(ucasFurtherEducation).Any();
         }
 
         /// <summary> 

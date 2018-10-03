@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Helpers;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.EqualityComparers;
@@ -13,7 +14,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class CourseLoader
     {
-        public InstitutionCourses LoadCourses(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata)
+        private readonly QualificationMapper qualificationMapper = new QualificationMapper();
+        private readonly SubjectMapper subjectMapper = new SubjectMapper();
+
+        public InstitutionCourses LoadCourses(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata, IEnumerable<PgdeCourse> pgdeCourses)
         {
             var returnCourses = new InstitutionCourses();
             if (courseRecords.Count() > 0)
@@ -26,9 +30,14 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 // nb - this separator uses characters that are never used in inst codes - thus avoiding ambiguity
                 var courseRecordGroupings = courseRecords.GroupBy(x => x.InstCode + "_@@_" + x.CrseCode);
                 var enrichmentGroupings = enrichmentMetadata.ToLookup(x => x.InstCode + "_@@_" + x.CourseCode);
+                var pgdeCoursesSimple = pgdeCourses.Select(x => x.InstCode + "_@@_" + x.CourseCode).ToList();
+
                 foreach (var grouping in courseRecordGroupings)
                 {
-                    returnCourses.Courses.Add(LoadCourse(grouping.ToList(), enrichmentGroupings[grouping.Key] ?? new List<UcasCourseEnrichmentGetModel>()));
+                    returnCourses.Courses.Add(LoadCourse(
+                        grouping.ToList(), 
+                        enrichmentGroupings[grouping.Key] ?? new List<UcasCourseEnrichmentGetModel>(),
+                        pgdeCoursesSimple.Contains(grouping.Key)));
                 }
             }
 
@@ -36,7 +45,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
         }
         
-        public Course LoadCourse(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata)
+        public Course LoadCourse(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata, bool isPgde)
         {
             var returnCourse = new Course();
             if (courseRecords.Count() > 0)
@@ -64,6 +73,13 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 returnCourse.Subjects = string.Join(", ", subjects);
                 returnCourse.Schools = GetSchoolsData(courseRecords);
                 returnCourse.EnrichmentWorkflowStatus = bestEnrichment?.Status;
+
+                returnCourse.Qualification = qualificationMapper.MapQualification(
+                    organisationCourseRecord.ProfpostFlag,
+                    subjectMapper.IsFurtherEducation(subjects),
+                    isPgde);
+
+                returnCourse.TypeDescription = returnCourse.GetCourseVariantType();
             }
 
             return returnCourse;

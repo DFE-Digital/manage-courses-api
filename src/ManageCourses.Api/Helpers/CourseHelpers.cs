@@ -9,29 +9,29 @@ namespace GovUk.Education.ManageCourses.Api.Helpers
 {
     public static class CourseHelpers
     {
-        public static string GetCourseVariantType(this Course course, IncludesPgce mappedQualification)
+        public static string GetCourseVariantType(this Course course)
         {
             string result;
             
-            switch(mappedQualification)
+            switch(course.Qualification)
             {
-                case IncludesPgce.No:
+                case CourseQualification.Qts:
                     result = "QTS";
                     break;
-                case IncludesPgce.Yes:
+                case CourseQualification.QtsWithPgce:
                     result = "PGCE with QTS";
                     break;
-                case IncludesPgce.QtlsWithPgce:
+                case CourseQualification.QtlsWithPgce:
                     result = "PGCE";
                     break;
-                case IncludesPgce.QtlsWithPgde:
+                case CourseQualification.QtlsWithPgde:
                     result = "PGDE";
                     break;
-                case IncludesPgce.QtsWithPgde:
+                case CourseQualification.QtsWithPgde:
                     result = "PGDE with QTS";
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException($"{nameof(mappedQualification)} is unknown value: {mappedQualification}");
+                    throw new ArgumentOutOfRangeException($"{nameof(course.Qualification)} is unknown value: {course.Qualification}");
             }
 
             if ((!string.IsNullOrWhiteSpace(result)) && string.Equals(course.StudyMode, "B", StringComparison.InvariantCultureIgnoreCase))

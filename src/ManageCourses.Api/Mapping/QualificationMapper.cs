@@ -1,24 +1,25 @@
 ﻿using System;
+using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 
 namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class QualificationMapper
     {
-        public IncludesPgce MapQualification(string profpostFlag, bool isFurtherEducationCourse, bool isPgde)
+        public CourseQualification MapQualification(string profpostFlag, bool isFurtherEducationCourse, bool isPgde)
         {
             if (isPgde)
             {
-                return isFurtherEducationCourse ? IncludesPgce.QtlsWithPgde : IncludesPgce.QtsWithPgde;
+                return isFurtherEducationCourse ? CourseQualification.QtlsWithPgde : CourseQualification.QtsWithPgde;
             }
 
             if (isFurtherEducationCourse)
             {
-                return IncludesPgce.QtlsWithPgce;
+                return CourseQualification.QtlsWithPgce;
             }
 
             var isPg = !string.IsNullOrWhiteSpace(profpostFlag);
-            return isPg ? IncludesPgce.Yes : IncludesPgce.No;
+            return isPg ? CourseQualification.QtsWithPgce : CourseQualification.Qts;
         }
     }
 }
