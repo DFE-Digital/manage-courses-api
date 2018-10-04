@@ -38,10 +38,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <returns></returns>
         public async Task<bool> SaveCourses(string instCode, string email)
         {
-            var courseCodes = _dataService.GetCourses(email, instCode).Courses
-                .Select(x => new CourseCode {InstCode = x.InstCode, CrseCode = x.CourseCode})
-                .ToList();
-            return await SaveImplementation(courseCodes, email);
+            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
+            var courses = GetValidCourses(instCode, email);
+
+            return await SaveImplementation(courses, instCode);
         }
         /// <summary>
         /// Publishes a list of courses to Search and Compare
@@ -52,30 +56,45 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <returns></returns>
         public async Task<bool> SaveCourse(string instCode, string courseCode, string email)
         {
-            return await SaveImplementation(
-                new List<CourseCode>
-                {
-                    new CourseCode {InstCode = instCode.ToUpperInvariant(), CrseCode = courseCode.ToUpperInvariant()}
-                }, email);
+            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
 
+            var courses = GetValidCourses(instCode, email, courseCode);
+
+            return await SaveImplementation(courses, instCode);
         }
-        private async Task<bool> SaveImplementation(IReadOnlyCollection<CourseCode> courseCodes, string email)
+
+        private List<Course> GetValidCourses(string instCode, string email, string courseCode = null)
+        {
+            var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
+            var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email, true);
+
+            var courses = new List<Course> ();
+
+            if (courseCode != null)
+            {
+                courses = new List<Course> { GetCourse(instCode, courseCode, email, ucasInstData, orgEnrichmentData) };
+
+            }
+            else
+            {
+                courses.AddRange(_dataService.GetCourses(email, instCode).Courses
+                    .Select(x => GetCourse(instCode, x.CourseCode, email, ucasInstData, orgEnrichmentData)));
+            }
+
+            return courses.Where(courseToSave => courseToSave.IsValid(false)).ToList();
+        }
+
+        private async Task<bool> SaveImplementation(List<Course> courses, string instCode)
         {
             var returnBool = false;
-            var instCode = courseCodes.Select(x => x.InstCode).FirstOrDefault();
-
             try
             {
-                var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-                var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email, true);
-
-                var coursesToSave = courseCodes.Select(course => GetCourse(instCode, course.CrseCode, email, ucasInstData, orgEnrichmentData))
-                    .Where(courseToSave => courseToSave.IsValid(false))
-                    .ToList();
-
-                if (coursesToSave.Count > 0)
+                if (courses.Count > 0)
                 {
-                    returnBool = await _api.UpdateCoursesAsync(coursesToSave);
+                    returnBool = await _api.UpdateCoursesAsync(courses);
                 }
 
                 if (!returnBool)
@@ -87,8 +106,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             {
                 _logger.LogError(e, $"An unexpected error occured. Save courses to search and compare failed for institution: {instCode}");
             }
+
             return returnBool;
         }
+
         private Course GetCourse(string instCode, string courseCode, string email, UcasInstitution ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
         {
             var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);

@@ -54,6 +54,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 AccreditedUcasCourses =
                     new List<UcasCourse> { new UcasCourse { InstCode = InstitutionCode, CrseCode = CourseCode, ProgramType = "SD", CrseTitle = "History"} }
             });
+            _dataServiceMock.Setup(x => x.GetCourse(email, InstitutionCode, CourseCode))
+                .Returns(new Course { CourseCode = CourseCode, InstCode = InstitutionCode, ProgramType = "SD", Subjects = "History", Name = "History" });
+
             _dataServiceMock.Setup(x => x.GetCourses(email, InstitutionCode))
                 .Returns(new InstitutionCourses{Courses = new List<Course>{ new Course { CourseCode = CourseCode, InstCode = InstitutionCode, ProgramType = "SD", Subjects = "History", Name = "History" } } });
 
@@ -63,13 +66,13 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var enrichmentModel = new CourseEnrichmentModel {FeeDetails = "It's gonna cost you", FeeInternational = (Decimal)123.5, FeeUkEu = (Decimal)234.5};
             _enrichmentServiceMock.Setup(x => x.GetCourseEnrichment(InstitutionCode, CourseCode, email, true))
                 .Returns(new UcasCourseEnrichmentGetModel { CourseCode = CourseCode, InstCode = InstitutionCode, EnrichmentModel = enrichmentModel, Status = EnumStatus.Published});
-            _httpMock.Setup(x => x.PostAsync(It.Is<Uri>(y => y.AbsoluteUri == $"{sncUrl}/courses/{InstitutionCode}/{CourseCode}"), It.IsAny<StringContent>())).ReturnsAsync(
+            _httpMock.Setup(x => x.PutAsync(It.Is<Uri>(y => y.AbsoluteUri == $"{sncUrl}/courses"), It.IsAny<StringContent>())).ReturnsAsync(
                 new HttpResponseMessage() {
                     StatusCode = HttpStatusCode.OK
             }
             ).Verifiable();
 
-            var result = _searchAndCompareService.SaveCourse(InstitutionCode, email, CourseCode).Result;
+            var result = _searchAndCompareService.SaveCourse(InstitutionCode, CourseCode, email).Result;
 
             result.Should().BeTrue();
             _httpMock.VerifyAll();
@@ -93,7 +96,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var enrichmentModel = new CourseEnrichmentModel { FeeDetails = "It's gonna cost you", FeeInternational = (Decimal)123.5, FeeUkEu = (Decimal)234.5 };
             _enrichmentServiceMock.Setup(x => x.GetCourseEnrichment(InstitutionCode, CourseCode, email, true))
                 .Returns(new UcasCourseEnrichmentGetModel { CourseCode = CourseCode, InstCode = InstitutionCode, EnrichmentModel = enrichmentModel, Status = EnumStatus.Draft });
-            var result = _searchAndCompareService.SaveCourse(InstitutionCode, email, CourseCode).Result;
+            var result = _searchAndCompareService.SaveCourse(InstitutionCode, CourseCode, email).Result;
 
             result.Should().BeFalse();
         }
@@ -121,7 +124,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 }
             ).Verifiable();
 
-            var result = _searchAndCompareService.SaveCourse(InstitutionCode, email, CourseCode).Result;
+            var result = _searchAndCompareService.SaveCourse(InstitutionCode, CourseCode, email).Result;
 
             result.Should().BeTrue();
             _httpMock.VerifyAll();
@@ -141,7 +144,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase(null, null, "email@qwe.com")]
         public void PublishCourseWithEmailInvalidParametersTest(string instCode, string courseCode, string email)
         {
-            var result = _searchAndCompareService.SaveCourse(instCode, email, courseCode).Result;
+            var result = _searchAndCompareService.SaveCourse(instCode, courseCode, email).Result;
 
             result.Should().BeFalse();
         }

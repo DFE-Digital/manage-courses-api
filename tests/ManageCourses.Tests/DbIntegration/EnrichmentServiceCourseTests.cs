@@ -98,7 +98,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var enrichmentService = new EnrichmentService(Context);
 
             var courseEnrichment = enrichmentService.GetCourseEnrichment(ProviderInstCode, UcasCourseCode.ToLower(), Email, false);
-            courseEnrichment.Should().BeNull("we haven't enriched this course yet");
+            courseEnrichment.CourseCode.Should().BeNull("we haven't enriched this course yet");
             var emptyMetadata = enrichmentService.GetCourseEnrichmentMetadata(ProviderInstCode, Email);
             emptyMetadata.Count.Should().Be(0, "we haven't enriched any courses yet");
 
