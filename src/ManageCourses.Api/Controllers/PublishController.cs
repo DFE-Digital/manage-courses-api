@@ -43,7 +43,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             return Ok(enrichmentResult);
         }
         /// <summary>
-        /// Publishes a single course
+        /// Publishes all courses for an organisation
         /// </summary>
         /// <returns>boolean indicating success/failure</returns>
         [BearerTokenAuth]

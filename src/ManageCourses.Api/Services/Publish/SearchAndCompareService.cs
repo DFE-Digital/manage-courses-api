@@ -30,49 +30,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             _logger = logger;
             _pgdeWhitelist = pgdeWhitelist;
         }
-
-        ///// <summary>
-        ///// Published a course to Search and Compare using the email address of the user
-        ///// </summary>
-        ///// <param name="instCode">institution code for the course</param>
-        ///// <param name="courseCode">code for the course</param>
-        ///// <param name="email">email of the user</param>
-        ///// <returns></returns>
-        //public async Task<bool> SaveSingleCourseToSearchAndCompare(string instCode, string courseCode, string email)
-        // {
-        //    if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
-        //     {
-        //         return false;
-        //     }
-        //     var returnBool = false;
-        //     try
-        //     {
-        //         var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-        //         var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email, true);
-
-        //         var course = GetCourse(instCode, courseCode, email, ucasInstData, orgEnrichmentData);
-
-        //         if (course.IsValid(true))
-        //         {
-        //             var courseList = new List<Course> { course };
-        //             returnBool = await _api.SaveCoursesAsync(courseList);
-        //         }
-        //         if (!returnBool)
-        //         {
-        //             _logger.LogError($"Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
-        //         }
-        //         else
-        //         {
-        //             _logger.LogError($"Save course to search and compare failed for course because the course status was draft: {courseCode}, Institution: {instCode}");
-        //         }
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         _logger.LogError(e, $"An unexpected error occured. Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
-        //     }
-
-        //     return returnBool;
-        //}
         /// <summary>
         /// Publishes a list of courses to Search and Compare
         /// </summary>
