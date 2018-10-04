@@ -118,7 +118,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
 
                 if (coursesToSave.Count > 0)
                 {
-                    returnBool = await _api.SaveCoursesAsync(coursesToSave);
+                    returnBool = await _api.UpdateCoursesAsync(coursesToSave);
                 }
 
                 if (!returnBool)
