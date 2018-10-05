@@ -8,7 +8,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email, bool publishableOnly);
         void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email);
         bool PublishInstitutionEnrichment(string instCode, string email);
-        UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email);
+        UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email, bool publishableOnly);
         void SaveCourseEnrichment(CourseEnrichmentModel model, string instCode, string ucasCourseCode, string email);
         bool PublishCourseEnrichment(string instCode, string ucasCourseCode, string email);
         IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email);

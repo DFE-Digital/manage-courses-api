@@ -32,13 +32,33 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> PublishToSearchAndCompare(string instCode, string courseCode)
+        public async Task<ActionResult> PublishCourseToSearchAndCompare(string instCode, string courseCode)
         {
             var name = this.User.Identity.Name;
 
             var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
 
-            await _searchAndCompareService.SaveSingleCourseToSearchAndCompare(instCode, courseCode, name);
+            await _searchAndCompareService.SaveCourse(instCode, courseCode, name);
+
+            return Ok(enrichmentResult);
+        }
+        /// <summary>
+        /// Publishes all courses for an organisation
+        /// </summary>
+        /// <returns>boolean indicating success/failure</returns>
+        [BearerTokenAuth]
+        [HttpPost]
+        [Route("organisation/{instCode}")]
+        [ProducesResponseType(typeof(bool), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult> PublishCoursesToSearchAndCompare(string instCode)
+        {
+            var name = this.User.Identity.Name;
+
+            var enrichmentResult = _enrichmentservice.PublishInstitutionEnrichment(instCode, name);
+
+            await _searchAndCompareService.SaveCourses(instCode, name);
 
             return Ok(enrichmentResult);
         }
@@ -66,7 +86,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             var ucasInstData = _dataService.GetUcasInstitutionForUser(name, instCode);
             var orgEnrichmentData = _enrichmentservice.GetInstitutionEnrichment(instCode, name, false);
             var ucasCourseData = _dataService.GetCourse(name, instCode, courseCode);
-            var courseEnrichmentData = _enrichmentservice.GetCourseEnrichment(instCode, courseCode, name);
+            var courseEnrichmentData = _enrichmentservice.GetCourseEnrichment(instCode, courseCode, name, false);
             if (ucasInstData == null || ucasCourseData == null)
             {
                 return NotFound();

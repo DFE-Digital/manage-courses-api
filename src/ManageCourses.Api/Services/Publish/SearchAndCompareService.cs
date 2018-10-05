@@ -4,10 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
+using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Client;
-using GovUk.Education.SearchAndCompare.Domain.Models;
 using Microsoft.Extensions.Logging;
+using Course = GovUk.Education.SearchAndCompare.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Publish
 {
@@ -29,57 +30,98 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             _logger = logger;
             _pgdeWhitelist = pgdeWhitelist;
         }
-
-         /// <summary>
-        /// Published a course to Search and Compare using the email address of the user
+        /// <summary>
+        /// Publishes a list of courses to Search and Compare
         /// </summary>
-        /// <param name="instCode">institution code for the course</param>
-        /// <param name="courseCode">code for the course</param>
+        /// <param name="instCode">institution code for the courses</param>
         /// <param name="email">email of the user</param>
         /// <returns></returns>
-        public async Task<bool> SaveSingleCourseToSearchAndCompare(string instCode, string courseCode, string email)
-         {
+        public async Task<bool> SaveCourses(string instCode, string email)
+        {
+            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
+            var courses = GetValidCourses(instCode, email);
+
+            return await SaveImplementation(courses, instCode);
+        }
+        /// <summary>
+        /// Publishes a list of courses to Search and Compare
+        /// </summary>
+        /// <param name="instCode">institution code for the courses</param>
+        /// <param name="courseCode">code for the course (if a single course is to be published)</param>
+        /// <param name="email">email of the user</param>
+        /// <returns></returns>
+        public async Task<bool> SaveCourse(string instCode, string courseCode, string email)
+        {
             if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
-             {
-                 return false;
-             }
-             var returnBool = false;
-             try
-             {
-                 var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-                 var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email, true);
-                 var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
-                 var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email);
+            {
+                return false;
+            }
 
-                 if (courseEnrichmentData.Status.Equals(EnumStatus.Published))
-                 {
-                     var course = _courseMapper.MapToSearchAndCompareCourse(
-                         ucasInstData,
-                         ucasCourseData,
-                         orgEnrichmentData.EnrichmentModel,
-                         courseEnrichmentData?.EnrichmentModel);
+            var courses = GetValidCourses(instCode, email, courseCode);
 
-                     if (course.IsValid(true))
-                     {
-                         returnBool = await _api.SaveCourseAsync(course);
-                     }
+            return await SaveImplementation(courses, instCode);
+        }
 
-                     if (!returnBool)
-                     {
-                         _logger.LogError($"Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
-                     }
+        private List<Course> GetValidCourses(string instCode, string email, string courseCode = null)
+        {
+            var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
+            var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email, true);
+
+            var courses = new List<Course> ();
+
+            if (courseCode != null)
+            {
+                courses = new List<Course> { GetCourse(instCode, courseCode, email, ucasInstData, orgEnrichmentData) };
+
+            }
+            else
+            {
+                courses.AddRange(_dataService.GetCourses(email, instCode).Courses
+                    .Select(x => GetCourse(instCode, x.CourseCode, email, ucasInstData, orgEnrichmentData)));
+            }
+
+            return courses.Where(courseToSave => courseToSave.IsValid(false)).ToList();
+        }
+
+        private async Task<bool> SaveImplementation(List<Course> courses, string instCode)
+        {
+            var returnBool = false;
+            try
+            {
+                if (courses.Count > 0)
+                {
+                    returnBool = await _api.UpdateCoursesAsync(courses);
                 }
-                else
-                 {
-                    _logger.LogError($"Save course to search and compare failed for course because the course status was draft: {courseCode}, Institution: {instCode}");
+
+                if (!returnBool)
+                {
+                    _logger.LogError($"Save courses to search and compare failed for institution: {instCode}");
                 }
             }
             catch (Exception e)
-             {
-                 _logger.LogError(e, $"An unexpected error occured. Save course to search and compare failed for course: {courseCode}, Institution: {instCode}");
-             }
+            {
+                _logger.LogError(e, $"An unexpected error occured. Save courses to search and compare failed for institution: {instCode}");
+            }
 
-             return returnBool;
+            return returnBool;
+        }
+
+        private Course GetCourse(string instCode, string courseCode, string email, UcasInstitution ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
+        {
+            var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
+            var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email, true);
+
+            var courseToReturn = _courseMapper.MapToSearchAndCompareCourse(
+                ucasInstData,
+                ucasCourseData,
+                orgEnrichmentData.EnrichmentModel,
+                courseEnrichmentData?.EnrichmentModel);
+
+            return courseToReturn;
         }
     }
 }
