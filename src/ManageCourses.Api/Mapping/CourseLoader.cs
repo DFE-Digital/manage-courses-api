@@ -50,7 +50,12 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             var returnCourse = new Course();
             if (courseRecords.Count() > 0)
             {
-                var organisationCourseRecord = courseRecords.First();//all the records in the list hold identical institution info so just get the first one
+                // pick a reference course record for shared data such as the accrediting provider
+                // users can edit only running locations in UCAS so give preference to using running locations
+                // if there are any.
+                var organisationCourseRecord = 
+                    courseRecords.FirstOrDefault(x => x.Status != null && x.Status.ToLowerInvariant() == "r") 
+                    ?? courseRecords.First();
 
                 var bestEnrichment = enrichmentMetadata.SingleOrDefault(x => x.InstCode == organisationCourseRecord.InstCode && x.CourseCode == organisationCourseRecord.CrseCode);
 

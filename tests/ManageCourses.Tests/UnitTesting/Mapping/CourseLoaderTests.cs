@@ -39,6 +39,41 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             res.StartDate.Should().BeNull();
         }
 
+        [Test]
+        public void RunningLocationsArePreferred()
+        {
+            var sut = new CourseLoader();
+            var loc1 = GetBlankUcasCourse();
+            loc1.Status = "S";
+            loc1.AccreditingProvider = "WRONG_ACC";
+            loc1.InstCode = "WRONG_INST";
+
+            var loc2 = GetBlankUcasCourse();
+            loc2.Status = "R";
+            loc2.AccreditingProvider = "RIGHT_ACC";
+            loc2.InstCode = "RIGHT_INST";
+
+            var res = sut.LoadCourse(new List<UcasCourse> {loc1, loc2}, new List<UcasCourseEnrichmentGetModel>(), false);
+
+            res.AccreditingProviderId.Should().Be("RIGHT_ACC");
+            res.InstCode.Should().Be("RIGHT_INST");
+        }
+
+        [Test]
+        public void FullySuspendedCoursesWorkStill()
+        {            
+            var sut = new CourseLoader();
+            var loc1 = GetBlankUcasCourse();
+            loc1.Status = "S";
+            loc1.AccreditingProvider = "RIGHT_ACC";
+            loc1.InstCode = "RIGHT_INST";
+
+            var res = LoadCourse(sut, loc1);
+
+            res.AccreditingProviderId.Should().Be("RIGHT_ACC");
+            res.InstCode.Should().Be("RIGHT_INST");
+        }
+
         private static Course LoadCourse(CourseLoader sut, UcasCourse course)
         {
             return sut.LoadCourse(new List<UcasCourse> { course }, new List<UcasCourseEnrichmentGetModel>(), false);
