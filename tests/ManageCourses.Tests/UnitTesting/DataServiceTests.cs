@@ -53,7 +53,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             // test draft
             var ucasInstitutionEnrichmentGetModel = new UcasInstitutionEnrichmentGetModel { Status = EnumStatus.Draft };
-            _enrichmentServiceMock.Setup(e => e.GetInstitutionEnrichment(instCode, email, false))
+            _enrichmentServiceMock.Setup(e => e.GetInstitutionEnrichment(instCode, email))
                 .Returns(ucasInstitutionEnrichmentGetModel);
             var enrichedOrg = _dataService.GetOrganisationForUser(email, instCode);
             enrichedOrg.Should().NotBeNull();

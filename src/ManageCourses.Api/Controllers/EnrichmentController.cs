@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(404)]
         public ActionResult GetInstitution(string ucasInstitutionCode)
         {
-            return Handle(() => _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name, false));
+            return Handle(() => _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(404)]
         public ActionResult GetCourse(string ucasInstitutionCode, string ucasCourseCode)
         {
-            return Handle(() => _service.GetCourseEnrichment(ucasInstitutionCode, ucasCourseCode, User.Identity.Name, false));
+            return Handle(() => _service.GetCourseEnrichment(ucasInstitutionCode, ucasCourseCode, User.Identity.Name));
         }
         /// <summary>
         /// saves a draft enrichment record (upsert)

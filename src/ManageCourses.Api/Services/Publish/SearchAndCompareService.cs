@@ -69,7 +69,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         private List<Course> GetValidCourses(string instCode, string email, string courseCode = null)
         {
             var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-            var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichment(instCode, email, true);
+            var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichmentForPublish(instCode, email);
 
             var courses = new List<Course> ();
 
@@ -113,7 +113,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         private Course GetCourse(string instCode, string courseCode, string email, UcasInstitution ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
         {
             var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
-            var courseEnrichmentData = _enrichmentService.GetCourseEnrichment(instCode, courseCode, email, true);
+            var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(instCode, courseCode, email);
 
             var courseToReturn = _courseMapper.MapToSearchAndCompareCourse(
                 ucasInstData,
