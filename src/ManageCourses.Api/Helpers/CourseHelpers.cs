@@ -49,6 +49,10 @@ namespace GovUk.Education.ManageCourses.Api.Helpers
                 ? " with salary"
                 : "";
 
+            result += string.Equals(course.ProgramType, "ta", StringComparison.InvariantCultureIgnoreCase)
+                ? " teaching apprenticeship" 
+                : "";
+            
             return result;
         }
         public static string GetRoute(this Course course)
