@@ -29,6 +29,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
                 .Include(x => x.AccreditingProviderInstitution)
                 .Include(x => x.UcasCampus)
+                .Where(x => x.Publish == "Y")
                 .ToList();
         
             Console.WriteLine("Retrieve institutions");
