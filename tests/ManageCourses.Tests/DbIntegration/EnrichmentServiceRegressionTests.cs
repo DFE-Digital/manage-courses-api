@@ -151,7 +151,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             
             var enrichmentService = new EnrichmentService(Context);
             //test get the enrichment using user2
-            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email2, false);
+            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email2);
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
             result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(TrainWithDisabilityText);
