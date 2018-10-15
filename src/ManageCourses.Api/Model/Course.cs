@@ -12,6 +12,11 @@ namespace GovUk.Education.ManageCourses.Api.Model
     /// </summary>
     public class Course
     {
+        public Course()
+        {
+            Schools = new List<School>();
+        }
+
         public string CourseCode { get; set; }
         public string ProgramType { get; set; }
         public string ProfpostFlag { get; set; }
@@ -35,5 +40,11 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public DateTime? StartDate { get; set; }
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
         public IEnumerable<School> Schools { get; set; }
+
+        /// <summary>
+        /// Aggregate of vacancy status for each campus.
+        /// </summary>
+        /// <value></value>
+        public bool HasVacancies { get; internal set; }
     }
 }

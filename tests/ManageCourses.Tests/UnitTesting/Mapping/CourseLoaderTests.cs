@@ -40,6 +40,26 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
         }
 
         [Test]
+        public void MapsSchoolVacStatus()
+        {
+            // arrange
+            var courseLoader = new CourseLoader();
+            var blankUcasCourse = GetBlankUcasCourse(); // ucas course is the denormalised course+campus combinations
+            const string both = "B";
+            blankUcasCourse.VacStatus = both;
+
+            // act
+            var courseRecords = new List<UcasCourse> { blankUcasCourse };
+            var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
+            const bool pgde = false;
+            var manageApiCourse = courseLoader.LoadCourse(courseRecords, enrichmentMetadata, pgde);
+
+            // assert
+            manageApiCourse.Schools.Should().HaveCount(1, "There's one campus");
+            manageApiCourse.Schools.First().VacStatus.Should().Be(both);
+        }
+
+        [Test]
         public void RunningLocationsArePreferred()
         {
             var sut = new CourseLoader();
