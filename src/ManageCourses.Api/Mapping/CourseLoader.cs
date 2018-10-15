@@ -101,6 +101,12 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     isPgde);
 
                 returnCourse.TypeDescription = returnCourse.GetCourseVariantType();
+
+                const string both = "B";
+                const string fullTime = "F";
+                const string partTime = "P";
+                var ucasVacancyStatusCodes = new HashSet<string> { both, fullTime, partTime };
+                returnCourse.HasVacancies = returnCourse.Schools.Any(s => ucasVacancyStatusCodes.Contains(s.VacStatus));
             }
 
             return returnCourse;
