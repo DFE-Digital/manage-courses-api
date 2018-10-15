@@ -17,6 +17,14 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
         private readonly QualificationMapper qualificationMapper = new QualificationMapper();
         private readonly SubjectMapper subjectMapper = new SubjectMapper();
 
+        /// <summary>
+        /// Takes the UcasCourse records which are actually de-normalised course-campus info and turns them into
+        /// proper British InstitutionCourses that have the campus info re-normalised into the .Schools list property.
+        /// </summary>
+        /// <param name="courseRecords">UcasCourse records</param>
+        /// <param name="enrichmentMetadata"></param>
+        /// <param name="pgdeCourses"></param>
+        /// <returns></returns>
         public InstitutionCourses LoadCourses(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata, IEnumerable<PgdeCourse> pgdeCourses)
         {
             var returnCourses = new InstitutionCourses();
@@ -45,6 +53,14 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
         }
         
+        /// <summary>
+        /// Takes the list of campus info within a single course and maps it into
+        /// our version of a course, with the schools being read from the campus info in the UcasCourse (aka campus)
+        /// </summary>
+        /// <param name="courseRecords">List of UcasCourse records for a single course (no really a course, not the course-campus combination in ucas-land)</param>
+        /// <param name="enrichmentMetadata">Relevant enrichment for the courseRecords</param>
+        /// <param name="isPgde"></param>
+        /// <returns></returns>
         public Course LoadCourse(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseEnrichmentGetModel> enrichmentMetadata, bool isPgde)
         {
             var returnCourse = new Course();
@@ -85,6 +101,12 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     isPgde);
 
                 returnCourse.TypeDescription = returnCourse.GetCourseVariantType();
+
+                const string both = "B";
+                const string fullTime = "F";
+                const string partTime = "P";
+                var ucasVacancyStatusCodes = new HashSet<string> { both, fullTime, partTime };
+                returnCourse.HasVacancies = returnCourse.Schools.Any(s => ucasVacancyStatusCodes.Contains(s.VacStatus));
             }
 
             return returnCourse;
@@ -102,6 +124,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 ApplicationsAcceptedFrom = courseRecord.CrseOpenDate,
                 Code = courseRecord.UcasCampus.CampusCode,
                 Status = courseRecord.Status,
+                VacStatus = courseRecord.VacStatus,
             }).ToList();
             //look for the main site and move it to the top of the list
             var main = schools.FirstOrDefault(s => s.Code == "-");

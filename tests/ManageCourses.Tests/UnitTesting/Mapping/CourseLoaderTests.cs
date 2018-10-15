@@ -40,6 +40,65 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
         }
 
         [Test]
+        public void CourseWithNoVacancies()
+        {
+            // arrange
+            var courseLoader = new CourseLoader();
+            var blankUcasCourse = GetBlankUcasCourse(); // ucas course is the denormalised course+campus combinations
+            const string noVacancies = "";
+            blankUcasCourse.VacStatus = noVacancies;
+
+            // act
+            var courseRecords = new List<UcasCourse> { blankUcasCourse };
+            var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
+            const bool pgde = false;
+            var manageApiCourse = courseLoader.LoadCourse(courseRecords, enrichmentMetadata, pgde);
+
+            // assert
+            manageApiCourse.HasVacancies.Should().Be(false, "because there is only one course and it has no vacancies");
+        }
+
+        [Test]
+        public void CourseWithVacancy()
+        {
+            // arrange
+            var courseLoader = new CourseLoader();
+            var ucasCourseWithoutVacancy = GetBlankUcasCourse();
+            var ucasCourseWithVacancy = GetBlankUcasCourse();
+            const string fullTime = "F";
+            ucasCourseWithVacancy.VacStatus = fullTime;
+
+            // act
+            var courseRecords = new List<UcasCourse> { ucasCourseWithoutVacancy, ucasCourseWithVacancy };
+            var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
+            const bool pgde = false;
+            var manageApiCourse = courseLoader.LoadCourse(courseRecords, enrichmentMetadata, pgde);
+
+            // assert
+            manageApiCourse.HasVacancies.Should().Be(true, "because there's one full time course");
+        }
+
+        [Test]
+        public void MapsSchoolVacStatus()
+        {
+            // arrange
+            var courseLoader = new CourseLoader();
+            var blankUcasCourse = GetBlankUcasCourse(); // ucas course is the denormalised course+campus combinations
+            const string both = "B";
+            blankUcasCourse.VacStatus = both;
+
+            // act
+            var courseRecords = new List<UcasCourse> { blankUcasCourse };
+            var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
+            const bool pgde = false;
+            var manageApiCourse = courseLoader.LoadCourse(courseRecords, enrichmentMetadata, pgde);
+
+            // assert
+            manageApiCourse.Schools.Should().HaveCount(1, "There's one campus");
+            manageApiCourse.Schools.First().VacStatus.Should().Be(both);
+        }
+
+        [Test]
         public void RunningLocationsArePreferred()
         {
             var sut = new CourseLoader();
