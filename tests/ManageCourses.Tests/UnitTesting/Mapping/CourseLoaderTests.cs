@@ -99,7 +99,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
         }
 
         [Test]
-        public void RunningLocationsArePreferred()
+        public void RunningAndPublishedLocationsArePreferred()
         {
             var sut = new CourseLoader();
             var loc1 = GetBlankUcasCourse();
@@ -111,6 +111,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             loc2.Status = "R";
             loc2.AccreditingProvider = "RIGHT_ACC";
             loc2.InstCode = "RIGHT_INST";
+            loc2.Publish = "Y";
 
             var res = sut.LoadCourse(new List<UcasCourse> {loc1, loc2}, new List<UcasCourseEnrichmentGetModel>(), false);
 
@@ -120,7 +121,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 
         [Test]
         public void FullySuspendedCoursesWorkStill()
-        {            
+        {
             var sut = new CourseLoader();
             var loc1 = GetBlankUcasCourse();
             loc1.Status = "S";
