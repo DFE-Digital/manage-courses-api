@@ -23,7 +23,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var context = GetContext();
 
             Console.WriteLine("Retrieve courses");
-
             var ucasCourses = context.UcasCourses.Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
                 .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
@@ -31,19 +30,20 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.UcasCampus)
                 .Where(x => x.Publish == "Y")
                 .ToList();
+            Console.WriteLine($" - {ucasCourses.Count()} courses");
         
             Console.WriteLine("Retrieve institutions");
             var insts = context.UcasInstitutions.ToDictionary(x => x.InstCode);
-
+            Console.WriteLine($" - {insts.Count()} institutions");
             
             Console.WriteLine("Retrieve enrichments");
-
             var courseEnrichments = context.CourseEnrichments
                 .Include(x => x.CreatedByUser)
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.InstCode + "_@@_" + x.UcasCourseCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
+            Console.WriteLine($" - {courseEnrichments.Count()} courseEnrichments");
 
             var orgEnrichments = context.InstitutionEnrichments
                 .Include(x => x.CreatedByUser)
@@ -51,13 +51,14 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.InstCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
+            Console.WriteLine($" - {orgEnrichments.Count()} orgEnrichments");
             
             var pgdeCourses = context.PgdeCourses.ToList();
+            Console.WriteLine($" - {pgdeCourses.Count()} pgdeCourses");
 
             Console.WriteLine("Load courses");
             var courses = new CourseLoader().LoadCourses(ucasCourses, new List<UcasCourseEnrichmentGetModel>(), pgdeCourses);
             
-
             var courseMapper = new CourseMapper();
             var converter = new EnrichmentConverter();
 
