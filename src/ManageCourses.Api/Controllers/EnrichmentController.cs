@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(404)]
         public ActionResult GetInstitution(string ucasInstitutionCode)
         {
-            return Handle(() => _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name, false));
+            return Handle(() => _service.GetInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name));
         }
 
         /// <summary>
@@ -44,22 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         {
             return HandleVoid(() => _service.SaveInstitutionEnrichment(model, ucasInstitutionCode, User.Identity.Name));
         }
-        /// <summary>
-        /// sets the status of the latest draft record to 'published'
-        /// </summary>
-        /// <param name="ucasInstitutionCode">institution code that relates to the Ucas institution</param>
-        /// <returns>true if successful</returns>
-        [HttpPost]
-        [Route("institution/{ucasInstitutionCode}/publish")]
-        [ProducesResponseType(typeof(bool), 200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(404)]
-        public ActionResult PublishInstitution(string ucasInstitutionCode)
-        {
-            //TODO send to search and compare
-            return Handle(() => _service.PublishInstitutionEnrichment(ucasInstitutionCode, User.Identity.Name));
-        }
-
+ 
         /// <summary>
         /// always get the latest enrichment record regardless of status
         /// </summary>

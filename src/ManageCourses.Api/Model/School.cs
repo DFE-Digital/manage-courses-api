@@ -18,5 +18,6 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string PartTimeVacancies { get; set; }
         public string ApplicationsAcceptedFrom { get; set; }
         public string Status { get; set; }
+        public string VacStatus { get; set; }
     }
 }

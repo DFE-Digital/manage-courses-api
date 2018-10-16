@@ -34,6 +34,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email
     /// services.AddScoped&lt;ICustomTemplateEmailService, CustomTemplateEmailService&gt;();
     /// </code>
     /// </example>
+    /// </summary>
     public abstract class TemplateEmailService<TEmailModel> : ITemplateEmailService<TEmailModel> where TEmailModel : class, IEmailModel
     {
         private readonly INotificationClientWrapper _notificationClient;

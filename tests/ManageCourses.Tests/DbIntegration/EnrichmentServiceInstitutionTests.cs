@@ -118,14 +118,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 }
             };
 
-            var emptyEnrichment = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email, false);
+            var emptyEnrichment = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
             emptyEnrichment.Status.Should().Be(EnumStatus.Draft, "no enrichments saved yet");
 
             //test save
             enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
 
             //test get
-            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email, false);
+            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
 
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
@@ -153,19 +153,19 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
 
             enrichmentService.SaveInstitutionEnrichment(updatedmodel, ProviderInstCode.ToLower(), Email);
-            var updateResult = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email, false);
+            var updateResult = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
             updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
             updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
             updateResult.LastPublishedTimestampUtc.Should().BeNull();
             //publish
             var publishResults = enrichmentService.PublishInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
             publishResults.Should().BeTrue();
-            var publishRecord = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email, false);
+            var publishRecord = enrichmentService.GetInstitutionEnrichment(ProviderInstCode.ToLower(), Email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
             //test save again after publish
             enrichmentService.SaveInstitutionEnrichment(model, ProviderInstCode.ToLower(), Email);
-            var updateResult2 = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email, false);
+            var updateResult2 = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email);
             updateResult2.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
             updateResult2.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
             updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
@@ -239,7 +239,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var enrichmentService = new EnrichmentService(Context);
 
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetInstitutionEnrichment(instCode, email, false));
+            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetInstitutionEnrichment(instCode, email));
         }
         [Test]
         [TestCase("eqweqw", "qweqweq")]
@@ -325,7 +325,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             dataService.ProcessUcasPayload(ucasPayload);
 
             // Assert
-            var res = enrichmentService.GetInstitutionEnrichment(_ucasInstitution.InstCode, Email, false);
+            var res = enrichmentService.GetInstitutionEnrichment(_ucasInstitution.InstCode, Email);
             res.EnrichmentModel.TrainWithUs.Should().Be(sourceModel.EnrichmentModel.TrainWithUs);
             res.EnrichmentModel.TrainWithDisability.Should().Be(sourceModel.EnrichmentModel.TrainWithDisability);
             res.EnrichmentModel.AccreditingProviderEnrichments.Should().HaveCount(1);

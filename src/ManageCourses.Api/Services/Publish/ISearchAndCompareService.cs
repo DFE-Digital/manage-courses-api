@@ -7,6 +7,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
 {
     public interface ISearchAndCompareService
     {
-        Task<bool> SaveSingleCourseToSearchAndCompare(string instCode, string courseCode, string email);
+        Task<bool> SaveCourse(string instCode, string courseCode, string email);
+        Task<bool> SaveCourses(string instCode, string email);
     }
 }
