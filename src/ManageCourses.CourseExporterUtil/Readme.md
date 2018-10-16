@@ -39,6 +39,7 @@ del out.json
 set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST=<redacted> && set PG_DATABASE=<redacted> && set PG_USERNAME=<redacted> && set PG_PASSWORD=<redacted> && dotnet run
 
 cd SendToSearch
+npm install
 node index https://bat-dev-search-and-compare-api-app.azurewebsites.net <redacted>
 node index https://bat-staging-search-and-compare-api-app.azurewebsites.net <redacted>
 node index https://bat-prod-search-and-compare-api-app.azurewebsites.net <redacted>
