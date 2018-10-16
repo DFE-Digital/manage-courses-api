@@ -151,6 +151,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         /// </summary>
         /// <param name="model">holds the enriched data</param>
         /// <param name="instCode">the institution code for the enrichment data</param>
+        /// <param name="ucasCourseCode">the course code for the enrichment data</param>
         /// <param name="email">the email of the user</param>
         public void SaveCourseEnrichment(CourseEnrichmentModel model, string instCode, string ucasCourseCode, string email)
         {
@@ -207,7 +208,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         /// <summary>
         /// Changes the status of the latest draft record to published
         /// </summary>
-        /// <param name="instCode">institution code of the enrichemtn to be published</param>
+        /// <param name="instCode">institution code of the enrichemnt to be published</param>
+        /// <param name="ucasCourseCode">course code of the enrichemnt to be published</param>
         /// <param name="email">email of the user</param>
         /// <returns>true if successful</returns>
         public bool PublishCourseEnrichment(string instCode, string ucasCourseCode, string email)

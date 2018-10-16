@@ -16,6 +16,7 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             _logger = logger.CreateLogger<BearerTokenApiKeyHandler>();
         }
 
+        #pragma warning disable 1998
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             var accessToken = Request.GetAccessToken();
@@ -58,5 +59,6 @@ namespace GovUk.Education.ManageCourses.Api.Middleware
             return Task.CompletedTask;
 
         }
+        #pragma warning restore 1998
     }
 }

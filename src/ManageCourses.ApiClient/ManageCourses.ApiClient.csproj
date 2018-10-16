@@ -10,6 +10,7 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <GitInfoReportImportance>high</GitInfoReportImportance>
     <GitVersionFile>$(ProjectDir)GitVersion.txt</GitVersionFile>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
