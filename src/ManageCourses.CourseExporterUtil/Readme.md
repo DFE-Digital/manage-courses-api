@@ -36,12 +36,13 @@ cd src
 cd ManageCourses.CourseExporterUtil
 
 del out.json
-set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST=<redacted> && set PG_DATABASE=<redacted> && set PG_USERNAME=<redacted> && set PG_PASSWORD=<redacted> && dotnet run
+set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST=<host> && set PG_DATABASE=<manage_db_name> && set PG_USERNAME=<username> && set PG_PASSWORD=<password> && dotnet run
 
 cd SendToSearch
 npm install
-node index https://bat-dev-search-and-compare-api-app.azurewebsites.net <redacted>
-node index https://bat-staging-search-and-compare-api-app.azurewebsites.net <redacted>
-node index https://bat-prod-search-and-compare-api-app.azurewebsites.net <redacted>
+node index http://localhost:5001/ <search-api-key>
+node index https://bat-dev-search-and-compare-api-app.azurewebsites.net <search-api-key>
+node index https://bat-staging-search-and-compare-api-app.azurewebsites.net <search-api-key>
+node index https://bat-prod-search-and-compare-api-app.azurewebsites.net <search-api-key>
 
 ```
