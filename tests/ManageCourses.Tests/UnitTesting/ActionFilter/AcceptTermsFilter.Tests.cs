@@ -181,6 +181,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.ActionFilter
 
             public override WebSocketManager WebSockets => throw new NotImplementedException();
 
+            [Obsolete]
             public override AuthenticationManager Authentication => throw new NotImplementedException();
 
             public override ClaimsPrincipal User { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

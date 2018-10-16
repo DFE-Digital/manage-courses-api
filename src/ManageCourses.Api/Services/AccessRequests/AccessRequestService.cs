@@ -56,7 +56,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
 
                     transaction.Commit();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     transaction.Rollback();
                     throw;
