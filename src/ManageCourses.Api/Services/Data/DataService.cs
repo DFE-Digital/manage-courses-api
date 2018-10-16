@@ -45,62 +45,34 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             int processed = 0;
             foreach (var inst in allInstitutions)
             {
-                // note: this does not perform a delete of existing institutions
-
-                var instRes = AttemptTransaction(inst.InstCode, "upsert institution entity", () => UpsertInstitution(inst));
-
-                var deleted = AttemptTransaction(inst.InstCode, "delete for replace", () => DeleteForInstitution(inst.InstCode));
-                var added = AttemptTransaction(inst.InstCode, "insert", () => AddForInstitution(inst.InstCode, payload));
-
-                if (added == null && deleted != null)
+                using (var transaction = (_context as DbContext).Database.BeginTransaction())
                 {
-                    //deletion succeeded but adding didn't... attempt to recover by re-adding deleted content
-                    AttemptTransaction(inst.InstCode, "restore", () => AddForInstitution(inst.InstCode, deleted));
+                    try 
+                    {
+                        UpsertInstitution(inst);
+                        _context.Save();
+                        DeleteForInstitution(inst.InstCode);
+                        _context.Save();
+                        AddForInstitution(inst.InstCode, payload);
+                        _context.Save();
+                        transaction.Commit();
+                    }
+                    catch (Exception e)
+                    {
+                        transaction.Rollback();
+                        _logger.LogError(e, $"UCAS import failed to update institution {inst.InstFull} [{inst.InstCode}]");
+                    }
                 }
                 if (++processed % 100 == 0)
                 {
                     _logger.LogInformation($"Upserted {processed} institutions so far");
                 }
             }
+            
             _logger.LogWarning("Completed UCAS import");
         }
 
-        private UcasPayload AttemptTransaction(string instCode, string operationName, Func<UcasPayload> performActions)
-        {
-            var transaction = (_context as DbContext).Database.BeginTransaction();
-            try
-            {
-                var res = performActions();
-
-                (_context as DbContext).SaveChanges();
-                transaction.Commit();
-                return res;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Import failed to update ({operationName}) Institution {instCode}");
-
-                transaction.Rollback();
-
-                foreach (var entry in (_context as DbContext).ChangeTracker.Entries().ToList())
-                {
-                    switch (entry.State)
-                    {
-                        case EntityState.Modified:
-                        case EntityState.Deleted:
-                            entry.State = EntityState.Modified; //Revert changes made to deleted entity.
-                            entry.State = EntityState.Unchanged;
-                            break;
-                        case EntityState.Added:
-                            entry.State = EntityState.Detached;
-                            break;
-                    }
-                }
-                return null;
-            }
-        }
-
-        private UcasPayload UpsertInstitution(UcasInstitution newValues)
+        private void UpsertInstitution(UcasInstitution newValues)
         {
             newValues.InstCode = newValues.InstCode.ToUpperInvariant();
             var entity = _context.UcasInstitutions.FirstOrDefault(x => x.InstCode == newValues.InstCode);
@@ -108,19 +80,17 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 // insert
                 _context.UcasInstitutions.Add(newValues);
-                return new UcasPayload { Institutions = new List<UcasInstitution> { newValues } };
 
             }
             else
             {
                 // update
                 entity.UpdateWith(newValues);
-                return new UcasPayload { Institutions = new List<UcasInstitution> { entity } };
             }
         }
 
 
-        private UcasPayload DeleteForInstitution(string instCode)
+        private void DeleteForInstitution(string instCode)
         {
             var toDelete = new UcasPayload()
             {
@@ -137,11 +107,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             _context.UcasCourses.RemoveRange(toDelete.Courses);
             _context.CourseCodes.RemoveRange(_context.CourseCodes.Where(c => c.InstCode == instCode));
             _context.UcasCampuses.RemoveRange(toDelete.Campuses);
-
-            return toDelete;
         }
 
-        private UcasPayload AddForInstitution(string instCode, UcasPayload payload)
+        private void AddForInstitution(string instCode, UcasPayload payload)
         {
 
             foreach (var campus in payload.Campuses.Where(c => c.InstCode == instCode))
@@ -241,7 +209,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                     }
                 );
             }
-            return payload;
         }
 
         public UserOrganisation GetOrganisationForUser(string email, string instCode)
