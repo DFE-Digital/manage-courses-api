@@ -34,7 +34,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var mockEnrichmentService = new Mock<IEnrichmentService>();
             mockEnrichmentService.Setup(x => x.GetCourseEnrichmentMetadata(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<UcasCourseEnrichmentGetModel>());
-                
+
             var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
             mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
             DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object, mockPdgeWhitelist.Object);
@@ -81,7 +81,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             GetCoursesForUser_isNull(TestUserEmail1, null);
             GetCoursesForUser_isNull(TestUserEmail2, null);
             GetCoursesForUser_isNull(TestUserEmail3, OrgId1);
-        }        
+        }
 
         [Test]
         public void RepeatImportsArePossible()
@@ -277,6 +277,26 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 foreach (var course in result.Courses)
                 {
                     course.Schools.All(s => s.Status == "N").Should().BeTrue();
+                }
+            }
+        }
+
+        [Test]
+        public void GetCoursesShouldReturnPublish()
+        {
+            const int numOrgs = 5;
+            const int numCourses = 6;
+            LoadData(TestUserEmail1, numOrgs, numCourses);
+            var orgList = DataService.GetOrganisationsForUser(TestUserEmail1).ToList();
+            orgList.Count.Should().Be(numOrgs);
+
+            foreach (var org in orgList)//we have a valist list of data
+            {
+                var result = DataService.GetCourses(TestUserEmail1, org.UcasCode);//get the course for each org
+
+                foreach (var course in result.Courses)
+                {
+                    course.Schools.All(s => s.Publish == "N").Should().BeTrue();
                 }
             }
         }
@@ -529,7 +549,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     CrseTitle = "Title " + counter,
                     InstCode = instCode,
                     CampusCode = campusCode,
-                    Status = "N"
+                    Status = "N",
+                    Publish = "N",
                 });
                 Context.UcasCampuses.Add(new UcasCampus
                 {
