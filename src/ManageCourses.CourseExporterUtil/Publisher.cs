@@ -42,6 +42,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mcConfig.SearchAndCompareApiKey);
+                httpClient.Timeout = TimeSpan.FromMinutes(15);
                 var client = new SearchAndCompareApi(httpClient, _mcConfig.SearchAndCompareApiUrl);
                 Console.WriteLine($"Sending {courses.Count()} courses to Search API...");
                 var success = await client.SaveCoursesAsync(courses);
