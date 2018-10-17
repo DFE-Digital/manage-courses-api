@@ -172,11 +172,11 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             ucasUnexpected = new string[]
             {
                 "construction and the built environment",
-                "history of art",
+                //"history of art",
                 "home economics",
                 "hospitality and catering",
                 "personal and social education",
-                "philosophy",
+                //"philosophy",
                 "sport and leisure",
                 "environmental science",
                 "law"
@@ -227,7 +227,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             // if unexpected throw.
             if (ucasSubjects.Intersect(ucasUnexpected).Any())
             {
-                throw new ArgumentException("found unsupported subject name");
+                throw new ArgumentException($"found unsupported subject name(s): {string.Join(", ", ucasSubjects.Intersect(ucasUnexpected))}");
             }            
             
             // If the subject indicates that it's primary, do not associate it with any
