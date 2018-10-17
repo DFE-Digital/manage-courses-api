@@ -2,23 +2,25 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.SearchAndCompare.Domain.Client;
 using GovUk.Education.SearchAndCompare.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using Course = GovUk.Education.SearchAndCompare.Domain.Models.Course;
+using SearchCourse = GovUk.Education.SearchAndCompare.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.CourseExporterUtil
 {
     /// <summary>
     /// Pulls data out of manage database and pushes it in bulk into search api.
     /// </summary>
-
     public class Publisher
     {
         private McConfig _mcConfig;
@@ -31,27 +33,22 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             _mcConfig = GetConfig();
             var context = GetContext();
             var mappedCourses = ReadAllCourseData(context);
-
-            Console.WriteLine("Saving to JSON");
-
-            var asJson = JsonifyCourses(mappedCourses);
-
-            System.IO.File.WriteAllText("out.json", asJson);
-
+            PublishToSearch(mappedCourses).Wait();
             Console.WriteLine("Done");
         }
 
-        private static string JsonifyCourses(List<Course> mappedCourses)
+        private async Task PublishToSearch(IList<SearchCourse> courses)
         {
-            var asJson = JsonConvert.SerializeObject(mappedCourses, new JsonSerializerSettings
+            using (var httpClient = new HttpClient())
             {
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore
-            });
-            return asJson;
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mcConfig.SearchAndCompareApiKey);
+                var client = new SearchAndCompareApi(httpClient, _mcConfig.SearchAndCompareApiUrl);
+                Console.WriteLine($"Sending {courses.Count()} courses to Search API...");
+                await client.SaveCoursesAsync(courses);
+            }
         }
 
-        private static List<Course> ReadAllCourseData(IManageCoursesDbContext context)
+        private static List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
         {
             Console.WriteLine("Retrieve courses");
             var ucasCourses = context.UcasCourses.Include(x => x.UcasInstitution)
@@ -121,7 +118,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 }
 
                 // hacks - remove when coursemapper refactor has completed
-                mappedCourse.ProviderLocation = new Location {Address = mappedCourse.ContactDetails.Address};
+                mappedCourse.ProviderLocation = new Location { Address = mappedCourse.ContactDetails.Address };
                 mappedCourse.Fees = mappedCourse.Fees ?? new Fees();
                 mappedCourse.Salary = mappedCourse.Salary ?? new Salary();
 
