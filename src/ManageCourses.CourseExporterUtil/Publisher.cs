@@ -11,6 +11,8 @@ using GovUk.Education.SearchAndCompare.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Course = GovUk.Education.SearchAndCompare.Domain.Models.Course;
+
 namespace GovUk.Education.ManageCourses.CourseExporterUtil
 {
     /// <summary>
@@ -28,7 +30,23 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
         {
             _mcConfig = GetConfig();
             var context = GetContext();
+            var mappedCourses = ReadAllCourseData(context);
 
+            Console.WriteLine("Saving to JSON");
+
+            var asJson = JsonConvert.SerializeObject(mappedCourses, new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Ignore,
+                NullValueHandling = NullValueHandling.Ignore
+            });
+
+            System.IO.File.WriteAllText("out.json", asJson);
+
+            Console.WriteLine("Done");
+        }
+
+        private static List<Course> ReadAllCourseData(IManageCoursesDbContext context)
+        {
             Console.WriteLine("Retrieve courses");
             var ucasCourses = context.UcasCourses.Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
@@ -90,31 +108,21 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
                 if (!mappedCourse.CourseSubjects.Any())
                 {
-
-                    Console.WriteLine($"failed to assign subject to [{c.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
+                    Console.WriteLine(
+                        $"failed to assign subject to [{c.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
                 }
 
                 // hacks - remove when coursemapper refactor has completed
-                mappedCourse.ProviderLocation = new Location { Address = mappedCourse.ContactDetails.Address };
+                mappedCourse.ProviderLocation = new Location {Address = mappedCourse.ContactDetails.Address};
                 mappedCourse.Fees = mappedCourse.Fees ?? new Fees();
                 mappedCourse.Salary = mappedCourse.Salary ?? new Salary();
 
                 mappedCourses.Add(mappedCourse);
             }
 
-            Console.WriteLine("Saving to JSON");
-
-            var asJson = JsonConvert.SerializeObject(mappedCourses, new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore
-            });
-
-            System.IO.File.WriteAllText("out.json", asJson);
-
-            Console.WriteLine("Done");
+            return mappedCourses;
         }
 
         private ManageCoursesDbContext GetContext()
