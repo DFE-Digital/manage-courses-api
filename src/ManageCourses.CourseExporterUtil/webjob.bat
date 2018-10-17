@@ -1,0 +1,1 @@
+dotnet ManageCourses.CourseExporterUtil.dll
