@@ -40,9 +40,10 @@ set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST=<host> && set PG_DATABASE=<manage_db_
 
 cd SendToSearch
 npm install
-node index http://localhost:5001/ <search-api-key>
+node index http://localhost:5001 <search-api-key>
 node index https://bat-dev-search-and-compare-api-app.azurewebsites.net <search-api-key>
 node index https://bat-staging-search-and-compare-api-app.azurewebsites.net <search-api-key>
 node index https://bat-prod-search-and-compare-api-app.azurewebsites.net <search-api-key>
 
 ```
+Gotcha: make sure there's no trailing slash on the api url otherwise it'll fail because the body size check in search-api is fussy.
