@@ -19,11 +19,14 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
     public class Publisher
     {
+        private McConfig _mcConfig;
+
         /// <summary>
         /// Pull data out of manage database and push it in bulk into search api.
         /// </summary>
         public void PublishToSearch()
         {
+            _mcConfig = GetConfig();
             var context = GetContext();
 
             Console.WriteLine("Retrieve courses");
@@ -114,25 +117,31 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             Console.WriteLine("Done");
         }
 
-        private static ManageCoursesDbContext GetContext()
+        private ManageCoursesDbContext GetContext()
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-                .AddUserSecrets<Api.Startup>()
-                .AddEnvironmentVariables()
-                .Build();
-
-            var mcConfig = new McConfig(config);
-            mcConfig.Validate();
-            var connectionString = mcConfig.BuildConnectionString();
+            var connectionString = _mcConfig.BuildConnectionString();
 
             var options = new DbContextOptionsBuilder<ManageCoursesDbContext>()
                 .UseNpgsql(connectionString)
                 .Options;
 
             return new ManageCoursesDbContext(options);
+        }
+
+        private static McConfig GetConfig()
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
+                    optional: true)
+                .AddUserSecrets<Api.Startup>()
+                .AddEnvironmentVariables()
+                .Build();
+
+            var mcConfig = new McConfig(config);
+            mcConfig.Validate();
+            return mcConfig;
         }
     }
 }
