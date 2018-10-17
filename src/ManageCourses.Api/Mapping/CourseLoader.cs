@@ -43,7 +43,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 foreach (var grouping in courseRecordGroupings)
                 {
                     returnCourses.Courses.Add(LoadCourse(
-                        grouping.ToList(), 
+                        grouping.ToList(),
                         enrichmentGroupings[grouping.Key] ?? new List<UcasCourseEnrichmentGetModel>(),
                         pgdeCoursesSimple.Contains(grouping.Key)));
                 }
@@ -52,7 +52,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             return returnCourses;
 
         }
-        
+
         /// <summary>
         /// Takes the list of campus info within a single course and maps it into
         /// our version of a course, with the schools being read from the campus info in the UcasCourse (aka campus)
@@ -67,10 +67,13 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             if (courseRecords.Count() > 0)
             {
                 // pick a reference course record for shared data such as the accrediting provider
-                // users can edit only running locations in UCAS so give preference to using running locations
+                // users can edit only:
+                // running locations in UCAS and
+                // published locations in UCAS
+                // so give preference to using running and published locations
                 // if there are any.
-                var organisationCourseRecord = 
-                    courseRecords.FirstOrDefault(x => x.Status != null && x.Status.ToLowerInvariant() == "r") 
+                var organisationCourseRecord =
+                    courseRecords.FirstOrDefault(x => x.Status != null && x.Status.ToLowerInvariant() == "r" && x.Publish != null && x.Publish.ToLowerInvariant() == "y")
                     ?? courseRecords.First();
 
                 var bestEnrichment = enrichmentMetadata.SingleOrDefault(x => x.InstCode == organisationCourseRecord.InstCode && x.CourseCode == organisationCourseRecord.CrseCode);
@@ -124,6 +127,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 ApplicationsAcceptedFrom = courseRecord.CrseOpenDate,
                 Code = courseRecord.UcasCampus.CampusCode,
                 Status = courseRecord.Status,
+                Publish = courseRecord.Publish,
                 VacStatus = courseRecord.VacStatus,
             }).ToList();
             //look for the main site and move it to the top of the list
