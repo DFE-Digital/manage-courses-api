@@ -34,15 +34,21 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
             Console.WriteLine("Saving to JSON");
 
+            var asJson = JsonifyCourses(mappedCourses);
+
+            System.IO.File.WriteAllText("out.json", asJson);
+
+            Console.WriteLine("Done");
+        }
+
+        private static string JsonifyCourses(List<Course> mappedCourses)
+        {
             var asJson = JsonConvert.SerializeObject(mappedCourses, new JsonSerializerSettings
             {
                 MissingMemberHandling = MissingMemberHandling.Ignore,
                 NullValueHandling = NullValueHandling.Ignore
             });
-
-            System.IO.File.WriteAllText("out.json", asJson);
-
-            Console.WriteLine("Done");
+            return asJson;
         }
 
         private static List<Course> ReadAllCourseData(IManageCoursesDbContext context)
