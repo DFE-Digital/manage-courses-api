@@ -44,7 +44,11 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mcConfig.SearchAndCompareApiKey);
                 var client = new SearchAndCompareApi(httpClient, _mcConfig.SearchAndCompareApiUrl);
                 Console.WriteLine($"Sending {courses.Count()} courses to Search API...");
-                await client.SaveCoursesAsync(courses);
+                var success = await client.SaveCoursesAsync(courses);
+                if (!success)
+                {
+                    throw new Exception("Publishing to Search API failed. Check search API logs for details");
+                }
             }
         }
 
