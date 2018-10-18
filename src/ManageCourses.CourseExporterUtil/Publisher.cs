@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -25,18 +24,21 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
     /// </summary>
     public class Publisher
     {
-        private McConfig _mcConfig;
-        private Logger _logger;
+        private readonly McConfig _mcConfig;
+        private readonly Logger _logger;
+
+        public Publisher(IConfiguration configuration)
+        {
+            _logger = GetLogger(configuration);
+            _mcConfig = GetMcConfig(configuration);
+        }
 
         /// <summary>
         /// Pull data out of manage database and push it in bulk into search api.
         /// </summary>
-        public void PublishToSearch()
+        public void Publish()
         {
-            var configuration = GetConfig();
-            _logger = GetLogger(configuration);
             _logger.Information("Bulk publish to search started");
-            _mcConfig = GetMcConfig(configuration);
             var context = GetContext();
             var mappedCourses = ReadAllCourseData(context);
             PublishToSearch(mappedCourses).Wait();
@@ -164,19 +166,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var mcConfig = new McConfig(configurationRoot);
             mcConfig.Validate();
             return mcConfig;
-        }
-
-        private static IConfiguration GetConfig()
-        {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
-                    optional: true)
-                .AddUserSecrets<Api.Startup>()
-                .AddEnvironmentVariables()
-                .Build();
-            return config;
         }
     }
 }
