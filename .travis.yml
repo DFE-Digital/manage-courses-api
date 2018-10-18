@@ -42,16 +42,13 @@ deploy:
     HEAD:refs/heads/master
   on: production
   - provider: script
-  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
-    bat-dev-manage-courses-api-app"
+  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-dev-manage-courses-api-app"
   on: master
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
-    bat-staging-manage-courses-api-app"
+  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-staging-manage-courses-api-app"
   on: staging
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
-    bat-prod-manage-courses-api-app"
+  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-prod-manage-courses-api-app"
   on: production
 - provider: script
   skip_cleanup: true
