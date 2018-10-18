@@ -124,7 +124,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
                 if (!mappedCourse.CourseSubjects.Any())
                 {
-                    _logger.Information(
+                    _logger.Warning(
                         $"failed to assign subject to [{c.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
