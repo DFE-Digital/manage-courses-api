@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,6 +13,8 @@ using GovUk.Education.SearchAndCompare.Domain.Client;
 using GovUk.Education.SearchAndCompare.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Core;
 using SearchCourse = GovUk.Education.SearchAndCompare.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.CourseExporterUtil
@@ -23,18 +24,25 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
     /// </summary>
     public class Publisher
     {
-        private McConfig _mcConfig;
+        private readonly McConfig _mcConfig;
+        private readonly Logger _logger;
+
+        public Publisher(IConfiguration configuration)
+        {
+            _logger = GetLogger(configuration);
+            _mcConfig = GetMcConfig(configuration);
+        }
 
         /// <summary>
         /// Pull data out of manage database and push it in bulk into search api.
         /// </summary>
-        public void PublishToSearch()
+        public void Publish()
         {
-            _mcConfig = GetConfig();
+            _logger.Information("Bulk publish to search started");
             var context = GetContext();
             var mappedCourses = ReadAllCourseData(context);
             PublishToSearch(mappedCourses).Wait();
-            Console.WriteLine("Done");
+            _logger.Information("Bulk publish to search completed");
         }
 
         private async Task PublishToSearch(IList<SearchCourse> courses)
@@ -44,7 +52,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mcConfig.SearchAndCompareApiKey);
                 httpClient.Timeout = TimeSpan.FromMinutes(120);
                 var client = new SearchAndCompareApi(httpClient, _mcConfig.SearchAndCompareApiUrl);
-                Console.WriteLine($"Sending {courses.Count()} courses to Search API...");
+                _logger.Information($"Sending {courses.Count()} courses to Search API...");
                 var success = await client.SaveCoursesAsync(courses);
                 if (!success)
                 {
@@ -53,9 +61,9 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             }
         }
 
-        private static List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
+        private List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
         {
-            Console.WriteLine("Retrieve courses");
+            _logger.Information("Retrieving courses");
             var ucasCourses = context.UcasCourses.Include(x => x.UcasInstitution)
                 .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
                 .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
@@ -63,20 +71,20 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.UcasCampus)
                 .Where(x => x.Publish == "Y")
                 .ToList();
-            Console.WriteLine($" - {ucasCourses.Count()} courses");
+            _logger.Information($" - {ucasCourses.Count()} courses");
 
-            Console.WriteLine("Retrieve institutions");
+            _logger.Information("Retrieving institutions");
             var insts = context.UcasInstitutions.ToDictionary(x => x.InstCode);
-            Console.WriteLine($" - {insts.Count()} institutions");
+            _logger.Information($" - {insts.Count()} institutions");
 
-            Console.WriteLine("Retrieve enrichments");
+            _logger.Information("Retrieving enrichments");
             var courseEnrichments = context.CourseEnrichments
                 .Include(x => x.CreatedByUser)
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.InstCode + "_@@_" + x.UcasCourseCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
-            Console.WriteLine($" - {courseEnrichments.Count()} courseEnrichments");
+            _logger.Information($" - {courseEnrichments.Count()} courseEnrichments");
 
             var orgEnrichments = context.InstitutionEnrichments
                 .Include(x => x.CreatedByUser)
@@ -84,12 +92,12 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.InstCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
-            Console.WriteLine($" - {orgEnrichments.Count()} orgEnrichments");
+            _logger.Information($" - {orgEnrichments.Count()} orgEnrichments");
 
             var pgdeCourses = context.PgdeCourses.ToList();
-            Console.WriteLine($" - {pgdeCourses.Count()} pgdeCourses");
+            _logger.Information($" - {pgdeCourses.Count()} pgdeCourses");
 
-            Console.WriteLine("Load courses");
+            _logger.Information("Load courses");
             var courses = new CourseLoader().LoadCourses(ucasCourses, new List<UcasCourseEnrichmentGetModel>(), pgdeCourses);
 
             var courseMapper = new CourseMapper();
@@ -97,7 +105,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
             var mappedCourses = new List<SearchAndCompare.Domain.Models.Course>();
 
-            Console.WriteLine("Combine courses with institution and enrichment data");
+            _logger.Information("Combine courses with institution and enrichment data");
 
             foreach (var c in courses.Courses)
             {
@@ -116,7 +124,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
                 if (!mappedCourse.CourseSubjects.Any())
                 {
-                    Console.WriteLine(
+                    _logger.Warning(
                         $"failed to assign subject to [{c.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
@@ -133,6 +141,15 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             return mappedCourses;
         }
 
+        private static Logger GetLogger(IConfiguration configuration)
+        {
+            return new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .WriteTo
+                .ApplicationInsightsTraces(configuration["APPINSIGHTS_INSTRUMENTATIONKEY"])
+                .CreateLogger();
+        }
+
         private ManageCoursesDbContext GetContext()
         {
             var connectionString = _mcConfig.BuildConnectionString();
@@ -144,18 +161,9 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             return new ManageCoursesDbContext(options);
         }
 
-        private static McConfig GetConfig()
+        private static McConfig GetMcConfig(IConfiguration configurationRoot)
         {
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",
-                    optional: true)
-                .AddUserSecrets<Api.Startup>()
-                .AddEnvironmentVariables()
-                .Build();
-
-            var mcConfig = new McConfig(config);
+            var mcConfig = new McConfig(configurationRoot);
             mcConfig.Validate();
             return mcConfig;
         }
