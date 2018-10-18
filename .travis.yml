@@ -41,7 +41,7 @@ deploy:
   script: git fetch --unshallow && git push https://govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD@bat-prod-manage-courses-api-app.scm.azurewebsites.net:443/bat-prod-manage-courses-api-app.git
     HEAD:refs/heads/master
   on: production
-  - provider: script
+- provider: script
   script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-dev-manage-courses-api-app"
   on: master
 - provider: script
