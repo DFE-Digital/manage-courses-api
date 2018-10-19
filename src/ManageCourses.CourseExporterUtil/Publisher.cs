@@ -41,8 +41,19 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             _logger.Information("Bulk publish to search started");
             var context = GetContext();
             var mappedCourses = ReadAllCourseData(context);
-            PublishToSearch(mappedCourses).Wait();
-            _logger.Information("Bulk publish to search completed");
+            try
+            {
+
+                PublishToSearch(mappedCourses).Wait();
+                _logger.Information("Bulk publish to search completed");
+            }
+            catch (Exception ex)
+            {
+                // Still exit cleanly even if the POST failed. The post takes longer than the timeout on the gateway
+                // so we usually get a 502 instead of 200. We have monitoring & alerts in azure so that we will notice
+                // if the receiving end isn't completing its side.
+                _logger.Information($"{nameof(PublishToSearch)} threw, this likely the usual gateway timeout. {ex.Message}");
+            }
         }
 
         private async Task PublishToSearch(IList<SearchCourse> courses)
