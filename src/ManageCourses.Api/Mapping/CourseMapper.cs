@@ -91,7 +91,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 },
                 IncludesPgce = MapQualification(ucasCourseData.Qualification),
                 Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools
-                    .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase))
+                    .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase) && String.Equals(school.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
                         new SearchAndCompare.Domain.Models.Campus
                         {
