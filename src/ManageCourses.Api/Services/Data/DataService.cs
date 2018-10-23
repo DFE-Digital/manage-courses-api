@@ -17,15 +17,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         private readonly CourseLoader _courseLoader;
         private readonly IManageCoursesDbContext _context;
         IEnrichmentService _enrichmentService;
-        private readonly IDataHelper _dataHelper;
         private readonly ILogger _logger;
         private readonly IPgdeWhitelist _pgdeWhitelist;
 
-        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, IDataHelper dataHelper, ILogger<DataService> logger, IPgdeWhitelist pgdeWhitelist)
+        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, ILogger<DataService> logger, IPgdeWhitelist pgdeWhitelist)
         {
             _context = context;
             _enrichmentService = enrichmentService;
-            _dataHelper = dataHelper;
             _logger = logger;
             _pgdeWhitelist = pgdeWhitelist;
             _courseLoader = new CourseLoader();

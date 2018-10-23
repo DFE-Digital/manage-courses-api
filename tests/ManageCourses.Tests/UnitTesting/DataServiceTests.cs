@@ -19,7 +19,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
     {
         private Mock<IManageCoursesDbContext> _contextMock;
         private Mock<IEnrichmentService> _enrichmentServiceMock;
-        private Mock<IDataHelper> _dataHelperMock;
         private IDataService _dataService;
 
         [SetUp]
@@ -27,10 +26,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             _contextMock = new Mock<IManageCoursesDbContext>();
             _enrichmentServiceMock = new Mock<IEnrichmentService>();
-            _dataHelperMock = new Mock<IDataHelper>();            
             var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
             mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
-            _dataService = new DataService(_contextMock.Object, _enrichmentServiceMock.Object, _dataHelperMock.Object, new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
+            _dataService = new DataService(_contextMock.Object, _enrichmentServiceMock.Object, new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
         }
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
             mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
-            DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object, mockPdgeWhitelist.Object);
+            DataService = new DataService(Context, mockEnrichmentService.Object, mockLogger.Object, mockPdgeWhitelist.Object);
         }
 
         [Test]
