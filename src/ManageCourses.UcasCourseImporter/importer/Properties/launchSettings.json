@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "UcasCourseImporter": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "hello-insights"
+      }
+    }
+  }
+}
