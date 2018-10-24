@@ -35,14 +35,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         {
 
             var courseRecords = _context.GetUcasCourseRecordsByUcasCode(instCode, ucasCode, email);
-            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
-
+            
             if (courseRecords.Count == 0)
             {
                 return null;
             }
 
-            return courseRecords.Single();
+            return WithEnrichmentMetadata(courseRecords, instCode, email).Single();
         }
 
         /// <summary>
@@ -67,7 +66,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             
             return new InstitutionCourses
             {
-                Courses = courseRecords,
+                Courses = WithEnrichmentMetadata(courseRecords, instCode, email).ToList(),
                 InstitutionCode = courseRecords.First().InstCode,
                 InstitutionName = courseRecords.First().Institution.InstFull
             };
@@ -111,6 +110,18 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         public Institution GetUcasInstitutionForUser(string name, string instCode)
         {
             return _context.GetInstitution(name, instCode);
+        }
+        
+        private IEnumerable<Course> WithEnrichmentMetadata(IEnumerable<Course> courseRecords, string instCode, string email)
+        {
+            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
+
+            foreach (var course in courseRecords)
+            {
+                var bestEnrichment = enrichmentMetadata.Where(x => x.CourseCode == course.CourseCode).OrderByDescending(x => x.CreatedTimestampUtc).FirstOrDefault();
+                course.EnrichmentWorkflowStatus = bestEnrichment?.Status;
+            }
+            return courseRecords;
         }
     }
 }
