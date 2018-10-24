@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             Institution institution = new Institution
             {
-                InstFull = "Joe's school @ UCAS",
+                InstName = "Joe's school @ UCAS",
                 InstCode = "ABC"
             };
             context.Institutions.Add(institution);

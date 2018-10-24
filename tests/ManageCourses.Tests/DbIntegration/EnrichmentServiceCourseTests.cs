@@ -32,7 +32,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var accreditingInstitution = new Institution
             {
-                InstFull = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
+                InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
                 InstCode = AccreditingInstCode,
             };
             Context.Add(accreditingInstitution);
@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const string crseCode = "TK101";
             _ucasInstitution = new Institution
             {
-                InstFull = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
+                InstName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
                 InstCode = providerInstCode,
                 Courses = new List<Course>
                 {

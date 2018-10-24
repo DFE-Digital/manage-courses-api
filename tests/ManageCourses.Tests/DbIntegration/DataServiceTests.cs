@@ -272,7 +272,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "AB1 CD2",
                     InstCode = instCode,
-                    InstFull = "Intitution " + counter
+                    InstName = "Intitution " + counter
                 };
                 Context.Institutions.Add(institution);
                 LoadCourses(institution, numCourses, Context.Subjects);

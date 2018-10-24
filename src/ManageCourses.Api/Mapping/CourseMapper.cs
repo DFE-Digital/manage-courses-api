@@ -48,14 +48,14 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
             var provider = new SearchAndCompare.Domain.Models.Provider
             {
-                Name = ucasInstData.InstFull,
+                Name = ucasInstData.InstName,
                 ProviderCode = ucasInstData.InstCode
             };
 
             var accreditingProvider = ucasCourseData.AccreditingInstitution == null ? null :
                 new SearchAndCompare.Domain.Models.Provider
                 {
-                    Name = ucasCourseData.AccreditingInstitution.InstFull,
+                    Name = ucasCourseData.AccreditingInstitution.InstName,
                     ProviderCode = ucasCourseData.AccreditingInstitution.InstCode
                 };
 

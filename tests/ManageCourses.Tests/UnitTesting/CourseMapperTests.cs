@@ -219,7 +219,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             return new Course
             {
                 CourseCode = "CourseCode",
-                AccreditingInstitution = new Institution {InstCode  = "ACC123", InstFull = "AccreditingProviderName"},
+                AccreditingInstitution = new Institution {InstCode  = "ACC123", InstName = "AccreditingProviderName"},
                 Qualification = CourseQualification.QtsWithPgce,
                 ProgramType = "SS", // school direct salaried
                 Name = "Course.Name",
@@ -280,7 +280,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 Url = "http://www.example.com",
 
                 InstCode = "ABC",
-                InstFull = "My institution"
+                InstName = "My institution"
             };
         }
 

@@ -81,7 +81,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     catch (Exception e)
                     {
                         transaction.Rollback();
-                        _logger.Error(e, $"UCAS import failed to update institution {inst.InstFull} [{inst.InstCode}]");
+                        _logger.Error(e, $"UCAS import failed to update institution {inst.InstName} [{inst.InstCode}]");
                     }
                 }
                 if (++processed % 100 == 0)
@@ -120,7 +120,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Telephone = x.Telephone,
                 Url = x.Url,
 
-                InstFull = x.InstFull,
+                InstName = x.InstFull,
                 InstCode = x.InstCode,
                 InstType = x.InstType,
                 YearCode = x.YearCode,

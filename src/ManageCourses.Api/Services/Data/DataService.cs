@@ -68,7 +68,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 Courses = WithEnrichmentMetadata(courseRecords, instCode, email).ToList(),
                 InstitutionCode = courseRecords.First().Institution.InstCode,
-                InstitutionName = courseRecords.First().Institution.InstFull
+                InstitutionName = courseRecords.First().Institution.InstName
             };
         }
 
@@ -78,7 +78,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 .Select(orgInst => new UserOrganisation()
                 {
                     OrganisationId = orgInst.Organisation.OrgId,
-                    OrganisationName = orgInst.Institution.InstFull,
+                    OrganisationName = orgInst.Institution.InstName,
                     UcasCode = orgInst.Institution.InstCode,
                     TotalCourses = orgInst.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
                 }).OrderBy(x => x.OrganisationName).ToList();
@@ -96,7 +96,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 return new UserOrganisation()
                 {
                     OrganisationId = userOrganisation.Organisation.OrgId,
-                    OrganisationName = userOrganisation.Institution.InstFull,
+                    OrganisationName = userOrganisation.Institution.InstName,
                     UcasCode = userOrganisation.Institution.InstCode,
                     TotalCourses = userOrganisation.Institution.Courses.Select(c => c.CourseCode).Distinct()
                         .Count(),

@@ -11,7 +11,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public void UpdateWith(Institution inst)
         {
-            InstFull = inst.InstFull;
+            InstName = inst.InstName;
             InstType = inst.InstType;
             Address1 = inst.Address1;
             Address2 = inst.Address2;
@@ -29,7 +29,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public int Id { get; set; }
         public string InstCode { get; set; }
-        public string InstFull { get; set; }
+        public string InstName { get; set; }
         public string InstType { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
