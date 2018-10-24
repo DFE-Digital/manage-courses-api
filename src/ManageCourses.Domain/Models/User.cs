@@ -8,7 +8,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     /// then they are updated from DfE SignIn every time they
     /// access the service to keep it fresh.
     /// </summary>
-    public class McUser : McBase
+    public class User : McBase
     {
         public string FirstName { get; set; }
 
@@ -44,9 +44,9 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         
         public DateTime? AcceptTermsDateUtc { get; set; }
 
-        public ICollection<McOrganisationUser> McOrganisationUsers { get; set; }
+        public ICollection<OrganisationUser> OrganisationUsers { get; set; }
         public ICollection<AccessRequest> AccessRequests { get; set; }
 
-        public ICollection<McSession> Sessions { get; set; }
+        public ICollection<Session> Sessions { get; set; }
     }
 }

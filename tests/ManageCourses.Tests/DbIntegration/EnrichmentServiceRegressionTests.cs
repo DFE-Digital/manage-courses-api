@@ -63,35 +63,35 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
             Context.Add(_ucasInstitution);
 
-            var user = new McUser
+            var user = new User
             {
                 Email = Email,
             };
             Context.Add(user);
-            var user2 = new McUser
+            var user2 = new User
             {
                 Email = Email2,
             };
             Context.Add(user);
             //create the organisation and add user1 and user2 to it
-            var org = new McOrganisation
+            var org = new Organisation
             {
                 Name = "Bucks Mega Org",
                 OrgId = "BMO1",
-                McOrganisationUsers = new List<McOrganisationUser>
+                OrganisationUsers = new List<OrganisationUser>
                 {
-                    new McOrganisationUser
+                    new OrganisationUser
                     {
-                        McUser = user,
+                        User = user,
                     },
-                    new McOrganisationUser
+                    new OrganisationUser
                     {
-                        McUser = user2,
+                        User = user2,
                     },
                 },
-                McOrganisationInstitutions = new List<McOrganisationInstitution>
+                OrganisationInstitutions = new List<OrganisationInstitution>
                 {
-                    new McOrganisationInstitution
+                    new OrganisationInstitution
                     {
                         Institution = _ucasInstitution,
                     },

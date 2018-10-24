@@ -77,7 +77,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             var userOrganisations = _context.GetUserOrganisations(email)
                 .Select(orgInst => new UserOrganisation()
                 {
-                    OrganisationId = orgInst.McOrganisation.OrgId,
+                    OrganisationId = orgInst.Organisation.OrgId,
                     OrganisationName = orgInst.Institution.InstFull,
                     UcasCode = orgInst.Institution.InstCode,
                     TotalCourses = orgInst.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
@@ -95,7 +95,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 return new UserOrganisation()
                 {
-                    OrganisationId = userOrganisation.McOrganisation.OrgId,
+                    OrganisationId = userOrganisation.Organisation.OrgId,
                     OrganisationName = userOrganisation.Institution.InstFull,
                     UcasCode = userOrganisation.Institution.InstCode,
                     TotalCourses = userOrganisation.Institution.Courses.Select(c => c.CourseCode).Distinct()

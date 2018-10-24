@@ -9,21 +9,21 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     {
         public static void AddTestReferenceData(this ManageCoursesDbContext context, string username)
         {
-            McUser user = new McUser
+            User user = new User
             {
                 FirstName = "Joe",
                 LastName = "Bloggs",
                 Email = username,
                 AcceptTermsDateUtc = DateTime.UtcNow
             };
-            context.McUsers.Add(user);
+            context.Users.Add(user);
 
-            McOrganisation organisation = new McOrganisation
+            Organisation organisation = new Organisation
             {
                 Name = "Joe's school",
                 OrgId = "123"
             };
-            context.McOrganisations.Add(organisation);
+            context.Organisations.Add(organisation);
 
             Institution institution = new Institution
             {
@@ -32,14 +32,14 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             };
             context.Institutions.Add(institution);
             
-            context.McOrganisationUsers.Add(new McOrganisationUser {
-                    McUser = user,
-                    McOrganisation = organisation
+            context.OrganisationUsers.Add(new OrganisationUser {
+                    User = user,
+                    Organisation = organisation
                 });
             
-            context.McOrganisationIntitutions.Add(new McOrganisationInstitution {
+            context.OrganisationIntitutions.Add(new OrganisationInstitution {
                     Institution = institution,
-                    McOrganisation = organisation
+                    Organisation = organisation
                 });
             
         }

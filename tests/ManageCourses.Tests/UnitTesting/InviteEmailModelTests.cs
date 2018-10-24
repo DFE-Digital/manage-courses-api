@@ -11,7 +11,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void Constructor_Test()
         {
-            var user = new McUser()
+            var user = new User()
             {
                 Email = "actual email address",
                 FirstName = "FirstName  there are spaces at the end             "

@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181024224324_RemoveMcPrefix")]
+    partial class RemoveMcPrefix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -314,6 +315,9 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
+                    b.Property<int?>("McOrganisationId")
+                        .HasColumnName("mc_organisation_id");
+
                     b.Property<string>("Name")
                         .HasColumnName("name");
 
@@ -321,12 +325,9 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .IsRequired()
                         .HasColumnName("nctl_id");
 
-                    b.Property<int?>("OrganisationId")
-                        .HasColumnName("organisation_id");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganisationId");
+                    b.HasIndex("McOrganisationId");
 
                     b.ToTable("nctl_organisation");
                 });
@@ -605,16 +606,16 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.NctlOrganisation", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Organisation", "Organisation")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Organisation", "McOrganisation")
                         .WithMany("NctlOrganisations")
-                        .HasForeignKey("OrganisationId")
+                        .HasForeignKey("McOrganisationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationInstitution", b =>
                 {
                     b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Institution", "Institution")
-                        .WithMany("OrganisationInstitutions")
+                        .WithMany("McOrganisationInstitutions")
                         .HasForeignKey("InstitutionId");
 
                     b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Organisation", "Organisation")

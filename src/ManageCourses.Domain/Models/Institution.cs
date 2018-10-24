@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Scitt { get; set; }
         public string SchemeMember { get; set; }
 
-        public ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
+        public ICollection<OrganisationInstitution> OrganisationInstitutions { get; set; }
         public ICollection<Course> Courses { get; set; }
         public ICollection<Course> AccreditedCourses { get; set; }
         public ICollection<Site> Sites { get; set; }

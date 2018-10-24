@@ -23,21 +23,21 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 }
             }
             
-            modelBuilder.Entity<McUser>()
+            modelBuilder.Entity<User>()
                 .HasIndex(x => x.Email)
                 .IsUnique();
 
-            modelBuilder.Entity<McOrganisation>()
+            modelBuilder.Entity<Organisation>()
                 .HasIndex(x => x.OrgId)
                 .IsUnique();
 
-            modelBuilder.Entity<McOrganisationUser>()
-                .HasOne(ou => ou.McUser)
-                .WithMany(u => u.McOrganisationUsers);
+            modelBuilder.Entity<OrganisationUser>()
+                .HasOne(ou => ou.User)
+                .WithMany(u => u.OrganisationUsers);
 
-            modelBuilder.Entity<McOrganisationUser>()
-                .HasOne(ou => ou.McOrganisation)
-                .WithMany(u => u.McOrganisationUsers);
+            modelBuilder.Entity<OrganisationUser>()
+                .HasOne(ou => ou.Organisation)
+                .WithMany(u => u.OrganisationUsers);
 
             modelBuilder.Entity<Institution>()
                 .HasIndex(ui => ui.InstCode)
@@ -51,13 +51,13 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasOne(uc => uc.Institution)
                 .WithMany(ui => ui.Sites);
 
-            modelBuilder.Entity<McOrganisationInstitution>()
-                .HasOne(oi => oi.McOrganisation)
-                .WithMany(o => o.McOrganisationInstitutions);
+            modelBuilder.Entity<OrganisationInstitution>()
+                .HasOne(oi => oi.Organisation)
+                .WithMany(o => o.OrganisationInstitutions);
 
-            modelBuilder.Entity<McOrganisationInstitution>()
+            modelBuilder.Entity<OrganisationInstitution>()
                 .HasOne(oi => oi.Institution)
-                .WithMany(ui => ui.McOrganisationInstitutions);
+                .WithMany(ui => ui.OrganisationInstitutions);
 
             modelBuilder.Entity<Course>()
                 .HasIndex(x => new { x.InstitutionId, x.Id } )
@@ -96,7 +96,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .IsUnique();
 
             modelBuilder.Entity<NctlOrganisation>()
-                .HasOne(x => x.McOrganisation)                
+                .HasOne(x => x.Organisation)                
                 .WithMany(x => x.NctlOrganisations)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -109,12 +109,12 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             modelBuilder.Entity<InstitutionEnrichment>()
                 .HasIndex(x => x.InstCode);
                 
-            modelBuilder.Entity<McSession>()
-                .HasOne(x => x.McUser)
+            modelBuilder.Entity<Session>()
+                .HasOne(x => x.User)
                 .WithMany(u => u.Sessions)
                 .OnDelete(DeleteBehavior.Cascade);
             
-            modelBuilder.Entity<McSession>()
+            modelBuilder.Entity<Session>()
                 .HasIndex(x => new {x.AccessToken, x.CreatedUtc});
 
             base.OnModelCreating(modelBuilder);
@@ -137,14 +137,14 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Site> Sites { get; set; }
         public DbSet<NctlOrganisation> NctlOrganisations { get; set; }
-        public DbSet<McOrganisation> McOrganisations { get; set; }
-        public DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
-        public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
-        public DbSet<McUser> McUsers { get; set; }
+        public DbSet<Organisation> Organisations { get; set; }
+        public DbSet<OrganisationInstitution> OrganisationIntitutions { get; set; }
+        public DbSet<OrganisationUser> OrganisationUsers { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
         public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
-        public DbSet<McSession> McSessions { get;  set; }
+        public DbSet<Session> Sessions { get;  set; }
         public DbSet<PgdeCourse> PgdeCourses { get; set; }
 
         public List<Course> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
@@ -152,10 +152,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             var ucasCourses = Courses.FromSql(@"
                     select c.* from course c
                     join institution i on c.institution_id = i.id
-                    join mc_organisation_institution oi on oi.institution_id=i.id
-                    join mc_organisation o on o.id = oi.mc_organisation_id 
-                    join mc_organisation_user ou on ou.mc_organisation_id = o.id 
-                    join mc_user u on u.id = ou.mc_user_id 
+                    join organisation_institution oi on oi.institution_id=i.id
+                    join organisation o on o.id = oi.organisation_id 
+                    join organisation_user ou on ou.organisation_id = o.id 
+                    join ""user"" u on u.id = ou.user_id 
                     where lower(i.inst_code)=lower(@instCode) 
                     and lower(c.course_code)=lower(@ucasCode) 
                     and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
@@ -172,10 +172,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             var ucasCourses = Courses.FromSql(
                     $"select c.* from course c " +
                     $"join institution i on i.id=c.institution_id " +
-                    $"join mc_organisation_institution oi on oi.institution_id=i.id " +
-                    $"join mc_organisation o on o.id = oi.mc_organisation_id " +
-                    $"join mc_organisation_user ou on ou.mc_organisation_id = o.id " +
-                    $"join mc_user u on ou.mc_user_id = u.id " +
+                    $"join organisation_institution oi on oi.institution_id=i.id " +
+                    $"join organisation o on o.id = oi.organisation_id " +
+                    $"join organisation_user ou on ou.organisation_id = o.id " +
+                    $"join \"user\" u on ou.user_id = u.id " +
                     $"where lower(i.inst_code)=lower(@instCode) " +
                     $"and lower(u.email)=lower(@email) order by c.name", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Institution)
@@ -187,40 +187,40 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return ucasCourses;
         }
 
-        public IQueryable<McOrganisationInstitution> GetUserOrganisations(string email)
+        public IQueryable<OrganisationInstitution> GetUserOrganisations(string email)
         {
-            var userOrganisations = McOrganisationIntitutions.FromSql(
-                $"select oi.* from mc_organisation_institution oi " +
-                $"join mc_organisation o on o.id = oi.mc_organisation_id " +
-                $"join mc_organisation_user ou on ou.mc_organisation_id = o.id " +
-                $"join mc_user u on ou.mc_user_id = u.id " +
+            var userOrganisations = OrganisationIntitutions.FromSql(
+                $"select oi.* from organisation_institution oi " +
+                $"join organisation o on o.id = oi.organisation_id " +
+                $"join organisation_user ou on ou.organisation_id = o.id " +
+                $"join \"user\" u on ou.user_id = u.id " +
                 $"where lower(u.email) = lower(@email)",
                 new NpgsqlParameter("email", email)
-            ).Include(x => x.McOrganisation)
+            ).Include(x => x.Organisation)
             .Include(x => x.Institution);
 
             return userOrganisations;
         }
 
-        public McOrganisationInstitution GetUserOrganisation(string email, string instCode)
+        public OrganisationInstitution GetUserOrganisation(string email, string instCode)
         {
-            var userOrganisations = McOrganisationIntitutions.FromSql(
-                $"select oi.* from mc_organisation_institution oi " +
+            var userOrganisations = OrganisationIntitutions.FromSql(
+                $"select oi.* from organisation_institution oi " +
                 $"join institution i on oi.institution_id = i.id " +
-                $"join mc_organisation o on oi.mc_organisation_id = o.id " +
-                $"join mc_organisation_user ou on ou.mc_organisation_id = o.id " +
-                $"join mc_user u on ou.mc_user_id = u.id " +
+                $"join organisation o on oi.organisation_id = o.id " +
+                $"join organisation_user ou on ou.organisation_id = o.id " +
+                $"join \"user\" u on ou.user_id = u.id " +
                 $"where lower(u.email) = lower(@email) and Lower(i.inst_code) = lower(@instCode)",
                 new NpgsqlParameter("email", email), new NpgsqlParameter("instCode", instCode)
-            ).Include(x => x.McOrganisation).Include(x => x.Institution).FirstOrDefault();
+            ).Include(x => x.Organisation).Include(x => x.Institution).FirstOrDefault();
 
             return userOrganisations;
         }
 
-        public IQueryable<McUser> GetMcUsers(string email)
+        public IQueryable<User> GetMcUsers(string email)
         {
-            var users = McUsers.FromSql(
-                $"select * from mc_user " +
+            var users = Users.FromSql(
+                $"select * from \"user\" " +
                 $"where lower(email) = lower(@email)",
                 new NpgsqlParameter("email", email)
             );
@@ -232,10 +232,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         {
             return Institutions.FromSql(@"
                     SELECT i.* from institution i
-                    JOIN mc_organisation_institution oi on i.id = oi.institution_id
-                    JOIN mc_organisation o on oi.mc_organisation_id = o.id
-                    JOIN mc_organisation_user ou on o.id = ou.mc_organisation_id
-                    JOIN mc_user u on ou.mc_user_id = u.id
+                    JOIN organisation_institution oi on i.id = oi.institution_id
+                    JOIN organisation o on oi.organisation_id = o.id
+                    JOIN organisation_user ou on o.id = ou.organisation_id
+                    JOIN ""user"" u on ou.user_id = u.id
                     WHERE lower(u.email) = lower(@email)
                     AND lower(i.inst_code) = lower(@instcode)",
                     new NpgsqlParameter("email", name),

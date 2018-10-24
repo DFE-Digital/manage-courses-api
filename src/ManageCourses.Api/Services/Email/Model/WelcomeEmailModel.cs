@@ -8,7 +8,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Email.Model
         public string EmailAddress { get; private set; }
         public Dictionary<string, dynamic> Personalisation { get; private set; }
 
-        public WelcomeEmailModel(McUser user)
+        public WelcomeEmailModel(User user)
         {
             var personalisation = new Dictionary<string, dynamic>() { { "first_name", user.FirstName?.Trim() } };
             this.EmailAddress = user.Email;

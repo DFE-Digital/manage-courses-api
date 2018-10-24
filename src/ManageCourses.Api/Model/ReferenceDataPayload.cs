@@ -7,18 +7,18 @@ namespace GovUk.Education.ManageCourses.Api.Model
     {
         public ReferenceDataPayload()
         {
-            this.Organisations = new List<McOrganisation>();
+            this.Organisations = new List<Organisation>();
             this.NctlOrganisation = new List<NctlOrganisation>();
             this.Institutions = new List<Institution>();
-            this.OrganisationInstitutions = new List<McOrganisationInstitution>();
-            this.OrganisationUsers = new List<McOrganisationUser>();
-            this.Users = new List<McUser>();
+            this.OrganisationInstitutions = new List<OrganisationInstitution>();
+            this.OrganisationUsers = new List<OrganisationUser>();
+            this.Users = new List<User>();
         }
-        public IEnumerable<McOrganisation> Organisations { get; set; }
+        public IEnumerable<Organisation> Organisations { get; set; }
         public IEnumerable<NctlOrganisation> NctlOrganisation { get; set; }
         public IEnumerable<Institution> Institutions { get; set; }
-        public IEnumerable<McOrganisationInstitution> OrganisationInstitutions { get; set; }
-        public IEnumerable<McOrganisationUser> OrganisationUsers { get; set; }
-        public IEnumerable<McUser> Users { get; set; }
+        public IEnumerable<OrganisationInstitution> OrganisationInstitutions { get; set; }
+        public IEnumerable<OrganisationUser> OrganisationUsers { get; set; }
+        public IEnumerable<User> Users { get; set; }
     }
 }

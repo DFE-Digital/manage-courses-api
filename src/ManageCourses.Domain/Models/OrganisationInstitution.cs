@@ -1,9 +1,9 @@
 ﻿namespace GovUk.Education.ManageCourses.Domain.Models
 {
-    public class McOrganisationInstitution
+    public class OrganisationInstitution
     {
         public int Id { get; set; }
-        public McOrganisation McOrganisation { get; set; }
+        public Organisation Organisation { get; set; }
         public Institution Institution { get; set; }
     }
 }

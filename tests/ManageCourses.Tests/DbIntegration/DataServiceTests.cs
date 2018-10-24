@@ -255,15 +255,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.Save();
 
             int numSubjects = 3;
-            McUser user = new McUser { FirstName = "fname", LastName = "lname", Email = email };
-            Context.McUsers.Add(user);
+            User user = new User { FirstName = "fname", LastName = "lname", Email = email };
+            Context.Users.Add(user);
             LoadSubjects(numSubjects);
             for (var counter = 1; counter <= numOrgs; counter++)
             {
                 var orgId = "org" + counter;
                 var instCode = "AB" + counter;
-                McOrganisation org = new McOrganisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter };
-                Context.McOrganisations.Add(org);
+                Organisation org = new Organisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter };
+                Context.Organisations.Add(org);
                 Institution institution = new Institution
                 {
                     Address1 = "add2",
@@ -276,11 +276,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 };
                 Context.Institutions.Add(institution);
                 LoadCourses(institution, numCourses, Context.Subjects);
-                Context.McOrganisationUsers.Add(new McOrganisationUser { McUser = user, McOrganisation = org });
-                Context.McOrganisationIntitutions.Add(new McOrganisationInstitution
+                Context.OrganisationUsers.Add(new OrganisationUser { User = user, Organisation = org });
+                Context.OrganisationIntitutions.Add(new OrganisationInstitution
                 {
                     Institution = institution,
-                    McOrganisation = org
+                    Organisation = org
                 });
             }
 

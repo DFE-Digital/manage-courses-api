@@ -11,6 +11,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public string Name { get; set; }
 
-        public McOrganisation McOrganisation { get; set; }
+        public Organisation Organisation { get; set; }
     }
 }

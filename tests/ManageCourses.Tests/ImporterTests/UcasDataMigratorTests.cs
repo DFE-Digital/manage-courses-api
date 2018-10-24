@@ -78,21 +78,21 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
         }
         private static void SaveReferenceDataPayload(ManageCoursesDbContext context)
         {
-            var users = new List<McUser>
+            var users = new List<User>
             {
-                new McUser
+                new User
                 {
                     FirstName = "FirstName_1",
                     LastName = "LastName_1",
                     Email = TestUserEmail1
                 },
-                new McUser
+                new User
                 {
                     FirstName = "FirstName_2",
                     LastName = "LastName_2",
                     Email = TestUserEmail2
                 },
-                new McUser
+                new User
                 {
                     FirstName = "FirstName_3",
                     LastName = "LastName_3",
@@ -100,11 +100,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                 }
             };
             const string orgId2 = "OrgId_2";
-            var organisations = new List<McOrganisation> {
-                new McOrganisation {
+            var organisations = new List<Organisation> {
+                new Organisation {
                     OrgId = OrgId1
                 },
-                new McOrganisation {
+                new Organisation {
                     OrgId = orgId2
                 }
 
@@ -121,29 +121,29 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                 }
             };
 
-            var organisationInstitutions = new List<McOrganisationInstitution>
+            var organisationInstitutions = new List<OrganisationInstitution>
             {
-                new McOrganisationInstitution {
+                new OrganisationInstitution {
                     Institution = institutions[1],
-                    McOrganisation = organisations[1],
+                    Organisation = organisations[1],
                 }
             };
-            var organisationUsers = new List<McOrganisationUser>
+            var organisationUsers = new List<OrganisationUser>
             {
-                new McOrganisationUser {
-                    McUser = users[1],
+                new OrganisationUser {
+                    User = users[1],
                 },
-                new McOrganisationUser {
-                    McUser = users[2],
-                    McOrganisation = organisations[0]
+                new OrganisationUser {
+                    User = users[2],
+                    Organisation = organisations[0]
                 }
             };
 
-            context.McUsers.AddRange(users);
-            context.McOrganisations.AddRange(organisations);
+            context.Users.AddRange(users);
+            context.Organisations.AddRange(organisations);
             context.Institutions.AddRange(institutions);
-            context.McOrganisationUsers.AddRange(organisationUsers);
-            context.McOrganisationIntitutions.AddRange(organisationInstitutions);
+            context.OrganisationUsers.AddRange(organisationUsers);
+            context.OrganisationIntitutions.AddRange(organisationInstitutions);
             context.Save();
         }
 

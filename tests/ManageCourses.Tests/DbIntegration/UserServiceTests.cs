@@ -25,25 +25,25 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private IUserService _userService;
         private Mock<IWelcomeEmailService> _mockWelcomeEmailService;
         private DateTime _mockTime = new DateTime(1978, 1, 2, 3, 4, 5, 7);
-        private McUser _testUserBob;
-        private McUser _userTestUserFrank;
+        private User _testUserBob;
+        private User _userTestUserFrank;
 
         protected override void Setup()
         {
-            _testUserBob = new McUser
+            _testUserBob = new User
             {
                 FirstName = "1.Spongebob",
                 LastName = "Squarepants",
                 Email = "bob@example.org",
             };
-            _userTestUserFrank = new McUser
+            _userTestUserFrank = new User
             {
                 FirstName = "Franky",
                 LastName = "Sinatra",
                 Email = "frank@example.org",
             };
-            Context.McUsers.Add(_testUserBob);
-            Context.McUsers.Add(_userTestUserFrank);
+            Context.Users.Add(_testUserBob);
+            Context.Users.Add(_userTestUserFrank);
             Context.SaveChanges();
 
             _mockWelcomeEmailService = new Mock<IWelcomeEmailService>();
@@ -165,7 +165,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         }
 
-        private void CheckUserDataUpdated(McUser mcUser, JsonUserDetails jsonUserDetails)
+        private void CheckUserDataUpdated(User mcUser, JsonUserDetails jsonUserDetails)
         {
             Thread.Sleep(100); // EF Core proxy object is returning stale data. Delay allows it to settle. Suggestions welcome!
             var mcUserFirstName = mcUser.FirstName; // seems to be a race condition or something here, keep getting stale value assigned

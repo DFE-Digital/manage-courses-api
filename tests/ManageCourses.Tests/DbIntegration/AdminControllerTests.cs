@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
 
             var res = new AdminController(Context).ActionAccessRequest(id);
 
-            var users = Context.McUsers.Include(x => x.McOrganisationUsers).ThenInclude(x => x.McOrganisation).ToList();
+            var users = Context.Users.Include(x => x.OrganisationUsers).ThenInclude(x => x.Organisation).ToList();
 
             (res as StatusCodeResult).StatusCode.Should().Be(200);
             users.Count.Should().Be(2);
@@ -31,8 +31,8 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
 
             recipient.FirstName.Should().Be("RecipientFirstName");
             recipient.LastName.Should().Be("RecipientLastName");
-            recipient.McOrganisationUsers.Single().McOrganisation.OrgId.Should().Be("123");
-            recipient.McOrganisationUsers.Single().McOrganisation.Name.Should().Be("TheOrg");
+            recipient.OrganisationUsers.Single().Organisation.OrgId.Should().Be("123");
+            recipient.OrganisationUsers.Single().Organisation.Name.Should().Be("TheOrg");
             Context.AccessRequests.Single().Status.Should().Be(AccessRequest.RequestStatus.Completed);
         }
         
@@ -57,8 +57,8 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
             var res = controller.ActionAccessRequest(id);
         
 
-            Context.McUsers.Count().Should().Be(2);
-            Context.McUsers.Include(x => x.McOrganisationUsers).Last().McOrganisationUsers.Count().Should().Be(1);
+            Context.Users.Count().Should().Be(2);
+            Context.Users.Include(x => x.OrganisationUsers).Last().OrganisationUsers.Count().Should().Be(1);
         }
 
         [Test]
@@ -78,14 +78,14 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
             ar.LastName.Should().Be("Bloggs");
             ar.Reason.Should().Be("Manual action (BAT)");
             
-            Context.McUsers.Count().Should().Be(2);
+            Context.Users.Count().Should().Be(2);
             
-            var recipient = Context.McUsers.Single(x => x.Email == "joe@bloggs.com");
+            var recipient = Context.Users.Single(x => x.Email == "joe@bloggs.com");
 
             recipient.FirstName.Should().Be("Joe");
             recipient.LastName.Should().Be("Bloggs");
-            recipient.McOrganisationUsers.Single().McOrganisation.OrgId.Should().Be("123");
-            recipient.McOrganisationUsers.Single().McOrganisation.Name.Should().Be("TheOrg");
+            recipient.OrganisationUsers.Single().Organisation.OrgId.Should().Be("123");
+            recipient.OrganisationUsers.Single().Organisation.Name.Should().Be("TheOrg");
         }
 
         [Test]
@@ -110,16 +110,16 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
 
         private void SaveExampleDataToContext()
         {
-            var user = new McUser
+            var user = new User
             {
                 FirstName = "RequesterFirstName",
                 LastName = "RequesterLastName",
                 Email = "requester@example.com",
-                McOrganisationUsers = new Collection<McOrganisationUser>()
+                OrganisationUsers = new Collection<OrganisationUser>()
                 {
-                    new McOrganisationUser
+                    new OrganisationUser
                     {
-                        McOrganisation = new McOrganisation()
+                        Organisation = new Organisation()
                         {
                             OrgId = "123",
                             Name = "TheOrg"

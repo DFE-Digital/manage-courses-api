@@ -38,7 +38,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
             _user = user;
         }
 
-        public void SendAccessRequestEmailToSupport(AccessRequest accessRequest, McUser requester, McUser requestedOrNull)
+        public void SendAccessRequestEmailToSupport(AccessRequest accessRequest, User requester, User requestedOrNull)
         {
             var templateValues = new Dictionary<string, dynamic>() {
                 {"request_id", accessRequest.Id},
@@ -46,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
                 {"requester_firstname", requester.FirstName ?? "unknown"},
                 {"requester_lastname", requester.LastName ?? "unknown"},
                 {"requester_email", requester.Email},
-                {"requester_existingorgs", String.Join(", ", requester.McOrganisationUsers.Select(x => x.McOrganisation.Name))},
+                {"requester_existingorgs", String.Join(", ", requester.OrganisationUsers.Select(x => x.Organisation.Name))},
 
                 {"requested_firstname", accessRequest.FirstName ?? "unknown"},
                 {"requested_lastname", accessRequest.LastName ?? "unknown"},
@@ -54,7 +54,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
                 {"requested_organisation", accessRequest.Organisation ?? "unknown"},
                 {"requested_reason", accessRequest.Reason ?? "unknown"},
 
-                {"requested_existingorgs", requestedOrNull == null ? "-" : String.Join(", ", requestedOrNull.McOrganisationUsers.Select(x => x.McOrganisation.Name))}
+                {"requested_existingorgs", requestedOrNull == null ? "-" : String.Join(", ", requestedOrNull.OrganisationUsers.Select(x => x.Organisation.Name))}
 
             };
 

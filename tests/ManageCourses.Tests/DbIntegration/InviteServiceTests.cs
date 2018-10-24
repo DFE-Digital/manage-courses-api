@@ -24,11 +24,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         protected override void Setup()
         {
-            var mockUsers = new List<McUser>
+            var mockUsers = new List<User>
             {
-                new McUser{Email = "not.me@example.org"},
+                new User{Email = "not.me@example.org"},
             };
-            Context.McUsers.AddRange(mockUsers);
+            Context.Users.AddRange(mockUsers);
             Context.SaveChanges();
             _mockInviteEmailService = new Mock<IInviteEmailService>();
             _inviteService = new InviteService(_mockInviteEmailService.Object, Context, MockClock.Object);
@@ -86,10 +86,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Assert.Throws<McUserNotFoundException>(() => _inviteService.Invite("jamie-oliver@example.org"));
         }
 
-        private McUser AddUser(string email)
+        private User AddUser(string email)
         {
-            var mcUser = new McUser { Email = email };
-            Context.McUsers.Add(mcUser);
+            var mcUser = new User { Email = email };
+            Context.Users.Add(mcUser);
             Context.SaveChanges();
             return mcUser;
         }

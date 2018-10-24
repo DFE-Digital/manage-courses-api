@@ -2,14 +2,14 @@
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
-    public class McOrganisation
+    public class Organisation
     {
         public int Id { get; set; }
         public string OrgId { get; set; }
         public string Name { get; set; }
 
-        public ICollection<McOrganisationUser> McOrganisationUsers { get; set; }
-        public ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
+        public ICollection<OrganisationUser> OrganisationUsers { get; set; }
+        public ICollection<OrganisationInstitution> OrganisationInstitutions { get; set; }
 
         public ICollection<NctlOrganisation> NctlOrganisations { get; set; }
     }
