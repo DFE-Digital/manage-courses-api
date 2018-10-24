@@ -17,20 +17,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Exports the data.
-        /// </summary>
-        /// <returns>The exported data</returns>
-        [BearerTokenAuth]
-        [HttpGet]
-        [Route("{ucasCode}")]
-        public OrganisationCourses ExportByOrganisation(string ucasCode)
-        {
-            var name = this.User.Identity.Name;
-            var courses = _dataService.GetCoursesForUserOrganisation(name, ucasCode);
-
-            return courses;
-        }
-        /// <summary>
         /// Imports the data.
         /// </summary>
         [ApiTokenAuth]
@@ -40,22 +26,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public void Import([FromBody] UcasPayload payload)
         {
             _dataService.ProcessUcasPayload(payload);
-
-            //TODO return Ok/Fail in action result
-        }
-
-        /// <summary>
-        /// Imports the reference data.
-        /// </summary>
-        [ApiTokenAuth]
-        [ExemptFromAcceptTerms]
-        [HttpPost]
-        [Route("referencedata")]
-        public void ImportReferenceData([FromBody] ReferenceDataPayload payload)
-        {
-            _dataService.ProcessReferencePayload(payload);
-
-            //TODO return Ok/Fail in action result
         }
     }
 }

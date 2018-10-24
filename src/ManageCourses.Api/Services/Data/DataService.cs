@@ -17,15 +17,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         private readonly CourseLoader _courseLoader;
         private readonly IManageCoursesDbContext _context;
         IEnrichmentService _enrichmentService;
-        private readonly IDataHelper _dataHelper;
         private readonly ILogger _logger;
         private readonly IPgdeWhitelist _pgdeWhitelist;
 
-        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, IDataHelper dataHelper, ILogger<DataService> logger, IPgdeWhitelist pgdeWhitelist)
+        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, ILogger<DataService> logger, IPgdeWhitelist pgdeWhitelist)
         {
             _context = context;
             _enrichmentService = enrichmentService;
-            _dataHelper = dataHelper;
             _logger = logger;
             _pgdeWhitelist = pgdeWhitelist;
             _courseLoader = new CourseLoader();
@@ -88,7 +86,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 entity.UpdateWith(newValues);
             }
         }
-
 
         private void DeleteForInstitution(string instCode)
         {
@@ -211,93 +208,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             }
         }
 
-        public UserOrganisation GetOrganisationForUser(string email, string instCode)
-        {
-            var org = GetUserOrganisation(email, instCode);
-            return org;
-        }
-
-        public void ProcessReferencePayload(ReferenceDataPayload payload)
-        {
-            ResetReferenceSchema();
-            _dataHelper.Load(_context, payload.Users.Where(u => !string.IsNullOrWhiteSpace(u.Email)).ToList());
-
-            var result = _dataHelper.Upsert();
-            if (!result.Success)
-            {
-                _logger.LogCritical("Error during user upsert:{0} Import terminated", result.errorMessage);
-                return;
-            }
-            _logger.LogInformation("User upsert result: {0} inserted, {1} deleted, {2} updated", result.NumberInserted, result.NumberDeleted, result.NumberUpdated);
-
-            foreach (var organisation in payload.Organisations)
-            {
-                _context.AddMcOrganisation(
-                    new McOrganisation
-                    {
-                        OrgId = organisation.OrgId,
-                        Name = organisation.Name
-                    }
-                    );
-            }
-            foreach (var nctlOrganisation in payload.NctlOrganisation)
-            {
-                _context.AddNctlOrganisation(
-                    new NctlOrganisation
-                    {
-                        NctlId = nctlOrganisation.NctlId,
-                        OrgId = nctlOrganisation.OrgId,
-                        Name = nctlOrganisation.Name
-                    });
-            }
-            foreach (var institution in payload.Institutions)
-            {
-                _context.AddUcasInstitution(
-                    new UcasInstitution
-                    {
-                        InstCode = institution.InstCode,
-                        InstName = institution.InstName,
-                        InstBig = institution.InstBig,
-                        InstFull = institution.InstFull,
-                        InstType = institution.InstType,
-                        Addr1 = institution.Addr1,
-                        Addr2 = institution.Addr2,
-                        Addr3 = institution.Addr3,
-                        Addr4 = institution.Addr4,
-                        Postcode = institution.Postcode,
-                        ContactName = institution.ContactName,
-                        Url = institution.Url,
-                        YearCode = institution.YearCode,
-                        Scitt = institution.Scitt,
-                        AccreditingProvider = institution.AccreditingProvider,
-                        SchemeMember = institution.SchemeMember
-                    }
-                );
-            }
-            foreach (var organisatioInstitution in payload.OrganisationInstitutions)
-            {
-                _context.AddMcOrganisationInstitution(
-                    new McOrganisationInstitution
-                    {
-                        OrgId = organisatioInstitution.OrgId,
-                        InstitutionCode = organisatioInstitution.InstitutionCode
-                    }
-                );
-            }
-            foreach (var organisationUser in payload.OrganisationUsers)
-            {
-                _context.AddMcOrganisationUser(
-                    new McOrganisationUser
-                    {
-                        OrgId = organisationUser.OrgId,
-                        Email = organisationUser.Email
-                    }
-                );
-            }
-
-            _context.Save();
-        }
-
+        
         /// <summary>
         /// returns a Course object containing all the required fields
         /// </summary>
@@ -366,88 +277,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         }
         #endregion
 
-        #region Export
-
-        /// <summary>
-        /// This method return an object containing a list of course for an organisation mapped to an email
-        /// </summary>
-        /// <param name="email">The user email address.</param>
-        /// <param name="ucasCode"></param>
-        /// <returns>The user's organisation courses.</returns>
-        public OrganisationCourses GetCoursesForUserOrganisation(string email, string ucasCode)
-        {
-            var org = GetOrganisation(email, ucasCode);
-
-            var returnCourses = new OrganisationCourses();
-
-            if (org == null) return returnCourses;
-
-            returnCourses.OrganisationId = org.OrgId;
-            returnCourses.UcasCode = org.UcasCode;
-            returnCourses.OrganisationName = org.Name;
-
-            var providersCourses = GetProviderCourses(org);
-            returnCourses.ProviderCourses = providersCourses;
-
-            return returnCourses;
-        }
         public IEnumerable<UserOrganisation> GetOrganisationsForUser(string email)
-        {
-            var orgs = GetOrganisations(email);
-            return orgs;
-        }
-
-        private List<ProviderCourse> GetProviderCourses(Organisation org)
-        {
-            var mappedCourses = _context.UcasCourses.Where(c => c.InstCode == org.UcasCode);
-
-            var accProviders = GetProviders(mappedCourses);
-
-            if (accProviders.Count == 0)
-            {
-                var course = GetCourseDetail(mappedCourses, org.UcasCode);
-                return new List<ProviderCourse>() { course };
-            }
-            else
-            {
-                var returnCoursesProviderCourses = accProviders
-                    .Select(x => GetCourseDetail(mappedCourses, org.UcasCode, x.InstCode, x.InstFull)).ToList();
-                return returnCoursesProviderCourses;
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Gets a specific organisation that is linked to the users email
-        /// </summary>
-        /// <param name="email">The user email address.</param>
-        /// <param name="ucasCode"></param>
-        /// <returns>The organisation of the user.</returns>
-        private Organisation GetOrganisation(string email, string ucasCode)
-        {
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(ucasCode)) return null;
-            ucasCode = ucasCode.ToUpperInvariant();
-
-            var mcUsers = _context.GetMcUsers(email)
-                .Include("McOrganisationUsers.McOrganisation.McOrganisationInstitutions.UcasInstitution").ToList();
-
-            var mcOrganisationInstitutions = mcUsers.SelectMany(
-                ou => ou.McOrganisationUsers.SelectMany(oi => oi.McOrganisation.McOrganisationInstitutions)).ToList();
-
-            var mcOrganisationInstitution = mcOrganisationInstitutions.SingleOrDefault(
-                oi => oi.InstitutionCode == ucasCode);
-
-            if (mcOrganisationInstitution == null) return null;
-
-            return new Organisation
-            {
-                Name = mcOrganisationInstitution.UcasInstitution.InstFull,
-                OrgId = mcOrganisationInstitution.OrgId,
-                UcasCode = mcOrganisationInstitution.InstitutionCode
-            };
-        }
-        private IEnumerable<UserOrganisation> GetOrganisations(string email)
         {
             var userOrganisations = _context.GetUserOrganisations(email)
                 .Select(orgInst => new UserOrganisation()
@@ -460,7 +290,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
             return userOrganisations;
         }
-        private UserOrganisation GetUserOrganisation(string email, string instCode)
+
+
+        public UserOrganisation GetOrganisationForUser(string email, string instCode)
         {
             var userOrganisation = _context.GetUserOrganisation(email, instCode);
             var enrichment = _enrichmentService.GetInstitutionEnrichment(instCode, email);
@@ -479,116 +311,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             }
 
             return null;
-        }
-        private List<UcasInstitution> GetProviders(IQueryable<UcasCourse> mappedCourses)
-        {
-            var accProviders = mappedCourses.Where(mc => (!string.IsNullOrWhiteSpace(mc.AccreditingProvider))).Select(mc => mc.AccreditingProvider).Distinct()
-                .Select(accProvider => _context.UcasInstitutions.FirstOrDefault(o => o.InstCode == accProvider))
-                .OrderBy(x => x.InstFull).ToList();
-
-            return accProviders;
-        }
-        private ProviderCourse GetCourseDetail(IQueryable<UcasCourse> mappedCourses, string organisationCode, string providerCode = null, string providerName = null)
-        {
-            var course = new ProviderCourse
-            {
-                AccreditingProviderId = providerCode,
-                AccreditingProviderName = providerName,
-                CourseDetails = new List<CourseDetail>()
-            };
-
-            foreach (var title in GetTitles(mappedCourses, organisationCode, providerCode))
-            {
-                var tempRecords = mappedCourses.Where(c => c.InstCode == organisationCode && c.CrseTitle == title && c.AccreditingProvider == providerCode).ToList();
-                var courseCodes = tempRecords.Select(x => x.CrseCode).Distinct().ToList();
-
-                var courseDetail = new CourseDetail
-                {
-                    CourseTitle = title,
-                    Variants = courseCodes.Select(c => GetVariant(tempRecords, title, c, organisationCode)).ToList(),
-                    AgeRange = tempRecords.FirstOrDefault()?.Age
-                };
-
-                course.CourseDetails.Add(courseDetail);
-            }
-
-            return course;
-        }
-
-        private CourseVariant GetVariant(IReadOnlyCollection<UcasCourse> tempRecords, string title, string courseCode, string organisationCode)
-        {
-            var subjects = GetSubjects(courseCode, organisationCode);
-
-            var currentCourse = tempRecords.FirstOrDefault(r => r.CrseCode == courseCode);
-            var variant = new CourseVariant
-            {
-                Name = title,
-                UcasCode = courseCode,
-                ProfPostFlag = currentCourse?.ProfpostFlag,
-                ProgramType = currentCourse?.ProgramType,
-                StudyMode = currentCourse?.Studymode,
-                Campuses = new List<Campus>(),
-                Subjects = subjects
-            };
-
-            var campusCodes = tempRecords.Where(c => c.CrseCode == courseCode && !string.IsNullOrWhiteSpace(c.CrseCode) && (c.CampusCode != null)).OrderBy(x => x.CampusCode).Select(c => c.CampusCode.Trim()).Distinct().ToList();
-
-            //look for dash and put add the top of the list
-            if (campusCodes.Contains("-"))
-            {
-                campusCodes.Remove("-");
-                campusCodes.Insert(0, "-");
-            }
-
-            //look for empty string and put add the top of the list
-            if (campusCodes.Contains(""))
-            {
-                campusCodes.Remove("");
-                campusCodes.Insert(0, "");
-            }
-
-            variant.Campuses = campusCodes.Select(x => GetCampus(x, organisationCode, tempRecords.FirstOrDefault(c => c.CrseCode == courseCode && c.CampusCode == x)?.CrseOpenDate)).ToList();
-
-            return variant;
-        }
-
-        private Campus GetCampus(string campusCode, string organisationCode, string openDate)
-        {
-            var campus = _context.UcasCampuses.FirstOrDefault(c => c.InstCode == organisationCode && c.CampusCode == campusCode);
-            if (campus != null)
-            {
-                return new Campus
-                {
-                    Name = campus.CampusName,
-                    Address1 = campus.Addr1,
-                    Address2 = campus.Addr2,
-                    Address3 = campus.Addr3,
-                    Address4 = campus.Addr4,
-                    PostCode = campus.Postcode,
-                    Code = campusCode,
-                    CourseOpenDate = openDate
-                };
-            }
-
-            return null;
-        }
-        private IEnumerable<string> GetTitles(IQueryable<UcasCourse> mappedCourses, string ucasCode, string instCode)
-        {
-            var titles = mappedCourses
-                .Where(c => c.InstCode == ucasCode && c.AccreditingProvider == instCode)
-                .OrderBy(x => x.CrseCode).Select(x => x.CrseTitle).Distinct().ToList();
-            return titles;
-        }
-
-        private List<string> GetSubjects(string courseCode, string organisationCode)
-        {
-            var subjects = _context.UcasSubjects
-                .Join(_context.UcasCourseSubjects, s => s.SubjectCode, cs => cs.SubjectCode,
-                    (s, cs) => new { s.SubjectDescription, cs.CrseCode, cs.InstCode })
-                .Where(x => x.CrseCode == courseCode && x.InstCode == organisationCode)
-                .Select(x => x.SubjectDescription).ToList();
-            return subjects;
-        }
+        }        
 
         public UcasInstitution GetUcasInstitutionForUser(string name, string instCode)
         {

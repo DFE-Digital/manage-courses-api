@@ -276,7 +276,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var enrichmentService = new EnrichmentService(Context);
             var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
             mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
-            var dataService = new DataService(Context, enrichmentService, new UserDataHelper(), new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
+            var dataService = new DataService(Context, enrichmentService, new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
             var sourceModel = new UcasInstitutionEnrichmentPostModel
             {
                 EnrichmentModel = new InstitutionEnrichmentModel

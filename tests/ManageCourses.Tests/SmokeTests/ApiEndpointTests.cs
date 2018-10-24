@@ -21,52 +21,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         private const string Email = "feddie.krueger@example.org";
 
         [Test]
-        public async Task DataExport_WithEmptyCampus()
-        {
-            SetupSmokeTestData();
-
-            var apiClient = await BuildSigninAwareClient();
-
-            var export = await apiClient.Data_ExportByOrganisationAsync("ABC");
-
-            Assert.AreEqual("123", export.OrganisationId, "OrganisationId should be retrieved");
-            Assert.AreEqual("Joe's school @ UCAS", export.OrganisationName, "OrganisationName should be retrieved");
-            Assert.AreEqual("ABC", export.UcasCode, "UcasCode should be retrieved");
-
-            Assert.AreEqual(1, export.ProviderCourses.Count, "Expecting exactly one in ProviderCourses");
-            var course = export.ProviderCourses.Single();
-            Assert.AreEqual(1, course.CourseDetails.Count, "Expecting exactly one in ProviderCourses.CourseDetails");
-            var details = course.CourseDetails.Single();
-
-            Assert.AreEqual("Joe's course for Primary teachers", details.CourseTitle, "ProviderCourses.CourseDetails.CourseTitle should be retrieved");
-
-            Assert.AreEqual(1, details.Variants.Count, "Expecting exactly one in ProviderCourses.CourseDetails.Variants");
-            var variant = details.Variants.Single();
-
-            Assert.AreEqual("XYZ", variant.UcasCode, "ProviderCourses.CourseDetails.Variants.UcasCode should be retrieved");
-
-            Assert.AreEqual(1, variant.Campuses.Count, "Expecting exactly one in ProviderCourses.CourseDetails.Variants.Campuses");
-            var campus = variant.Campuses.Single();
-
-            Assert.AreEqual("", campus.Code, "ProviderCourses.CourseDetails.Variants.Campuses.Code should be retrieved");
-            Assert.AreEqual("Main campus site", campus.Name, "ProviderCourses.CourseDetails.Variants.Campuses.Name should be retrieved");
-        }
-
-        [Test]
-        public void DataExport_badAccesCode_404()
-        {
-            var apiClient = BuildApiKeyClient("badAccesCode");
-
-            Assert.That(() => apiClient.Data_ExportByOrganisationAsync("ABC"),
-                Throws.TypeOf<SwaggerException>()
-                    .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
-
-            Assert.That(() => apiClient.Data_ImportAsync(new UcasPayload()),
-                Throws.TypeOf<SwaggerException>()
-                    .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
-        }
-
-        [Test]
         public async Task EnrichmentSaveTest()
         {
             SetupSmokeTestData();
@@ -183,7 +137,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 BaseUrl = LocalWebHost.Address
             };
 
-            client.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(Email)).Wait();
+            Context.AddTestReferenceData(Email);
+            Context.Save();
 
             // does not throw... nb. Assert.DoesNotThrow does not support async voids
             await client.Invite_IndexAsync(Email);
@@ -226,8 +181,10 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
         private void SetupSmokeTestData()
         {
+            Context.AddTestReferenceData(TestConfig.SignInUsername);
+            Context.Save();
+            
             var clientImport = BuildApiKeyClient();
-            clientImport.Data_ImportReferenceDataAsync(TestPayloadBuilder.MakeReferenceDataPayload(TestConfig.SignInUsername)).Wait();
             clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
         }
 

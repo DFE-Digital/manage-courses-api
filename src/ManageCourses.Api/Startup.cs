@@ -101,7 +101,6 @@ namespace GovUk.Education.ManageCourses.Api
                 return new SearchAndCompareApi(httpClient, mcConfig.SearchAndCompareApiUrl);
             });
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
-            services.AddScoped<IDataHelper, UserDataHelper>();
 
             services.AddMvc(options =>
                 options.Filters.Add(typeof(AcceptTermsFilter))

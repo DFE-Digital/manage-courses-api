@@ -5,38 +5,6 @@ using GovUk.Education.ManageCourses.ApiClient;
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
     public static class TestPayloadBuilder {
-            
-        public static ReferenceDataPayload MakeReferenceDataPayload(string username) => new ReferenceDataPayload {
-            
-                Users = ListOfOne(new McUser{
-                    FirstName = "Joe",
-                    LastName = "Bloggs",
-                    Email = username,
-                    AcceptTermsDateUtc = DateTime.UtcNow
-                }),
-
-                Organisations = ListOfOne(new McOrganisation {
-                    Name = "Joe's school",
-                    OrgId = "123"
-                }),
-
-                OrganisationUsers = ListOfOne(new McOrganisationUser {
-                    Email = username,
-                    OrgId = "123"
-                }),
-
-                OrganisationInstitutions = ListOfOne(new McOrganisationInstitution {
-                    InstitutionCode = "ABC",
-                    OrgId = "123"
-                }),
-                
-                Institutions = ListOfOne(new UcasInstitution { 
-                    InstFull = "Joe's school @ UCAS",
-                    InstCode = "ABC"
-                })
-            };
-        
-
         public static UcasPayload MakeSimpleUcasPayload() => new UcasPayload {
 
                 Institutions = ListOfOne(new UcasInstitution {

@@ -7,6 +7,7 @@ using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -37,108 +38,18 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
             mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
-            DataService = new DataService(Context, mockEnrichmentService.Object, new UserDataHelper(), mockLogger.Object, mockPdgeWhitelist.Object);
-        }
-
-        [Test]
-        public void ProcessPayload()
-        {
-            var referenceDataPayload = GetReferenceDataPayload();
-            DataService.ProcessReferencePayload(referenceDataPayload);
-
-            var payload = GetUcasCoursesPayload();
-            DataService.ProcessUcasPayload(payload);
-
-            foreach (var item in Context.McUsers)
-            {
-                var payloadUser = referenceDataPayload.Users.FirstOrDefault(
-                    x => x.FirstName == item.FirstName &&
-                    x.LastName == item.LastName &&
-                    x.Email == item.Email);
-
-                Assert.IsNotNull(payloadUser);
-
-                var payloadOrgUser = referenceDataPayload.OrganisationUsers.FirstOrDefault(x => x.Email == payloadUser.Email);
-
-                if (payloadOrgUser != null)
-                {
-                    if (!string.IsNullOrEmpty(payloadOrgUser.OrgId))
-                    {
-                        Assert.AreEqual(payloadUser.Email, TestUserEmail3);
-                        Assert.AreEqual(item.McOrganisationUsers.First().McOrganisation.OrgId, payloadOrgUser.OrgId);
-                    }
-                    else
-                    {
-                        Assert.AreEqual(payloadUser.Email, TestUserEmail2);
-                    }
-                }
-                else
-                {
-                    Assert.AreEqual(payloadUser.Email, TestUserEmail1);
-                }
-            }
-
-            GetCoursesForUser_isNull(TestUserEmail1, null);
-            GetCoursesForUser_isNull(TestUserEmail2, null);
-            GetCoursesForUser_isNull(TestUserEmail3, OrgId1);
+            DataService = new DataService(Context, mockEnrichmentService.Object, mockLogger.Object, mockPdgeWhitelist.Object);
         }
 
         [Test]
         public void RepeatImportsArePossible()
         {
+            SaveReferenceDataPayload(Context);
             var payload = GetUcasCoursesPayload();
-            var userPayload = GetReferenceDataPayload();
-
-            DataService.ProcessReferencePayload(userPayload);
-            DataService.ProcessUcasPayload(payload);
-
-            DataService.ProcessReferencePayload(userPayload);
-            DataService.ProcessUcasPayload(payload);
-
-            DataService.ProcessReferencePayload(userPayload);
-            DataService.ProcessReferencePayload(userPayload);
 
             DataService.ProcessUcasPayload(payload);
             DataService.ProcessUcasPayload(payload);
-
-            foreach (var expected in userPayload.Users)
-            {
-                var storedUser = Context.GetMcUsers(expected.Email);
-
-                Assert.AreEqual(1, storedUser.Count());
-                Assert.AreEqual(expected.FirstName, storedUser.Single().FirstName);
-                Assert.AreEqual(expected.LastName, storedUser.Single().LastName);
-            }
-
-            foreach (var expected in userPayload.Organisations)
-            {
-                var storedOrg = Context.McOrganisations.Where(o => o.OrgId == expected.OrgId);
-
-                Assert.AreEqual(1, storedOrg.Count());
-            }
-
-            foreach (var expected in userPayload.Institutions)
-            {
-                var storedOrg = Context.UcasInstitutions.Where(o => o.InstCode == expected.InstCode);
-
-                Assert.AreEqual(1, storedOrg.Count());
-            }
-
-            foreach (var expected in userPayload.OrganisationUsers)
-            {
-                var count = Context.McOrganisationUsers
-                    .Count(o => o.OrgId == expected.OrgId && o.Email == expected.Email);
-
-                Assert.AreEqual(1, count);
-            }
-
-            foreach (var expected in userPayload.OrganisationInstitutions)
-            {
-                var count = Context.McOrganisationIntitutions
-                    .Count(o => o.OrgId == expected.OrgId && o.InstitutionCode == expected.InstitutionCode);
-
-                Assert.AreEqual(1, count);
-            }
+            DataService.ProcessUcasPayload(payload);
 
             foreach (var expected in payload.Courses)
             {
@@ -152,7 +63,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void ErroneousCourseLeavesOtherCoursesAlone()
         {
-            DataService.ProcessReferencePayload(GetReferenceDataPayload());
+            SaveReferenceDataPayload(Context);
 
             var import = GetUcasCoursesPayload();
 
@@ -176,16 +87,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Assert.AreEqual(1, Context.CourseCodes.Count(), "valid courses should be re-imported anyway");
             Assert.AreEqual(1, Context.UcasCourses.Count(), "valid courses should be re-imported anyway");
             Assert.AreEqual("The best title", Context.UcasCourses.Single().CrseTitle);
-        }
-
-        [TestCase("nothing@nowhere.com", null)]
-        public void GetCoursesForUser_isNull(string email, string orgId)
-        {
-            var result = DataService.GetCoursesForUserOrganisation(email, orgId);
-
-            Assert.IsNull(result.OrganisationId);
-            Assert.IsNull(result.OrganisationName);
-
         }
 
         [Test]
@@ -394,7 +295,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             }
         }
 
-        private static ReferenceDataPayload GetReferenceDataPayload()
+        private static void SaveReferenceDataPayload(ManageCoursesDbContext context)
         {
             var users = new List<McUser>
             {
@@ -456,16 +357,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     OrgId = OrgId1
                 }
             };
-            var result = new ReferenceDataPayload
-            {
-                Users = users,
-                OrganisationInstitutions = organisationInstitutions,
-                OrganisationUsers = organisationUsers,
-                Organisations = organisations,
-                Institutions = institutions
-            };
 
-            return result;
+            context.McUsers.AddRange(users);
+            context.McOrganisations.AddRange(organisations);
+            context.UcasInstitutions.AddRange(institutions);
+            context.McOrganisationUsers.AddRange(organisationUsers);
+            context.McOrganisationIntitutions.AddRange(organisationInstitutions);
+            context.Save();
         }
 
         private static UcasPayload GetUcasCoursesPayload()
