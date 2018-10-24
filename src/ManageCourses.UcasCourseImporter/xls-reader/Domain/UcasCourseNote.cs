@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace GovUk.Education.ManageCourses.Domain.Models
+namespace GovUk.Education.ManageCourses.Xls.Domain
 {
     public class UcasCourseNote
     {

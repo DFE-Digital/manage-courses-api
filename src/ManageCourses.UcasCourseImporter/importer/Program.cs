@@ -7,8 +7,8 @@ using CsvHelper;
 using GovUk.Education.ManageCourses.Api;
 using GovUk.Education.ManageCourses.Csv.Domain;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
-using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Xls;
+using GovUk.Education.ManageCourses.Xls.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -64,7 +64,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
                 var payload = new UcasPayload
                 {
-                    Institutions = new List<UcasInstitution>(institutions),
+                    Institutions = new List<Xls.Domain.UcasInstitution>(institutions),
                     Courses = new List<UcasCourse>(courses),
                     CourseSubjects = new List<UcasCourseSubject>(courseSubjects),
                     Campuses = new List<UcasCampus>(campuses),
@@ -131,7 +131,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             return institutionProfiles;
         }
 
-        private static void UpdateContactDetails(List<UcasInstitution> institutions, IDictionary<string, UcasInstitutionProfile> institutionProfiles)
+        private static void UpdateContactDetails(List<Xls.Domain.UcasInstitution> institutions, IDictionary<string, UcasInstitutionProfile> institutionProfiles)
         {
             foreach(var inst in institutions)
             {

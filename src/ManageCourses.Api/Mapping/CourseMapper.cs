@@ -2,27 +2,21 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using GovUk.Education.ManageCourses.Api.Helpers;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using GovUk.Education.SearchAndCompare.Domain.Models.Joins;
-using Course = GovUk.Education.ManageCourses.Api.Model.Course;
-
 
 namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class CourseMapper : ICourseMapper
     {
-        private readonly SubjectMapper _subjectMapper = new SubjectMapper();
-        private readonly QualificationMapper _qualificationMapper = new QualificationMapper();
-
-        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(UcasInstitution ucasInstData, Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
+        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Institution ucasInstData, Domain.Models.Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
-            ucasInstData = ucasInstData ?? new UcasInstitution();
-            ucasCourseData = ucasCourseData ?? new Course();
-            ucasCourseData.Schools = ucasCourseData.Schools ?? new ObservableCollection<School>();
+            ucasInstData = ucasInstData ?? new Institution();
+            ucasCourseData = ucasCourseData ?? new Domain.Models.Course();
+            var sites = ucasCourseData.CourseSites ?? new ObservableCollection<CourseSite>();
             orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
 
@@ -35,14 +29,16 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 string.IsNullOrWhiteSpace(orgEnrichmentModel.Address4) &&
                 string.IsNullOrWhiteSpace(orgEnrichmentModel.Postcode);
 
-            var subjectStrings = string.IsNullOrWhiteSpace(ucasCourseData.Subjects)
-                ? new string[]{}
-                : _subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.Subjects.Split(", "));
+            var subjectStrings = new List<string>();
+            if (ucasCourseData?.CourseSubjects != null) 
+            {
+                subjectStrings = ucasCourseData.CourseSubjects.Select(x => x.Subject.SubjectName).ToList();
+            }
 
-            var subjects = new Collection<CourseSubject>(subjectStrings.Select(subject =>
-                new CourseSubject
+            var subjects = new Collection<SearchAndCompare.Domain.Models.Joins.CourseSubject>(subjectStrings.Select(subject =>
+                new SearchAndCompare.Domain.Models.Joins.CourseSubject
                 {
-                    Subject = new Subject
+                    Subject = new SearchAndCompare.Domain.Models.Subject
                     {
                         Name = subject
                     }
@@ -56,11 +52,11 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 ProviderCode = ucasInstData.InstCode
             };
 
-            var accreditingProvider = ucasCourseData.AccreditingProviderId == null ? null :
+            var accreditingProvider = ucasCourseData.AccreditingInstitution == null ? null :
                 new SearchAndCompare.Domain.Models.Provider
                 {
-                    Name = ucasCourseData.AccreditingProviderName,
-                    ProviderCode = ucasCourseData.AccreditingProviderId
+                    Name = ucasCourseData.AccreditingInstitution.InstFull,
+                    ProviderCode = ucasCourseData.AccreditingInstitution.InstCode
                 };
 
             var routeName = ucasCourseData.GetRoute();
@@ -82,7 +78,6 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 Name = ucasCourseData.Name,
                 ProgrammeCode = ucasCourseData.CourseCode,
                 Provider = provider,
-                ProviderCodeName = ucasInstData.InstBig,
                 AccreditingProvider = accreditingProvider,
                 Route = new Route
                 {
@@ -90,16 +85,16 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     IsSalaried = isSalaried
                 },
                 IncludesPgce = MapQualification(ucasCourseData.Qualification),
-                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(ucasCourseData.Schools
+                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(sites
                     .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase) && String.Equals(school.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
                         new SearchAndCompare.Domain.Models.Campus
                         {
-                            Name = school.LocationName,
-                            CampusCode = school.Code,
+                            Name = school.Site.LocationName,
+                            CampusCode = school.Site.Code,
                             Location = new Location
                             {
-                                Address = MapAddress(school)
+                                Address = MapAddress(school.Site)
                             }
                         }
                     ).ToList()),
@@ -116,7 +111,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     Address = address
                 },
 
-                ApplicationsAcceptedFrom = ucasCourseData.Schools.Select(x => {
+                ApplicationsAcceptedFrom = sites.Select(x => {
                     DateTime parsed;
                     return DateTime.TryParse(x.ApplicationsAcceptedFrom, out parsed) ? (DateTime?)parsed : null;
                 }).Where(x => x != null && x.HasValue)
@@ -126,7 +121,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 FullTime = ucasCourseData.StudyMode == "P" ? VacancyStatus.NA : VacancyStatus.Vacancies,
                 PartTime = ucasCourseData.StudyMode == "F" ? VacancyStatus.NA : VacancyStatus.Vacancies,
 
-                Mod = ucasCourseData.TypeDescription,
+                Mod = ucasCourseData.GetTypeDescription(),
             };
 
             mappedCourse.DescriptionSections = new Collection<CourseDescriptionSection>();
@@ -196,7 +191,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "about this training provider accrediting",//CourseDetailsSections.AboutTheAccreditingProvider,
-                Text = GetAccreditingProviderEnrichment(ucasCourseData.AccreditingProviderId, orgEnrichmentModel)
+                Text = GetAccreditingProviderEnrichment(ucasCourseData.AccreditingInstCode, orgEnrichmentModel)
             });
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
@@ -255,7 +250,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             return enrichment.Description;
         }
 
-        private string MapAddress(School school)
+        private string MapAddress(Site school)
         {
             var addressFragments = new List<string>{
                 school.Address1,
@@ -264,20 +259,20 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 school.Address4
             }.Where(x => !string.IsNullOrWhiteSpace(x));
 
-            var postCode = school.PostCode ?? "";
+            var postCode = school.Postcode ?? "";
 
             return addressFragments.Any()
                 ? String.Join(", ", addressFragments) + " " + postCode
                 : postCode;
         }
 
-        private string MapAddress(UcasInstitution inst)
+        private string MapAddress(Institution inst)
         {
             var addressFragments = new List<string>{
-                inst.Addr1,
-                inst.Addr2,
-                inst.Addr3,
-                inst.Addr4
+                inst.Address1,
+                inst.Address2,
+                inst.Address3,
+                inst.Address4
             }.Where(x => !string.IsNullOrWhiteSpace(x));
 
             var postCode = inst.Postcode ?? "";

@@ -70,7 +70,6 @@ namespace GovUk.Education.ManageCourses.Api
                     options.ApiKey = mcConfig.ApiKey;
                 });
             
-            services.AddScoped<IPgdeWhitelist, PgdeWhitelist>();
             services.AddScoped<ISearchAndCompareService, SearchAndCompareService>();
             services.AddScoped<ICourseMapper, CourseMapper>();
             services.AddScoped<IDataService, DataService>();

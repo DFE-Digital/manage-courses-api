@@ -9,6 +9,8 @@ using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using GovUk.Education.ManageCourses.Domain.Models;
 using NUnit.Framework;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.UcasCourseImporter.Mapping;
+using GovUk.Education.ManageCourses.Xls.Domain;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 {
@@ -51,8 +53,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             // act
             var courseRecords = new List<UcasCourse> { blankUcasCourse };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            const bool pgde = false;
-            var manageApiCourse = courseLoader.LoadCourse(courseRecords, enrichmentMetadata, pgde);
+            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(), new List<Site>{new Site()}, new List<Institution>()).Single();
 
             // assert
             manageApiCourse.HasVacancies.Should().Be(false, "because there is only one course and it has no vacancies");
@@ -71,8 +72,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             // act
             var courseRecords = new List<UcasCourse> { ucasCourseWithoutVacancy, ucasCourseWithVacancy };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            const bool pgde = false;
-            var manageApiCourse = courseLoader.LoadCourse(courseRecords, enrichmentMetadata, pgde);
+            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject> {new Subject {}}, new List<Site>{new Site()}, new List<Institution>()).Single();
 
             // assert
             manageApiCourse.HasVacancies.Should().Be(true, "because there's one full time course");
@@ -90,12 +90,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             // act
             var courseRecords = new List<UcasCourse> { blankUcasCourse };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            const bool pgde = false;
-            var manageApiCourse = courseLoader.LoadCourse(courseRecords, enrichmentMetadata, pgde);
+            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject> {new Subject {}}, new List<Site>{new Site()}, new List<Institution>()).Single();
 
             // assert
-            manageApiCourse.Schools.Should().HaveCount(1, "There's one campus");
-            manageApiCourse.Schools.First().VacStatus.Should().Be(both);
+            manageApiCourse.Sites.Should().HaveCount(1, "There's one campus");
+            manageApiCourse.CourseSites.First().VacStatus.Should().Be(both);
         }
 
         [Test]
@@ -105,7 +104,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             var loc1 = GetBlankUcasCourse();
             loc1.Status = "S";
             loc1.AccreditingProvider = "WRONG_ACC";
-            loc1.InstCode = "WRONG_INST";
+            loc1.InstCode = "RIGHT_INST";
 
             var loc2 = GetBlankUcasCourse();
             loc2.Status = "R";
@@ -113,9 +112,21 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             loc2.InstCode = "RIGHT_INST";
             loc2.Publish = "Y";
 
-            var res = sut.LoadCourse(new List<UcasCourse> {loc1, loc2}, new List<UcasCourseEnrichmentGetModel>(), false);
+            var institutions = new List<Institution>
+            {
+                new Institution { InstCode = "WRONG_ACC"},
+                new Institution { InstCode = "RIGHT_ACC"},
+                new Institution { InstCode = "RIGHT_INST"}
+            };
 
-            res.AccreditingProviderId.Should().Be("RIGHT_ACC");
+            var sites = new List<Site>
+            {
+                new Site { InstCode = "RIGHT_INST" }
+            };
+
+            var res = sut.LoadCourses(new List<UcasCourse> {loc1, loc2}, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(), sites, institutions).Single();
+
+            res.AccreditingInstCode.Should().Be("RIGHT_ACC");
             res.InstCode.Should().Be("RIGHT_INST");
         }
 
@@ -130,22 +141,23 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 
             var res = LoadCourse(sut, loc1);
 
-            res.AccreditingProviderId.Should().Be("RIGHT_ACC");
+            res.AccreditingInstCode.Should().Be("RIGHT_ACC");
             res.InstCode.Should().Be("RIGHT_INST");
         }
 
         private static Course LoadCourse(CourseLoader sut, UcasCourse course)
         {
-            return sut.LoadCourse(new List<UcasCourse> { course }, new List<UcasCourseEnrichmentGetModel>(), false);
+            var providers = new List<Institution> { new Institution { InstCode = course.InstCode } };
+            if (!string.IsNullOrWhiteSpace(course.AccreditingProvider))
+            {
+                providers.Add(new Institution { InstCode = course.AccreditingProvider });
+            }
+            return sut.LoadCourses(new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(),  new List<Site>{new Site {InstCode = course.InstCode, Code = course.CampusCode}}, providers).Single();
         }
 
         private static UcasCourse GetBlankUcasCourse()
         {
-            return new UcasCourse
-            {
-                CourseCode = new CourseCode { UcasCourseSubjects = new Collection<UcasCourseSubject>() },
-                UcasCampus = new UcasCampus()
-            };
+            return new UcasCourse();
         }
     }
 }

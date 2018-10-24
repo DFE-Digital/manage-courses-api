@@ -19,16 +19,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         private readonly IDataService _dataService;
         private readonly IEnrichmentService _enrichmentService;
         private readonly ILogger _logger;
-        private readonly IPgdeWhitelist _pgdeWhitelist;
 
-        public SearchAndCompareService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService, ILogger<SearchAndCompareService> logger, IPgdeWhitelist pgdeWhitelist)
+        public SearchAndCompareService(ISearchAndCompareApi api, ICourseMapper courseMapper, IDataService dataService, IEnrichmentService enrichmentService, ILogger<SearchAndCompareService> logger)
         {
             _api = api;
             _courseMapper = courseMapper;
             _dataService = dataService;
             _enrichmentService = enrichmentService;
             _logger = logger;
-            _pgdeWhitelist = pgdeWhitelist;
         }
         /// <summary>
         /// Publishes a list of courses to Search and Compare
@@ -110,7 +108,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             return returnBool;
         }
 
-        private Course GetCourse(string instCode, string courseCode, string email, UcasInstitution ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
+        private Course GetCourse(string instCode, string courseCode, string email, Institution ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
         {
             var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
             var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(instCode, courseCode, email);

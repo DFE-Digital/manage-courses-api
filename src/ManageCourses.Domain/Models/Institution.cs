@@ -2,23 +2,21 @@
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
-    public class UcasInstitution
+    public class Institution
     {
-        public UcasInstitution()
+        public Institution()
         {
-            UcasCourses = new List<UcasCourse>();
+            Courses = new List<Course>();
         }
 
-        public void UpdateWith(UcasInstitution inst)
+        public void UpdateWith(Institution inst)
         {
-            InstName = inst.InstName;
-            InstBig = inst.InstBig;
             InstFull = inst.InstFull;
             InstType = inst.InstType;
-            Addr1 = inst.Addr1;
-            Addr2 = inst.Addr2;
-            Addr3 = inst.Addr3;
-            Addr4 = inst.Addr4;
+            Address1 = inst.Address1;
+            Address2 = inst.Address2;
+            Address3 = inst.Address3;
+            Address4 = inst.Address4;
             Postcode = inst.Postcode;
             ContactName = inst.ContactName;
             Email = inst.Email;
@@ -31,14 +29,12 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public int Id { get; set; }
         public string InstCode { get; set; }
-        public string InstName { get; set; }
-        public string InstBig { get; set; }
         public string InstFull { get; set; }
         public string InstType { get; set; }
-        public string Addr1 { get; set; }
-        public string Addr2 { get; set; }
-        public string Addr3 { get; set; }
-        public string Addr4 { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string Address3 { get; set; }
+        public string Address4 { get; set; }
         public string Postcode { get; set; }
         public string ContactName { get; set; }
         public string Email { get; set; }
@@ -46,14 +42,11 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Url { get; set; }
         public string YearCode { get; set; }
         public string Scitt { get; set; }
-        public string AccreditingProvider { get; set; }
         public string SchemeMember { get; set; }
 
         public ICollection<McOrganisationInstitution> McOrganisationInstitutions { get; set; }
-        public ICollection<UcasCourse> UcasCourses { get; set; }
-        public ICollection<UcasCourse> AccreditedUcasCourses { get; set; }
-        public ICollection<UcasCourseSubject> UcasCourseSubjects { get; set; }
-        public ICollection<UcasCampus> UcasCampuses { get; set; }
-        public ICollection<CourseCode> CourseCodes { get; set; }
+        public ICollection<Course> Courses { get; set; }
+        public ICollection<Course> AccreditedCourses { get; set; }
+        public ICollection<Site> Sites { get; set; }
     }
 }

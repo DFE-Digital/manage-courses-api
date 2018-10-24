@@ -36,7 +36,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void HappyPath()
         {
-            Context.AddMcUser(MakeSomeExistingUser());
+            Context.McUsers.Add(MakeSomeExistingUser());
             Context.Save();
 
             _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
@@ -77,8 +77,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var user = MakeSomeExistingUser();
             var user2 = MakeSomeOtherExistingUser();
 
-            Context.AddMcUser(user);
-            Context.AddMcUser(user2);
+            Context.McUsers.Add(user);
+            Context.McUsers.Add(user2);
             Context.Save();
 
             _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
@@ -95,7 +95,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var userToDelete = MakeSomeExistingUser();
 
-            Context.AddMcUser(userToDelete);
+            Context.McUsers.Add(userToDelete);
             Context.Save();
 
             _system.LogAccessRequest(MakeSomeAccessRequest(), "joe@example.com");
@@ -116,7 +116,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var user = MakeSomeExistingUser();
 
-            Context.AddMcUser(user);
+            Context.McUsers.Add(user);
             Context.Save();
 
             _system.LogAccessRequest(MakeSomeAccessRequest(), "JoE@eXaMpLE.CoM");
@@ -134,8 +134,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var user = MakeSomeExistingUser();
             var user2 = MakeSomeOtherExistingUser();
 
-            Context.AddMcUser(user);
-            Context.AddMcUser(user2);
+            Context.McUsers.Add(user);
+            Context.McUsers.Add(user2);
             Context.Save();
 
             var accessRequest = MakeSomeAccessRequest();
@@ -167,7 +167,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [Test]
         public void EmailError_RollsBackAccessRequest()
         {
-            Context.AddMcUser(MakeSomeExistingUser());
+            Context.McUsers.Add(MakeSomeExistingUser());
             Context.Save();
 
             _system = new AccessRequestService(Context, new ErroringEmailService());

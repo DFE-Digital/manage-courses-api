@@ -8,6 +8,7 @@ using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.UcasCourseImporter;
+using GovUk.Education.ManageCourses.Xls.Domain;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class EnrichmentServiceInstitutionTests : DbIntegrationTestBase
     {
-        private UcasInstitution _ucasInstitution;
+        private Institution _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
 
@@ -28,32 +29,27 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         protected override void Setup()
         {
-            var accreditingInstitution = new UcasInstitution
+            var accreditingInstitution = new Institution
             {
-                InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
+                InstFull = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
                 InstCode = AccreditingInstCode,
             };
             Context.Add(accreditingInstitution);
 
             const string providerInstCode = "HNY1";
             const string crseCode = "TK101";
-            _ucasInstitution = new UcasInstitution
+            _ucasInstitution = new Institution
             {
-                InstName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
+                InstFull = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
                 InstCode = providerInstCode,
-                UcasCourses = new List<UcasCourse>
+                Courses = new List<Course>
                 {
-                    new UcasCourse
+                    new Course
                     {
                         InstCode = providerInstCode,
-                        CrseCode = crseCode,
-                        CrseTitle = "Conscious control of telekenisis",
-                        CourseCode = new CourseCode
-                        {
-                            InstCode = providerInstCode,
-                            CrseCode = crseCode,
-                        },
-                        AccreditingProvider = AccreditingInstCode,
+                        CourseCode = crseCode,
+                        Name = "Conscious control of telekenisis",
+                        AccreditingInstitution = accreditingInstitution,
                     }
                 }
             };
@@ -80,7 +76,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     new McOrganisationInstitution
                     {
-                        UcasInstitution = _ucasInstitution,
+                        Institution = _ucasInstitution,
                     },
                 }
             };
@@ -275,9 +271,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             // Arrange
             var enrichmentService = new EnrichmentService(Context);
-            var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
-            mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
-            var dataService = new DataService(Context, enrichmentService, new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
+            var dataService = new DataService(Context, enrichmentService, new Mock<ILogger<DataService>>().Object);
             var sourceModel = new UcasInstitutionEnrichmentPostModel
             {
                 EnrichmentModel = new InstitutionEnrichmentModel

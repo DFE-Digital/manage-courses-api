@@ -48,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}/ucas")]
-        [ProducesResponseType(typeof(UcasInstitution), 200)]
+        [ProducesResponseType(typeof(Institution), 200)]
         [ProducesResponseType(404)]
         public ActionResult GetUcasInstitution(string instCode)
         {

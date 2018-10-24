@@ -6,6 +6,7 @@ using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.DbIntegration;
 using GovUk.Education.ManageCourses.UcasCourseImporter;
+using GovUk.Education.ManageCourses.Xls.Domain;
 using Moq;
 using NUnit.Framework;
 
@@ -42,8 +43,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             foreach (var expected in payload.Courses)
             {
-                var count = Context.UcasCourses
-                    .Count(o => o.CrseCode == expected.CrseCode);
+                var count = Context.Courses
+                    .Count(o => o.CourseCode == expected.CrseCode);
 
                 Assert.AreEqual(1, count);
             }
@@ -64,8 +65,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             UcasDataMigrator.UpdateUcasData(import);
 
-            Assert.AreEqual(1, Context.CourseCodes.Count(), "valid courses should be imported anyway");
-            Assert.AreEqual(1, Context.UcasCourses.Count(), "valid courses should be imported anyway");
+            Assert.AreEqual(1, Context.Courses.Count(), "valid courses should be imported anyway");
 
             //make an update and change import order
             import.Courses.First().CrseTitle = "The best title";
@@ -73,9 +73,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             UcasDataMigrator.UpdateUcasData(import);
 
-            Assert.AreEqual(1, Context.CourseCodes.Count(), "valid courses should be re-imported anyway");
-            Assert.AreEqual(1, Context.UcasCourses.Count(), "valid courses should be re-imported anyway");
-            Assert.AreEqual("The best title", Context.UcasCourses.Single().CrseTitle);
+            Assert.AreEqual(1, Context.Courses.Count(), "valid courses should be re-imported anyway");
+            Assert.AreEqual("The best title", Context.Courses.Single().Name);
         }
         private static void SaveReferenceDataPayload(ManageCoursesDbContext context)
         {
@@ -112,12 +111,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             };
 
             const string instCode2 = "InstCode_2";
-            var institutions = new List<UcasInstitution>
+            var institutions = new List<Institution>
             {
-                new UcasInstitution {
+                new Institution {
                     InstCode = InstCode1
                 },
-                new UcasInstitution {
+                new Institution {
                     InstCode = instCode2
                 }
             };
@@ -125,7 +124,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             var organisationInstitutions = new List<McOrganisationInstitution>
             {
                 new McOrganisationInstitution {
-                    InstitutionCode = instCode2,
+                    InstCode = instCode2,
                     OrgId = orgId2,
                 }
             };
@@ -142,7 +141,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             context.McUsers.AddRange(users);
             context.McOrganisations.AddRange(organisations);
-            context.UcasInstitutions.AddRange(institutions);
+            context.Institutions.AddRange(institutions);
             context.McOrganisationUsers.AddRange(organisationUsers);
             context.McOrganisationIntitutions.AddRange(organisationInstitutions);
             context.Save();
@@ -162,8 +161,17 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                     {
                         InstCode = InstCode1,
                         CrseCode = "COURSECODE_1",
-                        Status = "N"
+                        Status = "N",
+                        CampusCode = "CMP"
                     }
+                },
+                Campuses = new List<UcasCampus>
+                {
+                    new UcasCampus
+                    {
+                        CampusCode = "CMP",
+                        InstCode = InstCode1
+                    }   
                 }
             };
         }

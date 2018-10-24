@@ -32,9 +32,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             mockEnrichmentService.Setup(x => x.GetCourseEnrichmentMetadata(It.IsAny<string>(), It.IsAny<string>()))
                 .Returns(new List<UcasCourseEnrichmentGetModel>());
 
-            var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
-            mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
-            DataService = new DataService(Context, mockEnrichmentService.Object, mockLogger.Object, mockPdgeWhitelist.Object);
+            DataService = new DataService(Context, mockEnrichmentService.Object, mockLogger.Object);
         }
 
         [Test]
@@ -125,7 +123,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
                 foreach (var course in result.Courses)
                 {
-                    course.Schools.All(s => s.Status == "N").Should().BeTrue();
+                    course.CourseSites.All(s => s.Status == "N").Should().BeTrue();
                 }
             }
         }
@@ -145,7 +143,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
                 foreach (var course in result.Courses)
                 {
-                    course.Schools.All(s => s.Publish == "N").Should().BeTrue();
+                    course.CourseSites.All(s => s.Publish == "N").Should().BeTrue();
                 }
             }
         }
@@ -253,6 +251,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         /// <param name="numCourses">number of course records to generate</param>
         private void LoadData(string email, int numOrgs, int numCourses)
         {
+            Context.Subjects.RemoveRange(Context.Subjects);
+            Context.Save();
+
             int numSubjects = 3;
             Context.McUsers.Add(new McUser { FirstName = "fname", LastName = "lname", Email = email });
             LoadSubjects(numSubjects);
@@ -261,21 +262,21 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 var orgId = "org" + counter;
                 var instCode = "AB" + counter;
                 Context.McOrganisations.Add(new McOrganisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter });
-                Context.UcasInstitutions.Add(new UcasInstitution
+                Context.Institutions.Add(new Institution
                 {
-                    Addr1 = "add2",
-                    Addr2 = "add2",
-                    Addr3 = "add3",
-                    Addr4 = "add4",
+                    Address1 = "add2",
+                    Address2 = "add2",
+                    Address3 = "add3",
+                    Address4 = "add4",
                     Postcode = "AB1 CD2",
                     InstCode = instCode,
                     InstFull = "Intitution " + counter
                 });
-                LoadCourses(instCode, numCourses, numSubjects);
+                LoadCourses(instCode, numCourses, Context.Subjects);
                 Context.McOrganisationUsers.Add(new McOrganisationUser { Email = email, OrgId = orgId });
                 Context.McOrganisationIntitutions.Add(new McOrganisationInstitution
                 {
-                    InstitutionCode = instCode,
+                    InstCode = instCode,
                     OrgId = orgId
                 });
             }
@@ -289,39 +290,49 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         /// <param name="instCode">institution code</param>
         /// <param name="numRecords">number of course records to generate</param>
         /// <param name="numSubjects"></param>
-        private void LoadCourses(string instCode, int numRecords, int numSubjects)
+        private void LoadCourses(string instCode, int numRecords, IEnumerable<Subject> subjects)
         {
             for (var counter = 1; counter <= numRecords; counter++)
-            {
+            {                
                 var courseCode = "CC" + counter;
                 var campusCode = "C" + counter;
-                Context.UcasCourses.Add(new UcasCourse
+
+                var site = new Site
                 {
-                    Age = "P",
-                    CrseCode = courseCode,
-                    CrseOpenDate = "2018-100-16 00:00;00",
+                    Code = campusCode,
+                    Address1 = "add1",
+                    Address2 = "add2",
+                    Address3 = "add3",
+                    Address4 = "add4",
+                    Postcode = "PC1 A23",
+                    LocationName = "Campus " + counter,
+                    InstCode = instCode
+                };
+                
+                var course = new Course
+                {
+                    AgeRange = "P",
+                    CourseCode = courseCode,
+                    StartDate = new DateTime(2018, 10, 16),
                     ProfpostFlag = "PG",
                     ProgramType = "SC",
-                    Studymode = "F",
-                    CrseTitle = "Title " + counter,
+                    StudyMode = "F",
+                    Name = "Title " + counter,
                     InstCode = instCode,
-                    CampusCode = campusCode,
-                    Status = "N",
-                    Publish = "N",
-                });
-                Context.UcasCampuses.Add(new UcasCampus
-                {
-                    Addr1 = "add1",
-                    Addr2 = "add2",
-                    Addr3 = "add3",
-                    Addr4 = "add4",
-                    Postcode = "PC1 A23",
-                    CampusCode = campusCode,
-                    CampusName = "Campus " + counter,
-                    InstCode = instCode
-                });
-                Context.CourseCodes.Add(new CourseCode { CrseCode = courseCode, InstCode = instCode });
-                LoadCourseSubjects(courseCode, instCode, numSubjects);
+                    CourseSites =  new List<CourseSite>() 
+                    {
+                        new CourseSite 
+                        { 
+                            Status = "N",
+                            Publish = "N",
+                            Site = site 
+                        }
+                    }
+                };
+                Context.Courses.Add(course);
+                Context.Sites.Add(site);
+
+                LoadCourseSubjects(course, instCode, subjects);
             }
         }
 
@@ -330,24 +341,22 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             for (var counter = 1; counter <= numRecords; counter++)
             {
                 var subjectCode = "SC" + counter;
-                Context.UcasSubjects.Add(new UcasSubject
+                Context.Subjects.Add(new Subject
                 {
                     SubjectCode = subjectCode,
-                    SubjectDescription = "subject " + counter
+                    SubjectName = "subject " + counter
                 });
             }
         }
 
-        private void LoadCourseSubjects(string courseCode, string instCode, int numRecords)
+        private void LoadCourseSubjects(Course course, string instCode, IEnumerable<Subject> subjects)
         {
-            for (var counter = 1; counter <= numRecords; counter++)
+            foreach (var subject in subjects)
             {
-                var subjectCode = "SC" + counter;
-                Context.UcasCourseSubjects.Add(new UcasCourseSubject
+                Context.CourseSubjects.Add(new CourseSubject
                 {
-                    CrseCode = courseCode,
-                    InstCode = instCode,
-                    SubjectCode = subjectCode
+                    Course = course,
+                    Subject = subject
                 });
             }
         }

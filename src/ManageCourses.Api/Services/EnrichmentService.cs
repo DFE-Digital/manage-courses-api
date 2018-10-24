@@ -312,16 +312,16 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             if (useUcasContact)
             {
-                var ucasInst = _context.UcasInstitutions.SingleOrDefault(x => x.InstCode == instCode);
+                var ucasInst = _context.Institutions.SingleOrDefault(x => x.InstCode == instCode);
                 if (ucasInst != null)
                 {
                     enrichmentModel.Email = ucasInst.Email;
                     enrichmentModel.Telephone = ucasInst.Telephone;
                     enrichmentModel.Website = ucasInst.Url;
-                    enrichmentModel.Address1 = ucasInst.Addr1;
-                    enrichmentModel.Address2 = ucasInst.Addr2;
-                    enrichmentModel.Address3 = ucasInst.Addr3;
-                    enrichmentModel.Address4 = ucasInst.Addr4;
+                    enrichmentModel.Address1 = ucasInst.Address1;
+                    enrichmentModel.Address2 = ucasInst.Address2;
+                    enrichmentModel.Address3 = ucasInst.Address3;
+                    enrichmentModel.Address4 = ucasInst.Address4;
                     enrichmentModel.Postcode = ucasInst.Postcode;
                 }
             }
@@ -336,7 +336,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             instCode = instCode.ToUpperInvariant();
             email = email.ToLowerInvariant();
 
-            var inst = _context.McOrganisationIntitutions.Single(x => x.InstitutionCode == instCode); //should throw an error if  the inst doesn't exist
+            var inst = _context.McOrganisationIntitutions.Single(x => x.InstCode == instCode); //should throw an error if  the inst doesn't exist
 
             var orgUser = _context.McOrganisationUsers
                 .Where(x => x.Email == email && x.OrgId == inst.OrgId)

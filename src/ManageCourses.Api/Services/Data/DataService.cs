@@ -5,7 +5,6 @@ using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
-using GovUk.Education.ManageCourses.Domain.EqualityComparers;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,19 +13,15 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 {
     public class DataService : IDataService
     {
-        private readonly CourseLoader _courseLoader;
         private readonly IManageCoursesDbContext _context;
         IEnrichmentService _enrichmentService;
         private readonly ILogger _logger;
-        private readonly IPgdeWhitelist _pgdeWhitelist;
 
-        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, ILogger<DataService> logger, IPgdeWhitelist pgdeWhitelist)
+        public DataService(IManageCoursesDbContext context, IEnrichmentService enrichmentService, ILogger<DataService> logger)
         {
             _context = context;
             _enrichmentService = enrichmentService;
             _logger = logger;
-            _pgdeWhitelist = pgdeWhitelist;
-            _courseLoader = new CourseLoader();
         }
         
         /// <summary>
@@ -46,12 +41,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 return null;
             }
-            
-            var isPgde = _pgdeWhitelist.IsPgde(instCode, ucasCode);
 
-            var course = _courseLoader.LoadCourse(courseRecords, enrichmentMetadata, isPgde);
-            return course;
+            return courseRecords.Single();
         }
+
         /// <summary>
         /// returns an InstitutionCourses object for a specified institution with the required courses mapped to a user email address
         /// </summary>
@@ -60,17 +53,24 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         /// <returns>new InstitutionCourse object with a list of all courses found</returns>
         public InstitutionCourses GetCourses(string email, string instCode)
         {
-            var returnCourses = new InstitutionCourses();
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(instCode))
             {
-                return returnCourses;
+                return new InstitutionCourses();
             }
 
             var courseRecords = _context.GetUcasCourseRecordsByInstCode(instCode, email);
-            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
-            var pgdeCourses = _pgdeWhitelist.ForInstitution(instCode);
-            returnCourses = _courseLoader.LoadCourses(courseRecords, enrichmentMetadata, pgdeCourses);
-            return returnCourses;
+
+            if (courseRecords.Count == 0)
+            {
+                return new InstitutionCourses();
+            }
+            
+            return new InstitutionCourses
+            {
+                Courses = courseRecords,
+                InstitutionCode = courseRecords.First().InstCode,
+                InstitutionName = courseRecords.First().Institution.InstFull
+            };
         }
 
         public IEnumerable<UserOrganisation> GetOrganisationsForUser(string email)
@@ -79,9 +79,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 .Select(orgInst => new UserOrganisation()
                 {
                     OrganisationId = orgInst.OrgId,
-                    OrganisationName = orgInst.UcasInstitution.InstFull,
-                    UcasCode = orgInst.InstitutionCode,
-                    TotalCourses = orgInst.UcasInstitution.UcasCourses.Select(c => c.CrseCode).Distinct().Count()
+                    OrganisationName = orgInst.Institution.InstFull,
+                    UcasCode = orgInst.InstCode,
+                    TotalCourses = orgInst.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
                 }).OrderBy(x => x.OrganisationName).ToList();
 
             return userOrganisations;
@@ -97,9 +97,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
                 return new UserOrganisation()
                 {
                     OrganisationId = userOrganisation.OrgId,
-                    OrganisationName = userOrganisation.UcasInstitution.InstFull,
-                    UcasCode = userOrganisation.InstitutionCode,
-                    TotalCourses = userOrganisation.UcasInstitution.UcasCourses.Select(c => c.CrseCode).Distinct()
+                    OrganisationName = userOrganisation.Institution.InstFull,
+                    UcasCode = userOrganisation.InstCode,
+                    TotalCourses = userOrganisation.Institution.Courses.Select(c => c.CourseCode).Distinct()
                         .Count(),
                     EnrichmentWorkflowStatus = enrichment?.Status
                 };
@@ -108,9 +108,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             return null;
         }        
 
-        public UcasInstitution GetUcasInstitutionForUser(string name, string instCode)
+        public Institution GetUcasInstitutionForUser(string name, string instCode)
         {
-            return _context.GetUcasInstitution(name, instCode);
+            return _context.GetInstitution(name, instCode);
         }
     }
 }

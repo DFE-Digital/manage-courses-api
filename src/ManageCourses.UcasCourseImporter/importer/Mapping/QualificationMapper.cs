@@ -1,8 +1,9 @@
 ﻿using System;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 
-namespace GovUk.Education.ManageCourses.Api.Mapping
+namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 {
     public class QualificationMapper
     {

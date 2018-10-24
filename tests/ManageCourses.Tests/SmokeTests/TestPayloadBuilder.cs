@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.UcasCourseImporter;
+using GovUk.Education.ManageCourses.Xls.Domain;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {

@@ -21,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     OrgId = "123"
                 });
                 
-            context.UcasInstitutions.Add(new UcasInstitution { 
+            context.Institutions.Add(new Institution { 
                     InstFull = "Joe's school @ UCAS",
                     InstCode = "ABC"
                 });
@@ -32,7 +32,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 });
             
             context.McOrganisationIntitutions.Add(new McOrganisationInstitution {
-                    InstitutionCode = "ABC",
+                    InstCode = "ABC",
                     OrgId = "123"
                 });
             

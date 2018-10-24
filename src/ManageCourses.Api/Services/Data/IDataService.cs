@@ -10,7 +10,7 @@ namespace GovUk.Education.ManageCourses.Api.Data
         UserOrganisation GetOrganisationForUser(string email, string instCode);
         Course GetCourse(string email, string instCode, string ucasCode);
         InstitutionCourses GetCourses(string email, string instCode);
-        UcasInstitution GetUcasInstitutionForUser(string name, string instCode);
+        Institution GetUcasInstitutionForUser(string name, string instCode);
     }
 }
     

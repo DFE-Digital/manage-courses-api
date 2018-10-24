@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GovUk.Education.ManageCourses.Domain.Models
+namespace GovUk.Education.ManageCourses.Xls.Domain
 {
     public class UcasSubject
     {
@@ -9,6 +9,5 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string SubjectDescription { get; set; }
         public string TitleMatch { get; set; }
 
-        public ICollection<UcasCourseSubject> UcasCourseSubjects { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using GovUk.Education.ManageCourses;
-using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.Xls.Domain;
 
 namespace GovUk.Education.ManageCourses.UcasCourseImporter
 {

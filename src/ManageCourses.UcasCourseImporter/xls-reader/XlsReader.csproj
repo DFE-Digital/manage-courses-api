@@ -8,10 +8,5 @@
   <ItemGroup>
     <PackageReference Include="DotNetCore.NPOI" Version="1.0.2" />    
     <PackageReference Include="Serilog" Version="2.7.1" />
-  </ItemGroup>  
-
-  <ItemGroup>  
-    <ProjectReference Include="..\..\ManageCourses.Domain\ManageCourses.Domain.csproj" />
-  </ItemGroup>
-  
+  </ItemGroup>    
 </Project>

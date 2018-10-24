@@ -1,4 +1,4 @@
-namespace GovUk.Education.ManageCourses.Api.Model
+namespace GovUk.Education.ManageCourses.Domain.Models
 {
     public enum CourseQualification
     {

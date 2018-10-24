@@ -42,8 +42,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 LastName = "Sinatra",
                 Email = "frank@example.org",
             };
-            Context.AddMcUser(_testUserBob);
-            Context.AddMcUser(_userTestUserFrank);
+            Context.McUsers.Add(_testUserBob);
+            Context.McUsers.Add(_userTestUserFrank);
             Context.SaveChanges();
 
             _mockWelcomeEmailService = new Mock<IWelcomeEmailService>();

@@ -26,9 +26,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             _contextMock = new Mock<IManageCoursesDbContext>();
             _enrichmentServiceMock = new Mock<IEnrichmentService>();
-            var mockPdgeWhitelist = new Mock<IPgdeWhitelist>();
-            mockPdgeWhitelist.Setup(x => x.ForInstitution(It.IsAny<string>())).Returns(new List<PgdeCourse>());
-            _dataService = new DataService(_contextMock.Object, _enrichmentServiceMock.Object, new Mock<ILogger<DataService>>().Object, mockPdgeWhitelist.Object);
+            _dataService = new DataService(_contextMock.Object, _enrichmentServiceMock.Object, new Mock<ILogger<DataService>>().Object);
         }
 
         /// <summary>
@@ -41,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             const string instCode = "BAT4";
             _contextMock.Setup(c => c.GetUserOrganisation(email, instCode)).Returns(new McOrganisationInstitution
             {
-                UcasInstitution = new UcasInstitution(),
+                Institution = new Institution(),
             });
 
             // test blank
@@ -62,28 +60,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var publishedOrg = _dataService.GetOrganisationForUser(email, instCode);
             publishedOrg.Should().NotBeNull();
             publishedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
-        }
-
-        [Ignore("wip")] // todo: finish off course status coverage in a new PR
-        [Test]
-        public void Test_CourseStatus()
-        {
-            const string email = "rabbit@example.org";
-            const string instCode = "BAT5";
-            const string ucasCourseCode = "VEG1";
-            _contextMock.Setup(c => c.GetUcasCourseRecordsByUcasCode(instCode, ucasCourseCode, email))
-                .Returns(new List<UcasCourse>
-                {
-                    new UcasCourse(),
-                });
-            var enrichmentList = new List<UcasCourseEnrichmentGetModel>();
-            _enrichmentServiceMock.Setup(e => e.GetCourseEnrichmentMetadata(instCode, email)).Returns(enrichmentList);
-            //var ucasCourseSubjects = new DbSet<UcasCourseSubject>();
-            var ucasCourseSubjects = new Mock<DbSet<UcasCourseSubject>>();
-            _contextMock.SetupGet(c => c.UcasCourseSubjects).Returns(ucasCourseSubjects.Object);
-            var cs = _dataService.GetCourse(email, instCode, ucasCourseCode);
-            cs.Should().NotBeNull("this course has been mocked");
-            cs.EnrichmentWorkflowStatus.Should().BeNull("course enrichment doesn't exist");
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
-namespace GovUk.Education.ManageCourses.Domain.Models
+namespace GovUk.Education.ManageCourses.Xls.Domain
 {
     public class UcasCampus
     {
@@ -16,8 +17,5 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string TelNo { get; set; }
         public string Email { get; set; }
         public string RegionCode { get; set; }
-
-        public UcasInstitution UcasInstitution { get; set; }
-        public ICollection<UcasCourse> UcasCourses { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace GovUk.Education.ManageCourses.Domain.Models
+﻿namespace GovUk.Education.ManageCourses.Xls.Domain
 {
     public class UcasCourseSubject
     {
@@ -8,8 +8,5 @@
         public string SubjectCode { get; set; }
         public string YearCode { get; set; }
 
-        public UcasInstitution UcasInstitution { get; set; }
-        public CourseCode CourseCode { get; set; }
-        public UcasSubject UcasSubject { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-namespace GovUk.Education.ManageCourses.Domain.Models
+namespace GovUk.Education.ManageCourses.Xls.Domain
 {
     public class UcasCourse
     {
@@ -19,10 +19,5 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string HasBeenPublished { get; set; }
         public string StartYear { get; set; }
         public string StartMonth { get; set; }
-
-        public UcasInstitution UcasInstitution { get; set; }
-        public UcasInstitution AccreditingProviderInstitution { get; set; }
-        public UcasCampus UcasCampus { get; set; }
-        public CourseCode CourseCode { get; set; }
     }
 }
