@@ -36,7 +36,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
                 StudyMode = studyMode,
                 ProgramType = programType
             };
-            var result = course.GetTypeDescription();
+            var result = course.TypeDescription;
             result.Should().Be(expectedResult);
         }
     }

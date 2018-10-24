@@ -112,22 +112,23 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             loc2.InstCode = "RIGHT_INST";
             loc2.Publish = "Y";
 
+            Institution institution = new Institution { InstCode = "RIGHT_INST" };
             var institutions = new List<Institution>
             {
                 new Institution { InstCode = "WRONG_ACC"},
                 new Institution { InstCode = "RIGHT_ACC"},
-                new Institution { InstCode = "RIGHT_INST"}
+                institution
             };
 
             var sites = new List<Site>
             {
-                new Site { InstCode = "RIGHT_INST" }
+                new Site { Institution = institution }
             };
 
             var res = sut.LoadCourses(new List<UcasCourse> {loc1, loc2}, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(), sites, institutions).Single();
 
-            res.AccreditingInstCode.Should().Be("RIGHT_ACC");
-            res.InstCode.Should().Be("RIGHT_INST");
+            res.AccreditingInstitution.InstCode.Should().Be("RIGHT_ACC");
+            res.Institution.InstCode.Should().Be("RIGHT_INST");
         }
 
         [Test]
@@ -141,18 +142,19 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 
             var res = LoadCourse(sut, loc1);
 
-            res.AccreditingInstCode.Should().Be("RIGHT_ACC");
-            res.InstCode.Should().Be("RIGHT_INST");
+            res.AccreditingInstitution.InstCode.Should().Be("RIGHT_ACC");
+            res.Institution.InstCode.Should().Be("RIGHT_INST");
         }
 
         private static Course LoadCourse(CourseLoader sut, UcasCourse course)
         {
-            var providers = new List<Institution> { new Institution { InstCode = course.InstCode } };
+            Institution institution = new Institution { InstCode = course.InstCode };
+            var providers = new List<Institution> { institution };
             if (!string.IsNullOrWhiteSpace(course.AccreditingProvider))
             {
                 providers.Add(new Institution { InstCode = course.AccreditingProvider });
             }
-            return sut.LoadCourses(new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(),  new List<Site>{new Site {InstCode = course.InstCode, Code = course.CampusCode}}, providers).Single();
+            return sut.LoadCourses(new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(),  new List<Site>{new Site {Institution = institution, Code = course.CampusCode}}, providers).Single();
         }
 
         private static UcasCourse GetBlankUcasCourse()

@@ -7,14 +7,10 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     {
         public int Id { get; set; }
 
-        public string OrgId { get; set; }
-
-        public string Email { get; set; }
-
         public McUser McUser { get; set; }
 
         public McOrganisation McOrganisation { get; set; }
 
-        public string DebuggerDisplay => $"McOrganisationUser: OrgId {OrgId} <--> User {Email}";
+        public string DebuggerDisplay => $"McOrganisationUser: OrgId {McOrganisation?.Id} <--> User {McUser?.Email}";
     }
 }

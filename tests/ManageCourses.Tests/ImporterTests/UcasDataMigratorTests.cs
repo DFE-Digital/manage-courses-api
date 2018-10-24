@@ -124,18 +124,18 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             var organisationInstitutions = new List<McOrganisationInstitution>
             {
                 new McOrganisationInstitution {
-                    InstCode = instCode2,
-                    OrgId = orgId2,
+                    Institution = institutions[1],
+                    McOrganisation = organisations[1],
                 }
             };
             var organisationUsers = new List<McOrganisationUser>
             {
                 new McOrganisationUser {
-                    Email = TestUserEmail2,
+                    McUser = users[1],
                 },
                 new McOrganisationUser {
-                    Email = TestUserEmail3,
-                    OrgId = OrgId1
+                    McUser = users[2],
+                    McOrganisation = organisations[0]
                 }
             };
 

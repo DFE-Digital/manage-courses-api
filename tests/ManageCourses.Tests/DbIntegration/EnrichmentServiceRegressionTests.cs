@@ -55,7 +55,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     new Course
                     {
-                        InstCode = providerInstCode,
                         CourseCode = crseCode,
                         Name = "Conscious control of telekenisis",
                         AccreditingInstitution = accreditingInstitution,

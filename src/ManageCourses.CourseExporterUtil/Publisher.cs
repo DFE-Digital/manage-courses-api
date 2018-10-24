@@ -122,8 +122,8 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 var mappedCourse = courseMapper.MapToSearchAndCompareCourse(
                     c.Institution,
                     c,
-                    converter.Convert(orgEnrichments.GetValueOrDefault(c.InstCode))?.EnrichmentModel,
-                    converter.Convert(courseEnrichments.GetValueOrDefault(c.InstCode + "_@@_" + c.CourseCode))?.EnrichmentModel
+                    converter.Convert(orgEnrichments.GetValueOrDefault(c.Institution.InstCode))?.EnrichmentModel,
+                    converter.Convert(courseEnrichments.GetValueOrDefault(c.Institution.InstCode + "_@@_" + c.CourseCode))?.EnrichmentModel
                 );
 
                 if (!mappedCourse.Campuses.Any())
@@ -135,7 +135,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 if (!mappedCourse.CourseSubjects.Any())
                 {
                     _logger.Warning(
-                        $"failed to assign subject to [{c.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.GetSubjects()}");
+                        $"failed to assign subject to [{c.Institution.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
                 }

@@ -3,9 +3,6 @@
     public class McOrganisationInstitution
     {
         public int Id { get; set; }
-        public string OrgId { get; set; }
-        public string InstCode { get; set; }
-
         public McOrganisation McOrganisation { get; set; }
         public Institution Institution { get; set; }
     }

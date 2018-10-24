@@ -255,14 +255,16 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.Save();
 
             int numSubjects = 3;
-            Context.McUsers.Add(new McUser { FirstName = "fname", LastName = "lname", Email = email });
+            McUser user = new McUser { FirstName = "fname", LastName = "lname", Email = email };
+            Context.McUsers.Add(user);
             LoadSubjects(numSubjects);
             for (var counter = 1; counter <= numOrgs; counter++)
             {
                 var orgId = "org" + counter;
                 var instCode = "AB" + counter;
-                Context.McOrganisations.Add(new McOrganisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter });
-                Context.Institutions.Add(new Institution
+                McOrganisation org = new McOrganisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter };
+                Context.McOrganisations.Add(org);
+                Institution institution = new Institution
                 {
                     Address1 = "add2",
                     Address2 = "add2",
@@ -271,13 +273,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Postcode = "AB1 CD2",
                     InstCode = instCode,
                     InstFull = "Intitution " + counter
-                });
-                LoadCourses(instCode, numCourses, Context.Subjects);
-                Context.McOrganisationUsers.Add(new McOrganisationUser { Email = email, OrgId = orgId });
+                };
+                Context.Institutions.Add(institution);
+                LoadCourses(institution, numCourses, Context.Subjects);
+                Context.McOrganisationUsers.Add(new McOrganisationUser { McUser = user, McOrganisation = org });
                 Context.McOrganisationIntitutions.Add(new McOrganisationInstitution
                 {
-                    InstCode = instCode,
-                    OrgId = orgId
+                    Institution = institution,
+                    McOrganisation = org
                 });
             }
 
@@ -290,7 +293,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         /// <param name="instCode">institution code</param>
         /// <param name="numRecords">number of course records to generate</param>
         /// <param name="numSubjects"></param>
-        private void LoadCourses(string instCode, int numRecords, IEnumerable<Subject> subjects)
+        private void LoadCourses(Institution institution, int numRecords, IEnumerable<Subject> subjects)
         {
             for (var counter = 1; counter <= numRecords; counter++)
             {                
@@ -306,7 +309,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "PC1 A23",
                     LocationName = "Campus " + counter,
-                    InstCode = instCode
+                    Institution = institution
                 };
                 
                 var course = new Course
@@ -318,7 +321,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     ProgramType = "SC",
                     StudyMode = "F",
                     Name = "Title " + counter,
-                    InstCode = instCode,
+                    Institution = institution,
                     CourseSites =  new List<CourseSite>() 
                     {
                         new CourseSite 
@@ -332,7 +335,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Context.Courses.Add(course);
                 Context.Sites.Add(site);
 
-                LoadCourseSubjects(course, instCode, subjects);
+                LoadCourseSubjects(course, subjects);
             }
         }
 
@@ -349,7 +352,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             }
         }
 
-        private void LoadCourseSubjects(Course course, string instCode, IEnumerable<Subject> subjects)
+        private void LoadCourseSubjects(Course course, IEnumerable<Subject> subjects)
         {
             foreach (var subject in subjects)
             {

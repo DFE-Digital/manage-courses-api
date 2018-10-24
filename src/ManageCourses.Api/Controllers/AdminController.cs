@@ -32,6 +32,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             var request = _context.AccessRequests
                 .Include(accessRequest => accessRequest.Requester)
                 .ThenInclude(requester => requester.McOrganisationUsers)
+                .ThenInclude(x => x.McOrganisation)
                 .SingleOrDefault(x => x.Id == accessRequestId);
 
             if (request == null)
@@ -43,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             // if a user gets recreated, this breaks the FK relation to mcUser, so we try to 
             // recover by finding the new user by email
-            var requesterUser = request.Requester ?? _context.McUsers.Include(x => x.McOrganisationUsers).SingleOrDefault(x => x.Email == request.RequesterEmail);
+            var requesterUser = request.Requester ?? _context.McUsers.Include(x => x.McOrganisationUsers).ThenInclude(x => x.McOrganisation).SingleOrDefault(x => x.Email == request.RequesterEmail);
 
             if (requesterUser == null)
             {
@@ -71,6 +72,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             requesterEmail = requesterEmail.ToLower();
             var requesterUser = _context.McUsers
                 .Include(x=>x.McOrganisationUsers)
+                .ThenInclude(x => x.McOrganisation)
                 .SingleOrDefault(x => x.Email == requesterEmail);
 
             if (requesterUser == null)
@@ -101,6 +103,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             var existingTargetUser = _context.McUsers
                             .Include(x => x.McOrganisationUsers)
+                            .ThenInclude(x => x.McOrganisation)
                             .SingleOrDefault(x => x.Email == requestedEmail); // throws if email is ambiguous
 
             if (existingTargetUser == null)
@@ -115,7 +118,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                     McOrganisationUsers = new Collection<McOrganisationUser>(
                             requesterUser.McOrganisationUsers.Select(x => new McOrganisationUser
                             {
-                                OrgId = x.OrgId
+                                McOrganisation = x.McOrganisation,
                             }).ToList())
                 });
             }
@@ -124,12 +127,12 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 // update
                 foreach (var organisationUser in requesterUser.McOrganisationUsers)
                 {
-                    if (!existingTargetUser.McOrganisationUsers.Any(x => x.OrgId == organisationUser.OrgId))
+                    if (!existingTargetUser.McOrganisationUsers.Any(x => x.McOrganisation.OrgId == organisationUser.McOrganisation.OrgId))
                     {
                         existingTargetUser.McOrganisationUsers.Add(new McOrganisationUser
                         {
-                            Email = existingTargetUser.Email,
-                            OrgId = organisationUser.OrgId
+                            McUser = existingTargetUser,
+                            McOrganisation = organisationUser.McOrganisation
                         });
                     }
                 }

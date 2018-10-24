@@ -13,27 +13,19 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     public class Course
     {
         public int Id { get; set; }
+
+        public int InstitutionId { get; set; }
         public Institution Institution {get; set;}
+        public int? AccreditingInstitutionId { get; set; }
         public Institution AccreditingInstitution {get; set;}
 
         public string CourseCode { get; set; }
         public string ProgramType { get; set; }
         public string ProfpostFlag { get; set; }
         public string Name { get; set; }
-        public string InstCode { get; set; }
-
-        public string AccreditingInstCode { get; set; }
         
-        public string GetAccreditingProviderName()
-        {
-            return AccreditingInstitution?.InstFull;
-        }
-
-        public string GetSubjects()
-        {
-            return string.Join(", ", CourseSubjects.Select(x => x.Subject.SubjectName));
-        }
-
+        public string Subjects => string.Join(", ", CourseSubjects.Select(x => x.Subject.SubjectName));
+        
         public string StudyMode { get; set; }
         public string AgeRange { get; set; }        
         public CourseQualification Qualification { get; set; }
@@ -45,11 +37,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         ///  - whether it's salaried or an apprenticeship
         ///  - whether it's full-time and/or part time
         /// </summary>
-        public string GetTypeDescription()
-        {
-            return GetCourseVariantType();
-        }
-
+        public string TypeDescription => GetCourseVariantType();
+        public string Route => GetRoute();
 
         public DateTime? StartDate { get; set; }
         
@@ -118,7 +107,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
             return result;
         }
 
-        public string GetRoute()
+        private string GetRoute()
         {
             if (string.IsNullOrWhiteSpace(ProgramType))
             {

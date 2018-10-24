@@ -9,31 +9,37 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     {
         public static void AddTestReferenceData(this ManageCoursesDbContext context, string username)
         {
-            context.McUsers.Add(new McUser{
-                    FirstName = "Joe",
-                    LastName = "Bloggs",
-                    Email = username,
-                    AcceptTermsDateUtc = DateTime.UtcNow
-                });
+            McUser user = new McUser
+            {
+                FirstName = "Joe",
+                LastName = "Bloggs",
+                Email = username,
+                AcceptTermsDateUtc = DateTime.UtcNow
+            };
+            context.McUsers.Add(user);
 
-            context.McOrganisations.Add(new McOrganisation {
-                    Name = "Joe's school",
-                    OrgId = "123"
-                });
-                
-            context.Institutions.Add(new Institution { 
-                    InstFull = "Joe's school @ UCAS",
-                    InstCode = "ABC"
-                });
+            McOrganisation organisation = new McOrganisation
+            {
+                Name = "Joe's school",
+                OrgId = "123"
+            };
+            context.McOrganisations.Add(organisation);
+
+            Institution institution = new Institution
+            {
+                InstFull = "Joe's school @ UCAS",
+                InstCode = "ABC"
+            };
+            context.Institutions.Add(institution);
             
             context.McOrganisationUsers.Add(new McOrganisationUser {
-                    Email = username,
-                    OrgId = "123"
+                    McUser = user,
+                    McOrganisation = organisation
                 });
             
             context.McOrganisationIntitutions.Add(new McOrganisationInstitution {
-                    InstCode = "ABC",
-                    OrgId = "123"
+                    Institution = institution,
+                    McOrganisation = organisation
                 });
             
         }

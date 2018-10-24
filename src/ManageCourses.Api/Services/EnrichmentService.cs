@@ -336,11 +336,12 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             instCode = instCode.ToUpperInvariant();
             email = email.ToLowerInvariant();
 
-            var inst = _context.McOrganisationIntitutions.Single(x => x.InstCode == instCode); //should throw an error if  the inst doesn't exist
+            var inst = _context.McOrganisationIntitutions.Include(x => x.McOrganisation).Single(x => x.Institution.InstCode == instCode); //should throw an error if  the inst doesn't exist
 
             var orgUser = _context.McOrganisationUsers
-                .Where(x => x.Email == email && x.OrgId == inst.OrgId)
+                .Where(x => x.McUser.Email == email && x.McOrganisation.OrgId == inst.McOrganisation.OrgId)
                 .Include(x => x.McUser)
+                .Include(x => x.McOrganisation)
                 .Single(); //should throw an error if the user doesn't have acces to the inst
 
             var returnUserInst = new UserInstitution

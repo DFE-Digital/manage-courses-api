@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
 
             var res = new AdminController(Context).ActionAccessRequest(id);
 
-            var users = Context.McUsers.Include(x => x.McOrganisationUsers).ToList();
+            var users = Context.McUsers.Include(x => x.McOrganisationUsers).ThenInclude(x => x.McOrganisation).ToList();
 
             (res as StatusCodeResult).StatusCode.Should().Be(200);
             users.Count.Should().Be(2);
@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
 
             recipient.FirstName.Should().Be("RecipientFirstName");
             recipient.LastName.Should().Be("RecipientLastName");
-            recipient.McOrganisationUsers.Single().OrgId.Should().Be("123");
+            recipient.McOrganisationUsers.Single().McOrganisation.OrgId.Should().Be("123");
             recipient.McOrganisationUsers.Single().McOrganisation.Name.Should().Be("TheOrg");
             Context.AccessRequests.Single().Status.Should().Be(AccessRequest.RequestStatus.Completed);
         }
@@ -84,7 +84,7 @@ namespace GovUk.Education.ManageCourses.Tests.Controllers
 
             recipient.FirstName.Should().Be("Joe");
             recipient.LastName.Should().Be("Bloggs");
-            recipient.McOrganisationUsers.Single().OrgId.Should().Be("123");
+            recipient.McOrganisationUsers.Single().McOrganisation.OrgId.Should().Be("123");
             recipient.McOrganisationUsers.Single().McOrganisation.Name.Should().Be("TheOrg");
         }
 

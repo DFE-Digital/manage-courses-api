@@ -77,12 +77,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.AccreditingProvider))
                 {
                     returnCourse.AccreditingInstitution = allInstitutions[organisationCourseRecord.AccreditingProvider];
-                    returnCourse.AccreditingInstCode = organisationCourseRecord.AccreditingProvider;
                 }
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.InstCode))
                 {
-                    returnCourse.InstCode = organisationCourseRecord.InstCode;
                     returnCourse.Institution = allInstitutions[organisationCourseRecord.InstCode];
                 }
                 returnCourse.CourseCode = organisationCourseRecord.CrseCode;
@@ -101,7 +99,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 returnCourse.CourseSubjects = new Collection<CourseSubject>(mappedSubjects.ToList());
                 returnCourse.CourseSites = new Collection<CourseSite>(courseRecords.Select(x => new CourseSite
                 { 
-                    Site = allSites.Single(y => y.InstCode == x.InstCode && y.Code == x.CampusCode),                    
+                    Site = allSites.Single(y => y.Institution?.InstCode == x.InstCode && y.Code == x.CampusCode),                    
                     ApplicationsAcceptedFrom = x.CrseOpenDate,
                     Status = x.Status,
                     Publish = x.Publish,

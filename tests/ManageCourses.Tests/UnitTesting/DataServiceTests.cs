@@ -40,6 +40,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             _contextMock.Setup(c => c.GetUserOrganisation(email, instCode)).Returns(new McOrganisationInstitution
             {
                 Institution = new Institution(),
+                McOrganisation = new McOrganisation()
             });
 
             // test blank

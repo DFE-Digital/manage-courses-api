@@ -8,7 +8,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     public class Site
     {
         public int Id { get; set; }
-        public string InstCode { get; set; }
+
+        public int InstitutionId { get; set; }
         public Institution Institution { get; set; }
         public IEnumerable<CourseSite> CourseSites { get; set; }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
@@ -31,8 +32,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         public void UpdateUcasData(UcasPayload payload)
         {
             var allInstitutions = payload.Institutions.Select(x => ToInstitution(x)).ToList();
-            var allSites = payload.Campuses.Select(x => ToSite(x)).ToList();
-            var allSitesGrouped = allSites.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
+            var allCampusesGrouped = payload.Campuses.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
             var ucasSubjects = payload.Subjects.ToList();
             var pgdeCourses = _context.PgdeCourses.ToList();
             var allSubjects = _context.Subjects.ToList();
@@ -49,15 +49,22 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 {
                     try 
                     {
-                        UpsertInstitution(inst);
+                        var savedInst = UpsertInstitution(inst);
                         _context.Save();
                         DeleteForInstitution(inst.InstCode);
                         _context.Save();
 
-                        var sites = allSitesGrouped.ContainsKey(inst.InstCode) ? allSitesGrouped[inst.InstCode] : null;
-                        if (sites != null)
+                        var campuses = allCampusesGrouped.ContainsKey(inst.InstCode) ? allCampusesGrouped[inst.InstCode] : null;
+                        IEnumerable<Site> sites = new List<Site>();
+                        if (campuses != null)
                         {
-                            _context.AddRange(sites);
+                            savedInst.Sites = savedInst.Sites ?? new Collection<Site>();
+                            sites = campuses.Select(x => ToSite(x)).ToList();
+                            foreach(var site in (IEnumerable<Site>) sites)
+                            {
+                                savedInst.Sites.Add(site);                                
+                                site.Institution = savedInst;
+                            }
                             _context.Save();
                         }
                         
@@ -65,8 +72,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                         IEnumerable<UcasCourse> ucasCourses = ucasCourseGroupings.GetValueOrDefault(inst.InstCode);
                         IEnumerable<UcasCourseSubject> ucasCourseSubjects = ucasCourseSubjectGroupings.GetValueOrDefault(inst.InstCode);
 
-                        var allCoursesForThisInstitution = _courseLoader.LoadCourses(ucasCourses ?? new List<UcasCourse>(), ucasCourseSubjects ?? new List<UcasCourseSubject>(), ucasSubjects, pgdeCourses, allSubjects, allSites, allInstitutions);
-                        AddForInstitution(allCoursesForThisInstitution);
+                        var allCoursesForThisInstitution = _courseLoader.LoadCourses(ucasCourses ?? new List<UcasCourse>(), ucasCourseSubjects ?? new List<UcasCourseSubject>(), ucasSubjects, pgdeCourses, allSubjects, sites, allInstitutions);
+                        AddForInstitution(allCoursesForThisInstitution, savedInst);
                         _context.Save();
                         
                         transaction.Commit();
@@ -96,7 +103,6 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Address4 = x.Addr4, 
                 Postcode = x.Postcode,
                 Code = x.CampusCode,
-                InstCode = x.InstCode,
                 LocationName = x.CampusName
             };
         }
@@ -123,31 +129,39 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             };
         }
 
-        private void UpsertInstitution(Institution newValues)
+        private Institution UpsertInstitution(Institution newValues)
         {
             newValues.InstCode = newValues.InstCode.ToUpperInvariant();
-            var entity = _context.Institutions.FirstOrDefault(x => x.InstCode == newValues.InstCode);
+            var entity = _context.Institutions
+                .Include(x => x.Sites).Include(x => x.Courses)
+                .FirstOrDefault(x => x.InstCode == newValues.InstCode);
             if (entity == null)
             {
                 // insert
                 _context.Institutions.Add(newValues);
+                return newValues;
             }
             else
             {
                 // update
                 entity.UpdateWith(newValues);
+                return entity;
             }
         }
 
         private void DeleteForInstitution(string instCode)
         {
-            _context.Courses.RemoveRange(_context.Courses.Where(x => x.InstCode == instCode));
-            _context.Sites.RemoveRange(_context.Sites.Where(x => x.InstCode == instCode));
+            _context.Courses.RemoveRange(_context.Courses.Where(x => x.Institution.InstCode == instCode));
+            _context.Sites.RemoveRange(_context.Sites.Where(x => x.Institution.InstCode == instCode));
         }
 
-        private void AddForInstitution(IEnumerable<Course> courses)
+        private void AddForInstitution(IEnumerable<Course> courses, Institution inst)
         {
-            _context.Courses.AddRange(courses);
+            inst.Courses = inst.Courses ?? new Collection<Course>();
+            foreach(var course in courses)
+            {
+                inst.Courses.Add(course);
+            }
         }
     }
 }

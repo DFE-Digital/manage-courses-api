@@ -59,7 +59,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     ProviderCode = ucasCourseData.AccreditingInstitution.InstCode
                 };
 
-            var routeName = ucasCourseData.GetRoute();
+            var routeName = ucasCourseData.Route;
             var isSalaried = string.Equals(ucasCourseData?.ProgramType, "ss", StringComparison.InvariantCultureIgnoreCase)
                           || string.Equals(ucasCourseData?.ProgramType, "ta", StringComparison.InvariantCultureIgnoreCase);
             var fees = courseEnrichmentModel.FeeUkEu.HasValue ? new Fees
@@ -121,7 +121,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 FullTime = ucasCourseData.StudyMode == "P" ? VacancyStatus.NA : VacancyStatus.Vacancies,
                 PartTime = ucasCourseData.StudyMode == "F" ? VacancyStatus.NA : VacancyStatus.Vacancies,
 
-                Mod = ucasCourseData.GetTypeDescription(),
+                Mod = ucasCourseData.TypeDescription,
             };
 
             mappedCourse.DescriptionSections = new Collection<CourseDescriptionSection>();
@@ -191,7 +191,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "about this training provider accrediting",//CourseDetailsSections.AboutTheAccreditingProvider,
-                Text = GetAccreditingProviderEnrichment(ucasCourseData.AccreditingInstCode, orgEnrichmentModel)
+                Text = GetAccreditingProviderEnrichment(ucasCourseData?.AccreditingInstitution?.InstCode, orgEnrichmentModel)
             });
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
