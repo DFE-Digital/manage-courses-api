@@ -11,7 +11,7 @@
   </ItemGroup>  
 
   <ItemGroup>  
-    <ProjectReference Include="..\..\ManageCourses.ApiClient\ManageCourses.ApiClient.csproj" />
+    <ProjectReference Include="..\..\ManageCourses.Domain\ManageCourses.Domain.csproj" />
   </ItemGroup>
   
 </Project>

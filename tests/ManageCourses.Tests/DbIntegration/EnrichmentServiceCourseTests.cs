@@ -7,6 +7,7 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Data;
 using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.UcasCourseImporter;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -287,7 +288,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     },
                 },
             };
-            dataService.ProcessUcasPayload(ucasPayload);
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object).UpdateUcasData(ucasPayload);
 
             // Assert
             var res = enrichmentService.GetCourseEnrichment(_ucasInstitution.InstCode, UcasCourseCode, Email);

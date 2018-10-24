@@ -4,9 +4,12 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using CsvHelper;
-using GovUk.Education.ManageCourses.ApiClient;
+using GovUk.Education.ManageCourses.Api;
 using GovUk.Education.ManageCourses.Csv.Domain;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Xls;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -61,16 +64,16 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
                 var payload = new UcasPayload
                 {
-                    Institutions = new ObservableCollection<UcasInstitution>(institutions),
-                    Courses = new ObservableCollection<UcasCourse>(courses),
-                    CourseSubjects = new ObservableCollection<UcasCourseSubject>(courseSubjects),
-                    Campuses = new ObservableCollection<UcasCampus>(campuses),
-                    CourseNotes = new ObservableCollection<UcasCourseNote>(courseNotes),
-                    NoteTexts = new ObservableCollection<UcasNoteText>(noteTexts)
+                    Institutions = new List<UcasInstitution>(institutions),
+                    Courses = new List<UcasCourse>(courses),
+                    CourseSubjects = new List<UcasCourseSubject>(courseSubjects),
+                    Campuses = new List<UcasCampus>(campuses),
+                    CourseNotes = new List<UcasCourseNote>(courseNotes),
+                    NoteTexts = new List<UcasNoteText>(noteTexts)
                 };
 
-                var manageApi = new ManageApi(logger, configOptions.ManageApiUrl, configOptions.ManageApiKey);
-                manageApi.PostPayload(payload);
+                var ucasDataMigrator = new UcasDataMigrator(GetDbContext(configuration), logger);
+                ucasDataMigrator.UpdateUcasData(payload);
             }
             catch (Exception e)
             {
@@ -82,6 +85,21 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 logger.Information("UcasCourseImporter finished.");
             }
         }
+
+        private static ManageCoursesDbContext GetDbContext(IConfiguration configuration)
+        {            
+            var mcConfig = new McConfig(configuration);
+            mcConfig.Validate();
+
+            var connectionString = mcConfig.BuildConnectionString();
+
+            var options = new DbContextOptionsBuilder<ManageCoursesDbContext>()
+                .UseNpgsql(connectionString)
+                .Options;
+
+            return new ManageCoursesDbContext(options);
+        }
+
         private static void CleanupTempData(string folder, ILogger logger)
         {
             try

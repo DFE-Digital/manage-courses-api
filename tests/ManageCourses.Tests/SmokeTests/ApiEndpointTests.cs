@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
+using GovUk.Education.ManageCourses.UcasCourseImporter;
 using Microsoft.Extensions.Configuration;
+using Moq;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
@@ -183,9 +185,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             Context.AddTestReferenceData(TestConfig.SignInUsername);
             Context.Save();
-            
-            var clientImport = BuildApiKeyClient();
-            clientImport.Data_ImportAsync(TestPayloadBuilder.MakeSimpleUcasPayload()).Wait();
+
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object).UpdateUcasData(TestPayloadBuilder.MakeSimpleUcasPayload());
         }
 
         private async Task<ManageCoursesApiClient> BuildSigninAwareClient()

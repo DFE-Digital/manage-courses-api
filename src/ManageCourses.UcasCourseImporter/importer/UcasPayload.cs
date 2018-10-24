@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using GovUk.Education.ManageCourses;
 using GovUk.Education.ManageCourses.Domain.Models;
 
-namespace GovUk.Education.ManageCourses.Api.Model
+namespace GovUk.Education.ManageCourses.UcasCourseImporter
 {
     public class UcasPayload
     {

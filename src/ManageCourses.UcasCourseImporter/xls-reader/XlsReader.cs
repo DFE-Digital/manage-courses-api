@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GovUk.Education.ManageCourses.ApiClient;
+using GovUk.Education.ManageCourses.Domain.Models;
 using NPOI.HSSF.UserModel;
 using Serilog;
 

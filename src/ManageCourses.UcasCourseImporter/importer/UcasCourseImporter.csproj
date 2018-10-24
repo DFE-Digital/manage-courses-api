@@ -6,7 +6,7 @@
     <UserSecretsId>manage-courses-importer-config</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DotNetCore.NPOI" Version="1.0.2" />
+    <PackageReference Include="DotNetCore.NPOI" Version="1.0.2" />    
     <PackageReference Include="Microsoft.ApplicationInsights" Version="2.7.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.DependencyCollector" Version="2.7.2" />
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
@@ -25,7 +25,8 @@
   <ItemGroup>
     <ProjectReference Include="..\csv-reader\CsvReader.csproj" />
     <ProjectReference Include="..\xls-reader\XlsReader.csproj" />
-    <ProjectReference Include="..\..\ManageCourses.ApiClient\ManageCourses.ApiClient.csproj" />
+    <ProjectReference Include="..\..\ManageCourses.Api\ManageCourses.Api.csproj" />
+    <ProjectReference Include="..\..\ManageCourses.Domain\ManageCourses.Domain.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
