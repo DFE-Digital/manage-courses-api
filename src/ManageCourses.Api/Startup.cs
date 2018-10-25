@@ -103,7 +103,10 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddMvc(options =>
                 options.Filters.Add(typeof(AcceptTermsFilter))
-            );
+            ).AddJsonOptions(x => {
+                x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;     
+                x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
