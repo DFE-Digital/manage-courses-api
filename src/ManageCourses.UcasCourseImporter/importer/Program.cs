@@ -19,8 +19,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
     {
         static void Main(string[] args)
         {
-            var configuration = GetConfiguration();
-
+            var configuration = GetConfiguration();            
+            
             var logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .WriteTo
@@ -28,6 +28,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 .CreateLogger();
 
             logger.Information("UcasCourseImporter started.");
+
+            var ucasDataMigrator = new UcasDataMigrator(GetDbContext(configuration), logger);
+
 
             var configOptions = new UcasCourseImporterConfigurationOptions(configuration);
             configOptions.Validate();
@@ -73,7 +76,6 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     Subjects = new List<UcasSubject>(subjects)
                 };
 
-                var ucasDataMigrator = new UcasDataMigrator(GetDbContext(configuration), logger);
                 ucasDataMigrator.UpdateUcasData(payload);
             }
             catch (Exception e)

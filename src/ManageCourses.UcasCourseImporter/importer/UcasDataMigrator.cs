@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         /// <param name="payload">Holds all the data entities that need to be imported</param>
         public void UpdateUcasData(UcasPayload payload)
         {
-            var allInstitutions = payload.Institutions.Select(x => ToInstitution(x)).ToList();
+            var allInstitutions = new List<Institution>();
             var allCampusesGrouped = payload.Campuses.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
             var ucasSubjects = payload.Subjects.ToList();
             var pgdeCourses = _context.PgdeCourses.ToList();
@@ -42,15 +42,31 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
             _logger.Warning("Beginning UCAS import");
             _logger.Information($"Upserting {allInstitutions.Count()} institutions");
-            int processed = 0;
+            foreach (var inst in payload.Institutions)
+            {
+                using (var transaction = (_context as DbContext).Database.BeginTransaction())
+                {
+                    try 
+                    {
+                        var savedInst = UpsertInstitution(ToInstitution(inst));
+                        _context.Save();
+                        allInstitutions.Add(savedInst);
+                    }                    
+                    catch (Exception e)
+                    {
+                        transaction.Rollback();
+                        _logger.Error(e, $"UCAS import failed to update institution {inst.InstName} [{inst.InstCode}]");
+                    }
+                }
+            }
+
+            int processed = 0;            
             foreach (var inst in allInstitutions)
             {
                 using (var transaction = (_context as DbContext).Database.BeginTransaction())
                 {
                     try 
                     {
-                        var savedInst = UpsertInstitution(inst);
-                        _context.Save();
                         DeleteForInstitution(inst.InstCode);
                         _context.Save();
 
@@ -58,12 +74,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                         IEnumerable<Site> sites = new List<Site>();
                         if (campuses != null)
                         {
-                            savedInst.Sites = savedInst.Sites ?? new Collection<Site>();
+                            inst.Sites = inst.Sites ?? new Collection<Site>();
                             sites = campuses.Select(x => ToSite(x)).ToList();
                             foreach(var site in (IEnumerable<Site>) sites)
                             {
-                                savedInst.Sites.Add(site);                                
-                                site.Institution = savedInst;
+                                inst.Sites.Add(site);                                
+                                site.Institution = inst;
                             }
                             _context.Save();
                         }
@@ -74,7 +90,14 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
                         var allSubjectsCountBefore = allSubjects.Count;
 
-                        var allCoursesForThisInstitution = _courseLoader.LoadCourses(ucasCourses ?? new List<UcasCourse>(), ucasCourseSubjects ?? new List<UcasCourseSubject>(), ucasSubjects, pgdeCourses, ref allSubjects, sites, allInstitutions);
+                        var allCoursesForThisInstitution = _courseLoader.LoadCourses(
+                            ucasCourses ?? new List<UcasCourse>(), 
+                            ucasCourseSubjects ?? new List<UcasCourseSubject>(), 
+                            ucasSubjects, 
+                            pgdeCourses, 
+                            ref allSubjects,
+                            sites, 
+                            allInstitutions);
                         
                         if (allSubjects.Count > allSubjectsCountBefore)
                         {
@@ -86,7 +109,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                         }
 
                         
-                        AddForInstitution(allCoursesForThisInstitution, savedInst);
+                        AddForInstitution(allCoursesForThisInstitution, inst);
                         _context.Save();
                         
                         transaction.Commit();

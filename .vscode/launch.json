@@ -38,6 +38,18 @@
             }
         },
         {
+            "name": ".NET Core Launch (importer)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-importer",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/src/ManageCourses.UcasCourseImporter/importer/bin/Debug/netcoreapp2.1/UcasCourseImporter.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/ManageCourses.UcasCourseImporter/importer",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach",
