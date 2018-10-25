@@ -72,7 +72,20 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                         IEnumerable<UcasCourse> ucasCourses = ucasCourseGroupings.GetValueOrDefault(inst.InstCode);
                         IEnumerable<UcasCourseSubject> ucasCourseSubjects = ucasCourseSubjectGroupings.GetValueOrDefault(inst.InstCode);
 
-                        var allCoursesForThisInstitution = _courseLoader.LoadCourses(ucasCourses ?? new List<UcasCourse>(), ucasCourseSubjects ?? new List<UcasCourseSubject>(), ucasSubjects, pgdeCourses, allSubjects, sites, allInstitutions);
+                        var allSubjectsCountBefore = allSubjects.Count;
+
+                        var allCoursesForThisInstitution = _courseLoader.LoadCourses(ucasCourses ?? new List<UcasCourse>(), ucasCourseSubjects ?? new List<UcasCourseSubject>(), ucasSubjects, pgdeCourses, ref allSubjects, sites, allInstitutions);
+                        
+                        if (allSubjects.Count > allSubjectsCountBefore)
+                        {
+                            for (int i = allSubjectsCountBefore; i < allSubjects.Count; i++)
+                            {
+                                _context.Subjects.Add(allSubjects[i]);
+                            }
+                            _context.Save();
+                        }
+
+                        
                         AddForInstitution(allCoursesForThisInstitution, savedInst);
                         _context.Save();
                         
