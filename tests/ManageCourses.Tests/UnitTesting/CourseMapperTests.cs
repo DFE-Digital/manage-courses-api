@@ -178,6 +178,19 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.ContactDetails.Website.Should().Be("https://overridden.com");
 
         }
+        [Test]
+        public void MapToSearchAndCompareCourse_VacStatus()
+        {
+            var res = mapper.MapToSearchAndCompareCourse(
+                GenerateUcasInstitution(),
+                GenearteUcasCourse(true),
+                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateCourseEnrichmentModel()
+            );
+
+            res.Campuses.Any(c => c.VacStatus == "F").Should().BeTrue();
+            res.HasVacancies.Should().BeTrue();
+        }
 
         private static CourseEnrichmentModel GenerateCourseEnrichmentModel()
         {
@@ -228,7 +241,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     new CourseSubject { Subject = new Subject { SubjectName = "Mathematics"}},
                     new CourseSubject { Subject = new Subject { SubjectName = "Physics"}}
                 },
-
+                
                 StudyMode = "B",
                 CourseSites = new List<CourseSite>
                     {
@@ -245,7 +258,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                         },
                         ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
                         Status = "r",
-                        Publish = publishedCampus ? "Y" : "n"
+                        Publish = publishedCampus ? "Y" : "n",
+                        VacStatus="F"
                         },
 
                         new CourseSite { 
@@ -261,7 +275,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                             },                            
                             ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
                             Status = "d",
-                            Publish = publishedCampus ? "Y" : "n"
+                            Publish = publishedCampus ? "Y" : "n",
+                            VacStatus="F"
                             },
 
                     }
