@@ -156,7 +156,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
 
             Assert.That(() => client.Invite_IndexAsync(Email),
-                Throws.TypeOf<SwaggerException>()
+                Throws.TypeOf<ManageCoursesApiException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
         }
 
@@ -170,7 +170,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
 
             Assert.That(() => client.Invite_IndexAsync(Email),
-                Throws.TypeOf<SwaggerException>()
+                Throws.TypeOf<ManageCoursesApiException>()
                     .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
         }
 

@@ -1,19 +1,30 @@
+using System.Net;
+
 namespace GovUk.Education.ManageCourses.ApiClient
 {
-    public partial class SwaggerException : System.Exception
+    public class ManageCoursesApiException : System.Exception
     {
-        public int StatusCode { get; private set; }
+        public HttpStatusCode? StatusCode { get; private set; }
 
         public string Response { get; private set; }
 
         public System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
 
-        public SwaggerException(string message, int statusCode, string response, System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
+        public ManageCoursesApiException(string message)
+            : base(message)
+        {
+        }
+
+        public ManageCoursesApiException(string message, System.Exception innerException)
             : base(message, innerException)
+        {
+        }
+
+        public ManageCoursesApiException(string message, HttpStatusCode? statusCode, string response)
+            : base(message)
         {
             StatusCode = statusCode;
             Response = response;
-            Headers = headers;
         }
 
         public override string ToString()

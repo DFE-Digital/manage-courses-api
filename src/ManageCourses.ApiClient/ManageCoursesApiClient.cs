@@ -1,31 +1,71 @@
-﻿using System.Net.Http.Headers;
+﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using GovUk.Education.ManageCourses.Api.Model;
-// using GovUk.Education.ManageCourses.Domain.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Web;
+using System.Text;
+
 namespace GovUk.Education.ManageCourses.ApiClient
 {
     public class ManageCoursesApiClient
     {
         private readonly IManageCoursesApiClientConfiguration _apiClientConfiguration;
-        private HttpClient _httpClient;
-        private string _baseUrl = "";
+        private readonly IHttpClient _httpClient;
+        private readonly string _apiUri;
 
-        public string BaseUrl
+        private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
         {
-            get { return _baseUrl; }
-            set { _baseUrl = value; }
-        }
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
 
         public ManageCoursesApiClient(IManageCoursesApiClientConfiguration apiClientConfiguration, HttpClient httpClient)
         {
-            _apiClientConfiguration = apiClientConfiguration;
-            _httpClient = httpClient;
-            BaseUrl = _apiClientConfiguration.GetBaseUrl();
-        }
-        void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url)
-        {
+            var apiUri = apiClientConfiguration.GetBaseUrl();
+            if(string.IsNullOrWhiteSpace(apiUri))
+            {
+                throw new ManageCoursesApiException($"Failed to instantiate due apiUri is null or white space");
+            }
+
             var accessToken = _apiClientConfiguration.GetAccessTokenAsync().Result;
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            _httpClient = new HttpClientWrapper(httpClient);
+            _apiUri = apiUri;
+            if (_apiUri.EndsWith('/')) { _apiUri = _apiUri.Remove(_apiUri.Length - 1); }
+        }
+
+        private void PostObjects<T>(Uri queryUri, T payload)
+        {
+
+            var payloadJson = JsonConvert.SerializeObject(payload, _serializerSettings);
+
+            var payloadStringContent = new StringContent(payloadJson, Encoding.UTF8, "application/json" );
+
+            var response = _httpClient.PostAsync(queryUri, payloadStringContent).Result;
+        }
+
+        private T GetObjects<T>(Uri queryUri)
+        {
+            T objects = default(T);
+            var response = _httpClient.GetAsync(queryUri).Result;
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = response.Content.ReadAsStringAsync().Result;
+                objects = JsonConvert.DeserializeObject<T>(jsonResponse);
+            }
+
+            return objects;
+        }
+
+        private Uri GetUri(string apiPath)
+        {
+            var uri = new Uri(_apiUri);
+            var builder = new UriBuilder(uri);
+            if (!builder.Path.EndsWith('/') && !apiPath.StartsWith('/')) { builder.Path += '/'; }
+            else if (builder.Path.EndsWith('/') && apiPath.StartsWith('/')) { apiPath = apiPath.Substring(1); }
+            builder.Path += apiPath;
+            return builder.Uri;
         }
 
     public System.Threading.Tasks.Task AcceptTerms_IndexAsync()
