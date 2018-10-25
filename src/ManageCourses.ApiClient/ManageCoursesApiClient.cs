@@ -20,6 +20,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
         {
             _apiClientConfiguration = apiClientConfiguration;
             _httpClient = httpClient;
+            BaseUrl = _apiClientConfiguration.GetBaseUrl();
         }
         void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url)
         {

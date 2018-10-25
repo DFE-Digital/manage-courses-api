@@ -136,10 +136,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var httpClient = new HttpClient();
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
-            {
-                BaseUrl = LocalWebHost.Address
-            };
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
 
             Context.AddTestReferenceData(Email);
             Context.Save();
@@ -155,10 +152,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var httpClient = new HttpClient();
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
-            {
-                BaseUrl = LocalWebHost.Address
-            };
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
 
 
             Assert.That(() => client.Invite_IndexAsync(Email),
@@ -173,10 +167,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var httpClient = new HttpClient();
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
-            {
-                BaseUrl = LocalWebHost.Address
-            };
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
 
             Assert.That(() => client.Invite_IndexAsync(Email),
                 Throws.TypeOf<SwaggerException>()
@@ -195,21 +186,17 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             var communicator = new DfeSignInCommunicator(TestConfig);
             var accessToken = await communicator.GetAccessTokenAsync(TestConfig);
-            var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient())
-            {
-                BaseUrl = LocalWebHost.Address
-            };
-            return clientExport;
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), new HttpClient());
+
+            return client;
         }
 
         private ManageCoursesApiClient BuildApiKeyClient(string apiKey = null)
         {
             var apiKeyAccessToken = apiKey ?? TestConfig.ApiKey;
-            var importClient = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), new HttpClient())
-            {
-                BaseUrl = LocalWebHost.Address
-            };
-            return importClient;
+            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken, LocalWebHost.Address), new HttpClient());
+
+            return client;
         }
     }
 }
