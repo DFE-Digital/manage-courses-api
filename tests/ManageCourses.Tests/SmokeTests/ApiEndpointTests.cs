@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.ApiClient;
+using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using GovUk.Education.ManageCourses.UcasCourseImporter;
 using Microsoft.Extensions.Configuration;
