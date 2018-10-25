@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -75,18 +76,19 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
         private List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
         {
             _logger.Information("Retrieving courses");
-            var ucasCourses = context.UcasCourses.Include(x => x.UcasInstitution)
-                .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
-                .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
-                .Include(x => x.AccreditingProviderInstitution)
-                .Include(x => x.UcasCampus)
-                .Where(x => x.Publish == "Y")
+            var courses = context.Courses.Include(x => x.Institution)
+                .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
+                .Include(x => x.AccreditingInstitution)
+                .Include(x => x.CourseSites).ThenInclude(x => x.Site)                
                 .ToList();
-            _logger.Information($" - {ucasCourses.Count()} courses");
 
-            _logger.Information("Retrieving institutions");
-            var insts = context.UcasInstitutions.ToDictionary(x => x.InstCode);
-            _logger.Information($" - {insts.Count()} institutions");
+            foreach(var course in courses)
+            {
+                course.CourseSites = new Collection<CourseSite>(course.CourseSites.Where(x => x.Publish == "Y").ToList());
+            }
+            courses.Where(x => x.CourseSites.Any(y => y.Publish =="Y")).ToList();
+
+            _logger.Information($" - {courses.Count()} courses");
 
             _logger.Information("Retrieving enrichments");
             var courseEnrichments = context.CourseEnrichments
@@ -108,9 +110,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var pgdeCourses = context.PgdeCourses.ToList();
             _logger.Information($" - {pgdeCourses.Count()} pgdeCourses");
 
-            _logger.Information("Load courses");
-            var courses = new CourseLoader().LoadCourses(ucasCourses, new List<UcasCourseEnrichmentGetModel>(), pgdeCourses);
-
             var courseMapper = new CourseMapper();
             var converter = new EnrichmentConverter();
 
@@ -118,13 +117,13 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
             _logger.Information("Combine courses with institution and enrichment data");
 
-            foreach (var c in courses.Courses)
+            foreach (var c in courses)
             {
                 var mappedCourse = courseMapper.MapToSearchAndCompareCourse(
-                    insts[c.InstCode],
+                    c.Institution,
                     c,
-                    converter.Convert(orgEnrichments.GetValueOrDefault(c.InstCode))?.EnrichmentModel,
-                    converter.Convert(courseEnrichments.GetValueOrDefault(c.InstCode + "_@@_" + c.CourseCode))?.EnrichmentModel
+                    converter.Convert(orgEnrichments.GetValueOrDefault(c.Institution.InstCode))?.EnrichmentModel,
+                    converter.Convert(courseEnrichments.GetValueOrDefault(c.Institution.InstCode + "_@@_" + c.CourseCode))?.EnrichmentModel
                 );
 
                 if (!mappedCourse.Campuses.Any())
@@ -136,7 +135,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 if (!mappedCourse.CourseSubjects.Any())
                 {
                     _logger.Warning(
-                        $"failed to assign subject to [{c.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
+                        $"failed to assign subject to [{c.Institution.InstCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
                 }

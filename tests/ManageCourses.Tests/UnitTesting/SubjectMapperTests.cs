@@ -7,6 +7,7 @@ using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.ApiClient;
+using GovUk.Education.ManageCourses.UcasCourseImporter.Mapping;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using NUnit.Framework;
 

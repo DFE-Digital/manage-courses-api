@@ -9,10 +9,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         [Required]
         public string NctlId { get; set; }
 
-        public string OrgId { get; set; }
-
         public string Name { get; set; }
 
-        public McOrganisation McOrganisation { get; set; }
+        public Organisation Organisation { get; set; }
     }
 }

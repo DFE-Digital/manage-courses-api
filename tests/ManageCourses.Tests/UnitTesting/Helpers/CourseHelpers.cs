@@ -1,6 +1,6 @@
 using FluentAssertions;
-using GovUk.Education.ManageCourses.Api.Helpers;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain.Models;
 using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
@@ -36,7 +36,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Helpers
                 StudyMode = studyMode,
                 ProgramType = programType
             };
-            var result = course.GetCourseVariantType();
+            var result = course.TypeDescription;
             result.Should().Be(expectedResult);
         }
     }

@@ -64,7 +64,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             {
                 //update
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.McUser;
+                enrichmentDraftRecord.UpdatedByUser = userInst.User;
                 enrichmentDraftRecord.JsonData = content;
             }
             else
@@ -86,8 +86,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
-                    CreatedByUser = userInst.McUser,
-                    UpdatedByUser = userInst.McUser,
+                    CreatedByUser = userInst.User,
+                    UpdatedByUser = userInst.User,
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
@@ -117,7 +117,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             if (enrichmentDraftRecord != null)
             {
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.McUser;
+                enrichmentDraftRecord.UpdatedByUser = userInst.User;
                 enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
                 _context.Save();
@@ -171,7 +171,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             {
                 //update
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.McUser;
+                enrichmentDraftRecord.UpdatedByUser = userInst.User;
                 enrichmentDraftRecord.JsonData = content;
             }
             else
@@ -194,8 +194,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
-                    CreatedByUser = userInst.McUser,
-                    UpdatedByUser = userInst.McUser,
+                    CreatedByUser = userInst.User,
+                    UpdatedByUser = userInst.User,
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
@@ -226,7 +226,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             if (enrichmentDraftRecord != null)
             {
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.McUser;
+                enrichmentDraftRecord.UpdatedByUser = userInst.User;
                 enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
                 _context.Save();
@@ -312,16 +312,16 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             if (useUcasContact)
             {
-                var ucasInst = _context.UcasInstitutions.SingleOrDefault(x => x.InstCode == instCode);
+                var ucasInst = _context.Institutions.SingleOrDefault(x => x.InstCode == instCode);
                 if (ucasInst != null)
                 {
                     enrichmentModel.Email = ucasInst.Email;
                     enrichmentModel.Telephone = ucasInst.Telephone;
                     enrichmentModel.Website = ucasInst.Url;
-                    enrichmentModel.Address1 = ucasInst.Addr1;
-                    enrichmentModel.Address2 = ucasInst.Addr2;
-                    enrichmentModel.Address3 = ucasInst.Addr3;
-                    enrichmentModel.Address4 = ucasInst.Addr4;
+                    enrichmentModel.Address1 = ucasInst.Address1;
+                    enrichmentModel.Address2 = ucasInst.Address2;
+                    enrichmentModel.Address3 = ucasInst.Address3;
+                    enrichmentModel.Address4 = ucasInst.Address4;
                     enrichmentModel.Postcode = ucasInst.Postcode;
                 }
             }
@@ -336,16 +336,17 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             instCode = instCode.ToUpperInvariant();
             email = email.ToLowerInvariant();
 
-            var inst = _context.McOrganisationIntitutions.Single(x => x.InstitutionCode == instCode); //should throw an error if  the inst doesn't exist
+            var inst = _context.OrganisationIntitutions.Include(x => x.Organisation).Single(x => x.Institution.InstCode == instCode); //should throw an error if  the inst doesn't exist
 
-            var orgUser = _context.McOrganisationUsers
-                .Where(x => x.Email == email && x.OrgId == inst.OrgId)
-                .Include(x => x.McUser)
+            var orgUser = _context.OrganisationUsers
+                .Where(x => x.User.Email == email && x.Organisation.OrgId == inst.Organisation.OrgId)
+                .Include(x => x.User)
+                .Include(x => x.Organisation)
                 .Single(); //should throw an error if the user doesn't have acces to the inst
 
             var returnUserInst = new UserInstitution
             {
-                McUser = orgUser.McUser,
+                User = orgUser.User,
                 UcasInstitutionCode = instCode
             };
 

@@ -25,9 +25,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public async Task<McUser> GetAndUpdateUserAsync(JsonUserDetails userDetails)
+        public async Task<User> GetAndUpdateUserAsync(JsonUserDetails userDetails)
         {
-            var mcUser = await _context.McUsers.SingleOrDefaultAsync(u => u.SignInUserId == userDetails.Subject);
+            var mcUser = await _context.Users.SingleOrDefaultAsync(u => u.SignInUserId == userDetails.Subject);
             if (mcUser == null)
             {
                 // fall back to email address for users where we don't yet know their sign-in id
@@ -49,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public Task LoggedInAsync(McUser user)
+        public Task LoggedInAsync(User user)
         {
             user.LastLoginDateUtc = _clock.UtcNow;
             if (user.FirstLoginDateUtc == null)
@@ -61,12 +61,12 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public Task CacheTokenAsync(string accessToken, McUser mcUser)
+        public Task CacheTokenAsync(string accessToken, User mcUser)
         {
-            _context.McSessions.Add(new McSession
+            _context.Sessions.Add(new Session
             {
                 AccessToken = accessToken,
-                McUser = mcUser,
+                User = mcUser,
                 CreatedUtc = _clock.UtcNow
             });
 
@@ -75,11 +75,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         }
 
         /// <inheritdoc />
-        public async Task<McUser> GetFromCacheAsync(string accessToken)
+        public async Task<User> GetFromCacheAsync(string accessToken)
         {
             var dateCutoff = _clock.UtcNow.AddMinutes(-30);
-            var session = await _context.McSessions
-                .Include(x => x.McUser)
+            var session = await _context.Sessions
+                .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.AccessToken == accessToken && x.CreatedUtc > dateCutoff);
             /*  ^ There is an edge case where more than one record for a valid session 
                 could be added, e.g. when clock skew occurs between two authentications. 
@@ -91,10 +91,10 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
                 return null;
             }
 
-            return session.McUser;
+            return session.User;
         }
 
-        private void SendWelcomeEmail(McUser user)
+        private void SendWelcomeEmail(User user)
         {
             if (user.WelcomeEmailDateUtc == null)
             {
@@ -105,7 +105,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             _context.Save();
         }
 
-        private static void UpdateMcUserFromSignIn(McUser user, JsonUserDetails userDetails)
+        private static void UpdateMcUserFromSignIn(User user, JsonUserDetails userDetails)
         {
             //user.Email = userDetails.Email; // todo: update email address from sign-in. blocked by use of email as a foreign-key
             user.FirstName = userDetails.GivenName;

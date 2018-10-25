@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void Send()
         {
-            var user = new McUser()
+            var user = new User()
             {
                 Email = "actual email address",
                 FirstName = "FirstName  there are spaces at the end             "

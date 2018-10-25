@@ -34,8 +34,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
         public void Index_CallsContextCorrectly()
         {
             // Arrange.... ugh
-            var list = new List<McUser>{
-                new McUser {
+            var list = new List<User>{
+                new User {
                 Email = "foo@example.com"
             }};
 

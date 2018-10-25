@@ -6,6 +6,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
 {
     public interface IAccessRequestEmailService
     {
-        void SendAccessRequestEmailToSupport(AccessRequest accessRequest, McUser requester, McUser requestedOrNull);
+        void SendAccessRequestEmailToSupport(AccessRequest accessRequest, User requester, User requestedOrNull);
     }
 }

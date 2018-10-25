@@ -61,23 +61,50 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("access_request");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseCode", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Course", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
-                    b.Property<string>("CrseCode")
-                        .IsRequired()
-                        .HasColumnName("crse_code");
+                    b.Property<int?>("AccreditingInstitutionId")
+                        .HasColumnName("accrediting_institution_id");
 
-                    b.Property<string>("InstCode")
-                        .IsRequired()
-                        .HasColumnName("inst_code");
+                    b.Property<string>("AgeRange")
+                        .HasColumnName("age_range");
+
+                    b.Property<string>("CourseCode")
+                        .HasColumnName("course_code");
+
+                    b.Property<int>("InstitutionId")
+                        .HasColumnName("institution_id");
+
+                    b.Property<string>("Name")
+                        .HasColumnName("name");
+
+                    b.Property<string>("ProfpostFlag")
+                        .HasColumnName("profpost_flag");
+
+                    b.Property<string>("ProgramType")
+                        .HasColumnName("program_type");
+
+                    b.Property<int>("Qualification")
+                        .HasColumnName("qualification");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnName("start_date");
+
+                    b.Property<string>("StudyMode")
+                        .HasColumnName("study_mode");
 
                     b.HasKey("Id");
 
-                    b.ToTable("course_code");
+                    b.HasIndex("AccreditingInstitutionId");
+
+                    b.HasIndex("InstitutionId", "Id")
+                        .IsUnique();
+
+                    b.ToTable("course");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseEnrichment", b =>
@@ -125,6 +152,119 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("course_enrichment");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseSite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("ApplicationsAcceptedFrom")
+                        .HasColumnName("applications_accepted_from");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnName("course_id");
+
+                    b.Property<string>("Publish")
+                        .HasColumnName("publish");
+
+                    b.Property<int?>("SiteId")
+                        .HasColumnName("site_id");
+
+                    b.Property<string>("Status")
+                        .HasColumnName("status");
+
+                    b.Property<string>("VacStatus")
+                        .HasColumnName("vac_status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SiteId");
+
+                    b.ToTable("course_site");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseSubject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<int?>("CourseId")
+                        .HasColumnName("course_id");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnName("subject_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("course_subject");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Institution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address1")
+                        .HasColumnName("address1");
+
+                    b.Property<string>("Address2")
+                        .HasColumnName("address2");
+
+                    b.Property<string>("Address3")
+                        .HasColumnName("address3");
+
+                    b.Property<string>("Address4")
+                        .HasColumnName("address4");
+
+                    b.Property<string>("ContactName")
+                        .HasColumnName("contact_name");
+
+                    b.Property<string>("Email")
+                        .HasColumnName("email");
+
+                    b.Property<string>("InstCode")
+                        .HasColumnName("inst_code");
+
+                    b.Property<string>("InstName")
+                        .HasColumnName("inst_name");
+
+                    b.Property<string>("InstType")
+                        .HasColumnName("inst_type");
+
+                    b.Property<string>("Postcode")
+                        .HasColumnName("postcode");
+
+                    b.Property<string>("SchemeMember")
+                        .HasColumnName("scheme_member");
+
+                    b.Property<string>("Scitt")
+                        .HasColumnName("scitt");
+
+                    b.Property<string>("Telephone")
+                        .HasColumnName("telephone");
+
+                    b.Property<string>("Url")
+                        .HasColumnName("url");
+
+                    b.Property<string>("YearCode")
+                        .HasColumnName("year_code");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstCode")
+                        .IsUnique();
+
+                    b.ToTable("institution");
+                });
+
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.InstitutionEnrichment", b =>
                 {
                     b.Property<int>("Id")
@@ -168,7 +308,30 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("institution_enrichment");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisation", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.NctlOrganisation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("Name")
+                        .HasColumnName("name");
+
+                    b.Property<string>("NctlId")
+                        .IsRequired()
+                        .HasColumnName("nctl_id");
+
+                    b.Property<int?>("OrganisationId")
+                        .HasColumnName("organisation_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.ToTable("nctl_organisation");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Organisation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -178,59 +341,78 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("OrgId")
+                        .HasColumnName("org_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrgId")
+                        .IsUnique();
+
+                    b.ToTable("organisation");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationInstitution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<int?>("InstitutionId")
+                        .HasColumnName("institution_id");
+
+                    b.Property<int?>("OrganisationId")
+                        .HasColumnName("organisation_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstitutionId");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.ToTable("organisation_institution");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<int?>("OrganisationId")
+                        .HasColumnName("organisation_id");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("organisation_user");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.PgdeCourse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("CourseCode")
                         .IsRequired()
-                        .HasColumnName("org_id");
+                        .HasColumnName("course_code");
+
+                    b.Property<string>("InstCode")
+                        .IsRequired()
+                        .HasColumnName("inst_code");
 
                     b.HasKey("Id");
 
-                    b.ToTable("mc_organisation");
+                    b.ToTable("pgde_course");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationInstitution", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("InstitutionCode")
-                        .HasColumnName("institution_code");
-
-                    b.Property<string>("OrgId")
-                        .HasColumnName("org_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InstitutionCode");
-
-                    b.HasIndex("OrgId", "InstitutionCode")
-                        .IsUnique();
-
-                    b.ToTable("mc_organisation_institution");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("Email")
-                        .HasColumnName("email");
-
-                    b.Property<string>("OrgId")
-                        .HasColumnName("org_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrgId");
-
-                    b.HasIndex("Email", "OrgId")
-                        .IsUnique();
-
-                    b.ToTable("mc_organisation_user");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McSession", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Session", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -242,19 +424,77 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnName("created_utc");
 
-                    b.Property<int>("McUserId")
-                        .HasColumnName("mc_user_id");
+                    b.Property<int>("UserId")
+                        .HasColumnName("user_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("McUserId");
+                    b.HasIndex("UserId");
 
                     b.HasIndex("AccessToken", "CreatedUtc");
 
-                    b.ToTable("mc_session");
+                    b.ToTable("session");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McUser", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Site", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("Address1")
+                        .HasColumnName("address1");
+
+                    b.Property<string>("Address2")
+                        .HasColumnName("address2");
+
+                    b.Property<string>("Address3")
+                        .HasColumnName("address3");
+
+                    b.Property<string>("Address4")
+                        .HasColumnName("address4");
+
+                    b.Property<string>("Code")
+                        .HasColumnName("code");
+
+                    b.Property<int>("InstitutionId")
+                        .HasColumnName("institution_id");
+
+                    b.Property<string>("LocationName")
+                        .HasColumnName("location_name");
+
+                    b.Property<string>("Postcode")
+                        .HasColumnName("postcode");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InstitutionId", "Code")
+                        .IsUnique();
+
+                    b.ToTable("site");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Subject", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("id");
+
+                    b.Property<string>("SubjectCode")
+                        .HasColumnName("subject_code");
+
+                    b.Property<string>("SubjectName")
+                        .HasColumnName("subject_name");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubjectCode")
+                        .IsUnique();
+
+                    b.ToTable("subject");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -264,7 +504,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("accept_terms_date_utc");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasColumnName("email");
 
                     b.Property<DateTime?>("FirstLoginDateUtc")
@@ -290,462 +529,124 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("mc_user");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.NctlOrganisation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("Name")
-                        .HasColumnName("name");
-
-                    b.Property<string>("NctlId")
-                        .IsRequired()
-                        .HasColumnName("nctl_id");
-
-                    b.Property<string>("OrgId")
-                        .HasColumnName("org_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrgId");
-
-                    b.ToTable("nctl_organisation");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.PgdeCourse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("CourseCode")
-                        .IsRequired()
-                        .HasColumnName("course_code");
-
-                    b.Property<string>("InstCode")
-                        .IsRequired()
-                        .HasColumnName("inst_code");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("pgde_course");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("Addr1")
-                        .HasColumnName("addr1");
-
-                    b.Property<string>("Addr2")
-                        .HasColumnName("addr2");
-
-                    b.Property<string>("Addr3")
-                        .HasColumnName("addr3");
-
-                    b.Property<string>("Addr4")
-                        .HasColumnName("addr4");
-
-                    b.Property<string>("CampusCode")
-                        .IsRequired()
-                        .HasColumnName("campus_code");
-
-                    b.Property<string>("CampusName")
-                        .HasColumnName("campus_name");
-
-                    b.Property<string>("Email")
-                        .HasColumnName("email");
-
-                    b.Property<string>("InstCode")
-                        .IsRequired()
-                        .HasColumnName("inst_code");
-
-                    b.Property<string>("Postcode")
-                        .HasColumnName("postcode");
-
-                    b.Property<string>("RegionCode")
-                        .HasColumnName("region_code");
-
-                    b.Property<string>("TelNo")
-                        .HasColumnName("tel_no");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ucas_campus");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourse", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("AccreditingProvider")
-                        .HasColumnName("accrediting_provider");
-
-                    b.Property<string>("Age")
-                        .HasColumnName("age");
-
-                    b.Property<string>("CampusCode")
-                        .HasColumnName("campus_code");
-
-                    b.Property<string>("CrseCode")
-                        .HasColumnName("crse_code");
-
-                    b.Property<string>("CrseOpenDate")
-                        .HasColumnName("crse_open_date");
-
-                    b.Property<string>("CrseTitle")
-                        .HasColumnName("crse_title");
-
-                    b.Property<string>("HasBeenPublished")
-                        .HasColumnName("has_been_published");
-
-                    b.Property<string>("InstCode")
-                        .HasColumnName("inst_code");
-
-                    b.Property<string>("ProfpostFlag")
-                        .HasColumnName("profpost_flag");
-
-                    b.Property<string>("ProgramType")
-                        .HasColumnName("program_type");
-
-                    b.Property<string>("Publish")
-                        .HasColumnName("publish");
-
-                    b.Property<string>("StartMonth")
-                        .HasColumnName("start_month");
-
-                    b.Property<string>("StartYear")
-                        .HasColumnName("start_year");
-
-                    b.Property<string>("Status")
-                        .HasColumnName("status");
-
-                    b.Property<string>("Studymode")
-                        .HasColumnName("studymode");
-
-                    b.Property<string>("VacStatus")
-                        .HasColumnName("vac_status");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccreditingProvider");
-
-                    b.HasIndex("InstCode", "CampusCode");
-
-                    b.HasIndex("InstCode", "CrseCode", "CampusCode")
+                    b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("ucas_course");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourseNote", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("CrseCode")
-                        .HasColumnName("crse_code");
-
-                    b.Property<string>("InstCode")
-                        .HasColumnName("inst_code");
-
-                    b.Property<string>("NoteNo")
-                        .HasColumnName("note_no");
-
-                    b.Property<string>("NoteType")
-                        .HasColumnName("note_type");
-
-                    b.Property<string>("YearCode")
-                        .HasColumnName("year_code");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ucas_course_note");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourseSubject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("CrseCode")
-                        .HasColumnName("crse_code");
-
-                    b.Property<string>("InstCode")
-                        .HasColumnName("inst_code");
-
-                    b.Property<string>("SubjectCode")
-                        .HasColumnName("subject_code");
-
-                    b.Property<string>("YearCode")
-                        .HasColumnName("year_code");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubjectCode");
-
-                    b.HasIndex("InstCode", "CrseCode");
-
-                    b.ToTable("ucas_course_subject");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("AccreditingProvider")
-                        .HasColumnName("accrediting_provider");
-
-                    b.Property<string>("Addr1")
-                        .HasColumnName("addr1");
-
-                    b.Property<string>("Addr2")
-                        .HasColumnName("addr2");
-
-                    b.Property<string>("Addr3")
-                        .HasColumnName("addr3");
-
-                    b.Property<string>("Addr4")
-                        .HasColumnName("addr4");
-
-                    b.Property<string>("ContactName")
-                        .HasColumnName("contact_name");
-
-                    b.Property<string>("Email")
-                        .HasColumnName("email");
-
-                    b.Property<string>("InstBig")
-                        .HasColumnName("inst_big");
-
-                    b.Property<string>("InstCode")
-                        .IsRequired()
-                        .HasColumnName("inst_code");
-
-                    b.Property<string>("InstFull")
-                        .HasColumnName("inst_full");
-
-                    b.Property<string>("InstName")
-                        .HasColumnName("inst_name");
-
-                    b.Property<string>("InstType")
-                        .HasColumnName("inst_type");
-
-                    b.Property<string>("Postcode")
-                        .HasColumnName("postcode");
-
-                    b.Property<string>("SchemeMember")
-                        .HasColumnName("scheme_member");
-
-                    b.Property<string>("Scitt")
-                        .HasColumnName("scitt");
-
-                    b.Property<string>("Telephone")
-                        .HasColumnName("telephone");
-
-                    b.Property<string>("Url")
-                        .HasColumnName("url");
-
-                    b.Property<string>("YearCode")
-                        .HasColumnName("year_code");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InstCode")
-                        .IsUnique();
-
-                    b.ToTable("ucas_institution");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasNoteText", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("InstCode")
-                        .HasColumnName("inst_code");
-
-                    b.Property<string>("LineText")
-                        .HasColumnName("line_text");
-
-                    b.Property<string>("NoteNo")
-                        .HasColumnName("note_no");
-
-                    b.Property<string>("NoteType")
-                        .HasColumnName("note_type");
-
-                    b.Property<string>("YearCode")
-                        .HasColumnName("year_code");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ucas_note_text");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasSubject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("id");
-
-                    b.Property<string>("SubjectCode")
-                        .IsRequired()
-                        .HasColumnName("subject_code");
-
-                    b.Property<string>("SubjectDescription")
-                        .HasColumnName("subject_description");
-
-                    b.Property<string>("TitleMatch")
-                        .HasColumnName("title_match");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ucas_subject");
+                    b.ToTable("user");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.AccessRequest", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "Requester")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.User", "Requester")
                         .WithMany("AccessRequests")
                         .HasForeignKey("RequesterId")
                         .OnDelete(DeleteBehavior.SetNull);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseCode", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Course", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("CourseCodes")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Institution", "AccreditingInstitution")
+                        .WithMany("AccreditedCourses")
+                        .HasForeignKey("AccreditingInstitutionId");
+
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Institution", "Institution")
+                        .WithMany("Courses")
+                        .HasForeignKey("InstitutionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseEnrichment", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "CreatedByUser")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId");
 
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "UpdatedByUser")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.User", "UpdatedByUser")
                         .WithMany()
                         .HasForeignKey("UpdatedByUserId");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseSite", b =>
+                {
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Course", "Course")
+                        .WithMany("CourseSites")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Site", "Site")
+                        .WithMany("CourseSites")
+                        .HasForeignKey("SiteId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.CourseSubject", b =>
+                {
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Course", "Course")
+                        .WithMany("CourseSubjects")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Subject", "Subject")
+                        .WithMany("CourseSubjects")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.InstitutionEnrichment", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "CreatedByUser")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.User", "CreatedByUser")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId");
 
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "UpdatedByUser")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.User", "UpdatedByUser")
                         .WithMany()
                         .HasForeignKey("UpdatedByUserId");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationInstitution", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("McOrganisationInstitutions")
-                        .HasForeignKey("InstitutionCode")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McOrganisation", "McOrganisation")
-                        .WithMany("McOrganisationInstitutions")
-                        .HasForeignKey("OrgId")
-                        .HasPrincipalKey("OrgId");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McOrganisationUser", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "McUser")
-                        .WithMany("McOrganisationUsers")
-                        .HasForeignKey("Email")
-                        .HasPrincipalKey("Email");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McOrganisation", "McOrganisation")
-                        .WithMany("McOrganisationUsers")
-                        .HasForeignKey("OrgId")
-                        .HasPrincipalKey("OrgId");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.McSession", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McUser", "McUser")
-                        .WithMany("Sessions")
-                        .HasForeignKey("McUserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.NctlOrganisation", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.McOrganisation", "McOrganisation")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Organisation", "Organisation")
                         .WithMany("NctlOrganisations")
-                        .HasForeignKey("OrgId")
-                        .HasPrincipalKey("OrgId")
+                        .HasForeignKey("OrganisationId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationInstitution", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("UcasCampuses")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode")
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Institution", "Institution")
+                        .WithMany("OrganisationInstitutions")
+                        .HasForeignKey("InstitutionId");
+
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Organisation", "Organisation")
+                        .WithMany("OrganisationInstitutions")
+                        .HasForeignKey("OrganisationId");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationUser", b =>
+                {
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Organisation", "Organisation")
+                        .WithMany("OrganisationUsers")
+                        .HasForeignKey("OrganisationId");
+
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.User", "User")
+                        .WithMany("OrganisationUsers")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Session", b =>
+                {
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourse", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.Site", b =>
                 {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "AccreditingProviderInstitution")
-                        .WithMany("AccreditedUcasCourses")
-                        .HasForeignKey("AccreditingProvider")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("UcasCourses")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasCampus", "UcasCampus")
-                        .WithMany("UcasCourses")
-                        .HasForeignKey("InstCode", "CampusCode")
-                        .HasPrincipalKey("InstCode", "CampusCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.CourseCode", "CourseCode")
-                        .WithMany("UcasCourses")
-                        .HasForeignKey("InstCode", "CrseCode")
-                        .HasPrincipalKey("InstCode", "CrseCode");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.UcasCourseSubject", b =>
-                {
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasInstitution", "UcasInstitution")
-                        .WithMany("UcasCourseSubjects")
-                        .HasForeignKey("InstCode")
-                        .HasPrincipalKey("InstCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.UcasSubject", "UcasSubject")
-                        .WithMany("UcasCourseSubjects")
-                        .HasForeignKey("SubjectCode")
-                        .HasPrincipalKey("SubjectCode");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.CourseCode", "CourseCode")
-                        .WithMany("UcasCourseSubjects")
-                        .HasForeignKey("InstCode", "CrseCode")
-                        .HasPrincipalKey("InstCode", "CrseCode");
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Institution", "Institution")
+                        .WithMany("Sites")
+                        .HasForeignKey("InstitutionId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }
