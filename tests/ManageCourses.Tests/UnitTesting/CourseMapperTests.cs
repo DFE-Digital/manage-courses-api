@@ -6,8 +6,9 @@ using System.Text;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain.Models;
 using NUnit.Framework;
-using UcasInstitution = GovUk.Education.ManageCourses.Domain.Models.UcasInstitution;
+using Institution = GovUk.Education.ManageCourses.Domain.Models.Institution;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
@@ -64,7 +65,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.Duration.Should().Be("1 year");
             res.Name.Should().Be("Course.Name");
             res.ProgrammeCode.Should().Be("CourseCode");
-            res.ProviderCodeName.Should().Be("MYINST");
 
             res.Provider.ProviderCode.Should().Be("ABC");
             res.Provider.Name.Should().Be("My institution");
@@ -113,7 +113,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.Duration.Should().Be("1 year");
             res.Name.Should().Be("Course.Name");
             res.ProgrammeCode.Should().Be("CourseCode");
-            res.ProviderCodeName.Should().Be("MYINST");
 
             res.Provider.ProviderCode.Should().Be("ABC");
             res.Provider.Name.Should().Be("My institution");
@@ -220,67 +219,68 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             return new Course
             {
                 CourseCode = "CourseCode",
-                AccreditingProviderId = "ACC123",
+                AccreditingInstitution = new Institution {InstCode  = "ACC123", InstName = "AccreditingProviderName"},
                 Qualification = CourseQualification.QtsWithPgce,
-                AccreditingProviderName = "AccreditingProviderName",
                 ProgramType = "SS", // school direct salaried
                 Name = "Course.Name",
                 ProfpostFlag = "T", // QTS+PGCE
-                Subjects = "Mathematics, Physics",
+                CourseSubjects = new List<CourseSubject> {
+                    new CourseSubject { Subject = new Subject { SubjectName = "Mathematics"}},
+                    new CourseSubject { Subject = new Subject { SubjectName = "Physics"}}
+                },
+
                 StudyMode = "B",
-                Schools = new ObservableCollection<School>
+                CourseSites = new List<CourseSite>
                     {
-                        new School
+                        
+                        new CourseSite { Site = new Site
                         {
                             LocationName = "School.Name",
                             Address1 = "School.Address1",
                             Address2 = "School.Address2",
                             Address3 = "School.Address3",
                             Address4 = "School.Address4",
-                            PostCode = "School.PostCode",
-                            Code = "SCH",
-                            ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
-                            FullTimeVacancies = "",
-                            PartTimeVacancies = "",
-                            Status = "r",
-                            Publish = publishedCampus ? "Y" : "n"
-
+                            Postcode = "School.PostCode",
+                            Code = "SCH"
+                        },
+                        ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
+                        Status = "r",
+                        Publish = publishedCampus ? "Y" : "n"
                         },
 
-                        new School
-                        {
-                            LocationName = "NotIncludedSchool.Name",
-                            Address1 = "NotIncludedSchool.Address1",
-                            Address2 = "NotIncludedSchool.Address2",
-                            Address3 = "NotIncludedSchool.Address3",
-                            Address4 = "NotIncludedSchool.Address4",
-                            PostCode = "NotIncludedSchool.PostCode",
-                            Code = "SCHNI",
+                        new CourseSite { 
+                            Site = new Site
+                            {
+                                LocationName = "NotIncludedSchool.Name",
+                                Address1 = "NotIncludedSchool.Address1",
+                                Address2 = "NotIncludedSchool.Address2",
+                                Address3 = "NotIncludedSchool.Address3",
+                                Address4 = "NotIncludedSchool.Address4",
+                                Postcode = "NotIncludedSchool.PostCode",
+                                Code = "SCHNI"
+                            },                            
                             ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
-                            FullTimeVacancies = "",
-                            PartTimeVacancies = "",
                             Status = "d",
                             Publish = publishedCampus ? "Y" : "n"
-                        },
+                            },
 
                     }
             };
         }
 
-        private static UcasInstitution GenerateUcasInstitution()
+        private static Institution GenerateUcasInstitution()
         {
-            return new UcasInstitution
+            return new Institution
             {
-                Addr1 = "Addr1",
-                Addr2 = "Addr2",
-                Addr3 = "Addr3",
-                Addr4 = "Addr4",
+                Address1 = "Addr1",
+                Address2 = "Addr2",
+                Address3 = "Addr3",
+                Address4 = "Addr4",
                 Postcode = "Postcode",
                 Url = "http://www.example.com",
 
                 InstCode = "ABC",
-                InstBig = "MYINST",
-                InstFull = "My institution"
+                InstName = "My institution"
             };
         }
 

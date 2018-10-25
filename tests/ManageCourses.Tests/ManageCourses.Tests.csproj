@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\src\ManageCourses.Api\ManageCourses.Api.csproj" />
     <ProjectReference Include="..\..\src\ManageCourses.Domain\ManageCourses.Domain.csproj" />
     <ProjectReference Include="..\..\src\ManageCourses.ApiClient\ManageCourses.ApiClient.csproj" />
+    <ProjectReference Include="..\..\src\ManageCourses.UcasCourseImporter\importer\UcasCourseImporter.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="logger.json">

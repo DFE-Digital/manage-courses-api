@@ -31,7 +31,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             // With ThenInclude you can also retrieve relations of relations
             var request = _context.AccessRequests
                 .Include(accessRequest => accessRequest.Requester)
-                .ThenInclude(requester => requester.McOrganisationUsers)
+                .ThenInclude(requester => requester.OrganisationUsers)
+                .ThenInclude(x => x.Organisation)
                 .SingleOrDefault(x => x.Id == accessRequestId);
 
             if (request == null)
@@ -43,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             // if a user gets recreated, this breaks the FK relation to mcUser, so we try to 
             // recover by finding the new user by email
-            var requesterUser = request.Requester ?? _context.McUsers.Include(x => x.McOrganisationUsers).SingleOrDefault(x => x.Email == request.RequesterEmail);
+            var requesterUser = request.Requester ?? _context.Users.Include(x => x.OrganisationUsers).ThenInclude(x => x.Organisation).SingleOrDefault(x => x.Email == request.RequesterEmail);
 
             if (requesterUser == null)
             {
@@ -69,8 +70,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             }
 
             requesterEmail = requesterEmail.ToLower();
-            var requesterUser = _context.McUsers
-                .Include(x=>x.McOrganisationUsers)
+            var requesterUser = _context.Users
+                .Include(x=>x.OrganisationUsers)
+                .ThenInclude(x => x.Organisation)
                 .SingleOrDefault(x => x.Email == requesterEmail);
 
             if (requesterUser == null)
@@ -95,41 +97,42 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             return Ok();
         }
 
-        private void UpdateAccessRights(string requestedEmail, string firstName, string lastName, McUser requesterUser)
+        private void UpdateAccessRights(string requestedEmail, string firstName, string lastName, User requesterUser)
         {
             var requesterEmail = requesterUser.Email.ToLower();
 
-            var existingTargetUser = _context.McUsers
-                            .Include(x => x.McOrganisationUsers)
+            var existingTargetUser = _context.Users
+                            .Include(x => x.OrganisationUsers)
+                            .ThenInclude(x => x.Organisation)
                             .SingleOrDefault(x => x.Email == requestedEmail); // throws if email is ambiguous
 
             if (existingTargetUser == null)
             {
                 // insert
-                _context.McUsers.Add(new McUser
+                _context.Users.Add(new User
                 {
                     FirstName = firstName,
                     LastName = lastName,
                     Email = requestedEmail,
                     InviteDateUtc = DateTime.Now,
-                    McOrganisationUsers = new Collection<McOrganisationUser>(
-                            requesterUser.McOrganisationUsers.Select(x => new McOrganisationUser
+                    OrganisationUsers = new Collection<OrganisationUser>(
+                            requesterUser.OrganisationUsers.Select(x => new OrganisationUser
                             {
-                                OrgId = x.OrgId
+                                Organisation = x.Organisation,
                             }).ToList())
                 });
             }
             else
             {
                 // update
-                foreach (var organisationUser in requesterUser.McOrganisationUsers)
+                foreach (var organisationUser in requesterUser.OrganisationUsers)
                 {
-                    if (!existingTargetUser.McOrganisationUsers.Any(x => x.OrgId == organisationUser.OrgId))
+                    if (!existingTargetUser.OrganisationUsers.Any(x => x.Organisation.OrgId == organisationUser.Organisation.OrgId))
                     {
-                        existingTargetUser.McOrganisationUsers.Add(new McOrganisationUser
+                        existingTargetUser.OrganisationUsers.Add(new OrganisationUser
                         {
-                            Email = existingTargetUser.Email,
-                            OrgId = organisationUser.OrgId
+                            User = existingTargetUser,
+                            Organisation = organisationUser.Organisation
                         });
                     }
                 }

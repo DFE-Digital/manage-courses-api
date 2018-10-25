@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using GovUk.Education.ManageCourses.ApiClient;
+using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.UcasCourseImporter;
+using GovUk.Education.ManageCourses.Xls.Domain;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
@@ -27,8 +30,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             };
         
         
-        private static ObservableCollection<T> ListOfOne<T> (T one) {
-            return new ObservableCollection<T> { one };
+        private static List<T> ListOfOne<T> (T one) {
+            return new List<T> { one };
         }
     }
 }

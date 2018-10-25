@@ -14,8 +14,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public DateTime CreatedTimestampUtc { get; set; }
         public DateTime UpdatedTimestampUtc { get; set; }
         public DateTime? LastPublishedTimestampUtc { get; set; }
-        public McUser CreatedByUser { get; set; }
-        public McUser UpdatedByUser { get; set; }
+        public User CreatedByUser { get; set; }
+        public User UpdatedByUser { get; set; }
         [Column(TypeName = "jsonb")]
         public string JsonData { get; set; }
         public EnumStatus Status { get; set; }

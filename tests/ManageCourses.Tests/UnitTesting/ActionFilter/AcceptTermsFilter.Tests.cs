@@ -102,7 +102,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.ActionFilter
             action.Should().Throw<InvalidOperationException>();
         }
         
-        private static AcceptTermsFilter GetAcceptTermsFilter(IQueryable<McUser> users)
+        private static AcceptTermsFilter GetAcceptTermsFilter(IQueryable<User> users)
         {
             var mockedContext = new Mock<IManageCoursesDbContext>();
             mockedContext.Setup(x => x.GetMcUsers("foo@example.com")).Returns(users);
@@ -110,10 +110,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.ActionFilter
             return acceptTermsFilter;
         }
 
-        private IQueryable<McUser> GetUsers(DateTime? consentDate, int multiple)
+        private IQueryable<User> GetUsers(DateTime? consentDate, int multiple)
         {
-            var list = new List<McUser>();
-            for (var i = 0; i < multiple; i++) list.Add(new McUser {
+            var list = new List<User>();
+            for (var i = 0; i < multiple; i++) list.Add(new User {
                 Email = "foo@example.com",
                 AcceptTermsDateUtc = consentDate
             });

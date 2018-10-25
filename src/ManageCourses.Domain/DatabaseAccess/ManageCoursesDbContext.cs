@@ -22,97 +22,82 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     p.Relational().ColumnName = PascalToSnakeCase(p.Name);
                 }
             }
-
-            modelBuilder.Entity<McOrganisationUser>()
-                .HasIndex(ou => new { ou.Email, ou.OrgId })
+            
+            modelBuilder.Entity<User>()
+                .HasIndex(x => x.Email)
                 .IsUnique();
-            modelBuilder.Entity<McOrganisationUser>()
-                .HasOne(ou => ou.McUser)
-                .WithMany(u => u.McOrganisationUsers)
-                .HasForeignKey(ou => ou.Email)
-                .HasPrincipalKey(u => u.Email);
-            modelBuilder.Entity<McOrganisationUser>()
-                .HasOne(ou => ou.McOrganisation)
-                .WithMany(u => u.McOrganisationUsers)
-                .HasForeignKey(ou => ou.OrgId)
-                .HasPrincipalKey(u => u.OrgId);
 
-            modelBuilder.Entity<UcasInstitution>()
+            modelBuilder.Entity<Organisation>()
+                .HasIndex(x => x.OrgId)
+                .IsUnique();
+
+            modelBuilder.Entity<OrganisationUser>()
+                .HasOne(ou => ou.User)
+                .WithMany(u => u.OrganisationUsers);
+
+            modelBuilder.Entity<OrganisationUser>()
+                .HasOne(ou => ou.Organisation)
+                .WithMany(u => u.OrganisationUsers);
+
+            modelBuilder.Entity<Institution>()
                 .HasIndex(ui => ui.InstCode)
                 .IsUnique();
 
-            modelBuilder.Entity<UcasCampus>()
-                .HasOne(uc => uc.UcasInstitution)
-                .WithMany(ui => ui.UcasCampuses)
-                .HasForeignKey(uc => uc.InstCode)
-                .HasPrincipalKey(ui => ui.InstCode);
-
-            modelBuilder.Entity<McOrganisationInstitution>()
-                .HasIndex(oi => new { oi.OrgId, oi.InstitutionCode })
+            modelBuilder.Entity<Site>()
+                .HasIndex(s => new {s.InstitutionId, s.Code})
                 .IsUnique();
-            modelBuilder.Entity<McOrganisationInstitution>()
-                .HasOne(oi => oi.McOrganisation)
-                .WithMany(o => o.McOrganisationInstitutions)
-                .HasForeignKey(oi => oi.OrgId)
-                .HasPrincipalKey(o => o.OrgId);
-            modelBuilder.Entity<McOrganisationInstitution>()
-                .HasOne(oi => oi.UcasInstitution)
-                .WithMany(ui => ui.McOrganisationInstitutions)
-                .HasForeignKey(oi => oi.InstitutionCode)
-                .HasPrincipalKey(ui => ui.InstCode);
 
-            modelBuilder.Entity<UcasCourse>()
-                .HasIndex(oi => new { oi.InstCode, oi.CrseCode, oi.CampusCode })
+            modelBuilder.Entity<Site>()
+                .HasOne(uc => uc.Institution)
+                .WithMany(ui => ui.Sites);
+
+            modelBuilder.Entity<OrganisationInstitution>()
+                .HasOne(oi => oi.Organisation)
+                .WithMany(o => o.OrganisationInstitutions);
+
+            modelBuilder.Entity<OrganisationInstitution>()
+                .HasOne(oi => oi.Institution)
+                .WithMany(ui => ui.OrganisationInstitutions);
+
+            modelBuilder.Entity<Course>()
+                .HasIndex(x => new { x.InstitutionId, x.Id } )
                 .IsUnique();
-            modelBuilder.Entity<UcasCourse>()
-                .HasOne(uc => uc.UcasInstitution)
-                .WithMany(ui => ui.UcasCourses)
-                .HasForeignKey(uc => uc.InstCode)
-                .HasPrincipalKey(ui => ui.InstCode);
-            modelBuilder.Entity<UcasCourse>()
-                .HasOne(uc => uc.CourseCode)
-                .WithMany(cc => cc.UcasCourses)
-                .HasForeignKey(uc => new { uc.InstCode, uc.CrseCode })
-                .HasPrincipalKey(cc => new { cc.InstCode, cc.CrseCode });
-            modelBuilder.Entity<UcasCourse>()
-                .HasOne(uc => uc.AccreditingProviderInstitution)
-                .WithMany(ui => ui.AccreditedUcasCourses)
-                .HasForeignKey(uc => uc.AccreditingProvider)
-                .HasPrincipalKey(ui => ui.InstCode);
-            modelBuilder.Entity<UcasCourse>()
-                .HasOne(uc => uc.UcasCampus)
-                .WithMany(ui => ui.UcasCourses)
-                .HasForeignKey(ucs => new { ucs.InstCode, ucs.CampusCode })
-                .HasPrincipalKey(ui => new { ui.InstCode, ui.CampusCode });
 
-            modelBuilder.Entity<CourseCode>()
-                .HasOne(cc => cc.UcasInstitution)
-                .WithMany(ui => ui.CourseCodes)
-                .HasForeignKey(oi => oi.InstCode)
-                .HasPrincipalKey(ui => ui.InstCode);
+            modelBuilder.Entity<Course>()
+                .HasOne(uc => uc.Institution)
+                .WithMany(ui => ui.Courses)
+                .HasForeignKey(uc => uc.InstitutionId);
 
-            modelBuilder.Entity<UcasCourseSubject>()
-                .HasOne(ucs => ucs.UcasInstitution)
-                .WithMany(ui => ui.UcasCourseSubjects)
-                .HasForeignKey(ucs => ucs.InstCode)
-                .HasPrincipalKey(ui => ui.InstCode);
-            modelBuilder.Entity<UcasCourseSubject>()
-                .HasOne(ucs => ucs.UcasSubject)
-                .WithMany(us => us.UcasCourseSubjects)
-                .HasForeignKey(ucs => ucs.SubjectCode)
-                .HasPrincipalKey(ui => ui.SubjectCode);
+            modelBuilder.Entity<Course>()
+                .HasOne(uc => uc.AccreditingInstitution)
+                .WithMany(ui => ui.AccreditedCourses)
+                .IsRequired(false);
 
-            modelBuilder.Entity<UcasCourseSubject>()
-                .HasOne(ucs => ucs.CourseCode)
-                .WithMany(cc => cc.UcasCourseSubjects)
-                .HasForeignKey(ucs => new { ucs.InstCode, ucs.CrseCode })
-                .HasPrincipalKey(cc => new { cc.InstCode, cc.CrseCode });
+            modelBuilder.Entity<CourseSite>()
+                .HasOne(cs => cs.Course)
+                .WithMany(c => c.CourseSites)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<CourseSite>()
+                .HasOne(cs => cs.Site)
+                .WithMany(c => c.CourseSites)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<CourseSubject>()
+                .HasOne(cs => cs.Course)
+                .WithMany(c => c.CourseSubjects)
+                .OnDelete(DeleteBehavior.Cascade);                
+            modelBuilder.Entity<CourseSubject>()
+                .HasOne(cs => cs.Subject)
+                .WithMany(s => s.CourseSubjects)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Subject>()
+                .HasIndex(x => x.SubjectCode)
+                .IsUnique();
 
             modelBuilder.Entity<NctlOrganisation>()
-                .HasOne(x => x.McOrganisation)                
+                .HasOne(x => x.Organisation)                
                 .WithMany(x => x.NctlOrganisations)
-                .HasForeignKey(x => x.OrgId)
-                .HasPrincipalKey(x => x.OrgId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<AccessRequest>()
@@ -124,14 +109,13 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             modelBuilder.Entity<InstitutionEnrichment>()
                 .HasIndex(x => x.InstCode);
                 
-            modelBuilder.Entity<McSession>()
-                .HasOne(x => x.McUser)
+            modelBuilder.Entity<Session>()
+                .HasOne(x => x.User)
                 .WithMany(u => u.Sessions)
                 .OnDelete(DeleteBehavior.Cascade);
             
-            modelBuilder.Entity<McSession>()
+            modelBuilder.Entity<Session>()
                 .HasIndex(x => new {x.AccessToken, x.CreatedUtc});
-
 
             base.OnModelCreating(modelBuilder);
         }
@@ -147,205 +131,96 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return Regex.Replace(value, @"([a-z\d])([A-Z])", "$1_$2").ToLower();
         }
 
-        public DbSet<UcasCourse> UcasCourses { get; set; }
-        public DbSet<CourseCode> CourseCodes { get; set; }
-        public DbSet<UcasInstitution> UcasInstitutions { get; set; }
-        public DbSet<UcasCourseSubject> UcasCourseSubjects { get; set; }
-        public DbSet<UcasSubject> UcasSubjects { get; set; }
-        public DbSet<UcasCampus> UcasCampuses { get; set; }
-        public DbSet<UcasCourseNote> UcasCourseNotes { get; set; }
-        public DbSet<UcasNoteText> UcasNoteTexts { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        public DbSet<Institution> Institutions { get; set; }
+        public DbSet<CourseSubject> CourseSubjects { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
+        public DbSet<Site> Sites { get; set; }
         public DbSet<NctlOrganisation> NctlOrganisations { get; set; }
-        public DbSet<McOrganisation> McOrganisations { get; set; }
-        public DbSet<McOrganisationInstitution> McOrganisationIntitutions { get; set; }
-        public DbSet<McOrganisationUser> McOrganisationUsers { get; set; }
-        public DbSet<McUser> McUsers { get; set; }
+        public DbSet<Organisation> Organisations { get; set; }
+        public DbSet<OrganisationInstitution> OrganisationIntitutions { get; set; }
+        public DbSet<OrganisationUser> OrganisationUsers { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
         public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
-        public DbSet<McSession> McSessions { get;  set; }
+        public DbSet<Session> Sessions { get;  set; }
         public DbSet<PgdeCourse> PgdeCourses { get; set; }
 
-        public IList<UcasCourse> GetAllUcasCourses()
+        public List<Course> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
         {
-            return UcasCourses.ToList();
-        }
-        public IList<UcasInstitution> GetAllUcasInstitutions()
-        {
-            return UcasInstitutions.ToList();
-        }
-
-        public IList<UcasSubject> GetAllUcasSubjects()
-        {
-            return UcasSubjects.ToList();
-        }
-
-        public IList<UcasCourseSubject> GetAllUcasCourseSubjects()
-        {
-            return UcasCourseSubjects.ToList();
-        }
-
-        public IList<UcasCampus> GetAllUcasCampuses()
-        {
-            return UcasCampuses.ToList();
-        }
-
-        public IList<UcasCourseNote> GetAllUcasCourseNotes()
-        {
-            return UcasCourseNotes.ToList();
-        }
-
-        public IList<UcasNoteText> GetAllUcasNoteTexts()
-        {
-            return UcasNoteTexts.ToList();
-        }
-
-        public IList<McOrganisation> GetAllMcOrganisations()
-        {
-            return McOrganisations.ToList();
-        }
-
-        public IList<McOrganisationInstitution> GetAllMcOrganisationsInstitutions()
-        {
-            return McOrganisationIntitutions.ToList();
-        }
-
-        public IList<McOrganisationUser> GetAllMcOrganisationsUsers()
-        {
-            return McOrganisationUsers.ToList();
-        }
-
-        public IList<McUser> GetAllMcUsers()
-        {
-            return McUsers.ToList();
-        }
-
-        public IList<InstitutionEnrichment> GetAllInstitutionEnrichments()
-        {
-            return InstitutionEnrichments.ToList();
-        }
-
-        public void AddUcasInstitution(UcasInstitution institution)
-        {
-            UcasInstitutions.Add(institution);
-        }
-
-        public void AddUcasSubject(UcasSubject subject)
-        {
-            UcasSubjects.Add(subject);
-        }
-
-        public void AddUcasCourseSubject(UcasCourseSubject courseSubject)
-        {
-            UcasCourseSubjects.Add(courseSubject);
-        }
-
-        public void AddUcasCampus(UcasCampus campus)
-        {
-            UcasCampuses.Add(campus);
-        }
-
-        public void AddUcasCourseNote(UcasCourseNote courseNote)
-        {
-            UcasCourseNotes.Add(courseNote);
-        }
-
-        public void AddUcasNoteText(UcasNoteText noteText)
-        {
-            UcasNoteTexts.Add(noteText);
-        }
-
-        public void AddMcOrganisation(McOrganisation organisation)
-        {
-            McOrganisations.Add(organisation);
-        }
-
-        public void AddNctlOrganisation(NctlOrganisation organisation)
-        {
-            NctlOrganisations.Add(organisation);
-        }
-
-        public void AddMcOrganisationInstitution(McOrganisationInstitution organisationInstitution)
-        {
-            McOrganisationIntitutions.Add(organisationInstitution);
-        }
-
-        public void AddMcOrganisationUser(McOrganisationUser organisationUser)
-        {
-            McOrganisationUsers.Add(organisationUser);
-        }
-
-        public void AddMcUser(McUser user)
-        {
-            McUsers.Add(user);
-        }
-        public void AddInstitutionEnrichment(InstitutionEnrichment institutionEnrichment)
-        {
-            InstitutionEnrichments.Add(institutionEnrichment);
-        }
-
-        public List<UcasCourse> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
-        {
-            var ucasCourses = UcasCourses.FromSql(@"
-                    select c.* from ucas_course c
-                    join mc_organisation_institution oi on oi.institution_code=c.inst_code 
-                    join mc_organisation_user ou on ou.org_id=oi.org_id 
-                    where lower(c.inst_code)=lower(@instCode) 
-                    and lower(c.crse_code)=lower(@ucasCode) 
-                    and lower(ou.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
-                .Include(x => x.UcasInstitution)
-                .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
-                .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
-                .Include(x => x.AccreditingProviderInstitution)
-                .Include(x => x.UcasCampus)
+            var ucasCourses = Courses.FromSql(@"
+                    select c.* from course c
+                    join institution i on c.institution_id = i.id
+                    join organisation_institution oi on oi.institution_id=i.id
+                    join organisation o on o.id = oi.organisation_id 
+                    join organisation_user ou on ou.organisation_id = o.id 
+                    join ""user"" u on u.id = ou.user_id 
+                    where lower(i.inst_code)=lower(@instCode) 
+                    and lower(c.course_code)=lower(@ucasCode) 
+                    and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
+                .Include(x => x.Institution)
+                .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
+                .Include(x => x.AccreditingInstitution)
+                .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 
             return ucasCourses;
         }
-        public List<UcasCourse> GetUcasCourseRecordsByInstCode(string instCode, string email)
+        public List<Course> GetUcasCourseRecordsByInstCode(string instCode, string email)
         {
-            var ucasCourses = UcasCourses.FromSql(
-                    $"select c.* from ucas_course c " +
-                    $"join mc_organisation_institution oi on oi.institution_code=c.inst_code " +
-                    $"join mc_organisation_user ou on ou.org_id=oi.org_id " +
-                    $"where lower(c.inst_code)=lower(@instCode) " +
-                    $"and lower(ou.email)=lower(@email) order by c.crse_title", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
-                .Include(x => x.UcasInstitution)
-                .Include(x => x.UcasInstitution.UcasCourseSubjects).ThenInclude(x => x.UcasSubject)
-                .Include(x => x.CourseCode).ThenInclude(x => x.UcasCourseSubjects)
-                .Include(x => x.AccreditingProviderInstitution)
-                .Include(x => x.UcasCampus)
+            var ucasCourses = Courses.FromSql(
+                    $"select c.* from course c " +
+                    $"join institution i on i.id=c.institution_id " +
+                    $"join organisation_institution oi on oi.institution_id=i.id " +
+                    $"join organisation o on o.id = oi.organisation_id " +
+                    $"join organisation_user ou on ou.organisation_id = o.id " +
+                    $"join \"user\" u on ou.user_id = u.id " +
+                    $"where lower(i.inst_code)=lower(@instCode) " +
+                    $"and lower(u.email)=lower(@email) order by c.name", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
+                .Include(x => x.Institution)
+                .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
+                .Include(x => x.AccreditingInstitution)
+                .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 
             return ucasCourses;
         }
-        public IQueryable<McOrganisationInstitution> GetUserOrganisations(string email)
+
+        public IQueryable<OrganisationInstitution> GetUserOrganisations(string email)
         {
-            var userOrganisations = McOrganisationIntitutions.FromSql(
-                $"select oi.* from mc_organisation_institution oi " +
-                $"join mc_organisation_user ou on ou.org_id = oi.org_id " +
-                $"where lower(ou.email) = lower(@email)",
+            var userOrganisations = OrganisationIntitutions.FromSql(
+                $"select oi.* from organisation_institution oi " +
+                $"join organisation o on o.id = oi.organisation_id " +
+                $"join organisation_user ou on ou.organisation_id = o.id " +
+                $"join \"user\" u on ou.user_id = u.id " +
+                $"where lower(u.email) = lower(@email)",
                 new NpgsqlParameter("email", email)
-            );
+            ).Include(x => x.Organisation)
+            .Include(x => x.Institution);
 
             return userOrganisations;
         }
-        public McOrganisationInstitution GetUserOrganisation(string email, string instCode)
+
+        public OrganisationInstitution GetUserOrganisation(string email, string instCode)
         {
-            var userOrganisations = McOrganisationIntitutions.FromSql(
-                $"select oi.* from mc_organisation_institution oi " +
-                $"join mc_organisation_user ou on ou.org_id = oi.org_id " +
-                $"where lower(ou.email) = lower(@email) and Lower(oi.institution_code) = lower(@instCode)",
+            var userOrganisations = OrganisationIntitutions.FromSql(
+                $"select oi.* from organisation_institution oi " +
+                $"join institution i on oi.institution_id = i.id " +
+                $"join organisation o on oi.organisation_id = o.id " +
+                $"join organisation_user ou on ou.organisation_id = o.id " +
+                $"join \"user\" u on ou.user_id = u.id " +
+                $"where lower(u.email) = lower(@email) and Lower(i.inst_code) = lower(@instCode)",
                 new NpgsqlParameter("email", email), new NpgsqlParameter("instCode", instCode)
-            ).FirstOrDefault();
+            ).Include(x => x.Organisation).Include(x => x.Institution).FirstOrDefault();
 
             return userOrganisations;
         }
 
-        public IQueryable<McUser> GetMcUsers(string email)
+        public IQueryable<User> GetMcUsers(string email)
         {
-            var users = McUsers.FromSql(
-                $"select * from mc_user " +
+            var users = Users.FromSql(
+                $"select * from \"user\" " +
                 $"where lower(email) = lower(@email)",
                 new NpgsqlParameter("email", email)
             );
@@ -353,23 +228,21 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return users;
         }
 
-        public UcasInstitution GetUcasInstitution(string name, string instCode)
+        public Institution GetInstitution(string name, string instCode)
         {
-            return UcasInstitutions.FromSql(@"
-                    SELECT i.* from ucas_institution i
-                    JOIN mc_organisation_institution oi on i.inst_code = oi.institution_code
-                    JOIN mc_organisation_user ou on oi.org_id = ou.org_id
-                    WHERE lower(ou.email) = lower(@email)
+            return Institutions.FromSql(@"
+                    SELECT i.* from institution i
+                    JOIN organisation_institution oi on i.id = oi.institution_id
+                    JOIN organisation o on oi.organisation_id = o.id
+                    JOIN organisation_user ou on o.id = ou.organisation_id
+                    JOIN ""user"" u on ou.user_id = u.id
+                    WHERE lower(u.email) = lower(@email)
                     AND lower(i.inst_code) = lower(@instcode)",
                     new NpgsqlParameter("email", name),
                     new NpgsqlParameter("instcode", instCode))
                 .FirstOrDefault();
         }
 
-        public void AddUcasCourse(UcasCourse course)
-        {
-            UcasCourses.Add(course);
-        }
         public void Save()
         {
             SaveChanges();

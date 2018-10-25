@@ -28,14 +28,14 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
                 {
                     var requester = _context
                         .GetMcUsers(requesterEmail)
-                        .Include(x => x.McOrganisationUsers)
-                        .ThenInclude(x => x.McOrganisation)
+                        .Include(x => x.OrganisationUsers)
+                        .ThenInclude(x => x.Organisation)
                         .Single();
 
                     var requestedIfExists = _context
                         .GetMcUsers(request.EmailAddress)
-                        .Include(x => x.McOrganisationUsers)
-                        .ThenInclude(x => x.McOrganisation)
+                        .Include(x => x.OrganisationUsers)
+                        .ThenInclude(x => x.Organisation)
                         .SingleOrDefault();
 
                     var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest()

@@ -9,31 +9,37 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     {
         public static void AddTestReferenceData(this ManageCoursesDbContext context, string username)
         {
-            context.McUsers.Add(new McUser{
-                    FirstName = "Joe",
-                    LastName = "Bloggs",
-                    Email = username,
-                    AcceptTermsDateUtc = DateTime.UtcNow
-                });
+            User user = new User
+            {
+                FirstName = "Joe",
+                LastName = "Bloggs",
+                Email = username,
+                AcceptTermsDateUtc = DateTime.UtcNow
+            };
+            context.Users.Add(user);
 
-            context.McOrganisations.Add(new McOrganisation {
-                    Name = "Joe's school",
-                    OrgId = "123"
-                });
-                
-            context.UcasInstitutions.Add(new UcasInstitution { 
-                    InstFull = "Joe's school @ UCAS",
-                    InstCode = "ABC"
+            Organisation organisation = new Organisation
+            {
+                Name = "Joe's school",
+                OrgId = "123"
+            };
+            context.Organisations.Add(organisation);
+
+            Institution institution = new Institution
+            {
+                InstName = "Joe's school @ UCAS",
+                InstCode = "ABC"
+            };
+            context.Institutions.Add(institution);
+            
+            context.OrganisationUsers.Add(new OrganisationUser {
+                    User = user,
+                    Organisation = organisation
                 });
             
-            context.McOrganisationUsers.Add(new McOrganisationUser {
-                    Email = username,
-                    OrgId = "123"
-                });
-            
-            context.McOrganisationIntitutions.Add(new McOrganisationInstitution {
-                    InstitutionCode = "ABC",
-                    OrgId = "123"
+            context.OrganisationIntitutions.Add(new OrganisationInstitution {
+                    Institution = institution,
+                    Organisation = organisation
                 });
             
         }

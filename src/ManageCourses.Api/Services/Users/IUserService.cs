@@ -15,7 +15,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         /// Updates stored user details with updated details in claims.
         /// </summary>
         /// <exception cref="McUserNotFoundException"></exception>
-        Task<McUser> GetAndUpdateUserAsync(JsonUserDetails userDetails);
+        Task<User> GetAndUpdateUserAsync(JsonUserDetails userDetails);
 
         /// <summary>
         /// Call this when a user signs in.
@@ -23,17 +23,17 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
         /// and sends welcome email if not already sent.
         /// </summary>
         /// <param name="user">The user to be updated</param>
-        Task LoggedInAsync(McUser user);
+        Task LoggedInAsync(User user);
 
         /// <summary>
         /// Save a copy of the access token in the cache
         /// </summary>
-        Task CacheTokenAsync(string accessToken, McUser mcUser);
+        Task CacheTokenAsync(string accessToken, User mcUser);
 
         /// <summary>
         /// Figure out who this is based on the cached access token to avoid
         /// unnecessary round-trips to DfE Sign-in claims endpoint.
         /// </summary>
-        Task<McUser> GetFromCacheAsync(string accessToken);
+        Task<User> GetFromCacheAsync(string accessToken);
     }
 }

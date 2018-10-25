@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.UcasCourseImporter.Mapping;
 using GovUk.Education.SearchAndCompare.Domain.Models.Enums;
 using NUnit.Framework;
 
