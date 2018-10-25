@@ -186,7 +186,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Context.AddTestReferenceData(TestConfig.SignInUsername);
             Context.Save();
 
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object).UpdateUcasData(TestPayloadBuilder.MakeSimpleUcasPayload());
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object,TestPayloadBuilder.MakeSimpleUcasPayload()).UpdateUcasData();
         }
 
         private async Task<ManageCoursesApiClient> BuildSigninAwareClient()

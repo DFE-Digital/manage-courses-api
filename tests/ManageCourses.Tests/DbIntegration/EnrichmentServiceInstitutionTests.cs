@@ -316,7 +316,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     },
                 },
             };
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object).UpdateUcasData(ucasPayload);
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, ucasPayload).UpdateUcasData();
 
             // Assert
             var res = enrichmentService.GetInstitutionEnrichment(_ucasInstitution.InstCode, Email);

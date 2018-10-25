@@ -29,9 +29,6 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
             logger.Information("UcasCourseImporter started.");
 
-            var ucasDataMigrator = new UcasDataMigrator(GetDbContext(configuration), logger);
-
-
             var configOptions = new UcasCourseImporterConfigurationOptions(configuration);
             configOptions.Validate();
 
@@ -75,8 +72,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     NoteTexts = new List<UcasNoteText>(noteTexts),
                     Subjects = new List<UcasSubject>(subjects)
                 };
-
-                ucasDataMigrator.UpdateUcasData(payload);
+                var ucasDataMigrator = new UcasDataMigrator(GetDbContext(configuration), logger, payload);
+                ucasDataMigrator.UpdateUcasData();
             }
             catch (Exception e)
             {

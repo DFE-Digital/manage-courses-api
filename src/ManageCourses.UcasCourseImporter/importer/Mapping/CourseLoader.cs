@@ -15,38 +15,42 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
     public class CourseLoader
     {
         private readonly QualificationMapper qualificationMapper = new QualificationMapper();
-        private readonly SubjectMapper subjectMapper = new SubjectMapper();
+        private Dictionary<string, Institution> allInstitutions;
+        private readonly List<string> pgdeCourses;
+        private readonly Dictionary<string, Subject> allSubjects;
+
+        public CourseLoader(Dictionary<string, Institution> allInstitutions, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses)
+        {
+            this.allInstitutions = allInstitutions;
+            this.pgdeCourses = pgdeCourses.Select(x => x.InstCode + "_@@_" + x.CourseCode).ToList();
+            this.allSubjects = allSubjects;
+        }
 
         /// <summary>
         /// Takes the UcasCourse records which are actually de-normalised course-campus info and turns them into
         /// proper British Courses that have the campus info re-normalised into the .Schools list property.
         /// </summary>
+        /// <param name="institution">Institution</param>
         /// <param name="courseRecords">UcasCourse records</param>
         /// <param name="enrichmentMetadata"></param>
         /// <param name="pgdeCourses"></param>
         /// <returns></returns>        
-        public List<Course> LoadCourses(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<UcasSubject> ucasSubjects, IEnumerable<PgdeCourse> pgdeCourses, ref List<Subject> allSubjects, IEnumerable<Site> allSites, IEnumerable<Institution> allInstitutions)
+        public List<Course> LoadCourses(Institution institution, IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<Site> allSites)
         {
             var returnCourses = new List<Course>();
             
-            var instDictionary = allInstitutions.Where(x => !string.IsNullOrWhiteSpace(x.InstCode)).ToDictionary(x => x.InstCode);
-
             // nb - this separator uses characters that are never used in inst codes - thus avoiding ambiguity
             var campusGroupings = courseRecords.GroupBy(x => x.InstCode + "_@@_" + x.CampusCode);
             var courseRecordGroupings = courseRecords.GroupBy(x => x.InstCode + "_@@_" + x.CrseCode);
-            var pgdeCoursesSimple = pgdeCourses.Select(x => x.InstCode + "_@@_" + x.CourseCode).ToList();
             var courseSubjectGroupings = courseSubjects.GroupBy(x => x.InstCode + "_@@_" + x.CrseCode).ToDictionary(x => x.Key, x => x);
 
             foreach (var grouping in courseRecordGroupings)
             {
                 returnCourses.Add(LoadCourse(
+                    institution,
                     grouping.ToList(),
-                    courseSubjectGroupings.GetValueOrDefault(grouping.Key) ?? (IEnumerable<UcasCourseSubject>) new List<UcasCourseSubject>(),
-                    ucasSubjects,
-                    pgdeCoursesSimple.Contains(grouping.Key),
-                    ref allSubjects,
-                    allSites,
-                    instDictionary));
+                    courseSubjectGroupings.GetValueOrDefault(grouping.Key).AsEnumerable() ?? new List<UcasCourseSubject>(),
+                    allSites));
             }            
 
             return returnCourses;
@@ -59,7 +63,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         /// <param name="courseRecords">List of UcasCourse records for a single course (no really a course, not the course-campus combination in ucas-land)</param>
         /// <param name="isPgde"></param>
         /// <returns></returns>
-        private Course LoadCourse(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<UcasSubject> ucasSubjects, bool isPgde, ref List<Subject> allSubjects, IEnumerable<Site> allSites, IDictionary<string, Institution> allInstitutions)
+        private Course LoadCourse(Institution institution, IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<Site> allSites)
         {
             var returnCourse = new Course();
             if (courseRecords.Count() > 0)
@@ -91,27 +95,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 returnCourse.StudyMode = organisationCourseRecord.Studymode;
                 returnCourse.StartDate = DateTime.TryParse($"{organisationCourseRecord.StartYear} {organisationCourseRecord.StartMonth}", out DateTime startDate) ? (DateTime?) startDate : null;
                 
-                var ucasSubjectsForThisCourse = courseSubjects.Select(x => ucasSubjects.Single(y => x.SubjectCode == y.SubjectCode).SubjectDescription);
+                returnCourse.CourseSubjects = new Collection<CourseSubject>(courseSubjects.Select(x => new CourseSubject {
+                    Subject = allSubjects[x.SubjectCode],
+                    Course = returnCourse
+                }).ToList());
 
-                var mappedSubjects = subjectMapper.MapToSecondarySubjects(organisationCourseRecord.CrseTitle, ucasSubjectsForThisCourse);
-                var courseSubjectsForThisCourse = new List<CourseSubject>();
-
-                foreach(var subject in mappedSubjects)
-                {
-                    var existingSubject = allSubjects.SingleOrDefault(x => x.SubjectName == subject);
-                    if(existingSubject != null)
-                    {
-                        courseSubjectsForThisCourse.Add(new CourseSubject { Subject = existingSubject });
-                    }
-                    else
-                    {
-                        var newSubject = new Subject{ SubjectName = subject };
-                        allSubjects.Add(newSubject);
-                        courseSubjectsForThisCourse.Add(new CourseSubject { Subject = newSubject });
-                    }
-                }
-
-                returnCourse.CourseSubjects = new Collection<CourseSubject>(courseSubjectsForThisCourse);
                 returnCourse.CourseSites = new Collection<CourseSite>(courseRecords.Select(x => new CourseSite
                 { 
                     Site = allSites.Single(y => y.Institution?.InstCode == x.InstCode && y.Code == x.CampusCode),                    
@@ -120,15 +108,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                     Publish = x.Publish,
                     VacStatus = x.VacStatus
                 }).ToList());
+
                 returnCourse.Qualification = qualificationMapper.MapQualification(
                     organisationCourseRecord.ProfpostFlag,
-                    subjectMapper.IsFurtherEducation(ucasSubjectsForThisCourse),
-                    isPgde);
-                
-                const string both = "B";
-                const string fullTime = "F";
-                const string partTime = "P";
-                var ucasVacancyStatusCodes = new HashSet<string> { both, fullTime, partTime };
+                    new SubjectMapper().IsFurtherEducation(returnCourse.CourseSubjects.Select(x => x.Subject.SubjectName)),
+                    pgdeCourses.Contains(organisationCourseRecord.InstCode + "_@@_" + organisationCourseRecord.CrseCode));
             }
 
             return returnCourse;

@@ -24,22 +24,15 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
         private const string TestUserEmail3 = "email_3@test-manage-courses.gov.uk";
         private const string OrgId1 = "OrgId_1";
 
-        private UcasDataMigrator UcasDataMigrator;
-
-        protected override void Setup()
-        {
-            UcasDataMigrator = new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object);
-        }
-
         [Test]
         public void RepeatImportsArePossible()
         {
             SaveReferenceDataPayload(Context);
             var payload = GetUcasCoursesPayload();
 
-            UcasDataMigrator.UpdateUcasData(payload);
-            UcasDataMigrator.UpdateUcasData(payload);
-            UcasDataMigrator.UpdateUcasData(payload);
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload).UpdateUcasData();
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload).UpdateUcasData();
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload).UpdateUcasData();
 
             foreach (var expected in payload.Courses)
             {
@@ -63,16 +56,16 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                 new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "FOO"}
             }).ToList();
 
-            UcasDataMigrator.UpdateUcasData(import);
-
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
+            
             Assert.AreEqual(1, Context.Courses.Count(), "valid courses should be imported anyway");
 
             //make an update and change import order
             import.Courses.First().CrseTitle = "The best title";
             import.Courses = import.Courses.Reverse();
 
-            UcasDataMigrator.UpdateUcasData(import);
-
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
+            
             Assert.AreEqual(1, Context.Courses.Count(), "valid courses should be re-imported anyway");
             Assert.AreEqual("The best title", Context.Courses.Single().Name);
         }

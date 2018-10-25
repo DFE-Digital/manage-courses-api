@@ -15,118 +15,148 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
     {
         private readonly ManageCoursesDbContext _context;
 
-        private readonly CourseLoader _courseLoader = new CourseLoader();
-        
         private readonly ILogger _logger;
+        private readonly UcasPayload payload;
 
-        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger)
+        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger,UcasPayload payload)
         {
             _context = manageCoursesDbContext;
             _logger = logger;
+            this.payload = payload;
         }
         
         /// <summary>
         /// Processes data in the payload object into the database as an upsert/delta
         /// </summary>
-        /// <param name="payload">Holds all the data entities that need to be imported</param>
-        public void UpdateUcasData(UcasPayload payload)
+        public void UpdateUcasData()
         {
-            var allInstitutions = new List<Institution>();
             var allCampusesGrouped = payload.Campuses.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
             var ucasSubjects = payload.Subjects.ToList();
             var pgdeCourses = _context.PgdeCourses.ToList();
-            var allSubjects = _context.Subjects.ToList();
 
             var ucasCourseGroupings = payload.Courses.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
             var ucasCourseSubjectGroupings = payload.CourseSubjects.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
 
             _logger.Warning("Beginning UCAS import");
-            _logger.Information($"Upserting {allInstitutions.Count()} institutions");
+            _logger.Information($"Upserting {payload.Institutions.Count()} institutions");
+
+            var allSubjects = new Dictionary<string, Subject>();
+            MigrateOnce("upsert subjects", () => {
+                foreach(var s in payload.Subjects)
+                {
+                    var savedSubject = UpsertSubject(new Subject {
+                        SubjectName = s.SubjectDescription,
+                        SubjectCode = s.SubjectCode
+                    });
+                    allSubjects[savedSubject.SubjectCode] = savedSubject;
+                }
+            });
+
+            var allInstitutions = new Dictionary<string, Institution>();
+            MigratePerInstitution("upsert institutions", inst => {
+                var savedInst = UpsertInstitution(ToInstitution(inst));
+                _context.Save();
+                allInstitutions[savedInst.InstCode] = savedInst;
+            });
+
+            var courseLoader = new CourseLoader(allInstitutions, allSubjects, pgdeCourses);
+
+
+            MigratePerInstitution("drop-and-create sites and courses", ucasInst => {
+                var inst = allInstitutions[ucasInst.InstCode];
+
+                DeleteForInstitution(inst.InstCode);
+                _context.Save();
+
+                var campuses = allCampusesGrouped.ContainsKey(inst.InstCode) ? allCampusesGrouped[inst.InstCode] : null;
+                IEnumerable<Site> sites = new List<Site>();
+                if (campuses != null)
+                {
+                    inst.Sites = inst.Sites ?? new Collection<Site>();
+                    sites = campuses.Select(x => ToSite(x)).ToList();
+                    foreach(var site in (IEnumerable<Site>) sites)
+                    {
+                        inst.Sites.Add(site);                                
+                        site.Institution = inst;
+                    }
+                    _context.Save();
+                }                
+
+                var allCoursesForThisInstitution = courseLoader.LoadCourses(
+                    inst,
+                    ucasCourseGroupings.GetValueOrDefault(inst.InstCode).AsEnumerable() ?? new List<UcasCourse>(), 
+                    ucasCourseSubjectGroupings.GetValueOrDefault(inst.InstCode).AsEnumerable() ?? new List<UcasCourseSubject>(),
+                    sites);
+
+                inst.Courses = new Collection<Course>(allCoursesForThisInstitution.ToList());       
+                _context.Save();
+            });
+            
+            _logger.Warning("Completed UCAS import");
+        }
+
+        private Subject UpsertSubject(Subject subject)
+        {
+            var entity = _context.Subjects.Where(x => x.SubjectCode == subject.SubjectCode).FirstOrDefault();
+            if (entity == null)
+            {
+                _context.Add(subject);
+                return subject;
+            }
+            else
+            {
+                entity.SubjectName = subject.SubjectName;
+                return entity;
+            }
+        }
+
+        private void MigratePerInstitution(string operationName, Action<UcasInstitution> action)
+        {            
+            int processed = 0;   
+
+            _logger.Information($"Begin operation \"{operationName}\" on {payload.Institutions.Count()} institutions");
+
             foreach (var inst in payload.Institutions)
             {
                 using (var transaction = (_context as DbContext).Database.BeginTransaction())
                 {
                     try 
                     {
-                        var savedInst = UpsertInstitution(ToInstitution(inst));
-                        _context.Save();
-                        allInstitutions.Add(savedInst);
+                        action(inst);
+                        transaction.Commit();
                     }                    
                     catch (Exception e)
                     {
                         transaction.Rollback();
-                        _logger.Error(e, $"UCAS import failed to update institution {inst.InstName} [{inst.InstCode}]");
+                        _logger.Error(e, $"UCAS import operation \"{operationName}\"failed to update institution {inst.InstName} [{inst.InstCode}]");
                     }
-                }
-            }
-
-            int processed = 0;            
-            foreach (var inst in allInstitutions)
-            {
-                using (var transaction = (_context as DbContext).Database.BeginTransaction())
-                {
-                    try 
-                    {
-                        DeleteForInstitution(inst.InstCode);
-                        _context.Save();
-
-                        var campuses = allCampusesGrouped.ContainsKey(inst.InstCode) ? allCampusesGrouped[inst.InstCode] : null;
-                        IEnumerable<Site> sites = new List<Site>();
-                        if (campuses != null)
-                        {
-                            inst.Sites = inst.Sites ?? new Collection<Site>();
-                            sites = campuses.Select(x => ToSite(x)).ToList();
-                            foreach(var site in (IEnumerable<Site>) sites)
-                            {
-                                inst.Sites.Add(site);                                
-                                site.Institution = inst;
-                            }
-                            _context.Save();
-                        }
-                        
-
-                        IEnumerable<UcasCourse> ucasCourses = ucasCourseGroupings.GetValueOrDefault(inst.InstCode);
-                        IEnumerable<UcasCourseSubject> ucasCourseSubjects = ucasCourseSubjectGroupings.GetValueOrDefault(inst.InstCode);
-
-                        var allSubjectsCountBefore = allSubjects.Count;
-
-                        var allCoursesForThisInstitution = _courseLoader.LoadCourses(
-                            ucasCourses ?? new List<UcasCourse>(), 
-                            ucasCourseSubjects ?? new List<UcasCourseSubject>(), 
-                            ucasSubjects, 
-                            pgdeCourses, 
-                            ref allSubjects,
-                            sites, 
-                            allInstitutions);
-                        
-                        if (allSubjects.Count > allSubjectsCountBefore)
-                        {
-                            for (int i = allSubjectsCountBefore; i < allSubjects.Count; i++)
-                            {
-                                _context.Subjects.Add(allSubjects[i]);
-                            }
-                            _context.Save();
-                        }
-
-                        
-                        AddForInstitution(allCoursesForThisInstitution, inst);
-                        _context.Save();
-                        
-                        transaction.Commit();
-                    }
-                    catch (Exception e)
-                    {
-                        transaction.Rollback();
-                        _logger.Error(e, $"UCAS import failed to update institution {inst.InstName} [{inst.InstCode}]");
-                    }
-                }
+                }                
                 if (++processed % 100 == 0)
                 {
-                    _logger.Information($"Upserted {processed} institutions so far");
+                    _logger.Information($"Ran operation \"{operationName}\" on {processed} institutions so far");
                 }
             }
-            
-            _logger.Warning("Completed UCAS import");
+            _logger.Information($"Finished operation \"{operationName}\"");
+        }
+
+        private void MigrateOnce(string operationName, Action action)
+        {            
+            _logger.Information($"Begin operation \"{operationName}\"");
+
+            using (var transaction = (_context as DbContext).Database.BeginTransaction())
+            {
+                try 
+                {
+                    action();
+                    transaction.Commit();
+                }                    
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    _logger.Error(e, $"UCAS import operation \"{operationName}\"failed");
+                }
+            }       
+            _logger.Information($"Finished operation \"{operationName}\"");
         }
 
         private Site ToSite(UcasCampus x)
@@ -189,15 +219,6 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         {
             _context.Courses.RemoveRange(_context.Courses.Where(x => x.Institution.InstCode == instCode));
             _context.Sites.RemoveRange(_context.Sites.Where(x => x.Institution.InstCode == instCode));
-        }
-
-        private void AddForInstitution(IEnumerable<Course> courses, Institution inst)
-        {
-            inst.Courses = inst.Courses ?? new Collection<Course>();
-            foreach(var course in courses)
-            {
-                inst.Courses.Add(course);
-            }
         }
     }
 }

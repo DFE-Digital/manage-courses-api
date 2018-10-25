@@ -345,7 +345,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             {
                 Context.Subjects.Add(new Subject
                 {
-                    SubjectName = "subject " + counter
+                    SubjectName = "subject " + counter,
+                    SubjectCode = "SC"+counter
                 });
             }
         }
