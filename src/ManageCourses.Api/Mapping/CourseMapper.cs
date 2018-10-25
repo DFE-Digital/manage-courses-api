@@ -85,6 +85,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     IsSalaried = isSalaried
                 },
                 IncludesPgce = MapQualification(ucasCourseData.Qualification),
+                HasVacancies = ucasCourseData.HasVacancies,
                 Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(sites
                     .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase) && String.Equals(school.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
@@ -95,7 +96,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                             Location = new Location
                             {
                                 Address = MapAddress(school.Site)
-                            }
+                            },
+                            VacStatus = school.VacStatus
                         }
                     ).ToList()),
                 CourseSubjects = subjects,

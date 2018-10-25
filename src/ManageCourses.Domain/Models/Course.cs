@@ -57,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         /// </summary>
         /// <value></value>
         [NotMapped]
-        public bool HasVacancies { get => CourseSites.Any(s => s.VacStatus == "B" || s.VacStatus == "F" || s.VacStatus == "P");}
+        public bool HasVacancies { get => CourseSites?.Any(s => s.VacStatus == "B" || s.VacStatus == "F" || s.VacStatus == "P") ?? false;}
 
 
         private string GetCourseVariantType()
