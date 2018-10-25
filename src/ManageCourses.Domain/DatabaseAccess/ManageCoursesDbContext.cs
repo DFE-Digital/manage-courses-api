@@ -91,10 +91,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(s => s.CourseSubjects)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Subject>()
-                .HasIndex(x => x.SubjectCode)
-                .IsUnique();
-
             modelBuilder.Entity<NctlOrganisation>()
                 .HasOne(x => x.Organisation)                
                 .WithMany(x => x.NctlOrganisations)

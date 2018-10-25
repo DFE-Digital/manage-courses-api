@@ -343,10 +343,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             for (var counter = 1; counter <= numRecords; counter++)
             {
-                var subjectCode = "SC" + counter;
                 Context.Subjects.Add(new Subject
                 {
-                    SubjectCode = subjectCode,
                     SubjectName = "subject " + counter
                 });
             }

@@ -53,7 +53,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             // act
             var courseRecords = new List<UcasCourse> { blankUcasCourse };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(), new List<Site>{new Site()}, new List<Institution>()).Single();
+            var foo = new List<Subject>();
+            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), ref foo, new List<Site>{new Site()}, new List<Institution>()).Single();
 
             // assert
             manageApiCourse.HasVacancies.Should().Be(false, "because there is only one course and it has no vacancies");
@@ -72,7 +73,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             // act
             var courseRecords = new List<UcasCourse> { ucasCourseWithoutVacancy, ucasCourseWithVacancy };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject> {new Subject {}}, new List<Site>{new Site()}, new List<Institution>()).Single();
+            var foo = new List<Subject>();
+            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), ref foo, new List<Site>{new Site()}, new List<Institution>()).Single();
 
             // assert
             manageApiCourse.HasVacancies.Should().Be(true, "because there's one full time course");
@@ -90,7 +92,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             // act
             var courseRecords = new List<UcasCourse> { blankUcasCourse };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject> {new Subject {}}, new List<Site>{new Site()}, new List<Institution>()).Single();
+            var foo = new List<Subject>();
+            var manageApiCourse = courseLoader.LoadCourses(courseRecords, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), ref foo, new List<Site>{new Site()}, new List<Institution>()).Single();
 
             // assert
             manageApiCourse.Sites.Should().HaveCount(1, "There's one campus");
@@ -125,7 +128,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
                 new Site { Institution = institution }
             };
 
-            var res = sut.LoadCourses(new List<UcasCourse> {loc1, loc2}, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(), sites, institutions).Single();
+            List<Subject> foo = new List<Subject>();
+            var res = sut.LoadCourses(new List<UcasCourse> { loc1, loc2}, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), ref foo, sites, institutions).Single();
 
             res.AccreditingInstitution.InstCode.Should().Be("RIGHT_ACC");
             res.Institution.InstCode.Should().Be("RIGHT_INST");
@@ -154,7 +158,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             {
                 providers.Add(new Institution { InstCode = course.AccreditingProvider });
             }
-            return sut.LoadCourses(new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), new List<Subject>(),  new List<Site>{new Site {Institution = institution, Code = course.CampusCode}}, providers).Single();
+            List<Subject> foo = new List<Subject>();
+            return sut.LoadCourses(new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<UcasSubject>(), new List<PgdeCourse>(), ref foo,  new List<Site> { new Site { Institution = institution, Code = course.CampusCode}}, providers).Single();
         }
 
         private static UcasCourse GetBlankUcasCourse()

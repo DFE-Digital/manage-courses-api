@@ -25,7 +25,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         /// <param name="enrichmentMetadata"></param>
         /// <param name="pgdeCourses"></param>
         /// <returns></returns>        
-        public List<Course> LoadCourses(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<UcasSubject> ucasSubjects, IEnumerable<PgdeCourse> pgdeCourses, IEnumerable<Subject> allSubjects, IEnumerable<Site> allSites, IEnumerable<Institution> allInstitutions)
+        public List<Course> LoadCourses(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<UcasSubject> ucasSubjects, IEnumerable<PgdeCourse> pgdeCourses, ref List<Subject> allSubjects, IEnumerable<Site> allSites, IEnumerable<Institution> allInstitutions)
         {
             var returnCourses = new List<Course>();
             
@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                     courseSubjectGroupings.GetValueOrDefault(grouping.Key) ?? (IEnumerable<UcasCourseSubject>) new List<UcasCourseSubject>(),
                     ucasSubjects,
                     pgdeCoursesSimple.Contains(grouping.Key),
-                    allSubjects,
+                    ref allSubjects,
                     allSites,
                     instDictionary));
             }            
@@ -59,7 +59,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         /// <param name="courseRecords">List of UcasCourse records for a single course (no really a course, not the course-campus combination in ucas-land)</param>
         /// <param name="isPgde"></param>
         /// <returns></returns>
-        private Course LoadCourse(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<UcasSubject> ucasSubjects, bool isPgde, IEnumerable<Subject> allSubjects, IEnumerable<Site> allSites, IDictionary<string, Institution> allInstitutions)
+        private Course LoadCourse(IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<UcasSubject> ucasSubjects, bool isPgde, ref List<Subject> allSubjects, IEnumerable<Site> allSites, IDictionary<string, Institution> allInstitutions)
         {
             var returnCourse = new Course();
             if (courseRecords.Count() > 0)
@@ -93,10 +93,25 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 
                 var ucasSubjectsForThisCourse = courseSubjects.Select(x => ucasSubjects.Single(y => x.SubjectCode == y.SubjectCode).SubjectDescription);
 
-                var mappedSubjects = subjectMapper.MapToSecondarySubjects(organisationCourseRecord.CrseTitle, ucasSubjectsForThisCourse)
-                    .Select(s => new CourseSubject { Subject = allSubjects.Single(x => x.SubjectName == s)});
+                var mappedSubjects = subjectMapper.MapToSecondarySubjects(organisationCourseRecord.CrseTitle, ucasSubjectsForThisCourse);
+                var courseSubjectsForThisCourse = new List<CourseSubject>();
 
-                returnCourse.CourseSubjects = new Collection<CourseSubject>(mappedSubjects.ToList());
+                foreach(var subject in mappedSubjects)
+                {
+                    var existingSubject = allSubjects.SingleOrDefault(x => x.SubjectName == subject);
+                    if(existingSubject != null)
+                    {
+                        courseSubjectsForThisCourse.Add(new CourseSubject { Subject = existingSubject });
+                    }
+                    else
+                    {
+                        var newSubject = new Subject{ SubjectName = subject };
+                        allSubjects.Add(newSubject);
+                        courseSubjectsForThisCourse.Add(new CourseSubject { Subject = newSubject });
+                    }
+                }
+
+                returnCourse.CourseSubjects = new Collection<CourseSubject>(courseSubjectsForThisCourse);
                 returnCourse.CourseSites = new Collection<CourseSite>(courseRecords.Select(x => new CourseSite
                 { 
                     Site = allSites.Single(y => y.Institution?.InstCode == x.InstCode && y.Code == x.CampusCode),                    

@@ -69,7 +69,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     CourseSubjects = new List<UcasCourseSubject>(courseSubjects),
                     Campuses = new List<UcasCampus>(campuses),
                     CourseNotes = new List<UcasCourseNote>(courseNotes),
-                    NoteTexts = new List<UcasNoteText>(noteTexts)
+                    NoteTexts = new List<UcasNoteText>(noteTexts),
+                    Subjects = new List<UcasSubject>(subjects)
                 };
 
                 var ucasDataMigrator = new UcasDataMigrator(GetDbContext(configuration), logger);
