@@ -90,9 +90,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 nullable: false,
                 defaultValue: 0);
 
-            //migrationBuilder.Sql("UPDATE site SET institution_id = b.id FROM site a INNER JOIN institution b on b.inst_code = a.inst_code");
+            migrationBuilder.Sql("UPDATE site a SET institution_id = b.id FROM institution b WHERE b.inst_code = a.inst_code");
 
-            migrationBuilder.Sql("DELETE FROM site where 1=1");
             migrationBuilder.DropColumn(
                 name: "inst_code",
                 table: "site");
@@ -103,7 +102,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 table: "nctl_organisation",
                 nullable: true);
 
-            migrationBuilder.Sql("UPDATE nctl_organisation SET mc_organisation_id = b.id FROM nctl_organisation a INNER JOIN mc_organisation b on b.org_id = a.org_id");
+            migrationBuilder.Sql("UPDATE nctl_organisation a SET mc_organisation_id = b.id FROM mc_organisation b WHERE b.org_id = a.org_id");
 
             migrationBuilder.DropColumn(
                 name: "org_id",
@@ -120,8 +119,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 table: "mc_organisation_user",
                 nullable: true);
 
-            migrationBuilder.Sql("UPDATE mc_organisation_user SET mc_organisation_id = b.id FROM mc_organisation_user a INNER JOIN mc_organisation b on b.org_id = a.org_id");
-            migrationBuilder.Sql("UPDATE mc_organisation_user SET mc_user_id = b.id FROM mc_organisation_user a INNER JOIN mc_user b on b.email = a.email");
+            migrationBuilder.Sql("UPDATE mc_organisation_user a SET mc_organisation_id = b.id, mc_user_id = c.id FROM mc_organisation b, mc_user c WHERE c.email = a.email AND b.org_id = a.org_id ");
 
             migrationBuilder.DropColumn(
                 name: "email",
@@ -142,9 +140,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 table: "mc_organisation_institution",
                 nullable: true);
 
-            migrationBuilder.Sql("UPDATE mc_organisation_institution SET mc_organisation_id = b.id FROM mc_organisation_institution a INNER JOIN mc_organisation b on b.org_id = a.org_id");
-            migrationBuilder.Sql("UPDATE mc_organisation_institution SET institution_id = b.id FROM mc_organisation_institution a INNER JOIN institution b on b.inst_code = a.inst_code");
-
+            migrationBuilder.Sql("UPDATE mc_organisation_institution a SET mc_organisation_id = b.id, institution_id = c.id FROM mc_organisation b, institution c WHERE c.inst_code = a.inst_code AND b.org_id = a.org_id");
 
             migrationBuilder.DropColumn(
                 name: "inst_code",
@@ -165,9 +161,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 nullable: false,
                 defaultValue: 0);
 
-            migrationBuilder.Sql("UPDATE course SET accrediting_institution_id = b.id FROM course a INNER JOIN institution b on b.inst_code = a.accrediting_inst_code");
-            migrationBuilder.Sql("UPDATE course SET institution_id = b.id FROM course a INNER JOIN institution b on b.inst_code = a.inst_code");
-
+            migrationBuilder.Sql("UPDATE course a SET accrediting_institution_id = b.id, institution_id = c.id FROM institution b, institution c WHERE c.inst_code = a.inst_code AND b.inst_code = a.accrediting_inst_code");
 
             migrationBuilder.DropColumn(
                 name: "accrediting_inst_code",
