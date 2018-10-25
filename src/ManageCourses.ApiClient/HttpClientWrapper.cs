@@ -58,25 +58,25 @@ namespace GovUk.Education.ManageCourses.ApiClient
             }
         }
 
-        public async Task<HttpResponseMessage> PutAsync(Uri queryUri, StringContent content)
-        {
-            var msg = $"API PUT Failed uri {queryUri}";
+        // public async Task<HttpResponseMessage> PutAsync(Uri queryUri, StringContent content)
+        // {
+        //     var msg = $"API PUT Failed uri {queryUri}";
 
-            try
-            {
-                var result = await wrapped.PutAsync(queryUri, content);
-                await Guard(result, msg);
-                return result;
-            }
-            catch(ManageCoursesApiException ex)
-            {
-                throw;
-            }
-            catch(Exception ex)
-            {
-                throw new ManageCoursesApiException(msg, ex);
-            }
-        }
+        //     try
+        //     {
+        //         var result = await wrapped.PutAsync(queryUri, content);
+        //         await Guard(result, msg);
+        //         return result;
+        //     }
+        //     catch(ManageCoursesApiException ex)
+        //     {
+        //         throw;
+        //     }
+        //     catch(Exception ex)
+        //     {
+        //         throw new ManageCoursesApiException(msg, ex);
+        //     }
+        // }
 
         private async Task Guard(HttpResponseMessage result, string msg)
         {
