@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" Private="false" PrivateAssets="all" />
+    <ProjectReference Include="..\ManageCourses.Domain\ManageCourses.Domain.csproj"  IncludeAssets="compile" />
   </ItemGroup>
   <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion" >
     <PropertyGroup Condition="'$(GitBranch)'=='master'">
