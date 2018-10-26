@@ -3,13 +3,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <RootNamespace>GovUk.Education.ManageCourses.CourseExporterUtil</RootNamespace>    
+    <RootNamespace>GovUk.Education.ManageCourses.CourseExporterUtil</RootNamespace>
     <UserSecretsId>manage-courses-api-config</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.2" />
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
     <PackageReference Include="DFE.SearchAndCompare.Domain" Version="0.10.3-beta" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
@@ -17,21 +15,21 @@
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="2.6.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
-    
+
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    
+
     <None Update="settings.job">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    
+
     <None Update="webjob.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    
+
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" />
     <ProjectReference Include="..\ManageCourses.ApiClient\ManageCourses.ApiClient.csproj" />
