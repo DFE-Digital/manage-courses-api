@@ -36,7 +36,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
         }
         [Test]
         public async Task EnrichmentPublishTest()
@@ -50,7 +50,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
 
             var result = await apiClient.Publish_PublishCoursesToSearchAndCompareAsync(ucasInstitutionCode);
             result.Should().BeTrue();
@@ -101,7 +101,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
 
             var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
 

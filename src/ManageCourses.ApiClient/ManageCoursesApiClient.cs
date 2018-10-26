@@ -35,6 +35,12 @@ namespace GovUk.Education.ManageCourses.ApiClient
             if (_apiUri.EndsWith('/')) { _apiUri = _apiUri.Remove(_apiUri.Length - 1); }
         }
 
+        private void PostObjects(string apiPath, object payload)
+        {
+            var uri = GetUri(apiPath);
+            PostObjects(uri, payload);
+
+        }
         private void PostObjects(Uri queryUri, object payload)
         {
 
@@ -105,9 +111,9 @@ namespace GovUk.Education.ManageCourses.ApiClient
     {
         return GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
     }
-    public System.Threading.Tasks.Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
+    public void Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
     {
-        return System.Threading.Tasks.Task.CompletedTask;
+        PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
     }
     public System.Threading.Tasks.Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
     {
