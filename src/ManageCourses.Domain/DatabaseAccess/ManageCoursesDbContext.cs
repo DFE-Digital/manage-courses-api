@@ -43,6 +43,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasIndex(ui => ui.InstCode)
                 .IsUnique();
 
+            modelBuilder.Entity<Subject>()
+                .HasIndex(s => s.SubjectCode)
+                .IsUnique();
+
             modelBuilder.Entity<Site>()
                 .HasIndex(s => new {s.InstitutionId, s.Code})
                 .IsUnique();
@@ -60,7 +64,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(ui => ui.OrganisationInstitutions);
 
             modelBuilder.Entity<Course>()
-                .HasIndex(x => new { x.InstitutionId, x.Id } )
+                .HasIndex(x => new { x.InstitutionId, x.CourseCode } )
                 .IsUnique();
 
             modelBuilder.Entity<Course>()
