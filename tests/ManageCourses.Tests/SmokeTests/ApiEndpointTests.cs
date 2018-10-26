@@ -175,7 +175,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
             var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite";
-            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.Unauthorized)
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.Unauthorized);
         }
 
         private void SetupSmokeTestData()
