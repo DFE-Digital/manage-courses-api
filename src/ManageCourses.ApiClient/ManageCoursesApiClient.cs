@@ -171,7 +171,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
     }
     public async Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
     {
-        return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/organisation/{instCode}/{courseCode}");
+        return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/searchandcompare/{instCode}/{courseCode}");
     }
 
 
