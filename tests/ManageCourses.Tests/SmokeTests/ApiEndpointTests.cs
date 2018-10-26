@@ -39,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
         }
         [Test]
         public async Task EnrichmentPublishTest()
@@ -53,7 +53,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
 
             var result = await apiClient.Publish_PublishCoursesToSearchAndCompareAsync(ucasInstitutionCode);
             result.Should().BeTrue();
@@ -69,7 +69,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
 
 //            var result = await apiClient(ucasInstitutionCode, ucasCourseCode);
 //            result.Should().BeTrue();
@@ -85,7 +85,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
 
             var result = await apiClient.Publish_GetSearchAndCompareCourseAsync(ucasInstitutionCode, ucasCourseCode);
 
@@ -104,7 +104,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
 
             var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
 
@@ -122,7 +122,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
 
             var loadedEnrichment = await apiClient.Enrichment_GetCourseAsync(ucasInstitutionCode, ucasCourseCode);
 
@@ -133,7 +133,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
 
         [Test]
-        public void Invite()
+        public async Task Invite()
         {
             var accessToken = TestConfig.ApiKey;
 
@@ -145,7 +145,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Context.Save();
 
             // does not throw... nb. Assert.DoesNotThrow does not support async voids
-            client.Invite_IndexAsync(Email);
+           await client.Invite_IndexAsync(Email);
         }
 
         [Test]
