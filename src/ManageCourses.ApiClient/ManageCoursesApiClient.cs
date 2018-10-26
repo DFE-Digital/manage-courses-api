@@ -75,7 +75,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
         private async Task<T> GetObjects<T>(Uri queryUri)
         {
             T objects = default(T);
-            var response = _httpClient.GetAsync(queryUri).Result;
+            var response = await _httpClient.GetAsync(queryUri);
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
