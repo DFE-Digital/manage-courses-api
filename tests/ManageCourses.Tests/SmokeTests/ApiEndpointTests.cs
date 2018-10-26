@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using FluentAssertions;
 using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Api.Model;
@@ -158,7 +159,10 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
-            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite";
+            var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
+            nameValueCollection["email"] = Email;
+
+            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite?{nameValueCollection.ToString()}";
 
             act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.NotFound);
         }
@@ -174,7 +178,10 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
-            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite";
+            var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
+            nameValueCollection["email"] = Email;
+
+            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite?{nameValueCollection.ToString()}";
             act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.Unauthorized);
         }
 
