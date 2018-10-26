@@ -85,7 +85,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             var ucasInstData = _dataService.GetUcasInstitutionForUser(name, instCode);
             var orgEnrichmentData = _enrichmentservice.GetInstitutionEnrichment(instCode, name);
-            var ucasCourseData = _dataService.GetCourse(name, instCode, courseCode);
+            var ucasCourseData = _dataService.GetCourseForUser(name, instCode, courseCode);
             var courseEnrichmentData = _enrichmentservice.GetCourseEnrichment(instCode, courseCode, name);
             if (ucasInstData == null || ucasCourseData == null)
             {

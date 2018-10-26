@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 throw new InvalidOperationException($"Accept terms attempted on unauthorised user");
             }
 
-            var user = context.GetMcUsers(email).SingleOrDefault();
+            var user = context.GetUsers(email).SingleOrDefault();
             if (user == null)
             {
                 return NotFound();

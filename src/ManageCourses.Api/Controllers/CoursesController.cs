@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ManageCourses.Api.Data;
+﻿using System.Collections.Generic;
+using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Services;
@@ -23,13 +24,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>a single course</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [Route("{instCode}/course/{ucasCode}")]
+        [Route("{instCode}/course/{courseCode}")]
         [ProducesResponseType(typeof(Course), 200)]
         [ProducesResponseType(404)]
-        public ActionResult Get(string instCode, string ucasCode)
+        public ActionResult Get(string instCode, string courseCode)
         {
             var name = this.User.Identity.Name;
-            var course = _dataService.GetCourse(name, instCode, ucasCode);
+            var course = _dataService.GetCourseForUser(name, instCode, courseCode);
 
             if (course == null)
             {
@@ -47,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}")]
-        [ProducesResponseType(typeof(InstitutionCourses), 200)]
+        [ProducesResponseType(typeof(List<Course>), 200)]
         [ProducesResponseType(404)]
         public ActionResult GetAll(string instCode)
         {
@@ -58,7 +59,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 return NotFound();
             };
 
-            var courses = _dataService.GetCourses(name, instCode);
+            var courses = _dataService.GetCoursesForUser(name, instCode);
 
             return Ok(courses);
         }

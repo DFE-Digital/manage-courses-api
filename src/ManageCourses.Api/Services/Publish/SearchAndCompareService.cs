@@ -78,7 +78,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             }
             else
             {
-                courses.AddRange(_dataService.GetCourses(email, instCode).Courses
+                courses.AddRange(_dataService.GetCoursesForUser(email, instCode)
                     .Select(x => GetCourse(instCode, x.CourseCode, email, ucasInstData, orgEnrichmentData)));
             }
 
@@ -110,7 +110,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
 
         private Course GetCourse(string instCode, string courseCode, string email, Institution ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
         {
-            var ucasCourseData = _dataService.GetCourse(email, instCode, courseCode);
+            var ucasCourseData = _dataService.GetCourseForUser(email, instCode, courseCode);
             var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(instCode, courseCode, email);
 
             var courseToReturn = _courseMapper.MapToSearchAndCompareCourse(

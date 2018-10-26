@@ -193,7 +193,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "about this training provider accrediting",//CourseDetailsSections.AboutTheAccreditingProvider,
-                Text = GetAccreditingProviderEnrichment(ucasCourseData?.AccreditingInstitution?.InstCode, orgEnrichmentModel)
+                Text = GetAccreditingInstitutionEnrichment(ucasCourseData?.AccreditingInstitution?.InstCode, orgEnrichmentModel)
             });
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
@@ -230,9 +230,9 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 : courseLength;
         }
 
-        private string GetAccreditingProviderEnrichment(string accreditingProviderId, InstitutionEnrichmentModel enrichmentModel)
+        private string GetAccreditingInstitutionEnrichment(string accreditingInstCode, InstitutionEnrichmentModel enrichmentModel)
         {
-            if (string.IsNullOrWhiteSpace(accreditingProviderId))
+            if (string.IsNullOrWhiteSpace(accreditingInstCode))
             {
                 return "";
             }
@@ -242,7 +242,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 return "";
             }
 
-            var enrichment = enrichmentModel.AccreditingProviderEnrichments.FirstOrDefault(x => x.UcasInstitutionCode == accreditingProviderId);
+            var enrichment = enrichmentModel.AccreditingProviderEnrichments.FirstOrDefault(x => x.UcasInstitutionCode == accreditingInstCode);
 
             if (enrichment == null)
             {

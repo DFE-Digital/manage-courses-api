@@ -143,7 +143,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<Session> Sessions { get;  set; }
         public DbSet<PgdeCourse> PgdeCourses { get; set; }
 
-        public List<Course> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
+        public List<Course> GetCourse(string instCode, string courseCode, string email)
         {
             var ucasCourses = Courses.FromSql(@"
                     select c.* from course c
@@ -153,8 +153,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     join organisation_user ou on ou.organisation_id = o.id 
                     join ""user"" u on u.id = ou.user_id 
                     where lower(i.inst_code)=lower(@instCode) 
-                    and lower(c.course_code)=lower(@ucasCode) 
-                    and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
+                    and lower(c.course_code)=lower(@courseCode) 
+                    and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Institution)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingInstitution)
@@ -163,7 +163,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
             return ucasCourses;
         }
-        public List<Course> GetUcasCourseRecordsByInstCode(string instCode, string email)
+        public List<Course> GetCoursesByInstCode(string instCode, string email)
         {
             var ucasCourses = Courses.FromSql(
                     $"select c.* from course c " +
@@ -213,7 +213,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return userOrganisations;
         }
 
-        public IQueryable<User> GetMcUsers(string email)
+        public IQueryable<User> GetUsers(string email)
         {
             var users = Users.FromSql(
                 $"select * from \"user\" " +
