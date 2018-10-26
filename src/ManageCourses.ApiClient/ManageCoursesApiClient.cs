@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using GovUk.Education.ManageCourses.Api.Model;
@@ -34,20 +35,32 @@ namespace GovUk.Education.ManageCourses.ApiClient
             if (_apiUri.EndsWith('/')) { _apiUri = _apiUri.Remove(_apiUri.Length - 1); }
         }
 
-        private void PostObjects(string apiPath, object payload)
+        private void PostObjects(string apiPath, object payload, NameValueCollection nameValueCollection = null)
         {
-            var uri = GetUri(apiPath);
+            var uri = GetUri($"{apiPath}", nameValueCollection);
             PostObjects(uri, payload);
-
         }
-        private void PostObjects(Uri queryUri, object payload)
+
+        private T PostObjects<T>(string apiPath, object payload, NameValueCollection nameValueCollection = null)
         {
+            T objects = default(T);
+            var uri = GetUri($"{apiPath}", nameValueCollection);
+            var response = PostObjects(uri, payload);
+             if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = response.Content.ReadAsStringAsync().Result;
+                objects = JsonConvert.DeserializeObject<T>(jsonResponse);
+            }
+            return objects;
+        }
 
-            var payloadJson = JsonConvert.SerializeObject(payload, _serializerSettings);
-
+        private HttpResponseMessage PostObjects(Uri queryUri, object payload)
+        {
+            var payloadJson = payload != null ? JsonConvert.SerializeObject(payload, _serializerSettings) : string.Empty;
             var payloadStringContent = new StringContent(payloadJson, Encoding.UTF8, "application/json" );
 
             var response = _httpClient.PostAsync(queryUri, payloadStringContent).Result;
+            return response;
         }
 
         private T GetObjects<T>(string apiPath)
@@ -70,13 +83,15 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return objects;
         }
 
-        private Uri GetUri(string apiPath)
+        private Uri GetUri(string apiPath, NameValueCollection nameValueCollection = null)
         {
             var uri = new Uri(_apiUri);
             var builder = new UriBuilder(uri);
             if (!builder.Path.EndsWith('/') && !apiPath.StartsWith('/')) { builder.Path += '/'; }
             else if (builder.Path.EndsWith('/') && apiPath.StartsWith('/')) { apiPath = apiPath.Substring(1); }
             builder.Path += apiPath;
+            var queryString = nameValueCollection != null ? nameValueCollection.ToString() : string.Empty;
+            builder.Query = queryString;
             return builder.Uri;
         }
 
@@ -114,18 +129,21 @@ namespace GovUk.Education.ManageCourses.ApiClient
     {
         PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
     }
-    public System.Threading.Tasks.Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
+    public async System.Threading.Tasks.Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
     {
-        return null;
+        return GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
     }
-    public System.Threading.Tasks.Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
+    public void Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
     {
-        return System.Threading.Tasks.Task.CompletedTask;
+        PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model);
     }
 
-    public System.Threading.Tasks.Task Invite_IndexAsync(string email)
+    public void Invite_IndexAsync(string email)
     {
-        return System.Threading.Tasks.Task.CompletedTask;
+        var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
+        nameValueCollection[nameof(email)] = email;
+
+        PostObjects($"invite", null, nameValueCollection);
     }
 
     // No coverage
@@ -145,13 +163,13 @@ namespace GovUk.Education.ManageCourses.ApiClient
     // {
     //     return null;
     // }
-    public System.Threading.Tasks.Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
+    public async System.Threading.Tasks.Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
     {
-        return null;
+        return PostObjects<bool>($"publish/organisation/{instCode}", null);
     }
-    public System.Threading.Tasks.Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
+    public async System.Threading.Tasks.Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
     {
-        return null;
+        return GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/organisation/{instCode}/{courseCode}");
     }
 
 

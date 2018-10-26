@@ -66,7 +66,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
 
 //            var result = await apiClient(ucasInstitutionCode, ucasCourseCode);
 //            result.Should().BeTrue();
@@ -82,7 +82,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
 
             var result = await apiClient.Publish_GetSearchAndCompareCourseAsync(ucasInstitutionCode, ucasCourseCode);
 
@@ -119,7 +119,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
 
             var loadedEnrichment = await apiClient.Enrichment_GetCourseAsync(ucasInstitutionCode, ucasCourseCode);
 
@@ -130,7 +130,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
 
         [Test]
-        public async Task Invite()
+        public void Invite()
         {
             var accessToken = TestConfig.ApiKey;
 
@@ -142,7 +142,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Context.Save();
 
             // does not throw... nb. Assert.DoesNotThrow does not support async voids
-            await client.Invite_IndexAsync(Email);
+            client.Invite_IndexAsync(Email);
         }
 
         [Test]
