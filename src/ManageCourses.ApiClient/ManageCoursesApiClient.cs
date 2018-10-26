@@ -97,15 +97,22 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return builder.Uri;
         }
 
+/*
+
+
+ManageApi.cs(98,20): error CS0103: The name 'deserializedCourse' does not exist in the current context [C:\repos\manage-courses-ui\src\ui\ManageCoursesUi.csproj]
+ManageApi.cs(104,43): error CS1061: 'ManageCoursesApiClient' does not contain a definition for 'Publish_PublishCourseToSearchAndCompareAsync' and no accessible extension method 'Publish_PublishCourseToSearchAndCompareAsync' accepting a first argument of type 'ManageCoursesApiClient' could be found (are you missing a using directive or an assembly reference?) [C:\repos\manage-courses-ui\src\ui\ManageCoursesUi.csproj]
+ */
+
     // No coverage
-    // public Task AcceptTerms_IndexAsync()
-    // {
-    //     return Task.CompletedTask;
-    // }
-    // public Task AccessRequest_IndexAsync(AccessRequest request)
-    // {
-    //     return Task.CompletedTask;
-    // }
+    public Task AcceptTerms_IndexAsync()
+    {
+        return Task.CompletedTask;
+    }
+    public Task AccessRequest_IndexAsync(AccessRequest request)
+    {
+        return Task.CompletedTask;
+    }
     // public Task Admin_ActionAccessRequestAsync(int accessRequestId)
     // {
     //     return Task.CompletedTask;
@@ -114,14 +121,14 @@ namespace GovUk.Education.ManageCourses.ApiClient
     // {
     //     return Task.CompletedTask;
     // }
-    // public Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
-    // {
-    //     return null;
-    // }
-    // public Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
-    // {
-    //     return null;
-    // }
+    public Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
+    {
+        return null;
+    }
+    public Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
+    {
+        return null;
+    }
 
     public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
     {
@@ -149,22 +156,22 @@ namespace GovUk.Education.ManageCourses.ApiClient
     }
 
     // No coverage
-    // public Task<UserOrganisation> Organisations_GetAsync(string instCode)
-    // {
-    //     return null;
-    // }
+    public Task<UserOrganisation> Organisations_GetAsync(string instCode)
+    {
+        return null;
+    }
     // public Task<Domain.Models.Institution> Organisations_GetUcasInstitutionAsync(string instCode)
     // {
     //     return null;
     // }
-    // public Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync()
-    // {
-    //     return null;
-    // }
-    // public Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
-    // {
-    //     return null;
-    // }
+    public Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync()
+    {
+        return null;
+    }
+    public Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
+    {
+        return null;
+    }
     public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
     {
         return await PostObjects<bool>($"publish/organisation/{instCode}", null);
