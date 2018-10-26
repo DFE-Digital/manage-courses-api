@@ -2,11 +2,12 @@
 using System.Collections.Specialized;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
 using GovUk.Education.ManageCourses.Api.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Web;
-using System.Text;
 
 namespace GovUk.Education.ManageCourses.ApiClient
 {
@@ -35,48 +36,49 @@ namespace GovUk.Education.ManageCourses.ApiClient
             if (_apiUri.EndsWith('/')) { _apiUri = _apiUri.Remove(_apiUri.Length - 1); }
         }
 
-        private void PostObjects(string apiPath, object payload, NameValueCollection nameValueCollection = null)
+        private async Task PostObjects(string apiPath, object payload, NameValueCollection nameValueCollection = null)
         {
             var uri = GetUri($"{apiPath}", nameValueCollection);
-            PostObjects(uri, payload);
+            await PostObjects(uri, payload);
         }
 
-        private T PostObjects<T>(string apiPath, object payload, NameValueCollection nameValueCollection = null)
+        private async Task<T> PostObjects<T>(string apiPath, object payload, NameValueCollection nameValueCollection = null)
         {
             T objects = default(T);
             var uri = GetUri($"{apiPath}", nameValueCollection);
-            var response = PostObjects(uri, payload);
+            var response = await PostObjects(uri, payload);
              if (response.IsSuccessStatusCode)
             {
-                var jsonResponse = response.Content.ReadAsStringAsync().Result;
+                var jsonResponse = await response.Content.ReadAsStringAsync();
                 objects = JsonConvert.DeserializeObject<T>(jsonResponse);
             }
+
             return objects;
         }
 
-        private HttpResponseMessage PostObjects(Uri queryUri, object payload)
+        private async Task<HttpResponseMessage> PostObjects(Uri queryUri, object payload)
         {
             var payloadJson = payload != null ? JsonConvert.SerializeObject(payload, _serializerSettings) : string.Empty;
             var payloadStringContent = new StringContent(payloadJson, Encoding.UTF8, "application/json" );
 
-            var response = _httpClient.PostAsync(queryUri, payloadStringContent).Result;
+            var response = await _httpClient.PostAsync(queryUri, payloadStringContent);
             return response;
         }
 
-        private T GetObjects<T>(string apiPath)
+        private async Task<T> GetObjects<T>(string apiPath)
         {
             var uri = GetUri(apiPath);
 
-            return GetObjects<T>(uri);
+            return await GetObjects<T>(uri);
         }
 
-        private T GetObjects<T>(Uri queryUri)
+        private async Task<T> GetObjects<T>(Uri queryUri)
         {
             T objects = default(T);
             var response = _httpClient.GetAsync(queryUri).Result;
             if (response.IsSuccessStatusCode)
             {
-                var jsonResponse = response.Content.ReadAsStringAsync().Result;
+                var jsonResponse = await response.Content.ReadAsStringAsync();
                 objects = JsonConvert.DeserializeObject<T>(jsonResponse);
             }
 
@@ -96,46 +98,46 @@ namespace GovUk.Education.ManageCourses.ApiClient
         }
 
     // No coverage
-    // public System.Threading.Tasks.Task AcceptTerms_IndexAsync()
+    // public Task AcceptTerms_IndexAsync()
     // {
-    //     return System.Threading.Tasks.Task.CompletedTask;
+    //     return Task.CompletedTask;
     // }
-    // public System.Threading.Tasks.Task AccessRequest_IndexAsync(AccessRequest request)
+    // public Task AccessRequest_IndexAsync(AccessRequest request)
     // {
-    //     return System.Threading.Tasks.Task.CompletedTask;
+    //     return Task.CompletedTask;
     // }
-    // public System.Threading.Tasks.Task Admin_ActionAccessRequestAsync(int accessRequestId)
+    // public Task Admin_ActionAccessRequestAsync(int accessRequestId)
     // {
-    //     return System.Threading.Tasks.Task.CompletedTask;
+    //     return Task.CompletedTask;
     // }
-    // public System.Threading.Tasks.Task Admin_ActionManualActionRequestAsync(string requesterEmail, string targetEmail, string firstName, string lastName)
+    // public Task Admin_ActionManualActionRequestAsync(string requesterEmail, string targetEmail, string firstName, string lastName)
     // {
-    //     return System.Threading.Tasks.Task.CompletedTask;
+    //     return Task.CompletedTask;
     // }
-    // public System.Threading.Tasks.Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
+    // public Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
     // {
     //     return null;
     // }
-    // public System.Threading.Tasks.Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
+    // public Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
     // {
     //     return null;
     // }
 
-    public async System.Threading.Tasks.Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
+    public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
     {
-        return GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
+        return await GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
     }
     public void Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
     {
-        PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
+        PostObjects($"enrichment/institution/{ucasInstitutionCode}", model).Wait();
     }
-    public async System.Threading.Tasks.Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
+    public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
     {
-        return GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
+        return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
     }
     public void Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
     {
-        PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model);
+        PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model).Wait();
     }
 
     public void Invite_IndexAsync(string email)
@@ -143,105 +145,105 @@ namespace GovUk.Education.ManageCourses.ApiClient
         var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
         nameValueCollection[nameof(email)] = email;
 
-        PostObjects($"invite", null, nameValueCollection);
+        PostObjects($"invite", null, nameValueCollection).Wait();
     }
 
     // No coverage
-    // public System.Threading.Tasks.Task<UserOrganisation> Organisations_GetAsync(string instCode)
+    // public Task<UserOrganisation> Organisations_GetAsync(string instCode)
     // {
     //     return null;
     // }
-    // public System.Threading.Tasks.Task<Domain.Models.Institution> Organisations_GetUcasInstitutionAsync(string instCode)
+    // public Task<Domain.Models.Institution> Organisations_GetUcasInstitutionAsync(string instCode)
     // {
     //     return null;
     // }
-    // public System.Threading.Tasks.Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync()
+    // public Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync()
     // {
     //     return null;
     // }
-    // public System.Threading.Tasks.Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
+    // public Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
     // {
     //     return null;
     // }
-    public async System.Threading.Tasks.Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
+    public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
     {
-        return PostObjects<bool>($"publish/organisation/{instCode}", null);
+        return await PostObjects<bool>($"publish/organisation/{instCode}", null);
     }
-    public async System.Threading.Tasks.Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
+    public async Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
     {
-        return GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/organisation/{instCode}/{courseCode}");
+        return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/organisation/{instCode}/{courseCode}");
     }
 
 
     // async boilerplating
 
-        // public async System.Threading.Tasks.Task AcceptTerms_IndexAsync(System.Threading.CancellationToken cancellationToken) {
+        // public async Task AcceptTerms_IndexAsync(System.Threading.CancellationToken cancellationToken) {
 
         //     return;
         // }
-        // public async System.Threading.Tasks.Task AccessRequest_IndexAsync(AccessRequest request, System.Threading.CancellationToken cancellationToken) {
+        // public async Task AccessRequest_IndexAsync(AccessRequest request, System.Threading.CancellationToken cancellationToken) {
 
         //     return;
         // }
-        // public async System.Threading.Tasks.Task Admin_ActionAccessRequestAsync(int accessRequestId, System.Threading.CancellationToken cancellationToken) {
+        // public async Task Admin_ActionAccessRequestAsync(int accessRequestId, System.Threading.CancellationToken cancellationToken) {
 
         //     return;
         // }
-        // public async System.Threading.Tasks.Task Admin_ActionManualActionRequestAsync(string requesterEmail, string targetEmail, string firstName, string lastName, System.Threading.CancellationToken cancellationToken) {
+        // public async Task Admin_ActionManualActionRequestAsync(string requesterEmail, string targetEmail, string firstName, string lastName, System.Threading.CancellationToken cancellationToken) {
 
         //     return;
         // }
-        // public async System.Threading.Tasks.Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }
-        // public async System.Threading.Tasks.Task<InstitutionCourses> Courses_GetAllAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<InstitutionCourses> Courses_GetAllAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }
 
-        // public async System.Threading.Tasks.Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }
-        // public async System.Threading.Tasks.Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model, System.Threading.CancellationToken cancellationToken) {
+        // public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model, System.Threading.CancellationToken cancellationToken) {
 
         //     return;
         // }
-        // public async System.Threading.Tasks.Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }
-        // public async System.Threading.Tasks.Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model, System.Threading.CancellationToken cancellationToken) {
+        // public async Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model, System.Threading.CancellationToken cancellationToken) {
 
         //     return;
         // }
 
-        // public async System.Threading.Tasks.Task Invite_IndexAsync(string email, System.Threading.CancellationToken cancellationToken) {
+        // public async Task Invite_IndexAsync(string email, System.Threading.CancellationToken cancellationToken) {
 
         //     return;
         // }
-        // public async System.Threading.Tasks.Task<UserOrganisation> Organisations_GetAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<UserOrganisation> Organisations_GetAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }
-        // public async System.Threading.Tasks.Task<Domain.Models.Institution> Organisations_GetUcasInstitutionAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<Domain.Models.Institution> Organisations_GetUcasInstitutionAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }
-        // public async System.Threading.Tasks.Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync(System.Threading.CancellationToken cancellationToken) {
+        // public async Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync(System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }
-        // public async System.Threading.Tasks.Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return false;
         // }
-        // public async System.Threading.Tasks.Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return false;
         // }
-        // public async System.Threading.Tasks.Task<Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode, System.Threading.CancellationToken cancellationToken) {
+        // public async Task<Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode, System.Threading.CancellationToken cancellationToken) {
 
         //     return null;
         // }

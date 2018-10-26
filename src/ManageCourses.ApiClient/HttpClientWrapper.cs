@@ -29,7 +29,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 await Guard(result, msg);
                 return result;
             }
-            catch(ManageCoursesApiException ex)
+            catch(ManageCoursesApiException)
             {
                 throw;
             }
@@ -48,7 +48,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 await Guard(result, msg);
                 return result;
             }
-            catch(ManageCoursesApiException ex)
+            catch(ManageCoursesApiException)
             {
                 throw;
             }
@@ -68,7 +68,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
         //         await Guard(result, msg);
         //         return result;
         //     }
-        //     catch(ManageCoursesApiException ex)
+        //     catch(ManageCoursesApiException)
         //     {
         //         throw;
         //     }
