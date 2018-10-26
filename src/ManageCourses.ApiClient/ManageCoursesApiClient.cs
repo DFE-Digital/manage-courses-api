@@ -11,7 +11,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
 {
     public class ManageCoursesApiClient
     {
-        private readonly IManageCoursesApiClientConfiguration _apiClientConfiguration;
         private readonly IHttpClient _httpClient;
         private readonly string _apiUri;
 
@@ -28,7 +27,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 throw new ManageCoursesApiException($"Failed to instantiate due apiUri is null or white space");
             }
 
-            var accessToken = _apiClientConfiguration.GetAccessTokenAsync().Result;
+            var accessToken = apiClientConfiguration.GetAccessTokenAsync().Result;
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
             _httpClient = new HttpClientWrapper(httpClient);
             _apiUri = apiUri;
