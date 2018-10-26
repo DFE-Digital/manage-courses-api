@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -154,10 +156,11 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
 
+            Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
-            Assert.That(() => client.Invite_IndexAsync(Email),
-                Throws.TypeOf<ManageCoursesApiException>()
-                    .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite";
+
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -169,9 +172,10 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
 
-            Assert.That(() => client.Invite_IndexAsync(Email),
-                Throws.TypeOf<ManageCoursesApiException>()
-                    .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
+            Func<Task> act = async () => await client.Invite_IndexAsync(Email);
+
+            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite";
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.Unauthorized)
         }
 
         private void SetupSmokeTestData()

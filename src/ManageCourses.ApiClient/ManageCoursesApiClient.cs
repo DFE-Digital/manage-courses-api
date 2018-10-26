@@ -127,25 +127,25 @@ namespace GovUk.Education.ManageCourses.ApiClient
     {
         return await GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
     }
-    public void Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
+    public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
     {
-        PostObjects($"enrichment/institution/{ucasInstitutionCode}", model).Wait();
+        await PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
     }
     public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
     {
         return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
     }
-    public void Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
+    public async Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
     {
-        PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model).Wait();
+        await PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model);
     }
 
-    public void Invite_IndexAsync(string email)
+    public async Task Invite_IndexAsync(string email)
     {
         var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
         nameValueCollection[nameof(email)] = email;
 
-        PostObjects($"invite", null, nameValueCollection).Wait();
+        await PostObjects($"invite", null, nameValueCollection);
     }
 
     // No coverage
