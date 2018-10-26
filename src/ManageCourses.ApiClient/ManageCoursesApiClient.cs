@@ -35,7 +35,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
             if (_apiUri.EndsWith('/')) { _apiUri = _apiUri.Remove(_apiUri.Length - 1); }
         }
 
-        private void PostObjects<T>(Uri queryUri, T payload)
+        private void PostObjects(Uri queryUri, object payload)
         {
 
             var payloadJson = JsonConvert.SerializeObject(payload, _serializerSettings);
