@@ -45,6 +45,13 @@ namespace GovUk.Education.ManageCourses.ApiClient
             var response = _httpClient.PostAsync(queryUri, payloadStringContent).Result;
         }
 
+        private T GetObjects<T>(string apiPath)
+        {
+            var uri = GetUri(apiPath);
+
+            return GetObjects<T>(uri);
+        }
+
         private T GetObjects<T>(Uri queryUri)
         {
             T objects = default(T);
@@ -96,7 +103,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
     public async System.Threading.Tasks.Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
     {
-        return null;
+        return GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
     }
     public System.Threading.Tasks.Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
     {

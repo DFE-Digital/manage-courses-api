@@ -21,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                 return Task.FromResult(_accessToken);
             }
 
-            public string GetBaseUrl() => _baseUrl;
+            public string GetBaseUrl() => $"{_baseUrl}/api";
         }
     }
 }
