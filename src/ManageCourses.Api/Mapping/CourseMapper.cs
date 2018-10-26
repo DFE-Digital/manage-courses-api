@@ -12,6 +12,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class CourseMapper : ICourseMapper
     {
+        private readonly SubjectMapper subjectMapper = new SubjectMapper();
+        
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Institution ucasInstData, Domain.Models.Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
             ucasInstData = ucasInstData ?? new Institution();
@@ -29,12 +31,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 string.IsNullOrWhiteSpace(orgEnrichmentModel.Address4) &&
                 string.IsNullOrWhiteSpace(orgEnrichmentModel.Postcode);
 
-            var subjectStrings = new List<string>();
-            if (ucasCourseData?.CourseSubjects != null) 
-            {
-                subjectStrings = ucasCourseData.CourseSubjects.Select(x => x.Subject.SubjectName).ToList();
-            }
-
+            var subjectStrings = ucasCourseData?.CourseSubjects != null
+                ? subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.CourseSubjects.Select(x => x.Subject.SubjectName))
+                : new List<string>();
+            
             var subjects = new Collection<SearchAndCompare.Domain.Models.Joins.CourseSubject>(subjectStrings.Select(subject =>
                 new SearchAndCompare.Domain.Models.Joins.CourseSubject
                 {

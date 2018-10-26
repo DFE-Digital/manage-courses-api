@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
+namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     /// <summary>
     /// This maps a list of of UCAS subjects to our interpretation of subjects.
@@ -309,7 +309,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
             return primarySubjects;
         }
 
-        public IEnumerable<string> MapToSecondarySubjects(string courseTitle, IEnumerable<string> ucasSubjects)
+        private IEnumerable<string> MapToSecondarySubjects(string courseTitle, IEnumerable<string> ucasSubjects)
         {
             var secondarySubjects = new List<string>();
 
