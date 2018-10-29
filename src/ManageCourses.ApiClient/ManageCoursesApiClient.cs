@@ -97,163 +97,73 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return builder.Uri;
         }
 
-/*
+        public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
+        {
+            return await GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
+        }
+        public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
+        {
+            await PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
+        }
+        public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
+        {
+            return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
+        }
+        public async Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
+        {
+            await PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model);
+        }
+
+        public async Task Invite_IndexAsync(string email)
+        {
+            var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
+            nameValueCollection[nameof(email)] = email;
+
+            await PostObjects($"invite", null, nameValueCollection);
+        }
 
 
-ManageApi.cs(98,20): error CS0103: The name 'deserializedCourse' does not exist in the current context [C:\repos\manage-courses-ui\src\ui\ManageCoursesUi.csproj]
-ManageApi.cs(104,43): error CS1061: 'ManageCoursesApiClient' does not contain a definition for 'Publish_PublishCourseToSearchAndCompareAsync' and no accessible extension method 'Publish_PublishCourseToSearchAndCompareAsync' accepting a first argument of type 'ManageCoursesApiClient' could be found (are you missing a using directive or an assembly reference?) [C:\repos\manage-courses-ui\src\ui\ManageCoursesUi.csproj]
- */
+        public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
+        {
+            return await PostObjects<bool>($"publish/organisation/{instCode}", null);
+        }
+        public async Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
+        {
+            return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/searchandcompare/{instCode}/{courseCode}");
+        }
 
-    // No coverage
-    public Task AcceptTerms_IndexAsync()
-    {
-        return Task.CompletedTask;
-    }
-    public Task AccessRequest_IndexAsync(AccessRequest request)
-    {
-        return Task.CompletedTask;
-    }
-    // public Task Admin_ActionAccessRequestAsync(int accessRequestId)
-    // {
-    //     return Task.CompletedTask;
-    // }
-    // public Task Admin_ActionManualActionRequestAsync(string requesterEmail, string targetEmail, string firstName, string lastName)
-    // {
-    //     return Task.CompletedTask;
-    // }
-    public Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
-    {
-        return null;
-    }
-    public Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
-    {
-        return null;
-    }
+        // No coverage
+        public Task AcceptTerms_IndexAsync()
+        {
+            return Task.CompletedTask;
+        }
+        public Task AccessRequest_IndexAsync(AccessRequest request)
+        {
+            return Task.CompletedTask;
+        }
 
-    public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
-    {
-        return await GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
-    }
-    public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
-    {
-        await PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
-    }
-    public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
-    {
-        return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
-    }
-    public async Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
-    {
-        await PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model);
-    }
+        public Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
+        {
+            return null;
+        }
+        public Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
+        {
+            return null;
+        }
 
-    public async Task Invite_IndexAsync(string email)
-    {
-        var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
-        nameValueCollection[nameof(email)] = email;
+        // No coverage
+        public Task<UserOrganisation> Organisations_GetAsync(string instCode)
+        {
+            return null;
+        }
 
-        await PostObjects($"invite", null, nameValueCollection);
-    }
-
-    // No coverage
-    public Task<UserOrganisation> Organisations_GetAsync(string instCode)
-    {
-        return null;
-    }
-    // public Task<Domain.Models.Institution> Organisations_GetUcasInstitutionAsync(string instCode)
-    // {
-    //     return null;
-    // }
-    public Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync()
-    {
-        return null;
-    }
-    public Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
-    {
-        return null;
-    }
-    public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
-    {
-        return await PostObjects<bool>($"publish/organisation/{instCode}", null);
-    }
-    public async Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
-    {
-        return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/searchandcompare/{instCode}/{courseCode}");
-    }
-
-
-    // async boilerplating
-
-        // public async Task AcceptTerms_IndexAsync(System.Threading.CancellationToken cancellationToken) {
-
-        //     return;
-        // }
-        // public async Task AccessRequest_IndexAsync(AccessRequest request, System.Threading.CancellationToken cancellationToken) {
-
-        //     return;
-        // }
-        // public async Task Admin_ActionAccessRequestAsync(int accessRequestId, System.Threading.CancellationToken cancellationToken) {
-
-        //     return;
-        // }
-        // public async Task Admin_ActionManualActionRequestAsync(string requesterEmail, string targetEmail, string firstName, string lastName, System.Threading.CancellationToken cancellationToken) {
-
-        //     return;
-        // }
-        // public async Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-        // public async Task<InstitutionCourses> Courses_GetAllAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-
-        // public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-        // public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model, System.Threading.CancellationToken cancellationToken) {
-
-        //     return;
-        // }
-        // public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-        // public async Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model, System.Threading.CancellationToken cancellationToken) {
-
-        //     return;
-        // }
-
-        // public async Task Invite_IndexAsync(string email, System.Threading.CancellationToken cancellationToken) {
-
-        //     return;
-        // }
-        // public async Task<UserOrganisation> Organisations_GetAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-        // public async Task<Domain.Models.Institution> Organisations_GetUcasInstitutionAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-        // public async Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync(System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-        // public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return false;
-        // }
-        // public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return false;
-        // }
-        // public async Task<Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode, System.Threading.CancellationToken cancellationToken) {
-
-        //     return null;
-        // }
-
+        public Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync()
+        {
+            return null;
+        }
+        public Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
+        {
+            return null;
+        }
     }
 }
