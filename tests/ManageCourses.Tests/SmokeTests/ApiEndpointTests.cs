@@ -1,18 +1,16 @@
+using FluentAssertions;
+using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.ApiClient;
+using GovUk.Education.ManageCourses.Tests.UnitTesting.Client;
+using GovUk.Education.ManageCourses.Tests.TestUtilities;
+using GovUk.Education.ManageCourses.UcasCourseImporter;
+using Moq;
+using NUnit.Framework;
 using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
-using FluentAssertions;
-using GovUk.Education.ManageCourses.ApiClient;
-using GovUk.Education.ManageCourses.Api.Model;
-using GovUk.Education.ManageCourses.Domain.Models;
-using GovUk.Education.ManageCourses.Tests.TestUtilities;
-using GovUk.Education.ManageCourses.UcasCourseImporter;
-using Microsoft.Extensions.Configuration;
-using Moq;
-using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
@@ -138,8 +136,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var accessToken = TestConfig.ApiKey;
 
             var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
             Context.AddTestReferenceData(Email);
             Context.Save();
@@ -154,8 +153,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var accessToken = "badAccesCode";
 
             var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
             Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
@@ -173,8 +173,9 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             const string accessToken = "";
 
             var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), httpClient);
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
             Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
@@ -196,16 +197,22 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         private async Task<ManageCoursesApiClient> BuildSigninAwareClient()
         {
             var communicator = new DfeSignInCommunicator(TestConfig);
-            var accessToken = await communicator.GetAccessTokenAsync(TestConfig);
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken, LocalWebHost.Address), new HttpClient());
+            var accessToken = await communicator.GetAccessToken(TestConfig);
+
+            var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
+
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
             return client;
         }
 
         private ManageCoursesApiClient BuildApiKeyClient(string apiKey = null)
         {
-            var apiKeyAccessToken = apiKey ?? TestConfig.ApiKey;
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken, LocalWebHost.Address), new HttpClient());
+            var accessToken = apiKey ?? TestConfig.ApiKey;
+            var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
             return client;
         }

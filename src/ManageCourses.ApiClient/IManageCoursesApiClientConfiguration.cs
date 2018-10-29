@@ -4,8 +4,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
 {
     public interface IManageCoursesApiClientConfiguration
     {
-        Task<string> GetAccessTokenAsync();
-
-        string GetBaseUrl();
+        string GetAccessToken();
     }
 }

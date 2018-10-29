@@ -8,6 +8,5 @@ namespace GovUk.Education.ManageCourses.ApiClient
     {
         Task<HttpResponseMessage> GetAsync(Uri queryUri);
         Task<HttpResponseMessage> PostAsync(Uri queryUri, StringContent content);
-        // Task<HttpResponseMessage> PutAsync(Uri queryUri, StringContent content);
     }
 }

@@ -1,39 +1,36 @@
-﻿using System;
+﻿using GovUk.Education.ManageCourses.Api.Model;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using GovUk.Education.ManageCourses.Api.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace GovUk.Education.ManageCourses.ApiClient
 {
     public class ManageCoursesApiClient
     {
         private readonly IHttpClient _httpClient;
-        private readonly string _apiUri;
+        private readonly string _baseUrl;
 
         private readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
         {
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         };
 
-        public ManageCoursesApiClient(IManageCoursesApiClientConfiguration apiClientConfiguration, HttpClient httpClient)
+        public ManageCoursesApiClient(string apiUrl, IHttpClient httpClient)
         {
-            var apiUri = apiClientConfiguration.GetBaseUrl();
-            if(string.IsNullOrWhiteSpace(apiUri))
+            if(string.IsNullOrWhiteSpace(apiUrl))
             {
-                throw new ManageCoursesApiException($"Failed to instantiate due apiUri is null or white space");
+                throw new ManageCoursesApiException($"Failed to instantiate due apiUrl is null or white space");
             }
 
-            var accessToken = apiClientConfiguration.GetAccessTokenAsync().Result;
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            _httpClient = new HttpClientWrapper(httpClient);
-            _apiUri = apiUri;
-            if (_apiUri.EndsWith('/')) { _apiUri = _apiUri.Remove(_apiUri.Length - 1); }
+            if (apiUrl.EndsWith('/')) { apiUrl = apiUrl.Remove(apiUrl.Length - 1); }
+            _baseUrl = $"{apiUrl}/api";
+            _httpClient = httpClient;
         }
 
         private async Task PostObjects(string apiPath, object payload, NameValueCollection nameValueCollection = null)
@@ -87,7 +84,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
         private Uri GetUri(string apiPath, NameValueCollection nameValueCollection = null)
         {
-            var uri = new Uri(_apiUri);
+            var uri = new Uri(_baseUrl);
             var builder = new UriBuilder(uri);
             if (!builder.Path.EndsWith('/') && !apiPath.StartsWith('/')) { builder.Path += '/'; }
             else if (builder.Path.EndsWith('/') && apiPath.StartsWith('/')) { apiPath = apiPath.Substring(1); }
@@ -122,7 +119,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
             await PostObjects($"invite", null, nameValueCollection);
         }
 
-
         public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
         {
             return await PostObjects<bool>($"publish/organisation/{instCode}", null);
@@ -133,37 +129,36 @@ namespace GovUk.Education.ManageCourses.ApiClient
         }
 
         // No coverage
-        public Task AcceptTerms_IndexAsync()
+        public async Task AcceptTerms_IndexAsync()
         {
-            return Task.CompletedTask;
+            await PostObjects($"acceptterms/accept", null);
         }
-        public Task AccessRequest_IndexAsync(AccessRequest request)
+        public async Task AccessRequest_IndexAsync(AccessRequest request)
         {
-            return Task.CompletedTask;
-        }
-
-        public Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
-        {
-            return null;
-        }
-        public Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
-        {
-            return null;
+            await PostObjects($"accessrequest", request);
         }
 
-        // No coverage
-        public Task<UserOrganisation> Organisations_GetAsync(string instCode)
+        public async Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
         {
-            return null;
+            return await GetObjects<Domain.Models.Course>("$courses/{instCode}/course/{ucasCode}");
+        }
+        public async Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
+        {
+            return await GetObjects<InstitutionCourses>("$courses/{instCode}");
         }
 
-        public Task<System.Collections.ObjectModel.ObservableCollection<UserOrganisation>> Organisations_GetAllAsync()
+        public async Task<UserOrganisation> Organisations_GetAsync(string instCode)
         {
-            return null;
+            return await GetObjects<UserOrganisation>("$organisation/{instCode}");
         }
-        public Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
+
+        public async Task<IEnumerable<UserOrganisation>> Organisations_GetAllAsync()
         {
-            return null;
+            return await GetObjects<IEnumerable<UserOrganisation>>("$organisation/getall");
+        }
+        public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
+        {
+            return await PostObjects<bool>("$publish/course/{instCode}/{courseCode}", null);;
         }
     }
 }
