@@ -8,8 +8,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
         public string Response { get; private set; }
 
-        public System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
-
         public ManageCoursesApiException(string message)
             : base(message)
         {
@@ -20,7 +18,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
         {
         }
 
-        public ManageCoursesApiException(string message, HttpStatusCode? statusCode, string response)
+        public ManageCoursesApiException(string message, HttpStatusCode? statusCode, string response = "")
             : base(message)
         {
             StatusCode = statusCode;
