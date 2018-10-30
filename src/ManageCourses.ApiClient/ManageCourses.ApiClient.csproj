@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" Private="false" PrivateAssets="contentFiles;analyzers;build" IncludeAssets="compile" />
+    <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" Private="true" PrivateAssets="all" />
   </ItemGroup>
   <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion" >
     <PropertyGroup Condition="'$(GitBranch)'=='master'">
@@ -38,7 +38,11 @@
     </PropertyGroup>
   </Target>
     <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+      <Message Importance="high" Text="Project File Name = $(MSBuildProjectFile)" />
+      <Message Importance="high" Text="These will also be packaged to nuget: @(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     <ItemGroup>
+
+
       <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     </ItemGroup>
   </Target>
