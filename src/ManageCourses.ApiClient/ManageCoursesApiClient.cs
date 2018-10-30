@@ -154,12 +154,12 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
         public async Task<UserOrganisation> Organisations_GetAsync(string instCode)
         {
-            return await GetObjects<UserOrganisation>($"organisation/{instCode}");
+            return await GetObjects<UserOrganisation>($"organisations/{instCode}");
         }
 
         public async Task<IEnumerable<UserOrganisation>> Organisations_GetAllAsync()
         {
-            return await GetObjects<IEnumerable<UserOrganisation>>($"organisation/getall");
+            return await GetObjects<IEnumerable<UserOrganisation>>($"organisations");
         }
         public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
         {

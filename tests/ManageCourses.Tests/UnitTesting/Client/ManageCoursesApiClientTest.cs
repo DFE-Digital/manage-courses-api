@@ -150,7 +150,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         {
             var instCode ="instCode";
 
-            var controller = "organisation";
+            var controller = "organisations";
             var leaf = $"/{instCode}";
             SetupGetUrlVerification<UserOrganisation>($"{baseurl}/api/{controller}{leaf}");
 
@@ -162,8 +162,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         [Test]
         public void Organisations_GetAllAsync()
         {
-            var controller = "organisation";
-            var leaf = $"/getall";
+            var controller = "organisations";
+            var leaf = $"";
             SetupGetUrlVerification<List<UserOrganisation>>($"{baseurl}/api/{controller}{leaf}");
 
             var result = sut.Organisations_GetAllAsync().Result;
