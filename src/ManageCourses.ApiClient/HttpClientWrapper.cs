@@ -6,21 +6,16 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ManageCourses.ApiClient
 {
-    public abstract class HttpClientWrapper : IHttpClient, IManageCoursesApiClientConfiguration
+    public abstract class HttpClientWrapper : IHttpClient
     {
         private readonly HttpClient wrapped;
 
         public HttpClientWrapper(HttpClient _wrapped)
         {
-            if(wrapped == null)
-            {
-                throw new ManageCoursesApiException($"Failed to instantiate due to HttpClient = null");
-            }
-
             this.wrapped = _wrapped;
         }
 
-        public async Task<HttpResponseMessage> GetAsync(Uri queryUri)
+        public virtual async Task<HttpResponseMessage> GetAsync(Uri queryUri)
         {
             var msg = $"API GET Failed uri {queryUri}";
             try
@@ -41,7 +36,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
             }
         }
 
-        public async Task<HttpResponseMessage> PostAsync(Uri queryUri, StringContent content)
+        public virtual async Task<HttpResponseMessage> PostAsync(Uri queryUri, StringContent content)
         {
             var msg = $"API POST Failed uri {queryUri}";
             try

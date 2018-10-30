@@ -28,6 +28,11 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 throw new ManageCoursesApiException($"Failed to instantiate due apiUrl is null or white space");
             }
 
+            if(httpClient == null)
+            {
+                throw new ManageCoursesApiException($"Failed to instantiate due to httpClient is null");
+            }
+
             if (apiUrl.EndsWith('/')) { apiUrl = apiUrl.Remove(apiUrl.Length - 1); }
             _baseUrl = $"{apiUrl}/api";
             _httpClient = httpClient;

@@ -13,9 +13,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
             _accessToken = accessToken;
         }
 
-        public override string SetAccessToken()
+        public override string GetAccessToken()
         {
-            return _accessToken;
+            return this._accessToken;
         }
     }
 }

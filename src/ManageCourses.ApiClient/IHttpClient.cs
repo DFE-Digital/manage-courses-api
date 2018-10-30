@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace GovUk.Education.ManageCourses.ApiClient
 {
-    public interface IHttpClient
+    public interface IHttpClient : IManageCoursesApiClientConfiguration
     {
         Task<HttpResponseMessage> GetAsync(Uri queryUri);
         Task<HttpResponseMessage> PostAsync(Uri queryUri, StringContent content);
