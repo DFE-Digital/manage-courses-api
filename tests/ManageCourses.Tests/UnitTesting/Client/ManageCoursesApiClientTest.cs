@@ -17,6 +17,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using System.Web;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
 {
@@ -39,51 +41,150 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         }
 
         [Test]
-        public async Task AcceptTerms_IndexAsync()
+        public void AcceptTerms_IndexAsync()
         {
             var controller = "acceptterms";
-             mockHttp.Setup(x => x.PostAsync(It.Is<Uri>(y => y.AbsoluteUri == $"{baseurl}/api/{controller}/accept"), It.IsAny<StringContent>())).ReturnsAsync(
-                new HttpResponseMessage() {
-                    StatusCode = HttpStatusCode.OK
-                }
-            ).Verifiable();
+            var leaf = "/accept";
 
-            sut.AcceptTerms_IndexAsync().Wait();
+            SetupPostUrlVerification($"{baseurl}/api/{controller}{leaf}");
+
+            // var url = $"{baseurl}/api/{controller}{leaf}";
+            // var expectedurl = It.Is<Uri>(y => y.AbsoluteUri == url);
+
+            //  mockHttp.Setup(x => x.PostAsync(It.Is<Uri>(y => y.AbsoluteUri == url), It.IsAny<System.Net.Http.StringContent>())).ReturnsAsync(
+            //     new System.Net.Http.HttpResponseMessage() {
+            //         StatusCode = HttpStatusCode.OK
+            //     }
+            // ).Verifiable();
+             sut.AcceptTerms_IndexAsync().Wait();
+             mockHttp.VerifyAll();
+        }
+
+        [Test]
+        public void AccessRequest_IndexAsync()
+        {
+            var request  = new Api.Model.AccessRequest();
+            var controller = "accessrequest";
+            var leaf = "";
+
+            SetupPostUrlVerification($"{baseurl}/api/{controller}{leaf}");
+
+            sut.AccessRequest_IndexAsync(request).Wait();
 
             mockHttp.VerifyAll();
-        }
-        /*
-         public async Task AcceptTerms_IndexAsync()
-        {
-            await PostObjects($"acceptterms/accept", null);
-        }
-        public async Task AccessRequest_IndexAsync(AccessRequest request)
-        {
-            await PostObjects($"accessrequest", request);
+
         }
 
-        public async Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
+        private void SetupPostUrlVerification(string url)
         {
-            return await GetObjects<Domain.Models.Course>("$courses/{instCode}/course/{ucasCode}");
-        }
-        public async Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
-        {
-            return await GetObjects<InstitutionCourses>("$courses/{instCode}");
-        }
-
-        public async Task<UserOrganisation> Organisations_GetAsync(string instCode)
-        {
-            return await GetObjects<UserOrganisation>("$organisation/{instCode}");
+            var setup = mockHttp.Setup(x => x.PostAsync(It.Is<Uri>(y => y.AbsoluteUri == url), It.IsAny<StringContent>()));
+            setup.ReturnsAsync(
+                new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK
+                })
+            .Verifiable();
         }
 
-        public async Task<IEnumerable<UserOrganisation>> Organisations_GetAllAsync()
+        private void SetupPostUrlVerification<T>(string url) where T : new()
         {
-            return await GetObjects<IEnumerable<UserOrganisation>>("$organisation/getall");
+            var payloadJson = JsonConvert.SerializeObject(new T());
+
+            var payloadStringContent = new StringContent(payloadJson, Encoding.UTF8, "application/json" );
+
+            var setup = mockHttp.Setup(x => x.PostAsync(It.Is<Uri>(y => y.AbsoluteUri == url), It.IsAny<StringContent>()));
+            setup.ReturnsAsync(
+                new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = payloadStringContent
+                })
+            .Verifiable();
         }
-        public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
+        private void SetupGetUrlVerification<T>(string url) where T : new()
         {
-            return await PostObjects<bool>("$publish/course/{instCode}/{courseCode}", null);;
+            var payloadJson = JsonConvert.SerializeObject(new T());
+
+            var payloadStringContent = new StringContent(payloadJson, Encoding.UTF8, "application/json" );
+
+            var setup = mockHttp.Setup(x => x.GetAsync(It.Is<Uri>(y => y.AbsoluteUri == url)));
+            setup.ReturnsAsync(
+                new HttpResponseMessage() {
+                    StatusCode = HttpStatusCode.OK,
+                    Content = payloadStringContent
+                })
+            .Verifiable();
         }
-         */
+
+        [Test]
+        public void Courses_GetAsync()
+        {
+            var instCode ="instCode";
+            var ucasCode = "ucasCode";
+
+            var controller = "courses";
+            var leaf = $"/{instCode}/course/{ucasCode}";
+            SetupGetUrlVerification<Course>($"{baseurl}/api/{controller}{leaf}");
+
+            var result = sut.Courses_GetAsync(instCode, ucasCode).Result;
+
+            result.Should().BeOfType<Course>();
+            mockHttp.VerifyAll();
+        }
+
+        [Test]
+        public void Courses_GetAllAsync()
+        {
+            var instCode ="instCode";
+
+            var controller = "courses";
+            var leaf = $"/{instCode}";
+            SetupGetUrlVerification<InstitutionCourses>($"{baseurl}/api/{controller}{leaf}");
+
+            var result = sut.Courses_GetAllAsync(instCode).Result;
+
+            result.Should().BeOfType<InstitutionCourses>();
+            mockHttp.VerifyAll();
+        }
+
+        [Test]
+        public void Organisations_GetAsync()
+        {
+            var instCode ="instCode";
+
+            var controller = "organisation";
+            var leaf = $"/{instCode}";
+            SetupGetUrlVerification<UserOrganisation>($"{baseurl}/api/{controller}{leaf}");
+
+            var result = sut.Organisations_GetAsync(instCode).Result;
+
+            result.Should().BeOfType<UserOrganisation>();
+            mockHttp.VerifyAll();
+        }
+        [Test]
+        public void Organisations_GetAllAsync()
+        {
+            var controller = "organisation";
+            var leaf = $"/getall";
+            SetupGetUrlVerification<List<UserOrganisation>>($"{baseurl}/api/{controller}{leaf}");
+
+            var result = sut.Organisations_GetAllAsync().Result;
+
+            result.Should().AllBeAssignableTo<IEnumerable<UserOrganisation>>();
+            mockHttp.VerifyAll();
+        }
+
+        public void Publish_PublishCourseToSearchAndCompareAsync()
+        {
+            var instCode = "instCode";
+            var courseCode = "courseCode";
+            var controller = "publish";
+            var leaf = $"/course/{instCode}/{courseCode}";
+
+            SetupPostUrlVerification<bool>($"{baseurl}/api/{controller}{leaf}");
+
+            var result = sut.Publish_PublishCourseToSearchAndCompareAsync(instCode, courseCode).Result;
+
+            result.Should().BeFalse();
+            mockHttp.VerifyAll();
+        }
     }
 }

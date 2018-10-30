@@ -145,25 +145,25 @@ namespace GovUk.Education.ManageCourses.ApiClient
 
         public async Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
         {
-            return await GetObjects<Domain.Models.Course>("$courses/{instCode}/course/{ucasCode}");
+            return await GetObjects<Domain.Models.Course>($"courses/{instCode}/course/{ucasCode}");
         }
         public async Task<InstitutionCourses> Courses_GetAllAsync(string instCode)
         {
-            return await GetObjects<InstitutionCourses>("$courses/{instCode}");
+            return await GetObjects<InstitutionCourses>($"courses/{instCode}");
         }
 
         public async Task<UserOrganisation> Organisations_GetAsync(string instCode)
         {
-            return await GetObjects<UserOrganisation>("$organisation/{instCode}");
+            return await GetObjects<UserOrganisation>($"organisation/{instCode}");
         }
 
         public async Task<IEnumerable<UserOrganisation>> Organisations_GetAllAsync()
         {
-            return await GetObjects<IEnumerable<UserOrganisation>>("$organisation/getall");
+            return await GetObjects<IEnumerable<UserOrganisation>>($"organisation/getall");
         }
         public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
         {
-            return await PostObjects<bool>("$publish/course/{instCode}/{courseCode}", null);;
+            return await PostObjects<bool>($"publish/course/{instCode}/{courseCode}", null);
         }
     }
 }
