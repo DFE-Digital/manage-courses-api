@@ -67,39 +67,6 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             return WithEnrichmentMetadata(courseRecords, instCode, email).ToList();
         }
 
-        public IEnumerable<InstitutionSummary> GetInstitutionSummariesForUser(string email)
-        {
-            var institutionSummaries = _context.GetOrganisationInstitutions(email)
-                .Select(institutionSummary => new InstitutionSummary()
-                {
-                    InstName = institutionSummary.Institution.InstName,
-                    InstCode = institutionSummary.Institution.InstCode,
-                    TotalCourses = institutionSummary.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
-                }).OrderBy(x => x.InstName).ToList();
-
-            return institutionSummaries;
-        }
-
-        public InstitutionSummary GetInstitutionSummaryForUser(string email, string instCode)
-        {
-            var organisationInstitution = _context.GetOrganisationInstitution(email, instCode);
-            var enrichment = _enrichmentService.GetInstitutionEnrichment(instCode, email);
-
-            if (organisationInstitution != null)
-            {
-                return new InstitutionSummary()
-                {
-                    InstName = organisationInstitution.Institution.InstName,
-                    InstCode = organisationInstitution.Institution.InstCode,
-                    TotalCourses = organisationInstitution.Institution.Courses.Select(c => c.CourseCode).Distinct()
-                        .Count(),
-                    EnrichmentWorkflowStatus = enrichment?.Status
-                };
-            }
-
-            return null;
-        }
-
         public Institution GetUcasInstitutionForUser(string name, string instCode)
         {
             return _context.GetInstitution(name, instCode);

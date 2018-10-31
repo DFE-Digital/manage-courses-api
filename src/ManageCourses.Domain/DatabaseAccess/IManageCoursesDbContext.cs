@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 {
@@ -26,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         List<Course> GetCoursesByInstCode(string instCode, string email);
         IQueryable<OrganisationInstitution> GetOrganisationInstitutions(string email);
         OrganisationInstitution GetOrganisationInstitution(string email, string instCode);
-
+        TResult GetOrganisationInstitution<TResult>(string email, string instCode, Func<OrganisationInstitution, string, string, TResult> mapping);
         Institution GetInstitution(string name, string instCode);
 
         IQueryable<User> GetUsers(string email);
