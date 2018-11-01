@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     p.Relational().ColumnName = PascalToSnakeCase(p.Name);
                 }
             }
-            
+
             modelBuilder.Entity<User>()
                 .HasIndex(x => x.Email)
                 .IsUnique();
@@ -48,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .IsUnique();
 
             modelBuilder.Entity<Site>()
-                .HasIndex(s => new {s.InstitutionId, s.Code})
+                .HasIndex(s => new { s.InstitutionId, s.Code })
                 .IsUnique();
 
             modelBuilder.Entity<Site>()
@@ -89,14 +89,14 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             modelBuilder.Entity<CourseSubject>()
                 .HasOne(cs => cs.Course)
                 .WithMany(c => c.CourseSubjects)
-                .OnDelete(DeleteBehavior.Cascade);                
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<CourseSubject>()
                 .HasOne(cs => cs.Subject)
                 .WithMany(s => s.CourseSubjects)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<NctlOrganisation>()
-                .HasOne(x => x.Organisation)                
+                .HasOne(x => x.Organisation)
                 .WithMany(x => x.NctlOrganisations)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -108,14 +108,14 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
             modelBuilder.Entity<InstitutionEnrichment>()
                 .HasIndex(x => x.InstCode);
-                
+
             modelBuilder.Entity<Session>()
                 .HasOne(x => x.User)
                 .WithMany(u => u.Sessions)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             modelBuilder.Entity<Session>()
-                .HasIndex(x => new {x.AccessToken, x.CreatedUtc});
+                .HasIndex(x => new { x.AccessToken, x.CreatedUtc });
 
             base.OnModelCreating(modelBuilder);
         }
@@ -144,10 +144,10 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<AccessRequest> AccessRequests { get; set; }
         public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
-        public DbSet<Session> Sessions { get;  set; }
+        public DbSet<Session> Sessions { get; set; }
         public DbSet<PgdeCourse> PgdeCourses { get; set; }
 
-        public List<Course> GetUcasCourseRecordsByUcasCode(string instCode, string ucasCode, string email)
+        public List<Course> GetCourse(string instCode, string courseCode, string email)
         {
             var ucasCourses = Courses.FromSql(@"
                     select c.* from course c
@@ -157,8 +157,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     join organisation_user ou on ou.organisation_id = o.id 
                     join ""user"" u on u.id = ou.user_id 
                     where lower(i.inst_code)=lower(@instCode) 
-                    and lower(c.course_code)=lower(@ucasCode) 
-                    and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("ucasCode", ucasCode), new NpgsqlParameter("email", email))
+                    and lower(c.course_code)=lower(@courseCode) 
+                    and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Institution)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingInstitution)
@@ -167,7 +167,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
             return ucasCourses;
         }
-        public List<Course> GetUcasCourseRecordsByInstCode(string instCode, string email)
+        public List<Course> GetCoursesByInstCode(string instCode, string email)
         {
             var ucasCourses = Courses.FromSql(
                     $"select c.* from course c " +
@@ -187,7 +187,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return ucasCourses;
         }
 
-        public IQueryable<OrganisationInstitution> GetUserOrganisations(string email)
+        public IQueryable<OrganisationInstitution> GetOrganisationInstitutions(string email)
         {
             var userOrganisations = OrganisationIntitutions.FromSql(
                 $"select oi.* from organisation_institution oi " +
@@ -202,7 +202,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return userOrganisations;
         }
 
-        public OrganisationInstitution GetUserOrganisation(string email, string instCode)
+        public OrganisationInstitution GetOrganisationInstitution(string email, string instCode)
         {
             var userOrganisations = OrganisationIntitutions.FromSql(
                 $"select oi.* from organisation_institution oi " +
@@ -217,7 +217,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return userOrganisations;
         }
 
-        public IQueryable<User> GetMcUsers(string email)
+        public IQueryable<User> GetUsers(string email)
         {
             var users = Users.FromSql(
                 $"select * from \"user\" " +

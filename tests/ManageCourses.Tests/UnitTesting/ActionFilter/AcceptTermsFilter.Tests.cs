@@ -105,7 +105,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.ActionFilter
         private static AcceptTermsFilter GetAcceptTermsFilter(IQueryable<User> users)
         {
             var mockedContext = new Mock<IManageCoursesDbContext>();
-            mockedContext.Setup(x => x.GetMcUsers("foo@example.com")).Returns(users);
+            mockedContext.Setup(x => x.GetUsers("foo@example.com")).Returns(users);
             var acceptTermsFilter = new AcceptTermsFilter(mockedContext.Object);
             return acceptTermsFilter;
         }

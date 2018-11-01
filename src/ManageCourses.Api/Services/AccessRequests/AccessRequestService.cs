@@ -27,13 +27,13 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
                 try
                 {
                     var requester = _context
-                        .GetMcUsers(requesterEmail)
+                        .GetUsers(requesterEmail)
                         .Include(x => x.OrganisationUsers)
                         .ThenInclude(x => x.Organisation)
                         .Single();
 
                     var requestedIfExists = _context
-                        .GetMcUsers(request.EmailAddress)
+                        .GetUsers(request.EmailAddress)
                         .Include(x => x.OrganisationUsers)
                         .ThenInclude(x => x.Organisation)
                         .SingleOrDefault();
