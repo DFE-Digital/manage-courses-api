@@ -25,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Gets an organisations by Institution Code
         /// </summary>
-        /// <returns>a single UserOrganisation object</returns>
+        /// <returns>a single InstitutionSummary object</returns>
         [BearerTokenAuth]
         [HttpGet]
         [Route("{instCode}")]
@@ -48,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Gets a list of organisations for the user
         /// </summary>
-        /// <returns>a list of UserOrganisation objects</returns>
+        /// <returns>a list of InstitutionSummary objects</returns>
         [BearerTokenAuth]
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<InstitutionSummary>), 200)]
