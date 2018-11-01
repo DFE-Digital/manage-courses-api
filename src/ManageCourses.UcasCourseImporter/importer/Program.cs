@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Threading;
@@ -30,15 +29,17 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 .ApplicationInsightsTraces(configuration["APPINSIGHTS_INSTRUMENTATIONKEY"])
                 .CreateLogger();
 
-            logger.Information("UcasCourseImporter started.");
-
-            var configOptions = new UcasCourseImporterConfigurationOptions(configuration);
-            configOptions.Validate();
-
             var folder = Path.Combine(Path.GetTempPath(), "ucasfiles", Guid.NewGuid().ToString());
-
             try
             {
+                logger.Information("UcasCourseImporter started.");
+
+                var configOptions = new UcasCourseImporterConfigurationOptions(configuration);
+                configOptions.Validate();
+                var mcConfig = new McConfig(configuration);
+                mcConfig.Validate();
+
+
                 Directory.CreateDirectory(folder);
 
                 var downloadAndExtractor = new DownloaderAndExtractor(logger, folder, configOptions.AzureUrl,
@@ -75,7 +76,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     NoteTexts = new List<UcasNoteText>(noteTexts),
                     Subjects = new List<UcasSubject>(subjects)
                 };
-                var ucasDataMigrator = new UcasDataMigrator(GetDbContext(configuration), logger, payload);
+                var context = GetDbContext(mcConfig);
+                var ucasDataMigrator = new UcasDataMigrator(context, logger, payload);
                 ucasDataMigrator.UpdateUcasData();
             }
             catch (Exception e)
@@ -93,12 +95,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             }
         }
 
-        private static ManageCoursesDbContext GetDbContext(IConfiguration configuration)
+        private static ManageCoursesDbContext GetDbContext(McConfig config)
         {
-            var mcConfig = new McConfig(configuration);
-            mcConfig.Validate();
-
-            var connectionString = mcConfig.BuildConnectionString();
+            var connectionString = config.BuildConnectionString();
 
             var options = new DbContextOptionsBuilder<ManageCoursesDbContext>()
                 .UseNpgsql(connectionString)
