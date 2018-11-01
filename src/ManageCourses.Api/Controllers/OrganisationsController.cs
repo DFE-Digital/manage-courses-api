@@ -41,29 +41,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             }
         }
 
-        // /// <summary>
-        // /// Gets UCAS Institution data by Institution Code
-        // /// </summary>
-        // /// <returns>a single UcasInstitution object</returns>
-        // [BearerTokenAuth]
-        // [HttpGet]
-        // [Route("{instCode}/ucas")]
-        // [ProducesResponseType(typeof(Institution), 200)]
-        // [ProducesResponseType(404)]
-        // public ActionResult GetUcasInstitution(string instCode)
-        // {
-        //     var name = this.User.Identity.Name;
-        //     var organisation = _dataService.GetUcasInstitutionForUser(name, instCode);
-        //     if (organisation == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     else
-        //     {
-        //         return Ok(organisation);
-        //     }
-        // }
-
         /// <summary>
         /// Gets a list of organisations for the user
         /// </summary>
