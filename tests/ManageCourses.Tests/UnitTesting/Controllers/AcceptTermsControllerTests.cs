@@ -40,7 +40,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Controllers
             }};
 
             var context = new Mock<IManageCoursesDbContext>();
-            context.Setup(x => x.GetMcUsers("foo@example.com")).Returns(list.AsQueryable()).Verifiable();
+            context.Setup(x => x.GetUsers("foo@example.com")).Returns(list.AsQueryable()).Verifiable();
             context.Setup(x => x.Save()).Verifiable();
             
             var identity = new Mock<ClaimsIdentity>();

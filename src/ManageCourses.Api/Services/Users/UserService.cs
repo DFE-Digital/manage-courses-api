@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Users
             if (mcUser == null)
             {
                 // fall back to email address for users where we don't yet know their sign-in id
-                mcUser = await _context.GetMcUsers(userDetails.Email).SingleOrDefaultAsync();
+                mcUser = await _context.GetUsers(userDetails.Email).SingleOrDefaultAsync();
                 if (mcUser != null)
                 {
                     // record the sign-in id and use that in future

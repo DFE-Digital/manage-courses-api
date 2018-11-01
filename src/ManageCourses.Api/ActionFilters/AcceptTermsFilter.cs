@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Api.ActionFilters
                 throw new InvalidOperationException("AcceptTermsFilter invoked without a user being authenticated");
             }
 
-            var users = dbContext.GetMcUsers(userEmail).ToList();
+            var users = dbContext.GetUsers(userEmail).ToList();
             if (users.Count > 1)
             {
                 throw new InvalidOperationException($"multiple users found for {userEmail}");
