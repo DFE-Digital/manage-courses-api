@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 SetAccessToken();
                 var result = await wrapped.GetAsync(queryUri);
 
-                await Guard(result, msg);
+                await EnsureSuccess(result, msg);
                 return result;
             }
             catch(ManageCoursesApiException)
@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
                 SetAccessToken();
                 var result = await wrapped.PostAsync(queryUri, content);
 
-                await Guard(result, msg);
+                await EnsureSuccess(result, msg);
                 return result;
             }
             catch(ManageCoursesApiException)
@@ -57,7 +57,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
             }
         }
 
-        private async Task Guard(HttpResponseMessage result, string msg)
+        private async Task EnsureSuccess(HttpResponseMessage result, string msg)
         {
             if(!result.IsSuccessStatusCode) {
 
