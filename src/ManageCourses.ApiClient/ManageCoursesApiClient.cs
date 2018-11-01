@@ -133,7 +133,6 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/searchandcompare/{instCode}/{courseCode}");
         }
 
-        // No coverage
         public async Task AcceptTerms_IndexAsync()
         {
             await PostObjects($"acceptterms/accept", null);
