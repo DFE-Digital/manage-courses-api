@@ -29,7 +29,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         private ManageCoursesApiClient manageCoursesApiClient;
         private Mock<HttpClientWrapper> mockHttp;
         private string accessToken = "accessToken";
-        private string baseurl = "http://baseurl.com";
+        private string baseurl = "http://fake.baseurl.com.fakefortesting";
 
         [SetUp]
         public void SetUp()
