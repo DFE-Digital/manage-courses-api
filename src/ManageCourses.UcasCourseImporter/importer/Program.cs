@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Threading;
 using CsvHelper;
 using GovUk.Education.ManageCourses.Api;
 using GovUk.Education.ManageCourses.Csv.Domain;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Xls;
 using GovUk.Education.ManageCourses.Xls.Domain;
+using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -19,8 +21,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
     {
         static void Main(string[] args)
         {
-            var configuration = GetConfiguration();            
-            
+            var configuration = GetConfiguration();
+            var telemetryClient = new TelemetryClient() { InstrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"] };
+
             var logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .WriteTo
@@ -83,11 +86,15 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             {
                 CleanupTempData(folder, logger);
                 logger.Information("UcasCourseImporter finished.");
+
+                // flush logs and wait for them to be written. https://github.com/serilog/serilog-sinks-applicationinsights#how-when-and-why-to-flush-messages-manually
+                telemetryClient.Flush();
+                Thread.Sleep(5000);
             }
         }
 
         private static ManageCoursesDbContext GetDbContext(IConfiguration configuration)
-        {            
+        {
             var mcConfig = new McConfig(configuration);
             mcConfig.Validate();
 
@@ -133,7 +140,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
         private static void UpdateContactDetails(List<Xls.Domain.UcasInstitution> institutions, IDictionary<string, UcasInstitutionProfile> institutionProfiles)
         {
-            foreach(var inst in institutions)
+            foreach (var inst in institutions)
             {
                 if (institutionProfiles.TryGetValue(inst.InstCode, out UcasInstitutionProfile profile))
                 {
