@@ -37,7 +37,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             const string email = "roger@example.org";
             const string instCode = "BAT4";
-            _contextMock.Setup(c => c.GetUserOrganisation(email, instCode)).Returns(new OrganisationInstitution
+            _contextMock.Setup(c => c.GetOrganisationInstitution(email, instCode)).Returns(new OrganisationInstitution
             {
                 Institution = new Institution(),
                 Organisation = new Organisation()

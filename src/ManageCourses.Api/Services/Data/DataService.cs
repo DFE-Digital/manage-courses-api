@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             _enrichmentService = enrichmentService;
             _logger = logger;
         }
-        
+
         /// <summary>
         /// returns a Course object containing all the required fields
         /// </summary>
@@ -35,7 +35,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         {
 
             var courseRecords = _context.GetCourse(instCode, courseCode, email);
-            
+
             if (courseRecords.Count == 0)
             {
                 return null;
@@ -63,48 +63,48 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 return new List<Course>();
             }
-            
+
             return WithEnrichmentMetadata(courseRecords, instCode, email).ToList();
         }
 
         public IEnumerable<InstitutionSummary> GetInstitutionSummariesForUser(string email)
         {
-            var userOrganisations = _context.GetUserOrganisations(email)
-                .Select(orgInst => new InstitutionSummary()
+            var institutionSummaries = _context.GetOrganisationInstitutions(email)
+                .Select(institutionSummary => new InstitutionSummary()
                 {
-                    InstName = orgInst.Institution.InstName,
-                    InstCode = orgInst.Institution.InstCode,
-                    TotalCourses = orgInst.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
+                    InstName = institutionSummary.Institution.InstName,
+                    InstCode = institutionSummary.Institution.InstCode,
+                    TotalCourses = institutionSummary.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
                 }).OrderBy(x => x.InstName).ToList();
 
-            return userOrganisations;
+            return institutionSummaries;
         }
 
         public InstitutionSummary GetInstitutionSummaryForUser(string email, string instCode)
         {
-            var userOrganisation = _context.GetUserOrganisation(email, instCode);
+            var organisationInstitution = _context.GetOrganisationInstitution(email, instCode);
             var enrichment = _enrichmentService.GetInstitutionEnrichment(instCode, email);
 
-            if (userOrganisation != null)
+            if (organisationInstitution != null)
             {
                 return new InstitutionSummary()
                 {
-                    InstName = userOrganisation.Institution.InstName,
-                    InstCode = userOrganisation.Institution.InstCode,
-                    TotalCourses = userOrganisation.Institution.Courses.Select(c => c.CourseCode).Distinct()
+                    InstName = organisationInstitution.Institution.InstName,
+                    InstCode = organisationInstitution.Institution.InstCode,
+                    TotalCourses = organisationInstitution.Institution.Courses.Select(c => c.CourseCode).Distinct()
                         .Count(),
                     EnrichmentWorkflowStatus = enrichment?.Status
                 };
             }
 
             return null;
-        }        
+        }
 
         public Institution GetUcasInstitutionForUser(string name, string instCode)
         {
             return _context.GetInstitution(name, instCode);
         }
-        
+
         private IEnumerable<Course> WithEnrichmentMetadata(IEnumerable<Course> courseRecords, string instCode, string email)
         {
             var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);

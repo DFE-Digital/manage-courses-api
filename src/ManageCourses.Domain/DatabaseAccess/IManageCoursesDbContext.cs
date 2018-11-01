@@ -19,13 +19,13 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<AccessRequest> AccessRequests { get; set; }
         DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         DbSet<CourseEnrichment> CourseEnrichments { get; set; }
-        DbSet<Session> Sessions { get;  set; }
+        DbSet<Session> Sessions { get; set; }
         DbSet<PgdeCourse> PgdeCourses { get; set; }
-        
+
         List<Course> GetCourse(string instCode, string courseCode, string email);
         List<Course> GetCoursesByInstCode(string instCode, string email);
-        IQueryable<OrganisationInstitution> GetUserOrganisations(string email);
-        OrganisationInstitution GetUserOrganisation(string email, string instCode);
+        IQueryable<OrganisationInstitution> GetOrganisationInstitutions(string email);
+        OrganisationInstitution GetOrganisationInstitution(string email, string instCode);
 
         Institution GetInstitution(string name, string instCode);
 

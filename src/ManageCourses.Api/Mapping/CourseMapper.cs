@@ -13,28 +13,28 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
     public class CourseMapper : ICourseMapper
     {
         private readonly SubjectMapper subjectMapper = new SubjectMapper();
-        
-        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Institution ucasInstData, Domain.Models.Course ucasCourseData, InstitutionEnrichmentModel orgEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
+
+        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Institution ucasInstData, Domain.Models.Course ucasCourseData, InstitutionEnrichmentModel institutionEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
             ucasInstData = ucasInstData ?? new Institution();
             ucasCourseData = ucasCourseData ?? new Domain.Models.Course();
             var sites = ucasCourseData.CourseSites ?? new ObservableCollection<CourseSite>();
-            orgEnrichmentModel = orgEnrichmentModel ?? new InstitutionEnrichmentModel();
+            institutionEnrichmentModel = institutionEnrichmentModel ?? new InstitutionEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
 
             var useUcasContact =
-                string.IsNullOrWhiteSpace(orgEnrichmentModel.Email) &&
-                string.IsNullOrWhiteSpace(orgEnrichmentModel.Website) &&
-                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address1) &&
-                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address2) &&
-                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address3) &&
-                string.IsNullOrWhiteSpace(orgEnrichmentModel.Address4) &&
-                string.IsNullOrWhiteSpace(orgEnrichmentModel.Postcode);
+                string.IsNullOrWhiteSpace(institutionEnrichmentModel.Email) &&
+                string.IsNullOrWhiteSpace(institutionEnrichmentModel.Website) &&
+                string.IsNullOrWhiteSpace(institutionEnrichmentModel.Address1) &&
+                string.IsNullOrWhiteSpace(institutionEnrichmentModel.Address2) &&
+                string.IsNullOrWhiteSpace(institutionEnrichmentModel.Address3) &&
+                string.IsNullOrWhiteSpace(institutionEnrichmentModel.Address4) &&
+                string.IsNullOrWhiteSpace(institutionEnrichmentModel.Postcode);
 
             var subjectStrings = ucasCourseData?.CourseSubjects != null
                 ? subjectMapper.GetSubjectList(ucasCourseData.Name, ucasCourseData.CourseSubjects.Select(x => x.Subject.SubjectName))
                 : new List<string>();
-            
+
             var subjects = new Collection<SearchAndCompare.Domain.Models.Joins.CourseSubject>(subjectStrings.Select(subject =>
                 new SearchAndCompare.Domain.Models.Joins.CourseSubject
                 {
@@ -69,10 +69,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 International = (int)(courseEnrichmentModel.FeeInternational ?? 0),
             } : new Fees();
 
-            var address = useUcasContact ? MapAddress(ucasInstData) :  MapAddress(orgEnrichmentModel);
+            var address = useUcasContact ? MapAddress(ucasInstData) : MapAddress(institutionEnrichmentModel);
             var mappedCourse = new SearchAndCompare.Domain.Models.Course
             {
-                ProviderLocation = new Location { Address = address},
+                ProviderLocation = new Location { Address = address },
                 Duration = MapCourseLength(courseEnrichmentModel.CourseLength),
                 StartDate = ucasCourseData.StartDate,
                 Name = ucasCourseData.Name,
@@ -107,13 +107,14 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
                 ContactDetails = new Contact
                 {
-                    Phone = useUcasContact ? ucasInstData.Telephone : orgEnrichmentModel.Telephone,
-                    Email = useUcasContact ? ucasInstData.Email : orgEnrichmentModel.Email,
-                    Website = useUcasContact ? ucasInstData.Url : orgEnrichmentModel.Website,
+                    Phone = useUcasContact ? ucasInstData.Telephone : institutionEnrichmentModel.Telephone,
+                    Email = useUcasContact ? ucasInstData.Email : institutionEnrichmentModel.Email,
+                    Website = useUcasContact ? ucasInstData.Url : institutionEnrichmentModel.Website,
                     Address = address
                 },
 
-                ApplicationsAcceptedFrom = sites.Select(x => {
+                ApplicationsAcceptedFrom = sites.Select(x =>
+                {
                     DateTime parsed;
                     return DateTime.TryParse(x.ApplicationsAcceptedFrom, out parsed) ? (DateTime?)parsed : null;
                 }).Where(x => x != null && x.HasValue)
@@ -187,19 +188,19 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "about this training provider",//CourseDetailsSections.AboutTheProvider,
-                Text = orgEnrichmentModel.TrainWithUs
+                Text = institutionEnrichmentModel.TrainWithUs
             });
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "about this training provider accrediting",//CourseDetailsSections.AboutTheAccreditingProvider,
-                Text = GetAccreditingInstitutionEnrichment(ucasCourseData?.AccreditingInstitution?.InstCode, orgEnrichmentModel)
+                Text = GetAccreditingInstitutionEnrichment(ucasCourseData?.AccreditingInstitution?.InstCode, institutionEnrichmentModel)
             });
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "training with disabilities",//CourseDetailsSections.TrainWithDisabilities,
-                Text = orgEnrichmentModel.TrainWithDisability
+                Text = institutionEnrichmentModel.TrainWithDisability
             });
 
             return mappedCourse;
@@ -219,7 +220,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             if (qualificationMap.TryGetValue(qualification, out IncludesPgce result))
             {
                 return result;
-            } 
+            }
             throw new ArgumentOutOfRangeException(nameof(qualification), qualification, "Could not map qualifications");
         }
 
@@ -282,7 +283,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             return addressFragments.Any()
                 ? String.Join("\n", addressFragments) + "\n" + postCode
                 : postCode;
-        }        
+        }
 
         private string MapAddress(InstitutionEnrichmentModel orgEnrichmentModel)
         {
