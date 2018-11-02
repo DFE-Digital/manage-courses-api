@@ -31,61 +31,61 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <summary>
         /// Publishes a list of courses to Search and Compare
         /// </summary>
-        /// <param name="instCode">institution code for the courses</param>
+        /// <param name="providerCode">provider code for the courses</param>
         /// <param name="email">email of the user</param>
         /// <returns></returns>
-        public async Task<bool> SaveCourses(string instCode, string email)
+        public async Task<bool> SaveCourses(string providerCode, string email)
         {
-            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(providerCode) || string.IsNullOrWhiteSpace(email))
             {
                 return false;
             }
 
-            var courses = GetValidCourses(instCode, email);
+            var courses = GetValidCourses(providerCode, email);
 
-            return await SaveImplementation(courses, instCode);
+            return await SaveImplementation(courses, providerCode);
         }
         /// <summary>
         /// Publishes a list of courses to Search and Compare
         /// </summary>
-        /// <param name="instCode">institution code for the courses</param>
+        /// <param name="providerCode">provider code for the courses</param>
         /// <param name="courseCode">code for the course (if a single course is to be published)</param>
         /// <param name="email">email of the user</param>
         /// <returns></returns>
-        public async Task<bool> SaveCourse(string instCode, string courseCode, string email)
+        public async Task<bool> SaveCourse(string providerCode, string courseCode, string email)
         {
-            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
+            if (string.IsNullOrWhiteSpace(providerCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
             {
                 return false;
             }
 
-            var courses = GetValidCourses(instCode, email, courseCode);
+            var courses = GetValidCourses(providerCode, email, courseCode);
 
-            return await SaveImplementation(courses, instCode);
+            return await SaveImplementation(courses, providerCode);
         }
 
-        private List<Course> GetValidCourses(string instCode, string email, string courseCode = null)
+        private List<Course> GetValidCourses(string providerCode, string email, string courseCode = null)
         {
-            var ucasInstData = _dataService.GetUcasInstitutionForUser(email, instCode);
-            var orgEnrichmentData = _enrichmentService.GetInstitutionEnrichmentForPublish(instCode, email);
+            var ucasProviderData = _dataService.GetUcasProviderForUser(email, providerCode);
+            var orgEnrichmentData = _enrichmentService.GetProviderEnrichmentForPublish(providerCode, email);
 
             var courses = new List<Course> ();
 
             if (courseCode != null)
             {
-                courses = new List<Course> { GetCourse(instCode, courseCode, email, ucasInstData, orgEnrichmentData) };
+                courses = new List<Course> { GetCourse(providerCode, courseCode, email, ucasProviderData, orgEnrichmentData) };
 
             }
             else
             {
-                courses.AddRange(_dataService.GetCoursesForUser(email, instCode)
-                    .Select(x => GetCourse(instCode, x.CourseCode, email, ucasInstData, orgEnrichmentData)));
+                courses.AddRange(_dataService.GetCoursesForUser(email, providerCode)
+                    .Select(x => GetCourse(providerCode, x.CourseCode, email, ucasProviderData, orgEnrichmentData)));
             }
 
             return courses.Where(courseToSave => courseToSave.IsValid(false)).ToList();
         }
 
-        private async Task<bool> SaveImplementation(List<Course> courses, string instCode)
+        private async Task<bool> SaveImplementation(List<Course> courses, string providerCode)
         {
             var returnBool = false;
             try
@@ -97,24 +97,24 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
 
                 if (!returnBool)
                 {
-                    _logger.LogError($"Save courses to search and compare failed for institution: {instCode}");
+                    _logger.LogError($"Save courses to search and compare failed for provider: {providerCode}");
                 }
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"An unexpected error occured. Save courses to search and compare failed for institution: {instCode}");
+                _logger.LogError(e, $"An unexpected error occured. Save courses to search and compare failed for provider: {providerCode}");
             }
 
             return returnBool;
         }
 
-        private Course GetCourse(string instCode, string courseCode, string email, Provider ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
+        private Course GetCourse(string providerCode, string courseCode, string email, Provider ucasProviderData, UcasProviderEnrichmentGetModel orgEnrichmentData)
         {
-            var ucasCourseData = _dataService.GetCourseForUser(email, instCode, courseCode);
-            var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(instCode, courseCode, email);
+            var ucasCourseData = _dataService.GetCourseForUser(email, providerCode, courseCode);
+            var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(providerCode, courseCode, email);
 
             var courseToReturn = _courseMapper.MapToSearchAndCompareCourse(
-                ucasInstData,
+                ucasProviderData,
                 ucasCourseData,
                 orgEnrichmentData.EnrichmentModel,
                 courseEnrichmentData?.EnrichmentModel);

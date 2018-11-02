@@ -2,9 +2,9 @@
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
-    internal class UserInstitution
+    internal class UserProvider
     {
         public User User { get; set; }
-        public string UcasInstitutionCode { get; set; }
+        public string UcasProviderCode { get; set; }
     }
 }

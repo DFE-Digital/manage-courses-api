@@ -134,9 +134,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             context.Users.AddRange(users);
             context.Organisations.AddRange(organisations);
-            context.Institutions.AddRange(institutions);
+            context.Providers.AddRange(institutions);
             context.OrganisationUsers.AddRange(organisationUsers);
-            context.OrganisationIntitutions.AddRange(organisationInstitutions);
+            context.OrganisationProviders.AddRange(organisationInstitutions);
             context.Save();
         }
 

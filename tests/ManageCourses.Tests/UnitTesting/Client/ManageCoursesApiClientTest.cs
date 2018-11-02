@@ -134,11 +134,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
 
             var controller = "organisations";
             var leaf = $"/{instCode}";
-            SetupGetUrlVerification<InstitutionSummary>($"{baseurl}/api/{controller}{leaf}");
+            SetupGetUrlVerification<ProviderSummary>($"{baseurl}/api/{controller}{leaf}");
 
             var result = manageCoursesApiClient.Organisations_GetAsync(instCode).Result;
 
-            result.Should().BeOfType<InstitutionSummary>();
+            result.Should().BeOfType<ProviderSummary>();
             mockHttp.VerifyAll();
         }
         [Test]
@@ -146,11 +146,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         {
             var controller = "organisations";
             var leaf = $"";
-            SetupGetUrlVerification<List<InstitutionSummary>>($"{baseurl}/api/{controller}{leaf}");
+            SetupGetUrlVerification<List<ProviderSummary>>($"{baseurl}/api/{controller}{leaf}");
 
             var result = manageCoursesApiClient.Organisations_GetAllAsync().Result;
 
-            result.Should().AllBeAssignableTo<IEnumerable<InstitutionSummary>>();
+            result.Should().AllBeAssignableTo<IEnumerable<ProviderSummary>>();
             mockHttp.VerifyAll();
         }
 

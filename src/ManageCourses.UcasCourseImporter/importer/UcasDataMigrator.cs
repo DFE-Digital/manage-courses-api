@@ -198,13 +198,13 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         private Provider UpsertInstitution(Provider newValues)
         {
             newValues.ProviderCode = newValues.ProviderCode.ToUpperInvariant();
-            var entity = _context.Institutions
+            var entity = _context.Providers
                 .Include(x => x.Sites).Include(x => x.Courses)
                 .FirstOrDefault(x => x.ProviderCode == newValues.ProviderCode);
             if (entity == null)
             {
                 // insert
-                _context.Institutions.Add(newValues);
+                _context.Providers.Add(newValues);
                 return newValues;
             }
             else

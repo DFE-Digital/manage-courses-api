@@ -99,7 +99,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
             _logger.Information($" - {courseEnrichments.Count()} courseEnrichments");
 
-            var orgEnrichments = context.InstitutionEnrichments
+            var orgEnrichments = context.ProviderEnrichments
                 .Include(x => x.CreatedByUser)
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)

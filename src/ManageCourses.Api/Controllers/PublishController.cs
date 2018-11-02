@@ -28,17 +28,17 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>boolean indicating success/failure</returns>
         [BearerTokenAuth]
         [HttpPost]
-        [Route("course/{instCode}/{courseCode}")]
+        [Route("course/{providerCode}/{courseCode}")]
         [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> PublishCourseToSearchAndCompare(string instCode, string courseCode)
+        public async Task<ActionResult> PublishCourseToSearchAndCompare(string providerCode, string courseCode)
         {
             var name = this.User.Identity.Name;
 
-            var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(instCode, courseCode, name);
+            var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(providerCode, courseCode, name);
 
-            await _searchAndCompareService.SaveCourse(instCode, courseCode, name);
+            await _searchAndCompareService.SaveCourse(providerCode, courseCode, name);
 
             return Ok(enrichmentResult);
         }
@@ -48,17 +48,17 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>boolean indicating success/failure</returns>
         [BearerTokenAuth]
         [HttpPost]
-        [Route("organisation/{instCode}")]
+        [Route("organisation/{providerCode}")]
         [ProducesResponseType(typeof(bool), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult> PublishCoursesToSearchAndCompare(string instCode)
+        public async Task<ActionResult> PublishCoursesToSearchAndCompare(string providerCode)
         {
             var name = this.User.Identity.Name;
 
-            var enrichmentResult = _enrichmentservice.PublishInstitutionEnrichment(instCode, name);
+            var enrichmentResult = _enrichmentservice.PublishProviderEnrichment(providerCode, name);
 
-            await _searchAndCompareService.SaveCourses(instCode, name);
+            await _searchAndCompareService.SaveCourses(providerCode, name);
 
             return Ok(enrichmentResult);
         }
@@ -69,31 +69,31 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>a single course</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [Route("searchandcompare/{instCode}/{courseCode}")]
+        [Route("searchandcompare/{providerCode}/{courseCode}")]
         [ProducesResponseType(typeof(SearchAndCompare.Domain.Models.Course), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult GetSearchAndCompareCourse(string instCode, string courseCode)
+        public ActionResult GetSearchAndCompareCourse(string providerCode, string courseCode)
         {
             var name = this.User.Identity.Name;
-            if (string.IsNullOrWhiteSpace(instCode) || string.IsNullOrWhiteSpace(courseCode))
+            if (string.IsNullOrWhiteSpace(providerCode) || string.IsNullOrWhiteSpace(courseCode))
             {
                 return BadRequest();
             }
 
             var courseMapper = new CourseMapper();
 
-            var ucasInstData = _dataService.GetUcasInstitutionForUser(name, instCode);
-            var orgEnrichmentData = _enrichmentservice.GetInstitutionEnrichment(instCode, name);
-            var ucasCourseData = _dataService.GetCourseForUser(name, instCode, courseCode);
-            var courseEnrichmentData = _enrichmentservice.GetCourseEnrichment(instCode, courseCode, name);
-            if (ucasInstData == null || ucasCourseData == null)
+            var ucasProviderData = _dataService.GetUcasProviderForUser(name, providerCode);
+            var orgEnrichmentData = _enrichmentservice.GetProviderEnrichment(providerCode, name);
+            var ucasCourseData = _dataService.GetCourseForUser(name, providerCode, courseCode);
+            var courseEnrichmentData = _enrichmentservice.GetCourseEnrichment(providerCode, courseCode, name);
+            if (ucasProviderData == null || ucasCourseData == null)
             {
                 return NotFound();
             }
 
             var course = courseMapper.MapToSearchAndCompareCourse(
-                ucasInstData,
+                ucasProviderData,
                 ucasCourseData,
                 orgEnrichmentData?.EnrichmentModel,
                 courseEnrichmentData?.EnrichmentModel);

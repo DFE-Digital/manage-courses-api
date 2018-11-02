@@ -210,9 +210,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static InstitutionEnrichmentModel GenerateInstitutionEnrichmentWithoutContactDetails()
+        private static ProviderEnrichmentModel GenerateInstitutionEnrichmentWithoutContactDetails()
         {
-            return new InstitutionEnrichmentModel
+            return new ProviderEnrichmentModel
             {
                 TrainWithUs = "TrainWithUs",
                 TrainWithDisability = "TrainWithDisability",
@@ -220,7 +220,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     {
                         new AccreditingProviderEnrichment
                         {
-                            UcasInstitutionCode = "ACC123",
+                            UcasProviderCode = "ACC123",
                             Description = "AccreditingProviderDescription"
                         }
                     }

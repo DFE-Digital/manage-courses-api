@@ -37,28 +37,28 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             const string email = "roger@example.org";
             const string instCode = "BAT4";
-            _contextMock.Setup(c => c.GetOrganisationInstitution(email, instCode)).Returns(new OrganisationProvider
+            _contextMock.Setup(c => c.GetOrganisationProvider(email, instCode)).Returns(new OrganisationProvider
             {
                 Provider = new Provider(),
                 Organisation = new Organisation()
             });
 
             // test blank
-            var org = _dataService.GetInstitutionSummaryForUser(email, instCode);
+            var org = _dataService.GetProviderSummaryForUser(email, instCode);
             org.Should().NotBeNull();
             org.EnrichmentWorkflowStatus.Should().BeNull("there's no enrichment present");
 
             // test draft
-            var ucasInstitutionEnrichmentGetModel = new UcasInstitutionEnrichmentGetModel { Status = EnumStatus.Draft };
-            _enrichmentServiceMock.Setup(e => e.GetInstitutionEnrichment(instCode, email))
+            var ucasInstitutionEnrichmentGetModel = new UcasProviderEnrichmentGetModel { Status = EnumStatus.Draft };
+            _enrichmentServiceMock.Setup(e => e.GetProviderEnrichment(instCode, email))
                 .Returns(ucasInstitutionEnrichmentGetModel);
-            var enrichedOrg = _dataService.GetInstitutionSummaryForUser(email, instCode);
+            var enrichedOrg = _dataService.GetProviderSummaryForUser(email, instCode);
             enrichedOrg.Should().NotBeNull();
             enrichedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
 
             // test published
             ucasInstitutionEnrichmentGetModel.Status = EnumStatus.Published;
-            var publishedOrg = _dataService.GetInstitutionSummaryForUser(email, instCode);
+            var publishedOrg = _dataService.GetProviderSummaryForUser(email, instCode);
             publishedOrg.Should().NotBeNull();
             publishedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
         }

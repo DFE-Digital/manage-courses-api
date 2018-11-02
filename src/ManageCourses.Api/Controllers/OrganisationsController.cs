@@ -24,13 +24,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>a single UserOrganisation object</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [Route("{instCode}")]
-        [ProducesResponseType(typeof(InstitutionSummary), 200)]
+        [Route("{providerCode}")]
+        [ProducesResponseType(typeof(ProviderSummary), 200)]
         [ProducesResponseType(404)]
-        public ActionResult Get(string instCode)
+        public ActionResult Get(string providerCode)
         {
             var name = this.User.Identity.Name;
-            var organisation = _dataService.GetInstitutionSummaryForUser(name, instCode);
+            var organisation = _dataService.GetProviderSummaryForUser(name, providerCode);
             if (organisation == null)
             {
                 return NotFound();
@@ -47,12 +47,12 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns>a list of UserOrganisation objects</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<InstitutionSummary>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<ProviderSummary>), 200)]
         [ProducesResponseType(401)]
         public IActionResult GetAll()
         {
             var name = this.User.Identity.Name;
-            var organisations = _dataService.GetInstitutionSummariesForUser(name);
+            var organisations = _dataService.GetProviderSummariesForUser(name);
             if (!organisations.Any())
             {
                 return Unauthorized();

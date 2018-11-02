@@ -31,8 +31,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
-            var model = new UcasInstitutionEnrichmentPostModel();
-            model.EnrichmentModel = new InstitutionEnrichmentModel
+            var model = new UcasProviderEnrichmentPostModel();
+            model.EnrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
@@ -45,8 +45,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
-            var model = new UcasInstitutionEnrichmentPostModel();
-            model.EnrichmentModel = new InstitutionEnrichmentModel
+            var model = new UcasProviderEnrichmentPostModel();
+            model.EnrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
@@ -96,8 +96,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
             const string ucasInstitutionCode = "ABC";
-            var model = new UcasInstitutionEnrichmentPostModel();
-            model.EnrichmentModel = new InstitutionEnrichmentModel
+            var model = new UcasProviderEnrichmentPostModel();
+            model.EnrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"

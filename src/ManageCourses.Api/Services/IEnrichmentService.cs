@@ -5,14 +5,14 @@ namespace GovUk.Education.ManageCourses.Api.Services
 {
     public interface IEnrichmentService
     {
-        UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email);
-        UcasInstitutionEnrichmentGetModel GetInstitutionEnrichmentForPublish(string instCode, string email);
-        UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email);        
-        UcasCourseEnrichmentGetModel GetCourseEnrichmentForPublish(string instCode, string ucasCourseCode, string email);
-        void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email);
-        bool PublishInstitutionEnrichment(string instCode, string email);        
-        void SaveCourseEnrichment(CourseEnrichmentModel model, string instCode, string ucasCourseCode, string email);
-        bool PublishCourseEnrichment(string instCode, string ucasCourseCode, string email);
-        IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email);
+        UcasProviderEnrichmentGetModel GetProviderEnrichment(string providerCode, string email);
+        UcasProviderEnrichmentGetModel GetProviderEnrichmentForPublish(string providerCode, string email);
+        UcasCourseEnrichmentGetModel GetCourseEnrichment(string providerCode, string ucasCourseCode, string email);        
+        UcasCourseEnrichmentGetModel GetCourseEnrichmentForPublish(string providerCode, string ucasCourseCode, string email);
+        void SaveProviderEnrichment(UcasProviderEnrichmentPostModel model, string providerCode, string email);
+        bool PublishProviderEnrichment(string providerCode, string email);        
+        void SaveCourseEnrichment(CourseEnrichmentModel model, string providerCode, string ucasCourseCode, string email);
+        bool PublishCourseEnrichment(string providerCode, string ucasCourseCode, string email);
+        IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string providerCode, string email);
     }
 }

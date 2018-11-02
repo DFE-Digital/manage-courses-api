@@ -100,7 +100,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.Add(org);
             Context.SaveChanges();
             //now add the enrichment model with user1
-            var enrichmentModel = new InstitutionEnrichmentModel
+            var enrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithDisability = TrainWithDisabilityText,
                 TrainWithUs = TrainWithUsText,
@@ -108,7 +108,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     new AccreditingProviderEnrichment
                     {
-                        UcasInstitutionCode = AccreditingInstCode,
+                        UcasProviderCode = AccreditingInstCode,
                         Description = "xcvxcvxcv",
                     }
                 }
@@ -131,7 +131,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Status = EnumStatus.Draft,
                 JsonData = content,
             };
-            Context.InstitutionEnrichments.Add(enrichment);
+            Context.ProviderEnrichments.Add(enrichment);
             Context.SaveChanges();            
         }
 
@@ -145,7 +145,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             
             var enrichmentService = new EnrichmentService(Context);
             //test get the enrichment using user2
-            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email2);
+            var result = enrichmentService.GetProviderEnrichment(ProviderInstCode, Email2);
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
             result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(TrainWithDisabilityText);

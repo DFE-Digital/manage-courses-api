@@ -6,10 +6,10 @@ using GovUk.Education.ManageCourses.Domain.Models;
 
 namespace GovUk.Education.ManageCourses.Api.Model
 {
-    public class InstitutionSummary
+    public class ProviderSummary
     {
-        public string InstName { get; set; }
-        public string InstCode { get; set; }
+        public string ProviderName { get; set; }
+        public string ProviderCode { get; set; }
         public int TotalCourses { get; set; }
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
     }

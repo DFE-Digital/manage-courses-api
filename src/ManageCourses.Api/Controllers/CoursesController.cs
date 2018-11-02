@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Middleware;
-using GovUk.Education.ManageCourses.Api.Model;
-using GovUk.Education.ManageCourses.Api.Services;
-using GovUk.Education.ManageCourses.Api.Services.Publish;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,18 +16,18 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Gets a course by institution Ucas code
+        /// Gets a course by provider Ucas code
         /// </summary>
         /// <returns>a single course</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [Route("{instCode}/course/{courseCode}")]
+        [Route("{providerCode}/course/{courseCode}")]
         [ProducesResponseType(typeof(Course), 200)]
         [ProducesResponseType(404)]
-        public ActionResult Get(string instCode, string courseCode)
+        public ActionResult Get(string providerCode, string courseCode)
         {
             var name = this.User.Identity.Name;
-            var course = _dataService.GetCourseForUser(name, instCode, courseCode);
+            var course = _dataService.GetCourseForUser(name, providerCode, courseCode);
 
             if (course == null)
             {
@@ -42,24 +39,24 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             }
         }
         /// <summary>
-        /// Gets a list of course by Inst code
+        /// Gets a list of course by provider code
         /// </summary>
         /// <returns>a single course</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [Route("{instCode}")]
+        [Route("{providerCode}")]
         [ProducesResponseType(typeof(List<Course>), 200)]
         [ProducesResponseType(404)]
-        public ActionResult GetAll(string instCode)
+        public ActionResult GetAll(string providerCode)
         {
             var name = this.User.Identity.Name;
 
-            if (_dataService.GetUcasInstitutionForUser(name, instCode) == null)
+            if (_dataService.GetUcasProviderForUser(name, providerCode) == null)
             {
                 return NotFound();
             };
 
-            var courses = _dataService.GetCoursesForUser(name, instCode);
+            var courses = _dataService.GetCoursesForUser(name, providerCode);
 
             return Ok(courses);
         }

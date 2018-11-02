@@ -99,11 +99,11 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return builder.Uri;
         }
 
-        public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
+        public async Task<UcasProviderEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
         {
-            return await GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
+            return await GetObjects<UcasProviderEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
         }
-        public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
+        public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasProviderEnrichmentPostModel model)
         {
             await PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
         }
@@ -151,14 +151,14 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return await GetObjects<List<Domain.Models.Course>>($"courses/{instCode}");
         }
 
-        public async Task<InstitutionSummary> Organisations_GetAsync(string instCode)
+        public async Task<ProviderSummary> Organisations_GetAsync(string instCode)
         {
-            return await GetObjects<InstitutionSummary>($"organisations/{instCode}");
+            return await GetObjects<ProviderSummary>($"organisations/{instCode}");
         }
 
-        public async Task<IEnumerable<InstitutionSummary>> Organisations_GetAllAsync()
+        public async Task<IEnumerable<ProviderSummary>> Organisations_GetAllAsync()
         {
-            return await GetObjects<IEnumerable<InstitutionSummary>>($"organisations");
+            return await GetObjects<IEnumerable<ProviderSummary>>($"organisations");
         }
         public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
         {

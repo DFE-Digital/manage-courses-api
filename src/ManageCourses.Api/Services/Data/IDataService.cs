@@ -6,11 +6,11 @@ namespace GovUk.Education.ManageCourses.Api.Data
 {
     public interface IDataService
     {
-        IEnumerable<InstitutionSummary> GetInstitutionSummariesForUser(string email);
-        InstitutionSummary GetInstitutionSummaryForUser(string email, string instCode);
-        Course GetCourseForUser(string email, string instCode, string courseCode);
-        List<Course> GetCoursesForUser(string email, string instCode);
-        Provider GetUcasInstitutionForUser(string name, string instCode);
+        IEnumerable<ProviderSummary> GetProviderSummariesForUser(string email);
+        ProviderSummary GetProviderSummaryForUser(string email, string providerCode);
+        Course GetCourseForUser(string email, string providerCode, string courseCode);
+        List<Course> GetCoursesForUser(string email, string providerCode);
+        Provider GetUcasProviderForUser(string name, string providerCode);
     }
 }
     

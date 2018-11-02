@@ -17,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             };
         }        
 
-        public string ConvertToJson(UcasInstitutionEnrichmentPostModel model)
+        public string ConvertToJson(UcasProviderEnrichmentPostModel model)
         {
             return JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
         }
@@ -46,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser?.Id ?? 0;
             enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
             enrichmentToReturn.Status = source.Status;
-            enrichmentToReturn.InstCode = source.ProviderCode;
+            enrichmentToReturn.ProviderCode = source.ProviderCode;
             enrichmentToReturn.CourseCode = source.UcasCourseCode;
             return enrichmentToReturn;
         }
@@ -56,12 +56,12 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
         /// </summary>
         /// <param name="source">enrichment data object</param>
         /// <returns>enrichment model with enrichment data (if found). Null if there is no source record</returns>
-        public UcasInstitutionEnrichmentGetModel Convert(ProviderEnrichment source)
+        public UcasProviderEnrichmentGetModel Convert(ProviderEnrichment source)
         {
             if (source == null) return null;
 
-            var enrichmentToReturn = new UcasInstitutionEnrichmentGetModel();
-            var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<InstitutionEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
+            var enrichmentToReturn = new UcasProviderEnrichmentGetModel();
+            var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<ProviderEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
 
             enrichmentToReturn.EnrichmentModel = enrichmentModel;
             enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;

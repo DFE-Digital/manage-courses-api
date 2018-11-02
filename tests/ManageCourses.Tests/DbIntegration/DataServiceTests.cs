@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var result = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var result = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             Assert.IsTrue(result.Count == numOrgs);
             Assert.IsTrue(result.All(c => c.TotalCourses == numCourses));
         }
@@ -52,7 +52,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var result = DataService.GetInstitutionSummariesForUser("anyone@testing.com").ToList();//try to get the list using an invalid email
+            var result = DataService.GetProviderSummariesForUser("anyone@testing.com").ToList();//try to get the list using an invalid email
             Assert.IsTrue(result.Count == 0);
             Assert.IsTrue(result.All(c => c.TotalCourses == 0));
         }
@@ -63,15 +63,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
 
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)//we have a valid list of data
             {
-                var result = DataService.GetInstitutionSummaryForUser(TestUserEmail1, org.InstCode);//get the organisation
-                Assert.IsTrue(result.InstName == org.InstName);
+                var result = DataService.GetProviderSummaryForUser(TestUserEmail1, org.ProviderCode);//get the organisation
+                Assert.IsTrue(result.ProviderName == org.ProviderName);
             }
         }
 
@@ -81,13 +81,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)
             {
-                var result = DataService.GetInstitutionSummaryForUser("anyone@testing.com", org.InstCode);//try to get the organisation using an invalid email
+                var result = DataService.GetProviderSummaryForUser("anyone@testing.com", org.ProviderCode);//try to get the organisation using an invalid email
                 Assert.IsNull(result);
             }
         }
@@ -98,13 +98,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)
             {
-                var result = DataService.GetCoursesForUser(TestUserEmail1, org.InstCode);//get the course for each org
+                var result = DataService.GetCoursesForUser(TestUserEmail1, org.ProviderCode);//get the course for each org
                 Assert.AreEqual(numCourses, result.Count);
             }
         }
@@ -114,12 +114,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             orgList.Count.Should().Be(numOrgs);
 
             foreach (var org in orgList)
             {
-                var result = DataService.GetCoursesForUser(TestUserEmail1, org.InstCode);//get the course for each org
+                var result = DataService.GetCoursesForUser(TestUserEmail1, org.ProviderCode);//get the course for each org
 
                 foreach (var course in result)
                 {
@@ -134,12 +134,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             orgList.Count.Should().Be(numOrgs);
 
             foreach (var org in orgList)
             {
-                var result = DataService.GetCoursesForUser(TestUserEmail1, org.InstCode);//get the course for each org
+                var result = DataService.GetCoursesForUser(TestUserEmail1, org.ProviderCode);//get the course for each org
 
                 foreach (var course in result)
                 {
@@ -173,13 +173,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)
             {
-                var result = DataService.GetCoursesForUser("anyone@anywhere.com", org.InstCode);//get the course for each org
+                var result = DataService.GetCoursesForUser("anyone@anywhere.com", org.ProviderCode);//get the course for each org
                 Assert.True(result.Count == 0);
             }
         }
@@ -205,16 +205,16 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)
             {
-                var coursesList = DataService.GetCoursesForUser(TestUserEmail1, org.InstCode);//get the courses for each org
+                var coursesList = DataService.GetCoursesForUser(TestUserEmail1, org.ProviderCode);//get the courses for each org
                 foreach (var course in coursesList)
                 {
-                    var result = DataService.GetCourseForUser(TestUserEmail1, org.InstCode, course.CourseCode);
+                    var result = DataService.GetCourseForUser(TestUserEmail1, org.ProviderCode, course.CourseCode);
                     Assert.IsTrue(course != null && result.Name == course.Name);
                 }
             }
@@ -226,16 +226,16 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
-            var orgList = DataService.GetInstitutionSummariesForUser(TestUserEmail1).ToList();
+            var orgList = DataService.GetProviderSummariesForUser(TestUserEmail1).ToList();
             Assert.IsTrue(orgList.Count == numOrgs);
             Assert.IsTrue(orgList.All(c => c.TotalCourses == numCourses));
 
             foreach (var org in orgList)
             {
-                var coursesList = DataService.GetCoursesForUser(TestUserEmail1, org.InstCode);//get the courses for each org
+                var coursesList = DataService.GetCoursesForUser(TestUserEmail1, org.ProviderCode);//get the courses for each org
                 foreach (var course in coursesList)
                 {
-                    var result = DataService.GetCourseForUser("someone@somewhere.com", org.InstCode, course.CourseCode);
+                    var result = DataService.GetCourseForUser("someone@somewhere.com", org.ProviderCode, course.CourseCode);
                     result.Should().BeNull();
                 }
             }
@@ -274,10 +274,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     ProviderCode = instCode,
                     ProviderName = "Intitution " + counter
                 };
-                Context.Institutions.Add(institution);
+                Context.Providers.Add(institution);
                 LoadCourses(institution, numCourses, Context.Subjects);
                 Context.OrganisationUsers.Add(new OrganisationUser { User = user, Organisation = org });
-                Context.OrganisationIntitutions.Add(new OrganisationProvider
+                Context.OrganisationProviders.Add(new OrganisationProvider
                 {
                     Provider = institution,
                     Organisation = org
