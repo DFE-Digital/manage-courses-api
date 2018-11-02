@@ -17,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<OrganisationUser> OrganisationUsers { get; set; }
         DbSet<User> Users { get; set; }
         DbSet<AccessRequest> AccessRequests { get; set; }
-        DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
+        DbSet<ProviderEnrichment> InstitutionEnrichments { get; set; }
         DbSet<CourseEnrichment> CourseEnrichments { get; set; }
         DbSet<Session> Sessions { get; set; }
         DbSet<PgdeCourse> PgdeCourses { get; set; }

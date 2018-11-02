@@ -120,7 +120,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
             var content = JsonConvert.SerializeObject(enrichmentModel, jsonSerializerSettings);
 
-            var enrichment = new InstitutionEnrichment
+            var enrichment = new ProviderEnrichment
             {
                 ProviderCode = ProviderInstCode,
                 CreatedTimestampUtc = DateTime.UtcNow,

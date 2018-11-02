@@ -80,7 +80,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 {
                     lastPublishedDate = enrichmentPublishRecord.LastPublishedTimestampUtc;
                 }
-                var enrichment = new InstitutionEnrichment
+                var enrichment = new ProviderEnrichment
                 {
                     ProviderCode = userInst.UcasInstitutionCode,
                     CreatedTimestampUtc = DateTime.UtcNow,

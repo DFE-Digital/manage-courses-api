@@ -106,7 +106,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasForeignKey(ar => ar.RequesterId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<InstitutionEnrichment>()
+            modelBuilder.Entity<ProviderEnrichment>()
                 .HasIndex(x => x.ProviderCode);
 
             modelBuilder.Entity<Session>()
@@ -142,7 +142,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<OrganisationUser> OrganisationUsers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
-        public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
+        public DbSet<ProviderEnrichment> InstitutionEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
         public DbSet<Session> Sessions { get; set; }
         public DbSet<PgdeCourse> PgdeCourses { get; set; }

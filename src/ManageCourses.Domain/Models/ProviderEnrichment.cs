@@ -6,7 +6,7 @@ using System.Text;
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
-    public class InstitutionEnrichment
+    public class ProviderEnrichment
     {
         public int Id { get; set; }
         [Required]

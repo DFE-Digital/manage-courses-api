@@ -56,7 +56,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
         /// </summary>
         /// <param name="source">enrichment data object</param>
         /// <returns>enrichment model with enrichment data (if found). Null if there is no source record</returns>
-        public UcasInstitutionEnrichmentGetModel Convert(InstitutionEnrichment source)
+        public UcasInstitutionEnrichmentGetModel Convert(ProviderEnrichment source)
         {
             if (source == null) return null;
 
