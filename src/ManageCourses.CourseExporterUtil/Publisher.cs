@@ -103,7 +103,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.CreatedByUser)
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
-                .ToLookup(x => x.InstCode)
+                .ToLookup(x => x.ProviderCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
             _logger.Information($" - {orgEnrichments.Count()} orgEnrichments");
 

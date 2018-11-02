@@ -54,7 +54,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             instCode = instCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
+                .Where(ie => ie.ProviderCode == instCode && ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
@@ -71,7 +71,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             {
                 //insert
                 var enrichmentPublishRecord = _context.InstitutionEnrichments
-                    .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Published)
+                    .Where(ie => ie.ProviderCode == instCode && ie.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -82,7 +82,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 }
                 var enrichment = new InstitutionEnrichment
                 {
-                    InstCode = userInst.UcasInstitutionCode,
+                    ProviderCode = userInst.UcasInstitutionCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
@@ -110,7 +110,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             instCode = instCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
+                .Where(ie => ie.ProviderCode == instCode && ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
@@ -284,7 +284,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             instCode = instCode.ToUpperInvariant();
 
             var enrichmentsQuery = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode);
+                .Where(ie => ie.ProviderCode == instCode);
 
             if (publishableOnly)
             {

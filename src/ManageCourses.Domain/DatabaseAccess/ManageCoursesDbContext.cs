@@ -107,7 +107,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<InstitutionEnrichment>()
-                .HasIndex(x => x.InstCode);
+                .HasIndex(x => x.ProviderCode);
 
             modelBuilder.Entity<Session>()
                 .HasOne(x => x.User)

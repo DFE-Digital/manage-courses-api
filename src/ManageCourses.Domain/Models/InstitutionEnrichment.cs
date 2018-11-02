@@ -10,7 +10,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     {
         public int Id { get; set; }
         [Required]
-        public string InstCode { get; set; }
+        public string ProviderCode { get; set; }
         public DateTime CreatedTimestampUtc { get; set; }
         public DateTime UpdatedTimestampUtc { get; set; }
         public DateTime? LastPublishedTimestampUtc { get; set; }
