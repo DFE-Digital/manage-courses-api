@@ -1,24 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using FluentAssertions;
-using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.ApiClient;
 using GovUk.Education.ManageCourses.Domain.Models;
-using NUnit.Framework;
-using Institution = GovUk.Education.ManageCourses.Domain.Models.Institution;
 using Moq;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
-using System.Web;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
 {
@@ -28,7 +19,6 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
 
         private ManageCoursesApiClient manageCoursesApiClient;
         private Mock<HttpClientWrapper> mockHttp;
-        private string accessToken = "accessToken";
         private string baseurl = "http://fake.baseurl.com.fakefortesting";
 
         [SetUp]
@@ -90,7 +80,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
                 })
             .Verifiable();
         }
-        
+
         private void SetupGetUrlVerification<T>(string url) where T : new()
         {
             var payloadJson = JsonConvert.SerializeObject(new T());
@@ -129,11 +119,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
 
             var controller = "courses";
             var leaf = $"/{instCode}";
-            SetupGetUrlVerification<InstitutionCourses>($"{baseurl}/api/{controller}{leaf}");
+            SetupGetUrlVerification<List<Domain.Models.Course>>($"{baseurl}/api/{controller}{leaf}");
 
             var result = manageCoursesApiClient.Courses_GetAllAsync(instCode).Result;
 
-            result.Should().BeOfType<InstitutionCourses>();
+            result.Should().BeOfType<List<Domain.Models.Course>>();
             mockHttp.VerifyAll();
         }
 
@@ -144,11 +134,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
 
             var controller = "organisations";
             var leaf = $"/{instCode}";
-            SetupGetUrlVerification<UserOrganisation>($"{baseurl}/api/{controller}{leaf}");
+            SetupGetUrlVerification<InstitutionSummary>($"{baseurl}/api/{controller}{leaf}");
 
             var result = manageCoursesApiClient.Organisations_GetAsync(instCode).Result;
 
-            result.Should().BeOfType<UserOrganisation>();
+            result.Should().BeOfType<InstitutionSummary>();
             mockHttp.VerifyAll();
         }
         [Test]
@@ -156,11 +146,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         {
             var controller = "organisations";
             var leaf = $"";
-            SetupGetUrlVerification<List<UserOrganisation>>($"{baseurl}/api/{controller}{leaf}");
+            SetupGetUrlVerification<List<InstitutionSummary>>($"{baseurl}/api/{controller}{leaf}");
 
             var result = manageCoursesApiClient.Organisations_GetAllAsync().Result;
 
-            result.Should().AllBeAssignableTo<IEnumerable<UserOrganisation>>();
+            result.Should().AllBeAssignableTo<IEnumerable<InstitutionSummary>>();
             mockHttp.VerifyAll();
         }
 
