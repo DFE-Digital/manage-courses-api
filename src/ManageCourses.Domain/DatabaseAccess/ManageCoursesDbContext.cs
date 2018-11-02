@@ -156,7 +156,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     join organisation o on o.id = oi.organisation_id 
                     join organisation_user ou on ou.organisation_id = o.id 
                     join ""user"" u on u.id = ou.user_id 
-                    where lower(i.provider)=lower(@providerCode) 
+                    where lower(i.provider_code)=lower(@providerCode) 
                     and lower(c.course_code)=lower(@courseCode) 
                     and lower(u.email)=lower(@email)", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Provider)
