@@ -8,7 +8,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     {
         public int Id { get; set; }
         [Required]
-        public string InstCode { get; set; }
+        public string ProviderCode { get; set; }
         [Required]
         public string UcasCourseCode { get; set; }
         public DateTime CreatedTimestampUtc { get; set; }

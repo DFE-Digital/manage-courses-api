@@ -46,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser?.Id ?? 0;
             enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
             enrichmentToReturn.Status = source.Status;
-            enrichmentToReturn.InstCode = source.InstCode;
+            enrichmentToReturn.InstCode = source.ProviderCode;
             enrichmentToReturn.CourseCode = source.UcasCourseCode;
             return enrichmentToReturn;
         }

@@ -14,10 +14,10 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     {
         public int Id { get; set; }
 
-        public int InstitutionId { get; set; }
-        public Provider Institution {get; set;}
-        public int? AccreditingInstitutionId { get; set; }
-        public Provider AccreditingInstitution {get; set;}
+        public int ProviderId { get; set; }
+        public Provider Provider {get; set;}
+        public int? AccreditingProviderId { get; set; }
+        public Provider AccreditingProvider {get; set;}
 
         public string CourseCode { get; set; }
         public string ProgramType { get; set; }

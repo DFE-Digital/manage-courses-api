@@ -48,32 +48,32 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .IsUnique();
 
             modelBuilder.Entity<Site>()
-                .HasIndex(s => new { s.InstitutionId, s.Code })
+                .HasIndex(s => new { InstitutionId = s.ProviderId, s.Code })
                 .IsUnique();
 
             modelBuilder.Entity<Site>()
-                .HasOne(uc => uc.Institution)
+                .HasOne(uc => uc.Provider)
                 .WithMany(ui => ui.Sites);
 
             modelBuilder.Entity<OrganisationProvider>()
                 .HasOne(oi => oi.Organisation)
-                .WithMany(o => o.OrganisationInstitutions);
+                .WithMany(o => o.OrganisationProviders);
 
             modelBuilder.Entity<OrganisationProvider>()
                 .HasOne(oi => oi.Provider)
                 .WithMany(ui => ui.OrganisationProviders);
 
             modelBuilder.Entity<Course>()
-                .HasIndex(x => new { x.InstitutionId, x.CourseCode } )
+                .HasIndex(x => new { InstitutionId = x.ProviderId, x.CourseCode } )
                 .IsUnique();
 
             modelBuilder.Entity<Course>()
-                .HasOne(uc => uc.Institution)
+                .HasOne(uc => uc.Provider)
                 .WithMany(ui => ui.Courses)
-                .HasForeignKey(uc => uc.InstitutionId);
+                .HasForeignKey(uc => uc.ProviderId);
 
             modelBuilder.Entity<Course>()
-                .HasOne(uc => uc.AccreditingInstitution)
+                .HasOne(uc => uc.AccreditingProvider)
                 .WithMany(ui => ui.AccreditedCourses)
                 .IsRequired(false);
 
@@ -159,9 +159,9 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     where lower(i.inst_code)=lower(@instCode) 
                     and lower(c.course_code)=lower(@courseCode) 
                     and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
-                .Include(x => x.Institution)
+                .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingInstitution)
+                .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 
@@ -178,9 +178,9 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     $"join \"user\" u on ou.user_id = u.id " +
                     $"where lower(i.inst_code)=lower(@instCode) " +
                     $"and lower(u.email)=lower(@email) order by c.name", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
-                .Include(x => x.Institution)
+                .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingInstitution)
+                .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 

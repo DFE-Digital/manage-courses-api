@@ -137,7 +137,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
 SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
 FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY inst_code, ucas_course_code) top_id
 INNER JOIN course_enrichment b on top_id.id = b.id")
-                .Where(e => e.InstCode == instCode);
+                .Where(e => e.ProviderCode == instCode);
 
             return enrichments.Select(x => _converter.Convert(x)).ToList();
         }
@@ -161,7 +161,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
+                .Where(ie => ie.ProviderCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
@@ -178,7 +178,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             {
                 //insert
                 var enrichmentPublishRecord = _context.CourseEnrichments
-                    .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Published)
+                    .Where(ie => ie.ProviderCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -189,7 +189,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                 }
                 var enrichment = new CourseEnrichment
                 {
-                    InstCode = userInst.UcasInstitutionCode,
+                    ProviderCode = userInst.UcasInstitutionCode,
                     UcasCourseCode = ucasCourseCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
@@ -221,7 +221,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+                .Where(ie => ie.ProviderCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
 
             if (enrichmentDraftRecord != null)
             {
@@ -250,7 +250,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentsQuery = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode);
+                .Where(ie => ie.ProviderCode == instCode && ie.UcasCourseCode == ucasCourseCode);
 
             if (publishableOnly)
             {

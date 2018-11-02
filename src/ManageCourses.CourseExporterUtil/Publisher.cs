@@ -76,9 +76,9 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
         private List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
         {
             _logger.Information("Retrieving courses");
-            var courses = context.Courses.Include(x => x.Institution)
+            var courses = context.Courses.Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingInstitution)
+                .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)                
                 .ToList();
 
@@ -95,7 +95,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.CreatedByUser)
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
-                .ToLookup(x => x.InstCode + "_@@_" + x.UcasCourseCode)
+                .ToLookup(x => x.ProviderCode + "_@@_" + x.UcasCourseCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
             _logger.Information($" - {courseEnrichments.Count()} courseEnrichments");
 
@@ -120,10 +120,10 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             foreach (var c in courses)
             {
                 var mappedCourse = courseMapper.MapToSearchAndCompareCourse(
-                    c.Institution,
+                    c.Provider,
                     c,
-                    converter.Convert(orgEnrichments.GetValueOrDefault(c.Institution.ProviderCode))?.EnrichmentModel,
-                    converter.Convert(courseEnrichments.GetValueOrDefault(c.Institution.ProviderCode + "_@@_" + c.CourseCode))?.EnrichmentModel
+                    converter.Convert(orgEnrichments.GetValueOrDefault(c.Provider.ProviderCode))?.EnrichmentModel,
+                    converter.Convert(courseEnrichments.GetValueOrDefault(c.Provider.ProviderCode + "_@@_" + c.CourseCode))?.EnrichmentModel
                 );
 
                 if (!mappedCourse.Campuses.Any())
@@ -135,7 +135,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 if (!mappedCourse.CourseSubjects.Any())
                 {
                     _logger.Warning(
-                        $"failed to assign subject to [{c.Institution.ProviderCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
+                        $"failed to assign subject to [{c.Provider.ProviderCode}]/[{c.CourseCode}] {c.Name}. UCAS tags: {c.Subjects}");
                     // only publish courses we could map to one or more subjects.
                     continue;
                 }

@@ -123,14 +123,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 
             var sites = new List<Site>
             {
-                new Site { Institution = institution }
+                new Site { Provider = institution }
             };
 
             List<Subject> foo = new List<Subject>();
             var res = GetCourseLoader(institutions).LoadCourses(institution, new List<UcasCourse> { loc1, loc2}, new List<UcasCourseSubject>(), sites).Single();
 
-            res.AccreditingInstitution.ProviderCode.Should().Be("RIGHT_ACC");
-            res.Institution.ProviderCode.Should().Be("RIGHT_INST");
+            res.AccreditingProvider.ProviderCode.Should().Be("RIGHT_ACC");
+            res.Provider.ProviderCode.Should().Be("RIGHT_INST");
         }
 
         [Test]
@@ -143,8 +143,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 
             var res = LoadCourse(loc1);
 
-            res.AccreditingInstitution.ProviderCode.Should().Be("RIGHT_ACC");
-            res.Institution.ProviderCode.Should().Be("RIGHT_INST");
+            res.AccreditingProvider.ProviderCode.Should().Be("RIGHT_ACC");
+            res.Provider.ProviderCode.Should().Be("RIGHT_INST");
         }
 
         private static Course LoadCourse(UcasCourse course)
@@ -156,7 +156,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
                 providers.Add(new Provider { ProviderCode = course.AccreditingProvider });
             }
             List<Subject> foo = new List<Subject>();
-            return GetCourseLoader(providers).LoadCourses(institution, new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<Site> { new Site { Institution = institution, Code = course.CampusCode}}).Single();
+            return GetCourseLoader(providers).LoadCourses(institution, new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<Site> { new Site { Provider = institution, Code = course.CampusCode}}).Single();
         }
 
         private static UcasCourse GetBlankUcasCourse()

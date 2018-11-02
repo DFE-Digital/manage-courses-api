@@ -23,7 +23,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         public CourseLoader(Dictionary<string, Provider> allInstitutions, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses)
         {
             this.allInstitutions = allInstitutions;
-            this.pgdeCourses = pgdeCourses.Select(x => x.InstCode + "_@@_" + x.CourseCode).ToList();
+            this.pgdeCourses = pgdeCourses.Select(x => x.ProviderCode + "_@@_" + x.CourseCode).ToList();
             this.allSubjects = allSubjects;
         }
 
@@ -81,12 +81,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.AccreditingProvider))
                 {
-                    returnCourse.AccreditingInstitution = allInstitutions[organisationCourseRecord.AccreditingProvider];
+                    returnCourse.AccreditingProvider = allInstitutions[organisationCourseRecord.AccreditingProvider];
                 }
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.InstCode))
                 {
-                    returnCourse.Institution = allInstitutions[organisationCourseRecord.InstCode];
+                    returnCourse.Provider = allInstitutions[organisationCourseRecord.InstCode];
                 }
                 returnCourse.CourseCode = organisationCourseRecord.CrseCode;
                 returnCourse.AgeRange = organisationCourseRecord.Age;
@@ -103,7 +103,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 
                 returnCourse.CourseSites = new Collection<CourseSite>(courseRecords.Select(x => new CourseSite
                 { 
-                    Site = allSites.Single(y => y.Institution?.ProviderCode == x.InstCode && y.Code == x.CampusCode),                    
+                    Site = allSites.Single(y => y.Provider?.ProviderCode == x.InstCode && y.Code == x.CampusCode),                    
                     ApplicationsAcceptedFrom = x.CrseOpenDate,
                     Status = x.Status,
                     Publish = x.Publish,

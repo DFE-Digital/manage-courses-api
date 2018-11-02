@@ -49,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         CourseCode = crseCode,
                         Name = "Conscious control of telekenisis",
-                        AccreditingInstitution = accreditingInstitution,
+                        AccreditingProvider = accreditingInstitution,
                     }
                 }
             };
@@ -72,7 +72,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         User = user,
                     },
                 },
-                OrganisationInstitutions = new List<OrganisationProvider>
+                OrganisationProviders = new List<OrganisationProvider>
                 {
                     new OrganisationProvider
                     {

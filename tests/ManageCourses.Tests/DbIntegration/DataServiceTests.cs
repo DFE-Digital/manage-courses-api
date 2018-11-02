@@ -309,7 +309,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "PC1 A23",
                     LocationName = "Campus " + counter,
-                    Institution = institution
+                    Provider = institution
                 };
                 
                 var course = new Course
@@ -321,7 +321,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     ProgramType = "SC",
                     StudyMode = "F",
                     Name = "Title " + counter,
-                    Institution = institution,
+                    Provider = institution,
                     CourseSites =  new List<CourseSite>() 
                     {
                         new CourseSite 

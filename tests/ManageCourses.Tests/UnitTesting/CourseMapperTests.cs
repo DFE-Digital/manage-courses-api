@@ -232,7 +232,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             return new Course
             {
                 CourseCode = "CourseCode",
-                AccreditingInstitution = new Provider {ProviderCode  = "ACC123", ProviderName = "AccreditingProviderName"},
+                AccreditingProvider = new Provider {ProviderCode  = "ACC123", ProviderName = "AccreditingProviderName"},
                 Qualification = CourseQualification.QtsWithPgce,
                 ProgramType = "SS", // school direct salaried
                 Name = "Course.Name",

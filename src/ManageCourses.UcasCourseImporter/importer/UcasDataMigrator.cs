@@ -77,7 +77,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     foreach(var site in (IEnumerable<Site>) sites)
                     {
                         inst.Sites.Add(site);                                
-                        site.Institution = inst;
+                        site.Provider = inst;
                     }
                     _context.Save();
                 }                
@@ -217,8 +217,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
         private void DeleteForInstitution(string instCode)
         {
-            _context.Courses.RemoveRange(_context.Courses.Where(x => x.Institution.ProviderCode == instCode));
-            _context.Sites.RemoveRange(_context.Sites.Where(x => x.Institution.ProviderCode == instCode));
+            _context.Courses.RemoveRange(_context.Courses.Where(x => x.Provider.ProviderCode == instCode));
+            _context.Sites.RemoveRange(_context.Sites.Where(x => x.Provider.ProviderCode == instCode));
         }
     }
 }

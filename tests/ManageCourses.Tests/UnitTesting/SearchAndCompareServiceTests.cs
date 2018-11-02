@@ -55,10 +55,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
             _dataServiceMock.Setup(x => x.GetUcasInstitutionForUser(email, InstitutionCode)).Returns(institution);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, InstitutionCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
+                .Returns(new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
             _dataServiceMock.Setup(x => x.GetCoursesForUser(email, InstitutionCode))
-                .Returns(new List<Course>{ new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" } } );
+                .Returns(new List<Course>{ new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" } } );
 
             _enrichmentServiceMock.Setup(x => x.GetInstitutionEnrichmentForPublish(InstitutionCode, email))
                 .Returns(new UcasInstitutionEnrichmentGetModel{EnrichmentModel = new InstitutionEnrichmentModel()});
@@ -90,13 +90,13 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             _dataServiceMock.Setup(x => x.GetUcasInstitutionForUser(email, InstitutionCode)).Returns(institution);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, InstitutionCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
+                .Returns(new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, InstitutionCode, CourseCode + "1"))
-                .Returns(new Course { CourseCode = CourseCode + "1", Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "Geography" });
+                .Returns(new Course { CourseCode = CourseCode + "1", Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "Geography" });
 
             _dataServiceMock.Setup(x => x.GetCoursesForUser(email, InstitutionCode))
-                .Returns(new List<Course> { new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" }, new Course { CourseCode = CourseCode + "1", Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "History" } } );
+                .Returns(new List<Course> { new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" }, new Course { CourseCode = CourseCode + "1", Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "History" } } );
 
             _enrichmentServiceMock.Setup(x => x.GetInstitutionEnrichmentForPublish(InstitutionCode, email))
                 .Returns(new UcasInstitutionEnrichmentGetModel { EnrichmentModel = new InstitutionEnrichmentModel() });
@@ -132,7 +132,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
             _dataServiceMock.Setup(x => x.GetUcasInstitutionForUser(email, InstitutionCode)).Returns(institution);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, InstitutionCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
+                .Returns(new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
             _enrichmentServiceMock.Setup(x => x.GetInstitutionEnrichmentForPublish(InstitutionCode, email))
                 .Returns(new UcasInstitutionEnrichmentGetModel { EnrichmentModel = new InstitutionEnrichmentModel() });
@@ -157,13 +157,13 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             _dataServiceMock.Setup(x => x.GetUcasInstitutionForUser(email, InstitutionCode)).Returns(institution);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, InstitutionCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
+                .Returns(new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, InstitutionCode, CourseCode + "1"))
-                .Returns(new Course { CourseCode = CourseCode + "1", Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "Geography" });
+                .Returns(new Course { CourseCode = CourseCode + "1", Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "Geography" });
 
             _dataServiceMock.Setup(x => x.GetCoursesForUser(email, InstitutionCode))
-                .Returns(new List<Course> { new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" }, new Course { CourseCode = CourseCode + "1", Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "History" } } );
+                .Returns(new List<Course> { new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" }, new Course { CourseCode = CourseCode + "1", Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "History" } } );
 
             _enrichmentServiceMock.Setup(x => x.GetInstitutionEnrichmentForPublish(InstitutionCode, email))
                 .Returns(new UcasInstitutionEnrichmentGetModel { EnrichmentModel = new InstitutionEnrichmentModel() });
@@ -192,7 +192,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
             _dataServiceMock.Setup(x => x.GetUcasInstitutionForUser(email, InstitutionCode)).Returns(institution);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, InstitutionCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, Institution = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
+                .Returns(new Course { CourseCode = CourseCode, Provider = institution, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
             _enrichmentServiceMock.Setup(x => x.GetInstitutionEnrichmentForPublish(InstitutionCode, email))
                 .Returns(new UcasInstitutionEnrichmentGetModel());
