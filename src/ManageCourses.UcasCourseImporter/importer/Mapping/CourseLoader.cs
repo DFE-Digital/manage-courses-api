@@ -16,11 +16,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
     public class CourseLoader
     {
         private readonly QualificationMapper qualificationMapper = new QualificationMapper();
-        private Dictionary<string, Institution> allInstitutions;
+        private Dictionary<string, Provider> allInstitutions;
         private readonly List<string> pgdeCourses;
         private readonly Dictionary<string, Subject> allSubjects;
 
-        public CourseLoader(Dictionary<string, Institution> allInstitutions, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses)
+        public CourseLoader(Dictionary<string, Provider> allInstitutions, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses)
         {
             this.allInstitutions = allInstitutions;
             this.pgdeCourses = pgdeCourses.Select(x => x.InstCode + "_@@_" + x.CourseCode).ToList();
@@ -36,7 +36,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         /// <param name="enrichmentMetadata"></param>
         /// <param name="pgdeCourses"></param>
         /// <returns></returns>        
-        public List<Course> LoadCourses(Institution institution, IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<Site> allSites)
+        public List<Course> LoadCourses(Provider institution, IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<Site> allSites)
         {
             var returnCourses = new List<Course>();
             
@@ -64,7 +64,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         /// <param name="courseRecords">List of UcasCourse records for a single course (no really a course, not the course-campus combination in ucas-land)</param>
         /// <param name="isPgde"></param>
         /// <returns></returns>
-        private Course LoadCourse(Institution institution, IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<Site> allSites)
+        private Course LoadCourse(Provider institution, IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<Site> allSites)
         {
             var returnCourse = new Course();
             if (courseRecords.Count() > 0)

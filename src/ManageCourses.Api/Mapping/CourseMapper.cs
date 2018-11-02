@@ -14,9 +14,9 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
     {
         private readonly SubjectMapper subjectMapper = new SubjectMapper();
 
-        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Institution ucasInstData, Domain.Models.Course ucasCourseData, InstitutionEnrichmentModel institutionEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
+        public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Domain.Models.Provider ucasInstData, Domain.Models.Course ucasCourseData, InstitutionEnrichmentModel institutionEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
-            ucasInstData = ucasInstData ?? new Institution();
+            ucasInstData = ucasInstData ?? new Domain.Models.Provider();
             ucasCourseData = ucasCourseData ?? new Domain.Models.Course();
             var sites = ucasCourseData.CourseSites ?? new ObservableCollection<CourseSite>();
             institutionEnrichmentModel = institutionEnrichmentModel ?? new InstitutionEnrichmentModel();
@@ -269,7 +269,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 : postCode;
         }
 
-        private string MapAddress(Institution inst)
+        private string MapAddress(Domain.Models.Provider inst)
         {
             var addressFragments = new List<string>{
                 inst.Address1,

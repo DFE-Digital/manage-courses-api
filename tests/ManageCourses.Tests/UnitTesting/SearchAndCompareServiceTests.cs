@@ -47,7 +47,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void PublishEnrichedCourseWithEmailHappyPathTest()
         {
             var email = "tester@example.com";
-            Institution institution = new Institution
+            Provider institution = new Provider
             {
                 ProviderCode = InstitutionCode,
                 AccreditedCourses =
@@ -81,7 +81,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void PublishEnrichedCoursesWithEmailHappyPathTest()
         {
             var email = "tester@example.com";
-            var institution = new Institution
+            var institution = new Provider
             {
                 ProviderCode = InstitutionCode,
                 AccreditedCourses =
@@ -124,7 +124,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void PublishEnrichedCourseWithEmailDraftTest()
         {
             var email = "tester@example.com";
-            Institution institution = new Institution
+            Provider institution = new Provider
             {
                 ProviderCode = InstitutionCode,
                 AccreditedCourses =
@@ -148,7 +148,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void PublishEnrichedCoursesWithEmailDraftTest()
         {
             var email = "tester@example.com";
-            var institution = new Institution
+            var institution = new Provider
             {
                 ProviderCode = InstitutionCode,
                 AccreditedCourses =
@@ -184,7 +184,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void PublishBasicCourseWithEmailHappyPathTest()
         {
             var email = "tester@example.com";
-            var institution = new Institution
+            var institution = new Provider
             {
                 ProviderCode = InstitutionCode,
                 AccreditedCourses =

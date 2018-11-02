@@ -2,14 +2,14 @@
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
-    public class Institution
+    public class Provider
     {
-        public Institution()
+        public Provider()
         {
             Courses = new List<Course>();
         }
 
-        public void UpdateWith(Institution inst)
+        public void UpdateWith(Provider inst)
         {
             ProviderName = inst.ProviderName;
             InstType = inst.InstType;

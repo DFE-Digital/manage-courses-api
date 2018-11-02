@@ -8,7 +8,7 @@ using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
 using NUnit.Framework;
-using Institution = GovUk.Education.ManageCourses.Domain.Models.Institution;
+using Provider = GovUk.Education.ManageCourses.Domain.Models.Provider;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
@@ -232,7 +232,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             return new Course
             {
                 CourseCode = "CourseCode",
-                AccreditingInstitution = new Institution {ProviderCode  = "ACC123", ProviderName = "AccreditingProviderName"},
+                AccreditingInstitution = new Provider {ProviderCode  = "ACC123", ProviderName = "AccreditingProviderName"},
                 Qualification = CourseQualification.QtsWithPgce,
                 ProgramType = "SS", // school direct salaried
                 Name = "Course.Name",
@@ -283,9 +283,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static Institution GenerateUcasInstitution()
+        private static Provider GenerateUcasInstitution()
         {
-            return new Institution
+            return new Provider
             {
                 Address1 = "Addr1",
                 Address2 = "Addr2",

@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public Organisation Organisation { get; set; }
-        public Institution Provider { get; set; }
+        public Provider Provider { get; set; }
     }
 }

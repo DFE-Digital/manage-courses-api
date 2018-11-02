@@ -21,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class EnrichmentServiceInstitutionTests : DbIntegrationTestBase
     {
-        private Institution _ucasInstitution;
+        private Provider _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
 
@@ -29,7 +29,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         protected override void Setup()
         {
-            var accreditingInstitution = new Institution
+            var accreditingInstitution = new Provider
             {
                 ProviderName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
                 ProviderCode = AccreditingInstCode,
@@ -38,7 +38,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             const string providerInstCode = "HNY1";
             const string crseCode = "TK101";
-            _ucasInstitution = new Institution
+            _ucasInstitution = new Provider
             {
                 ProviderName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
                 ProviderCode = providerInstCode,

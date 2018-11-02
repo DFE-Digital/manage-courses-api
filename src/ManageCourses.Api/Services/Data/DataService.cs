@@ -100,7 +100,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             return null;
         }
 
-        public Institution GetUcasInstitutionForUser(string name, string instCode)
+        public Provider GetUcasInstitutionForUser(string name, string instCode)
         {
             return _context.GetInstitution(name, instCode);
         }

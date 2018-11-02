@@ -108,7 +108,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             return returnBool;
         }
 
-        private Course GetCourse(string instCode, string courseCode, string email, Institution ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
+        private Course GetCourse(string instCode, string courseCode, string email, Provider ucasInstData, UcasInstitutionEnrichmentGetModel orgEnrichmentData)
         {
             var ucasCourseData = _dataService.GetCourseForUser(email, instCode, courseCode);
             var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(instCode, courseCode, email);

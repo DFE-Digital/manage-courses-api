@@ -39,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasOne(ou => ou.Organisation)
                 .WithMany(u => u.OrganisationUsers);
 
-            modelBuilder.Entity<Institution>()
+            modelBuilder.Entity<Provider>()
                 .HasIndex(ui => ui.ProviderCode)
                 .IsUnique();
 
@@ -132,7 +132,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         }
 
         public DbSet<Course> Courses { get; set; }
-        public DbSet<Institution> Institutions { get; set; }
+        public DbSet<Provider> Institutions { get; set; }
         public DbSet<CourseSubject> CourseSubjects { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Site> Sites { get; set; }
@@ -228,7 +228,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return users;
         }
 
-        public Institution GetInstitution(string name, string instCode)
+        public Provider GetInstitution(string name, string instCode)
         {
             return Institutions.FromSql(@"
                     SELECT i.* from institution i

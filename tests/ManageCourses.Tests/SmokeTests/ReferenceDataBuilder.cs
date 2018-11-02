@@ -25,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             };
             context.Organisations.Add(organisation);
 
-            Institution institution = new Institution
+            Provider institution = new Provider
             {
                 ProviderName = "Joe's school @ UCAS",
                 ProviderCode = "ABC"

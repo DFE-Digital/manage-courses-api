@@ -264,7 +264,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 var instCode = "AB" + counter;
                 Organisation org = new Organisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter };
                 Context.Organisations.Add(org);
-                Institution institution = new Institution
+                Provider institution = new Provider
                 {
                     Address1 = "add2",
                     Address2 = "add2",
@@ -293,7 +293,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         /// <param name="instCode">institution code</param>
         /// <param name="numRecords">number of course records to generate</param>
         /// <param name="numSubjects"></param>
-        private void LoadCourses(Institution institution, int numRecords, IEnumerable<Subject> subjects)
+        private void LoadCourses(Provider institution, int numRecords, IEnumerable<Subject> subjects)
         {
             for (var counter = 1; counter <= numRecords; counter++)
             {                

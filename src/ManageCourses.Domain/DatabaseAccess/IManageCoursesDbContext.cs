@@ -8,7 +8,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
     public interface IManageCoursesDbContext
     {
         DbSet<Course> Courses { get; set; }
-        DbSet<Institution> Institutions { get; set; }
+        DbSet<Provider> Institutions { get; set; }
         DbSet<CourseSubject> CourseSubjects { get; set; }
         DbSet<Subject> Subjects { get; set; }
         DbSet<Site> Sites { get; set; }
@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         IQueryable<OrganisationProvider> GetOrganisationInstitutions(string email);
         OrganisationProvider GetOrganisationInstitution(string email, string instCode);
 
-        Institution GetInstitution(string name, string instCode);
+        Provider GetInstitution(string name, string instCode);
 
         IQueryable<User> GetUsers(string email);
         void Save();

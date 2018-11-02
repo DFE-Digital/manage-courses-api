@@ -52,7 +52,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 }
             });
 
-            var allInstitutions = new Dictionary<string, Institution>();
+            var allInstitutions = new Dictionary<string, Provider>();
             MigratePerInstitution("upsert institutions", inst => {
                 var savedInst = UpsertInstitution(ToInstitution(inst));
                 _context.Save();
@@ -173,9 +173,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             };
         }
 
-        private Institution ToInstitution(UcasInstitution x)
+        private Provider ToInstitution(UcasInstitution x)
         {
-            return new Institution
+            return new Provider
             {
                 Address1 = x.Addr1,
                 Address2 = x.Addr2,
@@ -195,7 +195,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             };
         }
 
-        private Institution UpsertInstitution(Institution newValues)
+        private Provider UpsertInstitution(Provider newValues)
         {
             newValues.ProviderCode = newValues.ProviderCode.ToUpperInvariant();
             var entity = _context.Institutions

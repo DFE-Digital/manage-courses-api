@@ -104,12 +104,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             };
 
             const string instCode2 = "InstCode_2";
-            var institutions = new List<Institution>
+            var institutions = new List<Provider>
             {
-                new Institution {
+                new Provider {
                     ProviderCode = InstCode1
                 },
-                new Institution {
+                new Provider {
                     ProviderCode = instCode2
                 }
             };

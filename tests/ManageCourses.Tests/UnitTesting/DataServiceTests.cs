@@ -39,7 +39,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             const string instCode = "BAT4";
             _contextMock.Setup(c => c.GetOrganisationInstitution(email, instCode)).Returns(new OrganisationProvider
             {
-                Provider = new Institution(),
+                Provider = new Provider(),
                 Organisation = new Organisation()
             });
 
