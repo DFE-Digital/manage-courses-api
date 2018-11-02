@@ -99,11 +99,11 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return builder.Uri;
         }
 
-        public async Task<UcasProviderEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasProviderCode)
+        public async Task<UcasProviderEnrichmentGetModel> Enrichment_GetProviderAsync(string ucasProviderCode)
         {
             return await GetObjects<UcasProviderEnrichmentGetModel>($"enrichment/provider/{ucasProviderCode}");
         }
-        public async Task Enrichment_SaveInstitutionAsync(string ucasProviderCode, UcasProviderEnrichmentPostModel model)
+        public async Task Enrichment_SaveProviderAsync(string ucasProviderCode, UcasProviderEnrichmentPostModel model)
         {
             await PostObjects($"enrichment/provider/{ucasProviderCode}", model);
         }

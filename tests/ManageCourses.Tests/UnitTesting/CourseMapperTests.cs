@@ -21,9 +21,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse_ProviderLocation()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -40,9 +40,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             courseEnrichmentModel.FeeUkEu = null;
 
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 courseEnrichmentModel
             );
 
@@ -56,9 +56,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(true),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -104,9 +104,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse_with_no_published_campuses()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -153,7 +153,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void MapToSearchAndCompareCourse_EnrichmentContactDetailsPreferred()
         {
-            var instEnrichment = GenerateInstitutionEnrichmentWithoutContactDetails();
+            var instEnrichment = GenerateProviderEnrichmentWithoutContactDetails();
 
             instEnrichment.Email = "overridden@email.com";
 
@@ -167,7 +167,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             instEnrichment.Postcode = "OverriddenPostcode";
 
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
                 instEnrichment,
                 GenerateCourseEnrichmentModel()
@@ -182,9 +182,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse_VacStatus()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(true),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -210,7 +210,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static ProviderEnrichmentModel GenerateInstitutionEnrichmentWithoutContactDetails()
+        private static ProviderEnrichmentModel GenerateProviderEnrichmentWithoutContactDetails()
         {
             return new ProviderEnrichmentModel
             {
@@ -283,7 +283,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static Provider GenerateUcasInstitution()
+        private static Provider GenerateUcasProvider()
         {
             return new Provider
             {

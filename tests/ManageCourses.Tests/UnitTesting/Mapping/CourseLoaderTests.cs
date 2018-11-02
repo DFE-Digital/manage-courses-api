@@ -113,21 +113,21 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
             loc2.InstCode = "RIGHT_INST";
             loc2.Publish = "Y";
 
-            Provider institution = new Provider { ProviderCode = "RIGHT_INST" };
-            var institutions = new List<Provider>
+            Provider provider = new Provider { ProviderCode = "RIGHT_INST" };
+            var providers = new List<Provider>
             {
                 new Provider { ProviderCode = "WRONG_ACC"},
                 new Provider { ProviderCode = "RIGHT_ACC"},
-                institution
+                provider
             };
 
             var sites = new List<Site>
             {
-                new Site { Provider = institution }
+                new Site { Provider = provider }
             };
 
             List<Subject> foo = new List<Subject>();
-            var res = GetCourseLoader(institutions).LoadCourses(institution, new List<UcasCourse> { loc1, loc2}, new List<UcasCourseSubject>(), sites).Single();
+            var res = GetCourseLoader(providers).LoadCourses(provider, new List<UcasCourse> { loc1, loc2}, new List<UcasCourseSubject>(), sites).Single();
 
             res.AccreditingProvider.ProviderCode.Should().Be("RIGHT_ACC");
             res.Provider.ProviderCode.Should().Be("RIGHT_INST");
@@ -149,14 +149,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Mapping
 
         private static Course LoadCourse(UcasCourse course)
         {
-            Provider institution = new Provider { ProviderCode = course.InstCode };
-            var providers = new List<Provider> { institution };
+            Provider provider = new Provider { ProviderCode = course.InstCode };
+            var providers = new List<Provider> { provider };
             if (!string.IsNullOrWhiteSpace(course.AccreditingProvider))
             {
                 providers.Add(new Provider { ProviderCode = course.AccreditingProvider });
             }
             List<Subject> foo = new List<Subject>();
-            return GetCourseLoader(providers).LoadCourses(institution, new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<Site> { new Site { Provider = institution, Code = course.CampusCode}}).Single();
+            return GetCourseLoader(providers).LoadCourses(provider, new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<Site> { new Site { Provider = provider, Code = course.CampusCode}}).Single();
         }
 
         private static UcasCourse GetBlankUcasCourse()
