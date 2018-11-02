@@ -107,17 +107,17 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             var institutions = new List<Institution>
             {
                 new Institution {
-                    InstCode = InstCode1
+                    ProviderCode = InstCode1
                 },
                 new Institution {
-                    InstCode = instCode2
+                    ProviderCode = instCode2
                 }
             };
 
-            var organisationInstitutions = new List<OrganisationInstitution>
+            var organisationInstitutions = new List<OrganisationProvider>
             {
-                new OrganisationInstitution {
-                    Institution = institutions[1],
+                new OrganisationProvider {
+                    Provider = institutions[1],
                     Organisation = organisations[1],
                 }
             };

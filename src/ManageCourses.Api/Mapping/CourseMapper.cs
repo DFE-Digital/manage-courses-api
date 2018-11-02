@@ -48,15 +48,15 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
             var provider = new SearchAndCompare.Domain.Models.Provider
             {
-                Name = ucasInstData.InstName,
-                ProviderCode = ucasInstData.InstCode
+                Name = ucasInstData.ProviderName,
+                ProviderCode = ucasInstData.ProviderCode
             };
 
             var accreditingProvider = ucasCourseData.AccreditingInstitution == null ? null :
                 new SearchAndCompare.Domain.Models.Provider
                 {
-                    Name = ucasCourseData.AccreditingInstitution.InstName,
-                    ProviderCode = ucasCourseData.AccreditingInstitution.InstCode
+                    Name = ucasCourseData.AccreditingInstitution.ProviderName,
+                    ProviderCode = ucasCourseData.AccreditingInstitution.ProviderCode
                 };
 
             var routeName = ucasCourseData.Route;
@@ -194,7 +194,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "about this training provider accrediting",//CourseDetailsSections.AboutTheAccreditingProvider,
-                Text = GetAccreditingInstitutionEnrichment(ucasCourseData?.AccreditingInstitution?.InstCode, institutionEnrichmentModel)
+                Text = GetAccreditingInstitutionEnrichment(ucasCourseData?.AccreditingInstitution?.ProviderCode, institutionEnrichmentModel)
             });
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection

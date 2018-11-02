@@ -19,7 +19,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Gets an organisations by Institution Code
+        /// Gets an organisations by Provider Code
         /// </summary>
         /// <returns>a single UserOrganisation object</returns>
         [BearerTokenAuth]

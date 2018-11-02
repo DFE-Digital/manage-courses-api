@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         /// Takes the UcasCourse records which are actually de-normalised course-campus info and turns them into
         /// proper British Courses that have the campus info re-normalised into the .Schools list property.
         /// </summary>
-        /// <param name="institution">Institution</param>
+        /// <param name="institution">Provider</param>
         /// <param name="courseRecords">UcasCourse records</param>
         /// <param name="enrichmentMetadata"></param>
         /// <param name="pgdeCourses"></param>
@@ -103,7 +103,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 
                 returnCourse.CourseSites = new Collection<CourseSite>(courseRecords.Select(x => new CourseSite
                 { 
-                    Site = allSites.Single(y => y.Institution?.InstCode == x.InstCode && y.Code == x.CampusCode),                    
+                    Site = allSites.Single(y => y.Institution?.ProviderCode == x.InstCode && y.Code == x.CampusCode),                    
                     ApplicationsAcceptedFrom = x.CrseOpenDate,
                     Status = x.Status,
                     Publish = x.Publish,

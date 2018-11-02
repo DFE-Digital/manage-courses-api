@@ -13,7 +13,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<Subject> Subjects { get; set; }
         DbSet<Site> Sites { get; set; }
         DbSet<Organisation> Organisations { get; set; }
-        DbSet<OrganisationInstitution> OrganisationIntitutions { get; set; }
+        DbSet<OrganisationProvider> OrganisationIntitutions { get; set; }
         DbSet<OrganisationUser> OrganisationUsers { get; set; }
         DbSet<User> Users { get; set; }
         DbSet<AccessRequest> AccessRequests { get; set; }
@@ -24,8 +24,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
         List<Course> GetCourse(string instCode, string courseCode, string email);
         List<Course> GetCoursesByInstCode(string instCode, string email);
-        IQueryable<OrganisationInstitution> GetOrganisationInstitutions(string email);
-        OrganisationInstitution GetOrganisationInstitution(string email, string instCode);
+        IQueryable<OrganisationProvider> GetOrganisationInstitutions(string email);
+        OrganisationProvider GetOrganisationInstitution(string email, string instCode);
 
         Institution GetInstitution(string name, string instCode);
 

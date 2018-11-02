@@ -312,7 +312,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             if (useUcasContact)
             {
-                var ucasInst = _context.Institutions.SingleOrDefault(x => x.InstCode == instCode);
+                var ucasInst = _context.Institutions.SingleOrDefault(x => x.ProviderCode == instCode);
                 if (ucasInst != null)
                 {
                     enrichmentModel.Email = ucasInst.Email;
@@ -336,7 +336,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             instCode = instCode.ToUpperInvariant();
             email = email.ToLowerInvariant();
 
-            var inst = _context.OrganisationIntitutions.Include(x => x.Organisation).Single(x => x.Institution.InstCode == instCode); //should throw an error if  the inst doesn't exist
+            var inst = _context.OrganisationIntitutions.Include(x => x.Organisation).Single(x => x.Provider.ProviderCode == instCode); //should throw an error if  the inst doesn't exist
 
             var orgUser = _context.OrganisationUsers
                 .Where(x => x.User.Email == email && x.Organisation.OrgId == inst.Organisation.OrgId)

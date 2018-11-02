@@ -72,9 +72,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             var institutionSummaries = _context.GetOrganisationInstitutions(email)
                 .Select(institutionSummary => new InstitutionSummary()
                 {
-                    InstName = institutionSummary.Institution.InstName,
-                    InstCode = institutionSummary.Institution.InstCode,
-                    TotalCourses = institutionSummary.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
+                    InstName = institutionSummary.Provider.ProviderName,
+                    InstCode = institutionSummary.Provider.ProviderCode,
+                    TotalCourses = institutionSummary.Provider.Courses.Select(c => c.CourseCode).Distinct().Count()
                 }).OrderBy(x => x.InstName).ToList();
 
             return institutionSummaries;
@@ -89,9 +89,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             {
                 return new InstitutionSummary()
                 {
-                    InstName = organisationInstitution.Institution.InstName,
-                    InstCode = organisationInstitution.Institution.InstCode,
-                    TotalCourses = organisationInstitution.Institution.Courses.Select(c => c.CourseCode).Distinct()
+                    InstName = organisationInstitution.Provider.ProviderName,
+                    InstCode = organisationInstitution.Provider.ProviderCode,
+                    TotalCourses = organisationInstitution.Provider.Courses.Select(c => c.CourseCode).Distinct()
                         .Count(),
                     EnrichmentWorkflowStatus = enrichment?.Status
                 };

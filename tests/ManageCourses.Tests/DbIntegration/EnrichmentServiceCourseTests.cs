@@ -32,8 +32,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var accreditingInstitution = new Institution
             {
-                InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
-                InstCode = AccreditingInstCode,
+                ProviderName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
+                ProviderCode = AccreditingInstCode,
             };
             Context.Add(accreditingInstitution);
 
@@ -41,8 +41,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             const string crseCode = "TK101";
             _ucasInstitution = new Institution
             {
-                InstName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
-                InstCode = providerInstCode,
+                ProviderName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
+                ProviderCode = providerInstCode,
                 Courses = new List<Course>
                 {
                     new Course
@@ -72,11 +72,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         User = user,
                     },
                 },
-                OrganisationInstitutions = new List<OrganisationInstitution>
+                OrganisationInstitutions = new List<OrganisationProvider>
                 {
-                    new OrganisationInstitution
+                    new OrganisationProvider
                     {
-                        Institution = _ucasInstitution,
+                        Provider = _ucasInstitution,
                     },
                 }
             };
@@ -252,7 +252,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             {
                 AboutCourse = aboutCourseText,
             };
-            enrichmentService.SaveCourseEnrichment(sourceModel, _ucasInstitution.InstCode, UcasCourseCode, Email);
+            enrichmentService.SaveCourseEnrichment(sourceModel, _ucasInstitution.ProviderCode, UcasCourseCode, Email);
 
             // Act
             var ucasPayload = new UcasPayload
@@ -262,20 +262,20 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     new UcasInstitution
                     {
-                        InstCode = _ucasInstitution.InstCode,
-                        InstFull = "Rebranded Institution",
+                        InstCode = _ucasInstitution.ProviderCode,
+                        InstFull = "Rebranded Provider",
                     },
                     new UcasInstitution
                     {
                         InstCode = AccreditingInstCode,
-                        InstFull = "Rebranded Accrediting Institution",
+                        InstFull = "Rebranded Accrediting Provider",
                     },
                 },
                 Courses = new List<UcasCourse>
                 {
                     new UcasCourse
                     {
-                        InstCode = _ucasInstitution.InstCode,
+                        InstCode = _ucasInstitution.ProviderCode,
                         CrseCode = "CC11",
                         AccreditingProvider = AccreditingInstCode,
                     },
@@ -284,7 +284,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, ucasPayload).UpdateUcasData();
 
             // Assert
-            var res = enrichmentService.GetCourseEnrichment(_ucasInstitution.InstCode, UcasCourseCode, Email);
+            var res = enrichmentService.GetCourseEnrichment(_ucasInstitution.ProviderCode, UcasCourseCode, Email);
             res.EnrichmentModel.AboutCourse.Should().Be(sourceModel.AboutCourse);
         }
     }

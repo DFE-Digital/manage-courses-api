@@ -12,9 +12,10 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181102134742_RenamedInstitutionFields")]
+    partial class RenamedInstitutionFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -351,25 +352,25 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.ToTable("organisation");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationProvider", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationInstitution", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("id");
 
+                    b.Property<int?>("InstitutionId")
+                        .HasColumnName("institution_id");
+
                     b.Property<int?>("OrganisationId")
                         .HasColumnName("organisation_id");
 
-                    b.Property<int?>("ProviderId")
-                        .HasColumnName("provider_id");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("InstitutionId");
 
                     b.HasIndex("OrganisationId");
 
-                    b.HasIndex("ProviderId");
-
-                    b.ToTable("organisation_provider");
+                    b.ToTable("organisation_institution");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationUser", b =>
@@ -611,15 +612,15 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationProvider", b =>
+            modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationInstitution", b =>
                 {
+                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Institution", "Institution")
+                        .WithMany("OrganisationProviders")
+                        .HasForeignKey("InstitutionId");
+
                     b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Organisation", "Organisation")
                         .WithMany("OrganisationInstitutions")
                         .HasForeignKey("OrganisationId");
-
-                    b.HasOne("GovUk.Education.ManageCourses.Domain.Models.Institution", "Provider")
-                        .WithMany("OrganisationProviders")
-                        .HasForeignKey("ProviderId");
                 });
 
             modelBuilder.Entity("GovUk.Education.ManageCourses.Domain.Models.OrganisationUser", b =>

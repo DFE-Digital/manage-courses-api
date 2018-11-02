@@ -56,7 +56,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             MigratePerInstitution("upsert institutions", inst => {
                 var savedInst = UpsertInstitution(ToInstitution(inst));
                 _context.Save();
-                allInstitutions[savedInst.InstCode] = savedInst;
+                allInstitutions[savedInst.ProviderCode] = savedInst;
             });
 
             var courseLoader = new CourseLoader(allInstitutions, allSubjects, pgdeCourses);
@@ -65,10 +65,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             MigratePerInstitution("drop-and-create sites and courses", ucasInst => {
                 var inst = allInstitutions[ucasInst.InstCode];
 
-                DeleteForInstitution(inst.InstCode);
+                DeleteForInstitution(inst.ProviderCode);
                 _context.Save();
 
-                var campuses = allCampusesGrouped.ContainsKey(inst.InstCode) ? allCampusesGrouped[inst.InstCode] : null;
+                var campuses = allCampusesGrouped.ContainsKey(inst.ProviderCode) ? allCampusesGrouped[inst.ProviderCode] : null;
                 IEnumerable<Site> sites = new List<Site>();
                 if (campuses != null)
                 {
@@ -84,8 +84,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
                 var allCoursesForThisInstitution = courseLoader.LoadCourses(
                     inst,
-                    ucasCourseGroupings.GetValueOrDefault(inst.InstCode).AsEnumerable() ?? new List<UcasCourse>(), 
-                    ucasCourseSubjectGroupings.GetValueOrDefault(inst.InstCode).AsEnumerable() ?? new List<UcasCourseSubject>(),
+                    ucasCourseGroupings.GetValueOrDefault(inst.ProviderCode).AsEnumerable() ?? new List<UcasCourse>(), 
+                    ucasCourseSubjectGroupings.GetValueOrDefault(inst.ProviderCode).AsEnumerable() ?? new List<UcasCourseSubject>(),
                     sites);
 
                 inst.Courses = new Collection<Course>(allCoursesForThisInstitution.ToList());       
@@ -186,8 +186,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Telephone = x.Telephone,
                 Url = x.Url,
 
-                InstName = x.InstFull,
-                InstCode = x.InstCode,
+                ProviderName = x.InstFull,
+                ProviderCode = x.InstCode,
                 InstType = x.InstType,
                 YearCode = x.YearCode,
                 Scitt = x.Scitt,
@@ -197,10 +197,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
         private Institution UpsertInstitution(Institution newValues)
         {
-            newValues.InstCode = newValues.InstCode.ToUpperInvariant();
+            newValues.ProviderCode = newValues.ProviderCode.ToUpperInvariant();
             var entity = _context.Institutions
                 .Include(x => x.Sites).Include(x => x.Courses)
-                .FirstOrDefault(x => x.InstCode == newValues.InstCode);
+                .FirstOrDefault(x => x.ProviderCode == newValues.ProviderCode);
             if (entity == null)
             {
                 // insert
@@ -217,8 +217,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
         private void DeleteForInstitution(string instCode)
         {
-            _context.Courses.RemoveRange(_context.Courses.Where(x => x.Institution.InstCode == instCode));
-            _context.Sites.RemoveRange(_context.Sites.Where(x => x.Institution.InstCode == instCode));
+            _context.Courses.RemoveRange(_context.Courses.Where(x => x.Institution.ProviderCode == instCode));
+            _context.Sites.RemoveRange(_context.Sites.Where(x => x.Institution.ProviderCode == instCode));
         }
     }
 }

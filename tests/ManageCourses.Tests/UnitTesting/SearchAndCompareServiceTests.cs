@@ -49,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var email = "tester@example.com";
             Institution institution = new Institution
             {
-                InstCode = InstitutionCode,
+                ProviderCode = InstitutionCode,
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
@@ -83,7 +83,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var email = "tester@example.com";
             var institution = new Institution
             {
-                InstCode = InstitutionCode,
+                ProviderCode = InstitutionCode,
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
@@ -126,7 +126,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var email = "tester@example.com";
             Institution institution = new Institution
             {
-                InstCode = InstitutionCode,
+                ProviderCode = InstitutionCode,
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
@@ -150,7 +150,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var email = "tester@example.com";
             var institution = new Institution
             {
-                InstCode = InstitutionCode,
+                ProviderCode = InstitutionCode,
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" }, new Course { CourseCode = CourseCode + "1", ProgramType = "SD", Name = "Geography" } }
             };
@@ -186,7 +186,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var email = "tester@example.com";
             var institution = new Institution
             {
-                InstCode = InstitutionCode,
+                ProviderCode = InstitutionCode,
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };

@@ -40,7 +40,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(u => u.OrganisationUsers);
 
             modelBuilder.Entity<Institution>()
-                .HasIndex(ui => ui.InstCode)
+                .HasIndex(ui => ui.ProviderCode)
                 .IsUnique();
 
             modelBuilder.Entity<Subject>()
@@ -55,13 +55,13 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasOne(uc => uc.Institution)
                 .WithMany(ui => ui.Sites);
 
-            modelBuilder.Entity<OrganisationInstitution>()
+            modelBuilder.Entity<OrganisationProvider>()
                 .HasOne(oi => oi.Organisation)
                 .WithMany(o => o.OrganisationInstitutions);
 
-            modelBuilder.Entity<OrganisationInstitution>()
-                .HasOne(oi => oi.Institution)
-                .WithMany(ui => ui.OrganisationInstitutions);
+            modelBuilder.Entity<OrganisationProvider>()
+                .HasOne(oi => oi.Provider)
+                .WithMany(ui => ui.OrganisationProviders);
 
             modelBuilder.Entity<Course>()
                 .HasIndex(x => new { x.InstitutionId, x.CourseCode } )
@@ -138,7 +138,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<Site> Sites { get; set; }
         public DbSet<NctlOrganisation> NctlOrganisations { get; set; }
         public DbSet<Organisation> Organisations { get; set; }
-        public DbSet<OrganisationInstitution> OrganisationIntitutions { get; set; }
+        public DbSet<OrganisationProvider> OrganisationIntitutions { get; set; }
         public DbSet<OrganisationUser> OrganisationUsers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
@@ -187,7 +187,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return ucasCourses;
         }
 
-        public IQueryable<OrganisationInstitution> GetOrganisationInstitutions(string email)
+        public IQueryable<OrganisationProvider> GetOrganisationInstitutions(string email)
         {
             var userOrganisations = OrganisationIntitutions.FromSql(
                 $"select oi.* from organisation_institution oi " +
@@ -197,12 +197,12 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 $"where lower(u.email) = lower(@email)",
                 new NpgsqlParameter("email", email)
             ).Include(x => x.Organisation)
-            .Include(x => x.Institution);
+            .Include(x => x.Provider);
 
             return userOrganisations;
         }
 
-        public OrganisationInstitution GetOrganisationInstitution(string email, string instCode)
+        public OrganisationProvider GetOrganisationInstitution(string email, string instCode)
         {
             var userOrganisations = OrganisationIntitutions.FromSql(
                 $"select oi.* from organisation_institution oi " +
@@ -212,7 +212,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 $"join \"user\" u on ou.user_id = u.id " +
                 $"where lower(u.email) = lower(@email) and Lower(i.inst_code) = lower(@instCode)",
                 new NpgsqlParameter("email", email), new NpgsqlParameter("instCode", instCode)
-            ).Include(x => x.Organisation).Include(x => x.Institution).FirstOrDefault();
+            ).Include(x => x.Organisation).Include(x => x.Provider).FirstOrDefault();
 
             return userOrganisations;
         }

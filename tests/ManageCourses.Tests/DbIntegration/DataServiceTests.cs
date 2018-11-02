@@ -271,15 +271,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address3 = "add3",
                     Address4 = "add4",
                     Postcode = "AB1 CD2",
-                    InstCode = instCode,
-                    InstName = "Intitution " + counter
+                    ProviderCode = instCode,
+                    ProviderName = "Intitution " + counter
                 };
                 Context.Institutions.Add(institution);
                 LoadCourses(institution, numCourses, Context.Subjects);
                 Context.OrganisationUsers.Add(new OrganisationUser { User = user, Organisation = org });
-                Context.OrganisationIntitutions.Add(new OrganisationInstitution
+                Context.OrganisationIntitutions.Add(new OrganisationProvider
                 {
-                    Institution = institution,
+                    Provider = institution,
                     Organisation = org
                 });
             }
