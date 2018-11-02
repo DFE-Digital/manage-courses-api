@@ -1,13 +1,16 @@
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using FluentAssertions;
+using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.ApiClient;
+using GovUk.Education.ManageCourses.Tests.UnitTesting.Client;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using GovUk.Education.ManageCourses.UcasCourseImporter;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
@@ -133,17 +136,15 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var accessToken = TestConfig.ApiKey;
 
             var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
-            {
-                BaseUrl = LocalWebHost.Address
-            };
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
             Context.AddTestReferenceData(Email);
             Context.Save();
 
             // does not throw... nb. Assert.DoesNotThrow does not support async voids
-            await client.Invite_IndexAsync(Email);
+           await client.Invite_IndexAsync(Email);
         }
 
         [Test]
@@ -152,16 +153,18 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var accessToken = "badAccesCode";
 
             var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
-            {
-                BaseUrl = LocalWebHost.Address
-            };
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
+            Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
-            Assert.That(() => client.Invite_IndexAsync(Email),
-                Throws.TypeOf<SwaggerException>()
-                    .With.Message.EqualTo("The HTTP status code of the response was not expected (404)."));
+            var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
+            nameValueCollection["email"] = Email;
+
+            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite?{nameValueCollection.ToString()}";
+
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -170,15 +173,17 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             const string accessToken = "";
 
             var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
 
-            var client = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), httpClient)
-            {
-                BaseUrl = LocalWebHost.Address
-            };
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
 
-            Assert.That(() => client.Invite_IndexAsync(Email),
-                Throws.TypeOf<SwaggerException>()
-                    .With.Message.EqualTo("The HTTP status code of the response was not expected (401)."));
+            Func<Task> act = async () => await client.Invite_IndexAsync(Email);
+
+            var nameValueCollection = HttpUtility.ParseQueryString(string.Empty);
+            nameValueCollection["email"] = Email;
+
+            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/invite?{nameValueCollection.ToString()}";
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.Unauthorized);
         }
 
         private void SetupSmokeTestData()
@@ -192,22 +197,24 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         private async Task<ManageCoursesApiClient> BuildSigninAwareClient()
         {
             var communicator = new DfeSignInCommunicator(TestConfig);
-            var accessToken = await communicator.GetAccessTokenAsync(TestConfig);
-            var clientExport = new ManageCoursesApiClient(new MockApiClientConfiguration(accessToken), new HttpClient())
-            {
-                BaseUrl = LocalWebHost.Address
-            };
-            return clientExport;
+            var accessToken = await communicator.GetAccessToken(TestConfig);
+
+            var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
+
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+
+            return client;
         }
 
         private ManageCoursesApiClient BuildApiKeyClient(string apiKey = null)
         {
-            var apiKeyAccessToken = apiKey ?? TestConfig.ApiKey;
-            var importClient = new ManageCoursesApiClient(new MockApiClientConfiguration(apiKeyAccessToken), new HttpClient())
-            {
-                BaseUrl = LocalWebHost.Address
-            };
-            return importClient;
+            var accessToken = apiKey ?? TestConfig.ApiKey;
+            var httpClient = new HttpClient();
+            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
+            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+
+            return client;
         }
     }
 }

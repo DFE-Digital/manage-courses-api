@@ -23,11 +23,11 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string ProgramType { get; set; }
         public string ProfpostFlag { get; set; }
         public string Name { get; set; }
-        
-        public string Subjects => string.Join(", ", CourseSubjects.Select(x => x.Subject.SubjectName));
-        
+
+        public string Subjects => CourseSubjects != null && CourseSubjects.Any() ? string.Join(", ", CourseSubjects.Select(x => x.Subject.SubjectName)) : string.Empty;
+
         public string StudyMode { get; set; }
-        public string AgeRange { get; set; }        
+        public string AgeRange { get; set; }
         public CourseQualification Qualification { get; set; }
 
         /// <summary>
@@ -41,15 +41,15 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Route => GetRoute();
 
         public DateTime? StartDate { get; set; }
-        
+
         public ICollection<CourseSite> CourseSites { get; set; }
 
         [NotMapped]
-        public IEnumerable<Site> Sites { get => CourseSites.Select(x => x.Site); }
+        public IEnumerable<Site> Sites { get => CourseSites != null && CourseSites.Any() ? CourseSites.Select(x => x.Site) : null; }
         [NotMapped]
 
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
-        
+
         public ICollection<CourseSubject> CourseSubjects { get; set; }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         private string GetCourseVariantType()
         {
             string result;
-            
+
             switch(Qualification)
             {
                 case CourseQualification.Qts:
@@ -101,9 +101,9 @@ namespace GovUk.Education.ManageCourses.Domain.Models
                 : "";
 
             result += string.Equals(ProgramType, "ta", StringComparison.InvariantCultureIgnoreCase)
-                ? " teaching apprenticeship" 
+                ? " teaching apprenticeship"
                 : "";
-            
+
             return result;
         }
 

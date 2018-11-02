@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
             _clientSecret = config.SignInClientSecret;
         }
 
-        public async Task<string> GetAccessTokenAsync(TestConfigReader config)
+        public async Task<string> GetAccessToken(TestConfigReader config)
         {
             var startUrl = $"https://{_dfeSignInDomain}/auth?redirect_uri=https://{_redirectUriHostAndPort}/auth/cb&scope=openid profile email&response_type=code&state=1238&client_id={_clientId}";
             var loginPage = await GetUrl(startUrl, true);
