@@ -99,21 +99,21 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return builder.Uri;
         }
 
-        public async Task<UcasProviderEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
+        public async Task<UcasProviderEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasProviderCode)
         {
-            return await GetObjects<UcasProviderEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
+            return await GetObjects<UcasProviderEnrichmentGetModel>($"enrichment/provider/{ucasProviderCode}");
         }
-        public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasProviderEnrichmentPostModel model)
+        public async Task Enrichment_SaveInstitutionAsync(string ucasProviderCode, UcasProviderEnrichmentPostModel model)
         {
-            await PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
+            await PostObjects($"enrichment/provider/{ucasProviderCode}", model);
         }
-        public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
+        public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasProviderCode, string ucasCourseCode)
         {
-            return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
+            return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/provider/{ucasProviderCode}/course/{ucasCourseCode}");
         }
-        public async Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
+        public async Task Enrichment_SaveCourseAsync(string ucasProviderCode, string ucasCourseCode, CourseEnrichmentModel model)
         {
-            await PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model);
+            await PostObjects($"enrichment/provider/{ucasProviderCode}/course/{ucasCourseCode}", model);
         }
 
         public async Task Invite_IndexAsync(string email)

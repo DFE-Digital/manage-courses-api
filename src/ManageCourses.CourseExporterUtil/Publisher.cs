@@ -115,7 +115,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
             var mappedCourses = new List<SearchAndCompare.Domain.Models.Course>();
 
-            _logger.Information("Combine courses with institution and enrichment data");
+            _logger.Information("Combine courses with provider and enrichment data");
 
             foreach (var c in courses)
             {
