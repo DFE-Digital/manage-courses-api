@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -153,11 +154,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     select c.* from course c
                     join institution i on c.institution_id = i.id
                     join organisation_institution oi on oi.institution_id=i.id
-                    join organisation o on o.id = oi.organisation_id 
-                    join organisation_user ou on ou.organisation_id = o.id 
-                    join ""user"" u on u.id = ou.user_id 
-                    where lower(i.inst_code)=lower(@instCode) 
-                    and lower(c.course_code)=lower(@courseCode) 
+                    join organisation o on o.id = oi.organisation_id
+                    join organisation_user ou on ou.organisation_id = o.id
+                    join ""user"" u on u.id = ou.user_id
+                    where lower(i.inst_code)=lower(@instCode)
+                    and lower(c.course_code)=lower(@courseCode)
                     and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Institution)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
@@ -226,6 +227,12 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             );
 
             return users;
+        }
+
+        public TResult GetOrganisationInstitution<TResult>(string email, string instCode, Func<OrganisationInstitution, string, string, TResult> mapping)
+        {
+            var organisationInstitution = GetOrganisationInstitution(email, instCode);
+            return mapping(organisationInstitution, email, instCode);
         }
 
         public Institution GetInstitution(string name, string instCode)
