@@ -188,7 +188,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
                 ProviderName = x.InstFull,
                 ProviderCode = x.InstCode,
-                InstType = x.InstType,
+                ProviderType = x.InstType,
                 YearCode = x.YearCode,
                 Scitt = x.Scitt,
                 SchemeMember = x.SchemeMember
