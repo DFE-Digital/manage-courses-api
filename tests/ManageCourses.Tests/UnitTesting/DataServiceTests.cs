@@ -29,39 +29,39 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             _dataService = new DataService(_contextMock.Object, _enrichmentServiceMock.Object, new Mock<ILogger<DataService>>().Object);
         }
 
-        /// <summary>
-        /// Test status generation variations
-        /// </summary>
-        [Test]
-        public void Test_OrgStatus()
-        {
-            const string email = "roger@example.org";
-            const string instCode = "BAT4";
-            _contextMock.Setup(c => c.GetOrganisationProvider(email, instCode)).Returns(new OrganisationProvider
-            {
-                Provider = new Provider(),
-                Organisation = new Organisation()
-            });
+        // /// <summary>
+        // /// Test status generation variations
+        // /// </summary>
+        // [Test]
+        // public void Test_OrgStatus()
+        // {
+        //     const string email = "roger@example.org";
+        //     const string instCode = "BAT4";
+        //     _contextMock.Setup(c => c.GetUserOrganisation(email, instCode)).Returns(new OrganisationInstitution
+        //     {
+        //         Institution = new Institution(),
+        //         Organisation = new Organisation()
+        //     });
 
-            // test blank
-            var org = _dataService.GetProviderSummaryForUser(email, instCode);
-            org.Should().NotBeNull();
-            org.EnrichmentWorkflowStatus.Should().BeNull("there's no enrichment present");
+        //     // test blank
+        //     var org = _dataService.GetOrganisationForUser(email, instCode);
+        //     org.Should().NotBeNull();
+        //     org.EnrichmentWorkflowStatus.Should().BeNull("there's no enrichment present");
 
-            // test draft
-            var ucasProviderEnrichmentGetModel = new UcasProviderEnrichmentGetModel { Status = EnumStatus.Draft };
-            _enrichmentServiceMock.Setup(e => e.GetProviderEnrichment(instCode, email))
-                .Returns(ucasProviderEnrichmentGetModel);
-            var enrichedOrg = _dataService.GetProviderSummaryForUser(email, instCode);
-            enrichedOrg.Should().NotBeNull();
-            enrichedOrg.EnrichmentWorkflowStatus.Should().Be(ucasProviderEnrichmentGetModel.Status, $"there's a {ucasProviderEnrichmentGetModel.Status} enrichment present");
+        //     // test draft
+        //     var ucasInstitutionEnrichmentGetModel = new UcasInstitutionEnrichmentGetModel { Status = EnumStatus.Draft };
+        //     _enrichmentServiceMock.Setup(e => e.GetInstitutionEnrichment(instCode, email))
+        //         .Returns(ucasInstitutionEnrichmentGetModel);
+        //     var enrichedOrg = _dataService.GetOrganisationForUser(email, instCode);
+        //     enrichedOrg.Should().NotBeNull();
+        //     enrichedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
 
-            // test published
-            ucasProviderEnrichmentGetModel.Status = EnumStatus.Published;
-            var publishedOrg = _dataService.GetProviderSummaryForUser(email, instCode);
-            publishedOrg.Should().NotBeNull();
-            publishedOrg.EnrichmentWorkflowStatus.Should().Be(ucasProviderEnrichmentGetModel.Status, $"there's a {ucasProviderEnrichmentGetModel.Status} enrichment present");
-        }
+        //     // test published
+        //     ucasInstitutionEnrichmentGetModel.Status = EnumStatus.Published;
+        //     var publishedOrg = _dataService.GetOrganisationForUser(email, instCode);
+        //     publishedOrg.Should().NotBeNull();
+        //     publishedOrg.EnrichmentWorkflowStatus.Should().Be(ucasInstitutionEnrichmentGetModel.Status, $"there's a {ucasInstitutionEnrichmentGetModel.Status} enrichment present");
+        // }
     }
 }
 

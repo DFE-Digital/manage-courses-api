@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
+using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Data
@@ -25,86 +28,53 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
         /// returns a Course object containing all the required fields
         /// </summary>
         /// <param name="email">email of the user</param>
-        /// <param name="providerCode">the provider code</param>
+        /// <param name="instCode">the institution code</param>
         /// <param name="courseCode">the ucas code of the course</param>
         /// <returns>new Course object. Null if not found</returns>
-        public Course GetCourseForUser(string email, string providerCode, string courseCode)
+        public Course GetCourseForUser(string email, string instCode, string courseCode)
         {
 
-            var courseRecords = _context.GetCourse(providerCode, courseCode, email);
+            var courseRecords = _context.GetCourse(instCode, courseCode, email);
 
             if (courseRecords.Count == 0)
             {
                 return null;
             }
 
-            return WithEnrichmentMetadata(courseRecords, providerCode, email).Single();
+            return WithEnrichmentMetadata(courseRecords, instCode, email).Single();
         }
 
         /// <summary>
-        /// returns an List&lt;Course&gt; object for a specified provider with the required courses mapped to a user email address
+        /// returns an List&lt;Course&gt; object for a specified institution with the required courses mapped to a user email address
         /// </summary>
         /// <param name="email">user email address</param>
-        /// <param name="providerCode">the provider code</param>
-        /// <returns>new List of all courses found</returns>
-        public List<Course> GetCoursesForUser(string email, string providerCode)
+        /// <param name="instCode">the institution code</param>
+        /// <returns>new InstitutionCourse object with a list of all courses found</returns>
+        public List<Course> GetCoursesForUser(string email, string instCode)
         {
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(providerCode))
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(instCode))
             {
                 return new List<Course>();
             }
 
-            var courseRecords = _context.GetCoursesByProviderCode(providerCode, email);
+            var courseRecords = _context.GetCoursesByInstCode(instCode, email);
 
             if (courseRecords.Count == 0)
             {
                 return new List<Course>();
             }
 
-            return WithEnrichmentMetadata(courseRecords, providerCode, email).ToList();
+            return WithEnrichmentMetadata(courseRecords, instCode, email).ToList();
         }
 
-        public IEnumerable<ProviderSummary> GetProviderSummariesForUser(string email)
+        public Institution GetUcasInstitutionForUser(string name, string instCode)
         {
-            var providerSummaries = _context.GetOrganisationProviders(email)
-                .Select(providerSummary => new ProviderSummary()
-                {
-                    ProviderName = providerSummary.Provider.ProviderName,
-                    ProviderCode = providerSummary.Provider.ProviderCode,
-                    TotalCourses = providerSummary.Provider.Courses.Select(c => c.CourseCode).Distinct().Count()
-                }).OrderBy(x => x.ProviderName).ToList();
-
-            return providerSummaries;
+            return _context.GetInstitution(name, instCode);
         }
 
-        public ProviderSummary GetProviderSummaryForUser(string email, string providerCode)
+        private IEnumerable<Course> WithEnrichmentMetadata(IEnumerable<Course> courseRecords, string instCode, string email)
         {
-            var organisationProvider = _context.GetOrganisationProvider(email, providerCode);
-            var enrichment = _enrichmentService.GetProviderEnrichment(providerCode, email);
-
-            if (organisationProvider != null)
-            {
-                return new ProviderSummary()
-                {
-                    ProviderName = organisationProvider.Provider.ProviderName,
-                    ProviderCode = organisationProvider.Provider.ProviderCode,
-                    TotalCourses = organisationProvider.Provider.Courses.Select(c => c.CourseCode).Distinct()
-                        .Count(),
-                    EnrichmentWorkflowStatus = enrichment?.Status
-                };
-            }
-
-            return null;
-        }
-
-        public Provider GetUcasProviderForUser(string name, string providerCode)
-        {
-            return _context.GetProvider(name, providerCode);
-        }
-
-        private IEnumerable<Course> WithEnrichmentMetadata(IEnumerable<Course> courseRecords, string providerCode, string email)
-        {
-            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(providerCode, email);
+            var enrichmentMetadata = _enrichmentService.GetCourseEnrichmentMetadata(instCode, email);
 
             foreach (var course in courseRecords)
             {

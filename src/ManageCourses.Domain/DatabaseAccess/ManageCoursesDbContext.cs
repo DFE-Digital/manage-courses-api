@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -39,8 +40,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasOne(ou => ou.Organisation)
                 .WithMany(u => u.OrganisationUsers);
 
-            modelBuilder.Entity<Provider>()
-                .HasIndex(ui => ui.ProviderCode)
+            modelBuilder.Entity<Institution>()
+                .HasIndex(ui => ui.InstCode)
                 .IsUnique();
 
             modelBuilder.Entity<Subject>()
@@ -48,32 +49,32 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .IsUnique();
 
             modelBuilder.Entity<Site>()
-                .HasIndex(s => new { ProviderId = s.ProviderId, s.Code })
+                .HasIndex(s => new { s.InstitutionId, s.Code })
                 .IsUnique();
 
             modelBuilder.Entity<Site>()
-                .HasOne(uc => uc.Provider)
+                .HasOne(uc => uc.Institution)
                 .WithMany(ui => ui.Sites);
 
-            modelBuilder.Entity<OrganisationProvider>()
+            modelBuilder.Entity<OrganisationInstitution>()
                 .HasOne(oi => oi.Organisation)
-                .WithMany(o => o.OrganisationProviders);
+                .WithMany(o => o.OrganisationInstitutions);
 
-            modelBuilder.Entity<OrganisationProvider>()
-                .HasOne(oi => oi.Provider)
-                .WithMany(ui => ui.OrganisationProviders);
+            modelBuilder.Entity<OrganisationInstitution>()
+                .HasOne(oi => oi.Institution)
+                .WithMany(ui => ui.OrganisationInstitutions);
 
             modelBuilder.Entity<Course>()
-                .HasIndex(x => new { ProviderId = x.ProviderId, x.CourseCode } )
+                .HasIndex(x => new { x.InstitutionId, x.CourseCode } )
                 .IsUnique();
 
             modelBuilder.Entity<Course>()
-                .HasOne(uc => uc.Provider)
+                .HasOne(uc => uc.Institution)
                 .WithMany(ui => ui.Courses)
-                .HasForeignKey(uc => uc.ProviderId);
+                .HasForeignKey(uc => uc.InstitutionId);
 
             modelBuilder.Entity<Course>()
-                .HasOne(uc => uc.AccreditingProvider)
+                .HasOne(uc => uc.AccreditingInstitution)
                 .WithMany(ui => ui.AccreditedCourses)
                 .IsRequired(false);
 
@@ -106,8 +107,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .HasForeignKey(ar => ar.RequesterId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            modelBuilder.Entity<ProviderEnrichment>()
-                .HasIndex(x => x.ProviderCode);
+            modelBuilder.Entity<InstitutionEnrichment>()
+                .HasIndex(x => x.InstCode);
 
             modelBuilder.Entity<Session>()
                 .HasOne(x => x.User)
@@ -132,87 +133,87 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         }
 
         public DbSet<Course> Courses { get; set; }
-        public DbSet<Provider> Providers { get; set; }
+        public DbSet<Institution> Institutions { get; set; }
         public DbSet<CourseSubject> CourseSubjects { get; set; }
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<Site> Sites { get; set; }
         public DbSet<NctlOrganisation> NctlOrganisations { get; set; }
         public DbSet<Organisation> Organisations { get; set; }
-        public DbSet<OrganisationProvider> OrganisationProviders { get; set; }
+        public DbSet<OrganisationInstitution> OrganisationIntitutions { get; set; }
         public DbSet<OrganisationUser> OrganisationUsers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<AccessRequest> AccessRequests { get; set; }
-        public DbSet<ProviderEnrichment> ProviderEnrichments { get; set; }
+        public DbSet<InstitutionEnrichment> InstitutionEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
         public DbSet<Session> Sessions { get; set; }
         public DbSet<PgdeCourse> PgdeCourses { get; set; }
 
-        public List<Course> GetCourse(string providerCode, string courseCode, string email)
+        public List<Course> GetCourse(string instCode, string courseCode, string email)
         {
             var ucasCourses = Courses.FromSql(@"
                     select c.* from course c
-                    join provider i on c.provider_id = i.id
-                    join organisation_provider oi on oi.provider_id=i.id
-                    join organisation o on o.id = oi.organisation_id 
-                    join organisation_user ou on ou.organisation_id = o.id 
-                    join ""user"" u on u.id = ou.user_id 
-                    where lower(i.provider_code)=lower(@providerCode) 
-                    and lower(c.course_code)=lower(@courseCode) 
-                    and lower(u.email)=lower(@email)", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
-                .Include(x => x.Provider)
+                    join institution i on c.institution_id = i.id
+                    join organisation_institution oi on oi.institution_id=i.id
+                    join organisation o on o.id = oi.organisation_id
+                    join organisation_user ou on ou.organisation_id = o.id
+                    join ""user"" u on u.id = ou.user_id
+                    where lower(i.inst_code)=lower(@instCode)
+                    and lower(c.course_code)=lower(@courseCode)
+                    and lower(u.email)=lower(@email)", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
+                .Include(x => x.Institution)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingProvider)
+                .Include(x => x.AccreditingInstitution)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 
             return ucasCourses;
         }
-        public List<Course> GetCoursesByProviderCode(string providerCode, string email)
+        public List<Course> GetCoursesByInstCode(string instCode, string email)
         {
             var ucasCourses = Courses.FromSql(
                     $"select c.* from course c " +
-                    $"join provider i on i.id=c.provider_id " +
-                    $"join organisation_provider oi on oi.provider_id=i.id " +
+                    $"join institution i on i.id=c.institution_id " +
+                    $"join organisation_institution oi on oi.institution_id=i.id " +
                     $"join organisation o on o.id = oi.organisation_id " +
                     $"join organisation_user ou on ou.organisation_id = o.id " +
                     $"join \"user\" u on ou.user_id = u.id " +
-                    $"where lower(i.provider_code)=lower(@providerCode) " +
-                    $"and lower(u.email)=lower(@email) order by c.name", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("email", email))
-                .Include(x => x.Provider)
+                    $"where lower(i.inst_code)=lower(@instCode) " +
+                    $"and lower(u.email)=lower(@email) order by c.name", new NpgsqlParameter("instCode", instCode), new NpgsqlParameter("email", email))
+                .Include(x => x.Institution)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingProvider)
+                .Include(x => x.AccreditingInstitution)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 
             return ucasCourses;
         }
 
-        public IQueryable<OrganisationProvider> GetOrganisationProviders(string email)
+        public IQueryable<OrganisationInstitution> GetOrganisationInstitutions(string email)
         {
-            var userOrganisations = OrganisationProviders.FromSql(
-                $"select oi.* from organisation_provider oi " +
+            var userOrganisations = OrganisationIntitutions.FromSql(
+                $"select oi.* from organisation_institution oi " +
                 $"join organisation o on o.id = oi.organisation_id " +
                 $"join organisation_user ou on ou.organisation_id = o.id " +
                 $"join \"user\" u on ou.user_id = u.id " +
                 $"where lower(u.email) = lower(@email)",
                 new NpgsqlParameter("email", email)
             ).Include(x => x.Organisation)
-            .Include(x => x.Provider);
+            .Include(x => x.Institution);
 
             return userOrganisations;
         }
 
-        public OrganisationProvider GetOrganisationProvider(string email, string providerCode)
+        public OrganisationInstitution GetOrganisationInstitution(string email, string instCode)
         {
-            var userOrganisations = OrganisationProviders.FromSql(
-                $"select oi.* from organisation_provider oi " +
-                $"join provider i on oi.provider_id = i.id " +
+            var userOrganisations = OrganisationIntitutions.FromSql(
+                $"select oi.* from organisation_institution oi " +
+                $"join institution i on oi.institution_id = i.id " +
                 $"join organisation o on oi.organisation_id = o.id " +
                 $"join organisation_user ou on ou.organisation_id = o.id " +
                 $"join \"user\" u on ou.user_id = u.id " +
-                $"where lower(u.email) = lower(@email) and Lower(i.provider_code) = lower(@providerCode)",
-                new NpgsqlParameter("email", email), new NpgsqlParameter("providerCode", providerCode)
-            ).Include(x => x.Organisation).Include(x => x.Provider).FirstOrDefault();
+                $"where lower(u.email) = lower(@email) and Lower(i.inst_code) = lower(@instCode)",
+                new NpgsqlParameter("email", email), new NpgsqlParameter("instCode", instCode)
+            ).Include(x => x.Organisation).Include(x => x.Institution).FirstOrDefault();
 
             return userOrganisations;
         }
@@ -228,18 +229,24 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return users;
         }
 
-        public Provider GetProvider(string name, string providerCode)
+        public TResult GetOrganisationInstitution<TResult>(string email, string instCode, Func<OrganisationInstitution, string, string, TResult> mapping)
         {
-            return Providers.FromSql(@"
-                    SELECT i.* from provider i
-                    JOIN organisation_provider oi on i.id = oi.provider_id
+            var organisationInstitution = GetOrganisationInstitution(email, instCode);
+            return mapping(organisationInstitution, email, instCode);
+        }
+
+        public Institution GetInstitution(string name, string instCode)
+        {
+            return Institutions.FromSql(@"
+                    SELECT i.* from institution i
+                    JOIN organisation_institution oi on i.id = oi.institution_id
                     JOIN organisation o on oi.organisation_id = o.id
                     JOIN organisation_user ou on o.id = ou.organisation_id
                     JOIN ""user"" u on ou.user_id = u.id
                     WHERE lower(u.email) = lower(@email)
-                    AND lower(i.provider_code) = lower(@providercode)",
+                    AND lower(i.inst_code) = lower(@instcode)",
                     new NpgsqlParameter("email", name),
-                    new NpgsqlParameter("providercode", providerCode))
+                    new NpgsqlParameter("instcode", instCode))
                 .FirstOrDefault();
         }
 
