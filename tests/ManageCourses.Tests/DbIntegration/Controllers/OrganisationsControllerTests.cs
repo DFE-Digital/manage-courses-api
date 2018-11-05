@@ -73,21 +73,21 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             result.Should().NotBeOfType<UnauthorizedResult>();
             result.Should().BeOfType<OkObjectResult>();
 
-            var orgList =((List<InstitutionSummary>) ((OkObjectResult)result).Value).ToList();
+            var orgList =((List<ProviderSummary>) ((OkObjectResult)result).Value).ToList();
 
             orgList.All(c => c.TotalCourses == numCourses).Should().BeTrue();
 
             foreach (var org in orgList)
             {
-                var orgResult = organisationsController.Get(org.InstCode);
+                var orgResult = organisationsController.Get(org.ProviderCode);
 
 
                 orgResult.Should().NotBeOfType<UnauthorizedResult>();
                 orgResult.Should().BeOfType<OkObjectResult>();
 
-                var orgItem =((InstitutionSummary) ((OkObjectResult)orgResult).Value);
+                var orgItem =((ProviderSummary) ((OkObjectResult)orgResult).Value);
 
-                orgItem.InstName.Should().Equals(org.InstName);
+                orgItem.ProviderName.Should().Equals(org.ProviderName);
             }
         }
 
@@ -103,7 +103,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             result.Should().NotBeOfType<UnauthorizedResult>();
             result.Should().BeOfType<OkObjectResult>();
 
-            var orgList =((List<InstitutionSummary>) ((OkObjectResult)result).Value).ToList();
+            var orgList =((List<ProviderSummary>) ((OkObjectResult)result).Value).ToList();
 
             orgList.All(c => c.TotalCourses == numCourses).Should().BeTrue();
 
@@ -111,7 +111,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             foreach (var org in orgList)
             {
-                var orgResult = organisationsController.Get(org.InstCode);
+                var orgResult = organisationsController.Get(org.ProviderCode);
 
                 orgResult.Should().NotBeOfType<OkObjectResult>();
                 orgResult.Should().BeOfType<NotFoundResult>();
@@ -136,25 +136,25 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             for (var counter = 1; counter <= numOrgs; counter++)
             {
                 var orgId = "org" + counter;
-                var instCode = "AB" + counter;
+                var providerCode = "AB" + counter;
                 Organisation org = new Organisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter };
                 Context.Organisations.Add(org);
-                Institution institution = new Institution
+                Provider provider = new Provider()
                 {
                     Address1 = "add2",
                     Address2 = "add2",
                     Address3 = "add3",
                     Address4 = "add4",
                     Postcode = "AB1 CD2",
-                    InstCode = instCode,
-                    InstName = "Intitution " + counter
+                    ProviderCode = providerCode,
+                    ProviderName = "Intitution " + counter
                 };
-                Context.Institutions.Add(institution);
-                LoadCourses(institution, numCourses, Context.Subjects);
+                Context.Providers.Add(provider);
+                LoadCourses(provider, numCourses, Context.Subjects);
                 Context.OrganisationUsers.Add(new OrganisationUser { User = user, Organisation = org });
-                Context.OrganisationIntitutions.Add(new OrganisationInstitution
+                Context.OrganisationProviders.Add(new OrganisationProvider()
                 {
-                    Institution = institution,
+                    Provider = provider,
                     Organisation = org
                 });
             }
@@ -163,12 +163,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         }
 
         /// <summary>
-        /// Generates course records for a specific institution
+        /// Generates course records for a specific provider
         /// </summary>
-        /// <param name="instCode">institution code</param>
+        /// <param name="provider">provider</param>
         /// <param name="numRecords">number of course records to generate</param>
-        /// <param name="numSubjects"></param>
-        private void LoadCourses(Institution institution, int numRecords, IEnumerable<Subject> subjects)
+        /// <param name="subjects"></param>
+        private void LoadCourses(Provider provider, int numRecords, IEnumerable<Subject> subjects)
         {
             for (var counter = 1; counter <= numRecords; counter++)
             {
@@ -184,7 +184,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "PC1 A23",
                     LocationName = "Campus " + counter,
-                    Institution = institution
+                    Provider = provider
                 };
 
                 var course = new Course
@@ -196,7 +196,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     ProgramType = "SC",
                     StudyMode = "F",
                     Name = "Title " + counter,
-                    Institution = institution,
+                    Provider = provider,
                     CourseSites =  new List<CourseSite>()
                     {
                         new CourseSite
