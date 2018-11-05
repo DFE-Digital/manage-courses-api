@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
@@ -43,14 +44,14 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 table: "mc_organisation_institution",
                 newName: "IX_mc_organisation_institution_inst_code");
 
-            migrationBuilder.RenameTable("ucas_institution", null, "institution");            
+            migrationBuilder.RenameTable("ucas_institution", null, "institution");
             migrationBuilder.RenameColumn("addr1", "institution", "address1");
             migrationBuilder.RenameColumn("addr2", "institution", "address2");
             migrationBuilder.RenameColumn("addr3", "institution", "address3");
             migrationBuilder.RenameColumn("addr4", "institution", "address4");
             migrationBuilder.DropColumn("inst_big","institution");
             migrationBuilder.DropColumn("inst_name","institution");
-            migrationBuilder.DropColumn("accrediting_provider","institution");    
+            migrationBuilder.DropColumn("accrediting_provider","institution");
 
             migrationBuilder.RenameTable("ucas_subject", null, "subject");
             migrationBuilder.DropColumn("title_match", "subject");
@@ -245,9 +246,9 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             migrationBuilder.RenameColumn("address4", "institution", "addr4");
             migrationBuilder.AddColumn<string>("inst_big","institution");
             migrationBuilder.AddColumn<string>("inst_name","institution");
-            migrationBuilder.AddColumn<string>("accrediting_provider","institution");    
+            migrationBuilder.AddColumn<string>("accrediting_provider","institution");
             migrationBuilder.RenameTable("institution", null, "ucas_institution");
-            
+
             migrationBuilder.AddColumn<string>("title_match", "subject");
             migrationBuilder.RenameColumn("subject_name", "subject", "subject_description");
             migrationBuilder.RenameTable("subject", null, "ucas_subject");
@@ -318,7 +319,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         principalColumn: "inst_code",
                         onDelete: ReferentialAction.Cascade);
                 });
-                
+
             migrationBuilder.CreateTable(
                 name: "ucas_course_subject",
                 columns: table => new
