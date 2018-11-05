@@ -11,6 +11,6 @@ namespace GovUk.Education.ManageCourses.Api.Data
         // InstitutionSummary GetInstitutionSummaryForUser(string email, string providerCode);
         Course GetCourseForUser(string email, string providerCode, string courseCode);
         List<Course> GetCoursesForUser(string email, string providerCode);
-        Provider GetUcasProviderForUser(string name, string providerCode);
+        Provider GetProviderForUser(string name, string providerCode);
     }
 }

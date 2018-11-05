@@ -53,7 +53,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
-            _dataServiceMock.Setup(x => x.GetUcasProviderForUser(email, ProviderCode)).Returns(provider);
+            _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
                 .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
@@ -88,7 +88,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
 
-            _dataServiceMock.Setup(x => x.GetUcasProviderForUser(email, ProviderCode)).Returns(provider);
+            _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
                 .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
@@ -130,7 +130,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
-            _dataServiceMock.Setup(x => x.GetUcasProviderForUser(email, ProviderCode)).Returns(provider);
+            _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
                 .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
@@ -155,7 +155,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" }, new Course { CourseCode = CourseCode + "1", ProgramType = "SD", Name = "Geography" } }
             };
 
-            _dataServiceMock.Setup(x => x.GetUcasProviderForUser(email, ProviderCode)).Returns(provider);
+            _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
                 .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
@@ -190,7 +190,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 AccreditedCourses =
                     new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
-            _dataServiceMock.Setup(x => x.GetUcasProviderForUser(email, ProviderCode)).Returns(provider);
+            _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
                 .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 

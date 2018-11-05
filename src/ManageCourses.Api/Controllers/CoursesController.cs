@@ -16,7 +16,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Gets a course by provider Ucas code
+        /// Gets a course by provider code
         /// </summary>
         /// <returns>a single course</returns>
         [BearerTokenAuth]
@@ -51,7 +51,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         {
             var name = this.User.Identity.Name;
 
-            if (_dataService.GetUcasProviderForUser(name, providerCode) == null)
+            if (_dataService.GetProviderForUser(name, providerCode) == null)
             {
                 return NotFound();
             };

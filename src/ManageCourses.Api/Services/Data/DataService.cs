@@ -63,7 +63,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
             return WithEnrichmentMetadata(courseRecords, providerCode, email).ToList();
         }
 
-        public Provider GetUcasProviderForUser(string name, string providerCode)
+        public Provider GetProviderForUser(string name, string providerCode)
         {
             return _context.GetProvider(name, providerCode);
         }

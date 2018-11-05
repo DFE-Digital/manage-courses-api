@@ -83,18 +83,18 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             var courseMapper = new CourseMapper();
 
-            var ucasProviderData = _dataService.GetUcasProviderForUser(name, providerCode);
+            var providerData = _dataService.GetProviderForUser(name, providerCode);
             var orgEnrichmentData = _enrichmentservice.GetProviderEnrichment(providerCode, name);
-            var ucasCourseData = _dataService.GetCourseForUser(name, providerCode, courseCode);
+            var courseData = _dataService.GetCourseForUser(name, providerCode, courseCode);
             var courseEnrichmentData = _enrichmentservice.GetCourseEnrichment(providerCode, courseCode, name);
-            if (ucasProviderData == null || ucasCourseData == null)
+            if (providerData == null || courseData == null)
             {
                 return NotFound();
             }
 
             var course = courseMapper.MapToSearchAndCompareCourse(
-                ucasProviderData,
-                ucasCourseData,
+                providerData,
+                courseData,
                 orgEnrichmentData?.EnrichmentModel,
                 courseEnrichmentData?.EnrichmentModel);
 

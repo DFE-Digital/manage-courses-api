@@ -18,62 +18,62 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// always get the latest enrichment record regardless of status
         /// </summary>
-        /// <param name="ucasProviderCode">provider code that relates to the Ucas provider of the enrichment data</param>
+        /// <param name="providerCode">provider code that relates to the provider of the enrichment data</param>
         /// <returns>a data object. null if not found</returns>
         [HttpGet]
-        [Route("provider/{ucasProviderCode}")]
+        [Route("provider/{providerCode}")]
         [ProducesResponseType(typeof(UcasProviderEnrichmentGetModel), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult GetProvider(string ucasProviderCode)
+        public ActionResult GetProvider(string providerCode)
         {
-            return Handle(() => _service.GetProviderEnrichment(ucasProviderCode, User.Identity.Name));
+            return Handle(() => _service.GetProviderEnrichment(providerCode, User.Identity.Name));
         }
 
         /// <summary>
         /// saves a draft enrichment record (upsert)
         /// </summary>
-        /// <param name="ucasProviderCode">provider code that relates to the Ucas provider</param>
+        /// <param name="providerCode">provider code that relates to the Ucas provider</param>
         /// <param name="model">contains the payload that represents the data to be saved</param>
         [HttpPost]
-        [Route("provider/{ucasProviderCode}")]
+        [Route("provider/{providerCode}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult SaveProvider(string ucasProviderCode, [FromBody] UcasProviderEnrichmentPostModel model)
+        public ActionResult SaveProvider(string providerCode, [FromBody] UcasProviderEnrichmentPostModel model)
         {
-            return HandleVoid(() => _service.SaveProviderEnrichment(model, ucasProviderCode, User.Identity.Name));
+            return HandleVoid(() => _service.SaveProviderEnrichment(model, providerCode, User.Identity.Name));
         }
  
         /// <summary>
         /// always get the latest enrichment record regardless of status
         /// </summary>
-        /// <param name="ucasProviderCode">provider code that relates to the Ucas provider</param>
-        /// <param name="ucasCourseCode">Course code that relates to the Ucas Course of the enrichment data</param>
+        /// <param name="providerCode">provider code that relates to the Ucas provider</param>
+        /// <param name="courseCode">Course code that relates to the Ucas Course of the enrichment data</param>
         /// <returns>a data object. null if not found</returns>
         [HttpGet]
-        [Route("provider/{ucasProviderCode}/course/{ucasCourseCode}")]
+        [Route("provider/{providerCode}/course/{courseCode}")]
         [ProducesResponseType(typeof(UcasCourseEnrichmentGetModel), 200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult GetCourse(string ucasProviderCode, string ucasCourseCode)
+        public ActionResult GetCourse(string providerCode, string courseCode)
         {
-            return Handle(() => _service.GetCourseEnrichment(ucasProviderCode, ucasCourseCode, User.Identity.Name));
+            return Handle(() => _service.GetCourseEnrichment(providerCode, courseCode, User.Identity.Name));
         }
         /// <summary>
         /// saves a draft enrichment record (upsert)
         /// </summary>
-        /// <param name="ucasProviderCode"></param>
-        /// <param name="ucasCourseCode">Course code that relates to the Ucas Course</param>
+        /// <param name="providerCode"></param>
+        /// <param name="courseCode">Course code that relates to the Ucas Course</param>
         /// <param name="model">contains the payload that represents the data to be saved</param>
         [HttpPost]
-        [Route("provider/{ucasProviderCode}/course/{ucasCourseCode}")]
+        [Route("provider/{providerCode}/course/{courseCode}")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
-        public ActionResult SaveCourse(string ucasProviderCode, string ucasCourseCode, [FromBody] CourseEnrichmentModel model)
+        public ActionResult SaveCourse(string providerCode, string courseCode, [FromBody] CourseEnrichmentModel model)
         {
-            return HandleVoid(() => _service.SaveCourseEnrichment(model, ucasProviderCode, ucasCourseCode, User.Identity.Name));
+            return HandleVoid(() => _service.SaveCourseEnrichment(model, providerCode, courseCode, User.Identity.Name));
         }
 
 

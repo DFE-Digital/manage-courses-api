@@ -66,7 +66,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
 
         private List<Course> GetValidCourses(string providerCode, string email, string courseCode = null)
         {
-            var ucasProviderData = _dataService.GetUcasProviderForUser(email, providerCode);
+            var ucasProviderData = _dataService.GetProviderForUser(email, providerCode);
             var orgEnrichmentData = _enrichmentService.GetProviderEnrichmentForPublish(providerCode, email);
 
             var courses = new List<Course> ();
