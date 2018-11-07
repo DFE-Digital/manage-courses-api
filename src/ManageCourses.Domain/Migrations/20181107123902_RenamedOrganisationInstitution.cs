@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -30,7 +29,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             sqlBuilder.AppendLine("ALTER TABLE organisation_institution RENAME TO organisation_provider;");
 
             migrationBuilder.Sql(sqlBuilder.ToString());
-
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -55,7 +53,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             sqlBuilder.AppendLine("ALTER TABLE organisation_provider RENAME TO organisation_institution;");
 
             migrationBuilder.Sql(sqlBuilder.ToString());
-
         }
     }
 }

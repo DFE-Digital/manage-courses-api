@@ -27,7 +27,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             sqlBuilder.AppendLine("ALTER TABLE site RENAME CONSTRAINT \"FK_site_provider_provider_id\" TO \"FK_site_institution_institution_id\";");
 
             migrationBuilder.Sql(sqlBuilder.ToString());
-
         }
     }
 }

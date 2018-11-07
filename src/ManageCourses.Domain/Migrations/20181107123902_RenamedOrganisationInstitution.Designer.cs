@@ -12,8 +12,8 @@ using System;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    [Migration("20181107092541_RenamedCourseFields")]
-    partial class RenamedCourseFields
+    [Migration("20181107123902_RenamedOrganisationInstitution")]
+    partial class RenamedOrganisationInstitution
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

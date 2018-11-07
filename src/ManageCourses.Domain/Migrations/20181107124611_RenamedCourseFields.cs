@@ -20,7 +20,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             sqlBuilder.AppendLine("ALTER TABLE pgde_course RENAME inst_code TO provider_code;");
             sqlBuilder.AppendLine("ALTER TABLE course_enrichment RENAME inst_code TO provider_code;");
             migrationBuilder.Sql(sqlBuilder.ToString());
-
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -37,7 +36,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             sqlBuilder.AppendLine("ALTER TABLE course_enrichment RENAME provider_code TO inst_code;");
 
             migrationBuilder.Sql(sqlBuilder.ToString());
-
         }
     }
 }
