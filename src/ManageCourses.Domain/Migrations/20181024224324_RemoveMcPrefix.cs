@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
@@ -32,11 +33,11 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_nctl_organisation_mc_organisation_mc_organisation_id",
                 table: "nctl_organisation");
-            
+
             migrationBuilder.RenameTable("mc_organisation_institution", null, "organisation_institution");
             migrationBuilder.RenameColumn("mc_organisation_id", "organisation_institution", "organisation_id");
 
-            migrationBuilder.RenameTable("mc_organisation_user", null, "organisation_user");            
+            migrationBuilder.RenameTable("mc_organisation_user", null, "organisation_user");
             migrationBuilder.RenameColumn("mc_organisation_id", "organisation_user", "organisation_id");
             migrationBuilder.RenameColumn("mc_user_id", "organisation_user", "user_id");
 
@@ -45,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
             migrationBuilder.RenameTable("mc_organisation", null, "organisation");
             migrationBuilder.RenameTable("mc_user", null, "user");
-            
+
             migrationBuilder.DropPrimaryKey("PK_mc_organisation_institution", "organisation_institution");
             migrationBuilder.AddPrimaryKey("PK_organisation_institution", "organisation_institution", "id");
             migrationBuilder.AddForeignKey(
@@ -63,7 +64,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 principalColumn: "id",
                 onDelete: ReferentialAction.Restrict);
 
-    
+
             migrationBuilder.DropPrimaryKey("PK_mc_organisation_user", "organisation_user");
             migrationBuilder.AddPrimaryKey("PK_organisation_user", "organisation_user", "id");
             migrationBuilder.AddForeignKey(
@@ -80,7 +81,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 principalTable: "user",
                 principalColumn: "id",
                 onDelete: ReferentialAction.Restrict);
-                            
+
             migrationBuilder.DropPrimaryKey("PK_mc_session", "session");
             migrationBuilder.AddPrimaryKey("PK_session", "session", "id");
             migrationBuilder.AddForeignKey(
@@ -90,7 +91,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 principalTable: "user",
                 principalColumn: "id",
                 onDelete: ReferentialAction.Cascade);
-                
+
             migrationBuilder.CreateIndex(
                 name: "IX_organisation_org_id",
                 table: "organisation",
