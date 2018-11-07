@@ -17,7 +17,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             sqlBuilder.AppendLine("ALTER INDEX \"IX_course_institution_id_course_code\" RENAME TO \"IX_course_provider_id_course_code\";");
             sqlBuilder.AppendLine("ALTER TABLE course RENAME CONSTRAINT \"FK_course_institution_accrediting_institution_id\" TO \"FK_course_provider_accrediting_provider_id\";");
             sqlBuilder.AppendLine("ALTER TABLE course RENAME CONSTRAINT \"FK_course_institution_institution_id\" TO \"FK_course_provider_provider_id\";");
-
+            sqlBuilder.AppendLine("ALTER TABLE pgde_course RENAME inst_code TO provider_code;");
+            sqlBuilder.AppendLine("ALTER TABLE course_enrichment RENAME inst_code TO provider_code;");
             migrationBuilder.Sql(sqlBuilder.ToString());
 
         }
@@ -32,6 +33,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
             sqlBuilder.AppendLine("ALTER INDEX \"IX_course_provider_id_course_code\" RENAME TO \"IX_course_institution_id_course_code\";");
             sqlBuilder.AppendLine("ALTER TABLE course RENAME CONSTRAINT \"FK_course_provider_accrediting_provider_id\" TO \"FK_course_institution_accrediting_institution_id\";");
             sqlBuilder.AppendLine("ALTER TABLE course RENAME CONSTRAINT \"FK_course_provider_provider_id\" TO \"FK_course_institution_institution_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE pgde_course RENAME provider_code TO inst_code;");
+            sqlBuilder.AppendLine("ALTER TABLE course_enrichment RENAME provider_code TO inst_code;");
 
             migrationBuilder.Sql(sqlBuilder.ToString());
 
