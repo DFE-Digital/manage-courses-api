@@ -25,20 +25,20 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             };
             context.Organisations.Add(organisation);
 
-            Institution institution = new Institution
+            Provider provider = new Provider
             {
-                InstName = "Joe's school @ UCAS",
-                InstCode = "ABC"
+                ProviderName = "Joe's school @ UCAS",
+                ProviderCode = "ABC"
             };
-            context.Institutions.Add(institution);
+            context.Providers.Add(provider);
             
             context.OrganisationUsers.Add(new OrganisationUser {
                     User = user,
                     Organisation = organisation
                 });
             
-            context.OrganisationIntitutions.Add(new OrganisationInstitution {
-                    Institution = institution,
+            context.OrganisationProviders.Add(new OrganisationProvider {
+                    Provider = provider,
                     Organisation = organisation
                 });
             

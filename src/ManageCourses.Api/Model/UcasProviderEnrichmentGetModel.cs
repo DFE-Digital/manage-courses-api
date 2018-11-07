@@ -3,13 +3,13 @@ using GovUk.Education.ManageCourses.Domain.Models;
 
 namespace GovUk.Education.ManageCourses.Api.Model
 {
-    public class UcasInstitutionEnrichmentGetModel
+    public class UcasProviderEnrichmentGetModel
     {
-        public UcasInstitutionEnrichmentGetModel()
+        public UcasProviderEnrichmentGetModel()
         {
-            EnrichmentModel = new InstitutionEnrichmentModel();
+            EnrichmentModel = new ProviderEnrichmentModel();
         }
-        public InstitutionEnrichmentModel EnrichmentModel { get; set; }
+        public ProviderEnrichmentModel EnrichmentModel { get; set; }
         public DateTime? CreatedTimestampUtc { get; set; }
         public DateTime? UpdatedTimestampUtc { get; set; }
         public DateTime? LastPublishedTimestampUtc { get; set; }

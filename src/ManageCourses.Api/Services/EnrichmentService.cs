@@ -20,21 +20,21 @@ namespace GovUk.Education.ManageCourses.Api.Services
             _converter = new EnrichmentConverter();
         }
 
-        public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email)
+        public UcasProviderEnrichmentGetModel GetProviderEnrichment(string providerCode, string email)
         {
-            return GetInstitutionEnrichment(instCode, email, false);
+            return GetProviderEnrichment(providerCode, email, false);
         }
-        public UcasInstitutionEnrichmentGetModel GetInstitutionEnrichmentForPublish(string instCode, string email)
+        public UcasProviderEnrichmentGetModel GetProviderEnrichmentForPublish(string providerCode, string email)
         {
-            return GetInstitutionEnrichment(instCode, email, true);
+            return GetProviderEnrichment(providerCode, email, true);
         }
-        public UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email)
+        public UcasCourseEnrichmentGetModel GetCourseEnrichment(string providerCode, string ucasCourseCode, string email)
         {
-            return GetCourseEnrichment(instCode, ucasCourseCode, email, false);
+            return GetCourseEnrichment(providerCode, ucasCourseCode, email, false);
         }
-        public UcasCourseEnrichmentGetModel GetCourseEnrichmentForPublish(string instCode, string ucasCourseCode, string email)
+        public UcasCourseEnrichmentGetModel GetCourseEnrichmentForPublish(string providerCode, string ucasCourseCode, string email)
         {
-            return GetCourseEnrichment(instCode, ucasCourseCode, email, true);
+            return GetCourseEnrichment(providerCode, ucasCourseCode, email, true);
         }
 
         /// <summary>
@@ -45,16 +45,16 @@ namespace GovUk.Education.ManageCourses.Api.Services
         ///check for the existence of a previous published record and get the last pulished date
         /// </summary>
         /// <param name="model">holds the enriched data</param>
-        /// <param name="instCode">the institution code for the enrichment data</param>
+        /// <param name="providerCode">the provider code for the enrichment data</param>
         /// <param name="email">the email of the user</param>
-        public void SaveInstitutionEnrichment(UcasInstitutionEnrichmentPostModel model, string instCode, string email)
+        public void SaveProviderEnrichment(UcasProviderEnrichmentPostModel model, string providerCode, string email)
         {
-            var userInst = ValidateUserOrg(email, instCode);
+            var userProvider = ValidateUserOrg(email, providerCode);
 
-            instCode = instCode.ToUpperInvariant();
+            providerCode = providerCode.ToUpperInvariant();
 
-            var enrichmentDraftRecord = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
+            var enrichmentDraftRecord = _context.ProviderEnrichments
+                .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
@@ -64,14 +64,14 @@ namespace GovUk.Education.ManageCourses.Api.Services
             {
                 //update
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.User;
+                enrichmentDraftRecord.UpdatedByUser = userProvider.User;
                 enrichmentDraftRecord.JsonData = content;
             }
             else
             {
                 //insert
-                var enrichmentPublishRecord = _context.InstitutionEnrichments
-                    .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Published)
+                var enrichmentPublishRecord = _context.ProviderEnrichments
+                    .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -80,18 +80,18 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 {
                     lastPublishedDate = enrichmentPublishRecord.LastPublishedTimestampUtc;
                 }
-                var enrichment = new InstitutionEnrichment
+                var enrichment = new ProviderEnrichment
                 {
-                    InstCode = userInst.UcasInstitutionCode,
+                    ProviderCode = userProvider.UcasProviderCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
-                    CreatedByUser = userInst.User,
-                    UpdatedByUser = userInst.User,
+                    CreatedByUser = userProvider.User,
+                    UpdatedByUser = userProvider.User,
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
-                _context.InstitutionEnrichments.Add(enrichment);
+                _context.ProviderEnrichments.Add(enrichment);
             }
             _context.Save();
         }
@@ -99,25 +99,25 @@ namespace GovUk.Education.ManageCourses.Api.Services
         /// <summary>
         /// Changes the status of the latest draft record to published
         /// </summary>
-        /// <param name="instCode">institution code of the enrichemtn to be published</param>
+        /// <param name="providerCode">provider code of the enrichment to be published</param>
         /// <param name="email">email of the user</param>
         /// <returns>true if successful</returns>
-        public bool PublishInstitutionEnrichment(string instCode, string email)
+        public bool PublishProviderEnrichment(string providerCode, string email)
         {
             var returnBool = false;
-            var userInst = ValidateUserOrg(email, instCode);
+            var userOrg = ValidateUserOrg(email, providerCode);
 
-            instCode = instCode.ToUpperInvariant();
+            providerCode = providerCode.ToUpperInvariant();
 
-            var enrichmentDraftRecord = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.Status == EnumStatus.Draft)
+            var enrichmentDraftRecord = _context.ProviderEnrichments
+                .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
             if (enrichmentDraftRecord != null)
             {
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.User;
+                enrichmentDraftRecord.UpdatedByUser = userOrg.User;
                 enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
                 _context.Save();
@@ -127,17 +127,17 @@ namespace GovUk.Education.ManageCourses.Api.Services
             return returnBool;
         }
 
-        public IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string instCode, string email)
+        public IList<UcasCourseEnrichmentGetModel> GetCourseEnrichmentMetadata(string providerCode, string email)
         {
-            ValidateUserOrg(email, instCode);
+            ValidateUserOrg(email, providerCode);
 
-            instCode = instCode.ToUpperInvariant();
+            providerCode = providerCode.ToUpperInvariant();
 
             var enrichments = _context.CourseEnrichments.FromSql(@"
-SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.inst_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
-FROM (SELECT inst_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY inst_code, ucas_course_code) top_id
+SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.provider_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
+FROM (SELECT provider_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY provider_code, ucas_course_code) top_id
 INNER JOIN course_enrichment b on top_id.id = b.id")
-                .Where(e => e.InstCode == instCode);
+                .Where(e => e.ProviderCode == providerCode);
 
             return enrichments.Select(x => _converter.Convert(x)).ToList();
         }
@@ -150,18 +150,18 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         ///check for the existence of a previous published record and get the last pulished date
         /// </summary>
         /// <param name="model">holds the enriched data</param>
-        /// <param name="instCode">the institution code for the enrichment data</param>
+        /// <param name="providerCode">the provider code for the enrichment data</param>
         /// <param name="ucasCourseCode">the course code for the enrichment data</param>
         /// <param name="email">the email of the user</param>
-        public void SaveCourseEnrichment(CourseEnrichmentModel model, string instCode, string ucasCourseCode, string email)
+        public void SaveCourseEnrichment(CourseEnrichmentModel model, string providerCode, string ucasCourseCode, string email)
         {
-            var userInst = ValidateUserOrg(email, instCode);
+            var userOrg = ValidateUserOrg(email, providerCode);
 
-            instCode = instCode.ToUpperInvariant();
+            providerCode = providerCode.ToUpperInvariant();
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
+                .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
@@ -171,14 +171,14 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             {
                 //update
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.User;
+                enrichmentDraftRecord.UpdatedByUser = userOrg.User;
                 enrichmentDraftRecord.JsonData = content;
             }
             else
             {
                 //insert
                 var enrichmentPublishRecord = _context.CourseEnrichments
-                    .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Published)
+                    .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -189,13 +189,13 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                 }
                 var enrichment = new CourseEnrichment
                 {
-                    InstCode = userInst.UcasInstitutionCode,
+                    ProviderCode = userOrg.UcasProviderCode,
                     UcasCourseCode = ucasCourseCode,
                     CreatedTimestampUtc = DateTime.UtcNow,
                     UpdatedTimestampUtc = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
-                    CreatedByUser = userInst.User,
-                    UpdatedByUser = userInst.User,
+                    CreatedByUser = userOrg.User,
+                    UpdatedByUser = userOrg.User,
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
@@ -208,25 +208,25 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         /// <summary>
         /// Changes the status of the latest draft record to published
         /// </summary>
-        /// <param name="instCode">institution code of the enrichemnt to be published</param>
+        /// <param name="providerCode">provider code of the enrichemnt to be published</param>
         /// <param name="ucasCourseCode">course code of the enrichemnt to be published</param>
         /// <param name="email">email of the user</param>
         /// <returns>true if successful</returns>
-        public bool PublishCourseEnrichment(string instCode, string ucasCourseCode, string email)
+        public bool PublishCourseEnrichment(string providerCode, string ucasCourseCode, string email)
         {
             var returnBool = false;
-            var userInst = ValidateUserOrg(email, instCode);
+            var userOrg = ValidateUserOrg(email, providerCode);
 
-            instCode = instCode.ToUpperInvariant();
+            providerCode = providerCode.ToUpperInvariant();
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentDraftRecord = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
+                .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
 
             if (enrichmentDraftRecord != null)
             {
                 enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
-                enrichmentDraftRecord.UpdatedByUser = userInst.User;
+                enrichmentDraftRecord.UpdatedByUser = userOrg.User;
                 enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
                 _context.Save();
@@ -238,19 +238,19 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         /// <summary>
         /// gets the latest enrichment record regardless of the status
         /// </summary>
-        /// <param name="instCode">institution code for the enrichment</param>
+        /// <param name="providerCode">provider code for the enrichment</param>
         /// <param name="ucasCourseCode">can be null</param>
         /// <param name="email">email of the user</param>
         /// <param name="publishableOnly">if there is a draft enrichment then get the ucas contact details</param>
         /// <returns>An enrichment object with the enrichment data (if found). Nul if not found</returns>
-        private UcasCourseEnrichmentGetModel GetCourseEnrichment(string instCode, string ucasCourseCode, string email, bool publishableOnly)
+        private UcasCourseEnrichmentGetModel GetCourseEnrichment(string providerCode, string ucasCourseCode, string email, bool publishableOnly)
         {
-            ValidateUserOrg(email, instCode);
-            instCode = instCode.ToUpperInvariant();
+            ValidateUserOrg(email, providerCode);
+            providerCode = providerCode.ToUpperInvariant();
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentsQuery = _context.CourseEnrichments
-                .Where(ie => ie.InstCode == instCode && ie.UcasCourseCode == ucasCourseCode);
+                .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode);
 
             if (publishableOnly)
             {
@@ -270,21 +270,21 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         /// Gets the latest enrichment record if any regardless of the status.
         /// If there is no contact data then it will be pre-populated from the Ucas data.
         /// </summary>
-        /// <param name="instCode">institution code for the enrichment</param>
+        /// <param name="providerCode">provider code for the enrichment</param>
         /// <param name="email">email of the user</param>
         /// <param name="publishableOnly">if there is a draft enrichment then get the ucas contact details</param>
         /// <returns>
         /// An enrichment object with the enrichment data.
         /// If there is nothing in the db then an empty record with Ucas contact details will be returned.
         /// </returns>
-        private UcasInstitutionEnrichmentGetModel GetInstitutionEnrichment(string instCode, string email, bool publishableOnly)
+        private UcasProviderEnrichmentGetModel GetProviderEnrichment(string providerCode, string email, bool publishableOnly)
         {
-            ValidateUserOrg(email, instCode);
+            ValidateUserOrg(email, providerCode);
 
-            instCode = instCode.ToUpperInvariant();
+            providerCode = providerCode.ToUpperInvariant();
 
-            var enrichmentsQuery = _context.InstitutionEnrichments
-                .Where(ie => ie.InstCode == instCode);
+            var enrichmentsQuery = _context.ProviderEnrichments
+                .Where(ie => ie.ProviderCode == providerCode);
 
             if (publishableOnly)
             {
@@ -296,7 +296,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                 .Include(e => e.UpdatedByUser)
                 .FirstOrDefault();
 
-            var enrichmentGetModel = _converter.Convert(enrichment) ?? new UcasInstitutionEnrichmentGetModel();
+            var enrichmentGetModel = _converter.Convert(enrichment) ?? new UcasProviderEnrichmentGetModel();
 
             var enrichmentModel = enrichmentGetModel.EnrichmentModel;
 
@@ -312,45 +312,45 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             if (useUcasContact)
             {
-                var ucasInst = _context.Institutions.SingleOrDefault(x => x.InstCode == instCode);
-                if (ucasInst != null)
+                var ucasProvider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
+                if (ucasProvider != null)
                 {
-                    enrichmentModel.Email = ucasInst.Email;
-                    enrichmentModel.Telephone = ucasInst.Telephone;
-                    enrichmentModel.Website = ucasInst.Url;
-                    enrichmentModel.Address1 = ucasInst.Address1;
-                    enrichmentModel.Address2 = ucasInst.Address2;
-                    enrichmentModel.Address3 = ucasInst.Address3;
-                    enrichmentModel.Address4 = ucasInst.Address4;
-                    enrichmentModel.Postcode = ucasInst.Postcode;
+                    enrichmentModel.Email = ucasProvider.Email;
+                    enrichmentModel.Telephone = ucasProvider.Telephone;
+                    enrichmentModel.Website = ucasProvider.Url;
+                    enrichmentModel.Address1 = ucasProvider.Address1;
+                    enrichmentModel.Address2 = ucasProvider.Address2;
+                    enrichmentModel.Address3 = ucasProvider.Address3;
+                    enrichmentModel.Address4 = ucasProvider.Address4;
+                    enrichmentModel.Postcode = ucasProvider.Postcode;
                 }
             }
 
             return enrichmentGetModel;
         }
-        private UserInstitution ValidateUserOrg(string email, string instCode)
+        private UserProvider ValidateUserOrg(string email, string providerCode)
         {
-            if (string.IsNullOrWhiteSpace(instCode)) { throw new ArgumentException("The 'institution code' must be provided."); }
+            if (string.IsNullOrWhiteSpace(providerCode)) { throw new ArgumentException("The 'provider code' must be provided."); }
             if (string.IsNullOrWhiteSpace(email)) { throw new ArgumentException("The 'email' must be provided."); }
 
-            instCode = instCode.ToUpperInvariant();
+            providerCode = providerCode.ToUpperInvariant();
             email = email.ToLowerInvariant();
 
-            var inst = _context.OrganisationIntitutions.Include(x => x.Organisation).Single(x => x.Institution.InstCode == instCode); //should throw an error if  the inst doesn't exist
+            var provider = _context.OrganisationProviders.Include(x => x.Organisation).Single(x => x.Provider.ProviderCode == providerCode); //should throw an error if  the provider doesn't exist
 
             var orgUser = _context.OrganisationUsers
-                .Where(x => x.User.Email == email && x.Organisation.OrgId == inst.Organisation.OrgId)
+                .Where(x => x.User.Email == email && x.Organisation.OrgId == provider.Organisation.OrgId)
                 .Include(x => x.User)
                 .Include(x => x.Organisation)
-                .Single(); //should throw an error if the user doesn't have acces to the inst
+                .Single(); //should throw an error if the user doesn't have acces to the provider
 
-            var returnUserInst = new UserInstitution
+            var returnUserProvider = new UserProvider
             {
                 User = orgUser.User,
-                UcasInstitutionCode = instCode
+                UcasProviderCode = providerCode
             };
 
-            return returnUserInst;
+            return returnUserProvider;
         }
     }
 }

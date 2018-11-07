@@ -23,18 +23,18 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Gets an organisations by Institution Code
+        /// Gets an organisations by Provider Code
         /// </summary>
-        /// <returns>a single InstitutionSummary object</returns>
+        /// <returns>a single ProviderSummary object</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [Route("{instCode}")]
-        [ProducesResponseType(typeof(InstitutionSummary), 200)]
+        [Route("{providerCode}")]
+        [ProducesResponseType(typeof(ProviderSummary), 200)]
         [ProducesResponseType(404)]
-        public ActionResult Get(string instCode)
+        public ActionResult Get(string providerCode)
         {
             var name = this.User.Identity.Name;
-            var organisation = GetInstitutionSummaryForUser(name, instCode);
+            var organisation = GetProviderSummaryForUser(name, providerCode);
             if (organisation == null)
             {
                 return NotFound();
@@ -48,15 +48,15 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <summary>
         /// Gets a list of organisations for the user
         /// </summary>
-        /// <returns>a list of InstitutionSummary objects</returns>
+        /// <returns>a list of ProviderSummary objects</returns>
         [BearerTokenAuth]
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<InstitutionSummary>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<ProviderSummary>), 200)]
         [ProducesResponseType(401)]
         public IActionResult GetAll()
         {
             var name = this.User.Identity.Name;
-            var organisations = GetInstitutionSummariesForUser(name);
+            var organisations = GetProviderSummariesForUser(name);
             if (!organisations.Any())
             {
                 return Unauthorized();
@@ -65,30 +65,30 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             return Ok(organisations);
         }
 
-        private IEnumerable<InstitutionSummary> GetInstitutionSummariesForUser(string email)
+        private IEnumerable<ProviderSummary> GetProviderSummariesForUser(string email)
         {
-            var institutionSummaries = _context.GetOrganisationInstitutions(email)
-                .Select(institutionSummary => new InstitutionSummary()
+            var providerSummaries = _context.GetOrganisationProviders(email)
+                .Select(providerSummary => new ProviderSummary()
                 {
-                    InstName = institutionSummary.Institution.InstName,
-                    InstCode = institutionSummary.Institution.InstCode,
-                    TotalCourses = institutionSummary.Institution.Courses.Select(c => c.CourseCode).Distinct().Count()
-                }).OrderBy(x => x.InstName).ToList();
+                    ProviderName = providerSummary.Provider.ProviderName,
+                    ProviderCode = providerSummary.Provider.ProviderCode,
+                    TotalCourses = providerSummary.Provider.Courses.Select(c => c.CourseCode).Distinct().Count()
+                }).OrderBy(x => x.ProviderName).ToList();
 
-            return institutionSummaries;
+            return providerSummaries;
         }
 
-        private InstitutionSummary Mapping(OrganisationInstitution organisationInstitution, string email, string instCode) {
+        private ProviderSummary Mapping(OrganisationProvider organisationProvider, string email, string providerCode) {
 
-        if (organisationInstitution != null)
+        if (organisationProvider != null)
             {
-                var enrichment = _enrichmentService.GetInstitutionEnrichment(instCode, email);
+                var enrichment = _enrichmentService.GetProviderEnrichment(providerCode, email);
 
-                return new InstitutionSummary()
+                return new ProviderSummary()
                 {
-                    InstName = organisationInstitution.Institution.InstName,
-                    InstCode = organisationInstitution.Institution.InstCode,
-                    TotalCourses = organisationInstitution.Institution.Courses.Select(c => c.CourseCode).Distinct()
+                    ProviderName = organisationProvider.Provider.ProviderName,
+                    ProviderCode = organisationProvider.Provider.ProviderCode,
+                    TotalCourses = organisationProvider.Provider.Courses.Select(c => c.CourseCode).Distinct()
                         .Count(),
                     EnrichmentWorkflowStatus = enrichment?.Status
                 };
@@ -97,11 +97,11 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
             return null;
         }
 
-        private InstitutionSummary GetInstitutionSummaryForUser(string email, string instCode)
+        private ProviderSummary GetProviderSummaryForUser(string email, string providerCode)
         {
-            var organisationInstitution = _context.GetOrganisationInstitution(email, instCode, Mapping);
+            var organisationProvider = _context.GetOrganisationProvider(email, providerCode, Mapping);
 
-            return organisationInstitution;
+            return organisationProvider;
         }
     }
 }

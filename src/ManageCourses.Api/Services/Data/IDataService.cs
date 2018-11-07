@@ -8,9 +8,9 @@ namespace GovUk.Education.ManageCourses.Api.Data
     {
 
         // IEnumerable<InstitutionSummary> GetInstitutionSummariesForUser(string email);
-        // InstitutionSummary GetInstitutionSummaryForUser(string email, string instCode);
-        Course GetCourseForUser(string email, string instCode, string courseCode);
-        List<Course> GetCoursesForUser(string email, string instCode);
-        Institution GetUcasInstitutionForUser(string name, string instCode);
+        // InstitutionSummary GetInstitutionSummaryForUser(string email, string providerCode);
+        Course GetCourseForUser(string email, string providerCode, string courseCode);
+        List<Course> GetCoursesForUser(string email, string providerCode);
+        Provider GetProviderForUser(string name, string providerCode);
     }
 }

@@ -155,15 +155,15 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [TestCase("", "")]
         [TestCase("     ", "    ")]
         [TestCase("anyone@anywher.com", "")]
-        [TestCase("", "instCode")]
+        [TestCase("", "providerCode")]
         [TestCase("anyon@anywhere.com", "ABC")]
-        public void GetCoursesWithInvalidUserAndInvalidInstCodeShouldNotReturnNoData(string email, string instCode)
+        public void GetCoursesWithInvalidUserAndInvalidProviderCodeShouldNotReturnNoData(string email, string providerCode)
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);//ensure we have data
 
-            var result = DataService.GetCoursesForUser(email, instCode);//get the course for each org
+            var result = DataService.GetCoursesForUser(email, providerCode);//get the course for each org
             Assert.True(result.Count == 0);
         }
 
@@ -189,13 +189,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         [TestCase("   ")]
         [TestCase("")]
         [TestCase(null)]
-        public void GetCoursesWithValidUserAndInvalidInstCodeShouldNotReturnNoData(string instCode)
+        public void GetCoursesWithValidUserAndInvalidProviderCodeShouldNotReturnNoData(string providerCode)
         {
             const int numOrgs = 5;
             const int numCourses = 6;
             LoadData(TestUserEmail1, numOrgs, numCourses);
 
-            var result = DataService.GetCoursesForUser(TestUserEmail1, instCode);//get the course for each org
+            var result = DataService.GetCoursesForUser(TestUserEmail1, providerCode);//get the course for each org
             Assert.True(result.Count == 0);
         }
 
@@ -261,25 +261,25 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             for (var counter = 1; counter <= numOrgs; counter++)
             {
                 var orgId = "org" + counter;
-                var instCode = "AB" + counter;
+                var providerCode = "AB" + counter;
                 Organisation org = new Organisation { Id = counter, OrgId = orgId, Name = "Organisation " + counter };
                 Context.Organisations.Add(org);
-                Institution institution = new Institution
+                Provider provider = new Provider
                 {
                     Address1 = "add2",
                     Address2 = "add2",
                     Address3 = "add3",
                     Address4 = "add4",
                     Postcode = "AB1 CD2",
-                    InstCode = instCode,
-                    InstName = "Intitution " + counter
+                    ProviderCode = providerCode,
+                    ProviderName = "Provider " + counter
                 };
-                Context.Institutions.Add(institution);
-                LoadCourses(institution, numCourses, Context.Subjects);
+                Context.Providers.Add(provider);
+                LoadCourses(provider, numCourses, Context.Subjects);
                 Context.OrganisationUsers.Add(new OrganisationUser { User = user, Organisation = org });
-                Context.OrganisationIntitutions.Add(new OrganisationInstitution
+                Context.OrganisationProviders.Add(new OrganisationProvider
                 {
-                    Institution = institution,
+                    Provider = provider,
                     Organisation = org
                 });
             }
@@ -288,12 +288,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         }
 
         /// <summary>
-        /// Generates course records for a specific institution
+        /// Generates course records for a specific provider
         /// </summary>
-        /// <param name="instCode">institution code</param>
+        /// <param name="provider">provider code</param>
         /// <param name="numRecords">number of course records to generate</param>
-        /// <param name="numSubjects"></param>
-        private void LoadCourses(Institution institution, int numRecords, IEnumerable<Subject> subjects)
+        /// <param name="subjects"></param>
+        private void LoadCourses(Provider provider, int numRecords, IEnumerable<Subject> subjects)
         {
             for (var counter = 1; counter <= numRecords; counter++)
             {
@@ -309,7 +309,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "PC1 A23",
                     LocationName = "Campus " + counter,
-                    Institution = institution
+                    Provider = provider
                 };
 
                 var course = new Course
@@ -321,7 +321,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     ProgramType = "SC",
                     StudyMode = "F",
                     Name = "Title " + counter,
-                    Institution = institution,
+                    Provider = provider,
                     CourseSites =  new List<CourseSite>()
                     {
                         new CourseSite

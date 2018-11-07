@@ -3,11 +3,11 @@
 namespace GovUk.Education.ManageCourses.Api.Model
 {
     /// <summary>
-    /// Enrichment data entered by a manage courses user about one of the institutions they look after.
+    /// Enrichment data entered by a manage courses user about one of the providers they look after.
     /// </summary>
-    public class InstitutionEnrichmentModel
+    public class ProviderEnrichmentModel
     {
-        public InstitutionEnrichmentModel()
+        public ProviderEnrichmentModel()
         {
             AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>();
         }
@@ -16,7 +16,7 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string TrainWithDisability { get; set; }
 
         /// <summary>
-        /// Enrichment data for all of the accrediting providers for the courses this institution offers.
+        /// Enrichment data for all of the accrediting providers for the courses this provider offers.
         /// </summary>
         public IList<AccreditingProviderEnrichment> AccreditingProviderEnrichments { get; set; }
 

@@ -30,30 +30,30 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
-            const string ucasInstitutionCode = "ABC";
-            var model = new UcasInstitutionEnrichmentPostModel();
-            model.EnrichmentModel = new InstitutionEnrichmentModel
+            const string ucasProviderCode = "ABC";
+            var model = new UcasProviderEnrichmentPostModel();
+            model.EnrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            await apiClient.Enrichment_SaveProviderAsync(ucasProviderCode, model);
         }
         [Test]
         public async Task EnrichmentPublishTest()
         {
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
-            const string ucasInstitutionCode = "ABC";
-            var model = new UcasInstitutionEnrichmentPostModel();
-            model.EnrichmentModel = new InstitutionEnrichmentModel
+            const string ucasProviderCode = "ABC";
+            var model = new UcasProviderEnrichmentPostModel();
+            model.EnrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            await apiClient.Enrichment_SaveProviderAsync(ucasProviderCode, model);
 
-            var result = await apiClient.Publish_PublishCoursesToSearchAndCompareAsync(ucasInstitutionCode);
+            var result = await apiClient.Publish_PublishCoursesToSearchAndCompareAsync(ucasProviderCode);
             result.Should().BeTrue();
         }
         [Test][Ignore("needs search and compare environment up and running for this test to pass")]
@@ -61,13 +61,13 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
-            const string ucasInstitutionCode = "ABC";
+            const string ucasProviderCode = "ABC";
             const string ucasCourseCode = "CC101";
             var postModel = new CourseEnrichmentModel
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            await apiClient.Enrichment_SaveCourseAsync(ucasProviderCode, ucasCourseCode, postModel);
 
 //            var result = await apiClient(ucasInstitutionCode, ucasCourseCode);
 //            result.Should().BeTrue();
@@ -77,34 +77,34 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
-            const string ucasInstitutionCode = "ABC";
+            const string ucasProviderCode = "ABC";
             const string ucasCourseCode = "XYZ";
             var postModel = new CourseEnrichmentModel
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            await apiClient.Enrichment_SaveCourseAsync(ucasProviderCode, ucasCourseCode, postModel);
 
-            var result = await apiClient.Publish_GetSearchAndCompareCourseAsync(ucasInstitutionCode, ucasCourseCode);
+            var result = await apiClient.Publish_GetSearchAndCompareCourseAsync(ucasProviderCode, ucasCourseCode);
 
             result.ProgrammeCode.Should().BeEquivalentTo(ucasCourseCode);
-            result.Provider.ProviderCode.Should().BeEquivalentTo(ucasInstitutionCode);
+            result.Provider.ProviderCode.Should().BeEquivalentTo(ucasProviderCode);
         }
         [Test]
         public async Task EnrichmentLoadTest()
         {
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
-            const string ucasInstitutionCode = "ABC";
-            var model = new UcasInstitutionEnrichmentPostModel();
-            model.EnrichmentModel = new InstitutionEnrichmentModel
+            const string ucasProviderCode = "ABC";
+            var model = new UcasProviderEnrichmentPostModel();
+            model.EnrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithUs = "wqeqwe",
                 TrainWithDisability = "werwer"
             };
-            await apiClient.Enrichment_SaveInstitutionAsync(ucasInstitutionCode, model);
+            await apiClient.Enrichment_SaveProviderAsync(ucasProviderCode, model);
 
-            var loadedEnrichment = await apiClient.Enrichment_GetInstitutionAsync(ucasInstitutionCode);
+            var loadedEnrichment = await apiClient.Enrichment_GetProviderAsync(ucasProviderCode);
 
             loadedEnrichment.Should().NotBeNull();
         }
@@ -114,15 +114,15 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             SetupSmokeTestData();
             var apiClient = await BuildSigninAwareClient();
-            const string ucasInstitutionCode = "ABC";
+            const string ucasProviderCode = "ABC";
             const string ucasCourseCode = "CC101";
             var postModel = new CourseEnrichmentModel
             {
                 AboutCourse = "'Begin at the beginning,' the King said, very gravely, 'and go on till you come to the end: then stop.'",
             };
-            await apiClient.Enrichment_SaveCourseAsync(ucasInstitutionCode, ucasCourseCode, postModel);
+            await apiClient.Enrichment_SaveCourseAsync(ucasProviderCode, ucasCourseCode, postModel);
 
-            var loadedEnrichment = await apiClient.Enrichment_GetCourseAsync(ucasInstitutionCode, ucasCourseCode);
+            var loadedEnrichment = await apiClient.Enrichment_GetCourseAsync(ucasProviderCode, ucasCourseCode);
 
             loadedEnrichment.Should().NotBeNull();
             loadedEnrichment.EnrichmentModel.Should().NotBeNull();

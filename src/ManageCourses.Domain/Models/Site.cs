@@ -9,8 +9,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     {
         public int Id { get; set; }
 
-        public int InstitutionId { get; set; }
-        public Institution Institution { get; set; }
+        public int ProviderId { get; set; }
+        public Provider Provider { get; set; }
         public IEnumerable<CourseSite> CourseSites { get; set; }
 
         public string LocationName { get; set; }

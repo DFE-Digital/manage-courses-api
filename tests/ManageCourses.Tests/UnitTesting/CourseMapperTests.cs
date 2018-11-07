@@ -8,7 +8,7 @@ using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
 using NUnit.Framework;
-using Institution = GovUk.Education.ManageCourses.Domain.Models.Institution;
+using Provider = GovUk.Education.ManageCourses.Domain.Models.Provider;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
@@ -21,9 +21,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse_ProviderLocation()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -40,9 +40,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             courseEnrichmentModel.FeeUkEu = null;
 
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 courseEnrichmentModel
             );
 
@@ -56,9 +56,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(true),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -104,9 +104,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse_with_no_published_campuses()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -153,7 +153,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void MapToSearchAndCompareCourse_EnrichmentContactDetailsPreferred()
         {
-            var instEnrichment = GenerateInstitutionEnrichmentWithoutContactDetails();
+            var instEnrichment = GenerateProviderEnrichmentWithoutContactDetails();
 
             instEnrichment.Email = "overridden@email.com";
 
@@ -167,7 +167,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             instEnrichment.Postcode = "OverriddenPostcode";
 
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(),
                 instEnrichment,
                 GenerateCourseEnrichmentModel()
@@ -182,9 +182,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void MapToSearchAndCompareCourse_VacStatus()
         {
             var res = mapper.MapToSearchAndCompareCourse(
-                GenerateUcasInstitution(),
+                GenerateUcasProvider(),
                 GenearteUcasCourse(true),
-                GenerateInstitutionEnrichmentWithoutContactDetails(),
+                GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
 
@@ -210,9 +210,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static InstitutionEnrichmentModel GenerateInstitutionEnrichmentWithoutContactDetails()
+        private static ProviderEnrichmentModel GenerateProviderEnrichmentWithoutContactDetails()
         {
-            return new InstitutionEnrichmentModel
+            return new ProviderEnrichmentModel
             {
                 TrainWithUs = "TrainWithUs",
                 TrainWithDisability = "TrainWithDisability",
@@ -220,7 +220,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     {
                         new AccreditingProviderEnrichment
                         {
-                            UcasInstitutionCode = "ACC123",
+                            UcasProviderCode = "ACC123",
                             Description = "AccreditingProviderDescription"
                         }
                     }
@@ -232,7 +232,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             return new Course
             {
                 CourseCode = "CourseCode",
-                AccreditingInstitution = new Institution {InstCode  = "ACC123", InstName = "AccreditingProviderName"},
+                AccreditingProvider = new Provider {ProviderCode  = "ACC123", ProviderName = "AccreditingProviderName"},
                 Qualification = CourseQualification.QtsWithPgce,
                 ProgramType = "SS", // school direct salaried
                 Name = "Course.Name",
@@ -283,9 +283,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static Institution GenerateUcasInstitution()
+        private static Provider GenerateUcasProvider()
         {
-            return new Institution
+            return new Provider
             {
                 Address1 = "Addr1",
                 Address2 = "Addr2",
@@ -294,8 +294,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 Postcode = "Postcode",
                 Url = "http://www.example.com",
 
-                InstCode = "ABC",
-                InstName = "My institution"
+                ProviderCode = "ABC",
+                ProviderName = "My institution"
             };
         }
 

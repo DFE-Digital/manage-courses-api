@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class EnrichmentServiceRegressionTests : DbIntegrationTestBase
     {
-        private Institution _ucasInstitution;
+        private Provider _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
 
@@ -38,26 +38,26 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         protected override void Setup()
         {
-            var accreditingInstitution = new Institution
+            var accreditingInstitution = new Provider
             {
-                InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
-                InstCode = AccreditingInstCode,
+                ProviderName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
+                ProviderCode = AccreditingInstCode,
             };
             Context.Add(accreditingInstitution);
 
             const string providerInstCode = "HNY1";
             const string crseCode = "TK101";
-            _ucasInstitution = new Institution
+            _ucasInstitution = new Provider
             {
-                InstName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
-                InstCode = providerInstCode,
+                ProviderName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
+                ProviderCode = providerInstCode,
                 Courses = new List<Course>
                 {
                     new Course
                     {
                         CourseCode = crseCode,
                         Name = "Conscious control of telekenisis",
-                        AccreditingInstitution = accreditingInstitution,
+                        AccreditingProvider = accreditingInstitution,
                     }
                 }
             };
@@ -89,18 +89,18 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         User = user2,
                     },
                 },
-                OrganisationInstitutions = new List<OrganisationInstitution>
+                OrganisationProviders = new List<OrganisationProvider>
                 {
-                    new OrganisationInstitution
+                    new OrganisationProvider
                     {
-                        Institution = _ucasInstitution,
+                        Provider = _ucasInstitution,
                     },
                 }
             };
             Context.Add(org);
             Context.SaveChanges();
             //now add the enrichment model with user1
-            var enrichmentModel = new InstitutionEnrichmentModel
+            var enrichmentModel = new ProviderEnrichmentModel
             {
                 TrainWithDisability = TrainWithDisabilityText,
                 TrainWithUs = TrainWithUsText,
@@ -108,7 +108,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     new AccreditingProviderEnrichment
                     {
-                        UcasInstitutionCode = AccreditingInstCode,
+                        UcasProviderCode = AccreditingInstCode,
                         Description = "xcvxcvxcv",
                     }
                 }
@@ -120,9 +120,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             };
             var content = JsonConvert.SerializeObject(enrichmentModel, jsonSerializerSettings);
 
-            var enrichment = new InstitutionEnrichment
+            var enrichment = new ProviderEnrichment
             {
-                InstCode = ProviderInstCode,
+                ProviderCode = ProviderInstCode,
                 CreatedTimestampUtc = DateTime.UtcNow,
                 UpdatedTimestampUtc = DateTime.UtcNow,
                 LastPublishedTimestampUtc = null,
@@ -131,7 +131,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Status = EnumStatus.Draft,
                 JsonData = content,
             };
-            Context.InstitutionEnrichments.Add(enrichment);
+            Context.ProviderEnrichments.Add(enrichment);
             Context.SaveChanges();            
         }
 
@@ -145,7 +145,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             
             var enrichmentService = new EnrichmentService(Context);
             //test get the enrichment using user2
-            var result = enrichmentService.GetInstitutionEnrichment(ProviderInstCode, Email2);
+            var result = enrichmentService.GetProviderEnrichment(ProviderInstCode, Email2);
             result.Should().NotBeNull();
             result.EnrichmentModel.Should().NotBeNull();
             result.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(TrainWithDisabilityText);

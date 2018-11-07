@@ -9,7 +9,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Name { get; set; }
 
         public ICollection<OrganisationUser> OrganisationUsers { get; set; }
-        public ICollection<OrganisationInstitution> OrganisationInstitutions { get; set; }
+        public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
 
         public ICollection<NctlOrganisation> NctlOrganisations { get; set; }
     }

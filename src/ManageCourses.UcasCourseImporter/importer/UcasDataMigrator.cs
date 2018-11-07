@@ -52,23 +52,23 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 }
             });
 
-            var allInstitutions = new Dictionary<string, Institution>();
-            MigratePerInstitution("upsert institutions", inst => {
-                var savedInst = UpsertInstitution(ToInstitution(inst));
+            var allProviders = new Dictionary<string, Provider>();
+            MigratePerProvider("upsert providers", inst => {
+                var savedProvider = UpsertProvider(ToProvider(inst));
                 _context.Save();
-                allInstitutions[savedInst.InstCode] = savedInst;
+                allProviders[savedProvider.ProviderCode] = savedProvider;
             });
 
-            var courseLoader = new CourseLoader(allInstitutions, allSubjects, pgdeCourses);
+            var courseLoader = new CourseLoader(allProviders, allSubjects, pgdeCourses);
 
 
-            MigratePerInstitution("drop-and-create sites and courses", ucasInst => {
-                var inst = allInstitutions[ucasInst.InstCode];
+            MigratePerProvider("drop-and-create sites and courses", ucasInst => {
+                var inst = allProviders[ucasInst.InstCode];
 
-                DeleteForInstitution(inst.InstCode);
+                DeleteForProvider(inst.ProviderCode);
                 _context.Save();
 
-                var campuses = allCampusesGrouped.ContainsKey(inst.InstCode) ? allCampusesGrouped[inst.InstCode] : null;
+                var campuses = allCampusesGrouped.ContainsKey(inst.ProviderCode) ? allCampusesGrouped[inst.ProviderCode] : null;
                 IEnumerable<Site> sites = new List<Site>();
                 if (campuses != null)
                 {
@@ -77,18 +77,18 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     foreach(var site in (IEnumerable<Site>) sites)
                     {
                         inst.Sites.Add(site);                                
-                        site.Institution = inst;
+                        site.Provider = inst;
                     }
                     _context.Save();
                 }                
 
-                var allCoursesForThisInstitution = courseLoader.LoadCourses(
+                var allCoursesForThisProvider = courseLoader.LoadCourses(
                     inst,
-                    ucasCourseGroupings.GetValueOrDefault(inst.InstCode).AsEnumerable() ?? new List<UcasCourse>(), 
-                    ucasCourseSubjectGroupings.GetValueOrDefault(inst.InstCode).AsEnumerable() ?? new List<UcasCourseSubject>(),
+                    ucasCourseGroupings.GetValueOrDefault(inst.ProviderCode).AsEnumerable() ?? new List<UcasCourse>(), 
+                    ucasCourseSubjectGroupings.GetValueOrDefault(inst.ProviderCode).AsEnumerable() ?? new List<UcasCourseSubject>(),
                     sites);
 
-                inst.Courses = new Collection<Course>(allCoursesForThisInstitution.ToList());       
+                inst.Courses = new Collection<Course>(allCoursesForThisProvider.ToList());       
                 _context.Save();
             });
             
@@ -110,7 +110,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             }
         }
 
-        private void MigratePerInstitution(string operationName, Action<UcasInstitution> action)
+        private void MigratePerProvider(string operationName, Action<UcasInstitution> action)
         {            
             int processed = 0;   
 
@@ -128,12 +128,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     catch (Exception e)
                     {
                         transaction.Rollback();
-                        _logger.Error(e, $"UCAS import operation \"{operationName}\"failed to update institution {inst.InstName} [{inst.InstCode}]");
+                        _logger.Error(e, $"UCAS import operation \"{operationName}\"failed to update provider {inst.InstName} [{inst.InstCode}]");
                     }
                 }                
                 if (++processed % 100 == 0)
                 {
-                    _logger.Information($"Ran operation \"{operationName}\" on {processed} institutions so far");
+                    _logger.Information($"Ran operation \"{operationName}\" on {processed} providers so far");
                 }
             }
             _logger.Information($"Finished operation \"{operationName}\"");
@@ -173,9 +173,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             };
         }
 
-        private Institution ToInstitution(UcasInstitution x)
+        private Provider ToProvider(UcasInstitution x)
         {
-            return new Institution
+            return new Provider
             {
                 Address1 = x.Addr1,
                 Address2 = x.Addr2,
@@ -186,25 +186,25 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Telephone = x.Telephone,
                 Url = x.Url,
 
-                InstName = x.InstFull,
-                InstCode = x.InstCode,
-                InstType = x.InstType,
+                ProviderName = x.InstFull,
+                ProviderCode = x.InstCode,
+                ProviderType = x.InstType,
                 YearCode = x.YearCode,
                 Scitt = x.Scitt,
                 SchemeMember = x.SchemeMember
             };
         }
 
-        private Institution UpsertInstitution(Institution newValues)
+        private Provider UpsertProvider(Provider newValues)
         {
-            newValues.InstCode = newValues.InstCode.ToUpperInvariant();
-            var entity = _context.Institutions
+            newValues.ProviderCode = newValues.ProviderCode.ToUpperInvariant();
+            var entity = _context.Providers
                 .Include(x => x.Sites).Include(x => x.Courses)
-                .FirstOrDefault(x => x.InstCode == newValues.InstCode);
+                .FirstOrDefault(x => x.ProviderCode == newValues.ProviderCode);
             if (entity == null)
             {
                 // insert
-                _context.Institutions.Add(newValues);
+                _context.Providers.Add(newValues);
                 return newValues;
             }
             else
@@ -215,10 +215,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             }
         }
 
-        private void DeleteForInstitution(string instCode)
+        private void DeleteForProvider(string providerCode)
         {
-            _context.Courses.RemoveRange(_context.Courses.Where(x => x.Institution.InstCode == instCode));
-            _context.Sites.RemoveRange(_context.Sites.Where(x => x.Institution.InstCode == instCode));
+            _context.Courses.RemoveRange(_context.Courses.Where(x => x.Provider.ProviderCode == providerCode));
+            _context.Sites.RemoveRange(_context.Sites.Where(x => x.Provider.ProviderCode == providerCode));
         }
     }
 }

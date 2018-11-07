@@ -2,17 +2,17 @@
 
 namespace GovUk.Education.ManageCourses.Domain.Models
 {
-    public class Institution
+    public class Provider
     {
-        public Institution()
+        public Provider()
         {
             Courses = new List<Course>();
         }
 
-        public void UpdateWith(Institution inst)
+        public void UpdateWith(Provider inst)
         {
-            InstName = inst.InstName;
-            InstType = inst.InstType;
+            ProviderName = inst.ProviderName;
+            ProviderType = inst.ProviderType;
             Address1 = inst.Address1;
             Address2 = inst.Address2;
             Address3 = inst.Address3;
@@ -28,9 +28,9 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         }
 
         public int Id { get; set; }
-        public string InstCode { get; set; }
-        public string InstName { get; set; }
-        public string InstType { get; set; }
+        public string ProviderCode { get; set; }
+        public string ProviderName { get; set; }
+        public string ProviderType { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
         public string Address3 { get; set; }
@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Scitt { get; set; }
         public string SchemeMember { get; set; }
 
-        public ICollection<OrganisationInstitution> OrganisationInstitutions { get; set; }
+        public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
         public ICollection<Course> Courses { get; set; }
         public ICollection<Course> AccreditedCourses { get; set; }
         public ICollection<Site> Sites { get; set; }

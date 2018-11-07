@@ -99,21 +99,21 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return builder.Uri;
         }
 
-        public async Task<UcasInstitutionEnrichmentGetModel> Enrichment_GetInstitutionAsync(string ucasInstitutionCode)
+        public async Task<UcasProviderEnrichmentGetModel> Enrichment_GetProviderAsync(string ucasProviderCode)
         {
-            return await GetObjects<UcasInstitutionEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}");
+            return await GetObjects<UcasProviderEnrichmentGetModel>($"enrichment/provider/{ucasProviderCode}");
         }
-        public async Task Enrichment_SaveInstitutionAsync(string ucasInstitutionCode, UcasInstitutionEnrichmentPostModel model)
+        public async Task Enrichment_SaveProviderAsync(string ucasProviderCode, UcasProviderEnrichmentPostModel model)
         {
-            await PostObjects($"enrichment/institution/{ucasInstitutionCode}", model);
+            await PostObjects($"enrichment/provider/{ucasProviderCode}", model);
         }
-        public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasInstitutionCode, string ucasCourseCode)
+        public async Task<UcasCourseEnrichmentGetModel> Enrichment_GetCourseAsync(string ucasProviderCode, string ucasCourseCode)
         {
-            return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}");
+            return await GetObjects<UcasCourseEnrichmentGetModel>($"enrichment/provider/{ucasProviderCode}/course/{ucasCourseCode}");
         }
-        public async Task Enrichment_SaveCourseAsync(string ucasInstitutionCode, string ucasCourseCode, CourseEnrichmentModel model)
+        public async Task Enrichment_SaveCourseAsync(string ucasProviderCode, string ucasCourseCode, CourseEnrichmentModel model)
         {
-            await PostObjects($"enrichment/institution/{ucasInstitutionCode}/course/{ucasCourseCode}", model);
+            await PostObjects($"enrichment/provider/{ucasProviderCode}/course/{ucasCourseCode}", model);
         }
 
         public async Task Invite_IndexAsync(string email)
@@ -151,14 +151,14 @@ namespace GovUk.Education.ManageCourses.ApiClient
             return await GetObjects<List<Domain.Models.Course>>($"courses/{instCode}");
         }
 
-        public async Task<InstitutionSummary> Organisations_GetAsync(string instCode)
+        public async Task<ProviderSummary> Organisations_GetAsync(string instCode)
         {
-            return await GetObjects<InstitutionSummary>($"organisations/{instCode}");
+            return await GetObjects<ProviderSummary>($"organisations/{instCode}");
         }
 
-        public async Task<IEnumerable<InstitutionSummary>> Organisations_GetAllAsync()
+        public async Task<IEnumerable<ProviderSummary>> Organisations_GetAllAsync()
         {
-            return await GetObjects<IEnumerable<InstitutionSummary>>($"organisations");
+            return await GetObjects<IEnumerable<ProviderSummary>>($"organisations");
         }
         public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
         {

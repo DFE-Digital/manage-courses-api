@@ -104,20 +104,20 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             };
 
             const string instCode2 = "InstCode_2";
-            var institutions = new List<Institution>
+            var institutions = new List<Provider>
             {
-                new Institution {
-                    InstCode = InstCode1
+                new Provider {
+                    ProviderCode = InstCode1
                 },
-                new Institution {
-                    InstCode = instCode2
+                new Provider {
+                    ProviderCode = instCode2
                 }
             };
 
-            var organisationInstitutions = new List<OrganisationInstitution>
+            var organisationInstitutions = new List<OrganisationProvider>
             {
-                new OrganisationInstitution {
-                    Institution = institutions[1],
+                new OrganisationProvider {
+                    Provider = institutions[1],
                     Organisation = organisations[1],
                 }
             };
@@ -134,9 +134,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             context.Users.AddRange(users);
             context.Organisations.AddRange(organisations);
-            context.Institutions.AddRange(institutions);
+            context.Providers.AddRange(institutions);
             context.OrganisationUsers.AddRange(organisationUsers);
-            context.OrganisationIntitutions.AddRange(organisationInstitutions);
+            context.OrganisationProviders.AddRange(organisationInstitutions);
             context.Save();
         }
 

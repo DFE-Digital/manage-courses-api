@@ -21,7 +21,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [Explicit]
     public class EnrichmentServiceCourseTests : DbIntegrationTestBase
     {
-        private Institution _ucasInstitution;
+        private Provider _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
         private const string UcasCourseCode = "451F";
@@ -30,26 +30,26 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
         protected override void Setup()
         {
-            var accreditingInstitution = new Institution
+            var accreditingInstitution = new Provider
             {
-                InstName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
-                InstCode = AccreditingInstCode,
+                ProviderName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
+                ProviderCode = AccreditingInstCode,
             };
             Context.Add(accreditingInstitution);
 
             const string providerInstCode = "HNY1";
             const string crseCode = "TK101";
-            _ucasInstitution = new Institution
+            _ucasInstitution = new Provider
             {
-                InstName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
-                InstCode = providerInstCode,
+                ProviderName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
+                ProviderCode = providerInstCode,
                 Courses = new List<Course>
                 {
                     new Course
                     {
                         CourseCode = crseCode,
                         Name = "Conscious control of telekenisis",
-                        AccreditingInstitution = accreditingInstitution,
+                        AccreditingProvider = accreditingInstitution,
                     }
                 }
             };
@@ -72,11 +72,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         User = user,
                     },
                 },
-                OrganisationInstitutions = new List<OrganisationInstitution>
+                OrganisationProviders = new List<OrganisationProvider>
                 {
-                    new OrganisationInstitution
+                    new OrganisationProvider
                     {
-                        Institution = _ucasInstitution,
+                        Provider = _ucasInstitution,
                     },
                 }
             };
@@ -252,7 +252,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             {
                 AboutCourse = aboutCourseText,
             };
-            enrichmentService.SaveCourseEnrichment(sourceModel, _ucasInstitution.InstCode, UcasCourseCode, Email);
+            enrichmentService.SaveCourseEnrichment(sourceModel, _ucasInstitution.ProviderCode, UcasCourseCode, Email);
 
             // Act
             var ucasPayload = new UcasPayload
@@ -262,20 +262,20 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     new UcasInstitution
                     {
-                        InstCode = _ucasInstitution.InstCode,
-                        InstFull = "Rebranded Institution",
+                        InstCode = _ucasInstitution.ProviderCode,
+                        InstFull = "Rebranded Provider",
                     },
                     new UcasInstitution
                     {
                         InstCode = AccreditingInstCode,
-                        InstFull = "Rebranded Accrediting Institution",
+                        InstFull = "Rebranded Accrediting Provider",
                     },
                 },
                 Courses = new List<UcasCourse>
                 {
                     new UcasCourse
                     {
-                        InstCode = _ucasInstitution.InstCode,
+                        InstCode = _ucasInstitution.ProviderCode,
                         CrseCode = "CC11",
                         AccreditingProvider = AccreditingInstCode,
                     },
@@ -284,7 +284,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, ucasPayload).UpdateUcasData();
 
             // Assert
-            var res = enrichmentService.GetCourseEnrichment(_ucasInstitution.InstCode, UcasCourseCode, Email);
+            var res = enrichmentService.GetCourseEnrichment(_ucasInstitution.ProviderCode, UcasCourseCode, Email);
             res.EnrichmentModel.AboutCourse.Should().Be(sourceModel.AboutCourse);
         }
     }
