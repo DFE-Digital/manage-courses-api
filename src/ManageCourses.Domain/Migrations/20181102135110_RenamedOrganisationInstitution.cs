@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
@@ -9,86 +10,52 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "organisation_institution");
+            var sqlBuilder = new StringBuilder();
 
-            migrationBuilder.CreateTable(
-                name: "organisation_provider",
-                columns: table => new
-                {
-                    id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    institution_id = table.Column<int>(nullable: true),
-                    organisation_id = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_organisation_provider", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_organisation_provider_institution_institution_id",
-                        column: x => x.institution_id,
-                        principalTable: "institution",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_organisation_provider_organisation_organisation_id",
-                        column: x => x.organisation_id,
-                        principalTable: "organisation",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            sqlBuilder.AppendLine("ALTER TABLE organisation_institution RENAME institution_id TO provider_id;");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_mc_organisation_institution_institution_id\" RENAME TO \"IX_mc_organisation_provider_provider_id\";");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_mc_organisation_institution_mc_organisation_id\" RENAME TO \"IX_mc_organisation_provider_mc_organisation_id\";");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_organisation_institution_institution_id\" RENAME TO \"IX_organisation_provider_provider_id\";");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_organisation_institution_organisation_id\" RENAME TO \"IX_organisation_provider_organisation_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_institution");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_mc_organisation_institution_institution_institution_id\" TO \"FK_mc_organisation_provider_provider_provider_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_institution");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_mc_organisation_institution_mc_organisation_mc_organisation_\" TO \"FK_mc_organisation_provider_mc_organisation_mc_organisation_\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_institution");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_organisation_institution_institution_institution_id\" TO \"FK_organisation_provider_provider_provider_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_institution");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_organisation_institution_organisation_organisation_id\" TO \"FK_organisation_provider_organisation_organisation_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_institution");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"PK_organisation_institution\" TO \"PK_organisation_provider\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_institution RENAME TO organisation_provider;");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_organisation_provider_institution_id",
-                table: "organisation_provider",
-                column: "institution_id");
+            migrationBuilder.Sql(sqlBuilder.ToString());
 
-            migrationBuilder.CreateIndex(
-                name: "IX_organisation_provider_organisation_id",
-                table: "organisation_provider",
-                column: "organisation_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "organisation_provider");
+            var sqlBuilder = new StringBuilder();
 
-            migrationBuilder.CreateTable(
-                name: "organisation_institution",
-                columns: table => new
-                {
-                    id = table.Column<int>(nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
-                    institution_id = table.Column<int>(nullable: true),
-                    organisation_id = table.Column<int>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_organisation_institution", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_organisation_institution_institution_institution_id",
-                        column: x => x.institution_id,
-                        principalTable: "institution",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_organisation_institution_organisation_organisation_id",
-                        column: x => x.organisation_id,
-                        principalTable: "organisation",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
+            sqlBuilder.AppendLine("ALTER TABLE organisation_provider RENAME provider_id TO institution_id;");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_mc_organisation_provider_provider_id\" RENAME TO \"IX_mc_organisation_institution_institution_id\";");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_mc_organisation_provider_mc_organisation_id\" RENAME TO \"IX_mc_organisation_institution_mc_organisation_id\";");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_organisation_provider_provider_id\" RENAME TO \"IX_organisation_institution_institution_id\";");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_organisation_provider_organisation_id\" RENAME TO \"IX_organisation_institution_organisation_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_provider");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_mc_organisation_provider_provider_provider_id\" TO \"FK_mc_organisation_institution_institution_institution_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_provider");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_mc_organisation_provider_mc_organisation_mc_organisation_\" TO \"FK_mc_organisation_institution_mc_organisation_mc_organisation_\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_provider");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_organisation_provider_provider_provider_id\" TO \"FK_organisation_institution_institution_institution_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_provider");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"FK_organisation_provider_organisation_organisation_id\" TO \"FK_organisation_institution_organisation_organisation_id\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_provider");
+            sqlBuilder.AppendLine("RENAME CONSTRAINT \"PK_organisation_provider\" TO \"PK_organisation_institution\";");
+            sqlBuilder.AppendLine("ALTER TABLE organisation_provider RENAME TO organisation_institution;");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_organisation_institution_institution_id",
-                table: "organisation_institution",
-                column: "institution_id");
+            migrationBuilder.Sql(sqlBuilder.ToString());
 
-            migrationBuilder.CreateIndex(
-                name: "IX_organisation_institution_organisation_id",
-                table: "organisation_institution",
-                column: "organisation_id");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
@@ -8,52 +9,25 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_site_provider_institution_id",
-                table: "site");
+            var sqlBuilder = new StringBuilder();
 
-            migrationBuilder.RenameColumn(
-                name: "institution_id",
-                table: "site",
-                newName: "provider_id");
+            sqlBuilder.AppendLine("ALTER TABLE site RENAME institution_id TO provider_id;");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_site_institution_id_code\" RENAME TO \"IX_site_provider_id_code\";");
+            sqlBuilder.AppendLine("ALTER TABLE site RENAME CONSTRAINT \"FK_site_institution_institution_id\" TO \"FK_site_provider_provider_id\";");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_site_institution_id_code",
-                table: "site",
-                newName: "IX_site_provider_id_code");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_site_provider_provider_id",
-                table: "site",
-                column: "provider_id",
-                principalTable: "provider",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
+            migrationBuilder.Sql(sqlBuilder.ToString());
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_site_provider_provider_id",
-                table: "site");
+            var sqlBuilder = new StringBuilder();
 
-            migrationBuilder.RenameColumn(
-                name: "provider_id",
-                table: "site",
-                newName: "institution_id");
+            sqlBuilder.AppendLine("ALTER TABLE site RENAME provider_id TO institution_id;");
+            sqlBuilder.AppendLine("ALTER INDEX \"IX_site_provider_id_code\" RENAME TO \"IX_site_institution_id_code\";");
+            sqlBuilder.AppendLine("ALTER TABLE site RENAME CONSTRAINT \"FK_site_provider_provider_id\" TO \"FK_site_institution_institution_id\";");
 
-            migrationBuilder.RenameIndex(
-                name: "IX_site_provider_id_code",
-                table: "site",
-                newName: "IX_site_institution_id_code");
+            migrationBuilder.Sql(sqlBuilder.ToString());
 
-            migrationBuilder.AddForeignKey(
-                name: "FK_site_provider_institution_id",
-                table: "site",
-                column: "institution_id",
-                principalTable: "provider",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Cascade);
         }
     }
 }
