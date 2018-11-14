@@ -1,9 +1,11 @@
 ﻿using System;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Middleware;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -14,6 +16,8 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     [Route("api/[controller]")]
     public class DevOpsController : Controller
     {
+        private readonly IManageCoursesDbContext _context;
+
         /// <summary>
         /// easily searchable string
         /// </summary>
@@ -21,9 +25,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         private readonly ILogger<DevOpsController> _logger;
 
-        public DevOpsController(ILogger<DevOpsController> logger)
+        public DevOpsController(ILogger<DevOpsController> logger, IManageCoursesDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         /// <summary>
@@ -75,7 +80,13 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ExemptFromAcceptTerms]
         public ActionResult Ping()
         {
-            return Ok();
+            var courseCount = _context.Courses.Count();
+            const int minCourses = 1000;
+            if (courseCount < minCourses)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Not enough courses found, expected at least {minCourses}. Found {courseCount} courses");
+            }
+            return Ok($"{courseCount} courses");
         }
     }
 }
