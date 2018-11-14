@@ -78,10 +78,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns></returns>
         [Route("/ping")]
         [ExemptFromAcceptTerms]
-        public ActionResult Ping()
+        public ObjectResult Ping()
         {
             var courseCount = _context.Courses.Count();
-            const int minCourses = 1000;
+            const int minCourses = 10;
             if (courseCount < minCourses)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, $"Not enough courses found, expected at least {minCourses}. Found {courseCount} courses");
