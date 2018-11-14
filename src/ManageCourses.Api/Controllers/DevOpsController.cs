@@ -12,7 +12,6 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     /// Use the actions in here to verify that various error conditions are correctly logged / alerted etc.
     /// </summary>
     [Route("api/[controller]")]
-    [ApiTokenAuth]
     public class DevOpsController : Controller
     {
         /// <summary>
@@ -32,6 +31,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// </summary>
         [Route("throw")]
         [ExemptFromAcceptTerms]
+        [ApiTokenAuth]
         public ActionResult Throw()
         {
             throw new Exception($"This is a test exception. {MagicString}");
@@ -42,6 +42,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// </summary>
         [Route("log")]
         [ExemptFromAcceptTerms]
+        [ApiTokenAuth]
         public ActionResult Log()
         {
             _logger.LogCritical($"logtests: Critical. {MagicString}");
@@ -60,9 +61,21 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns></returns>
         [Route("error")]
         [ExemptFromAcceptTerms]
+        [ApiTokenAuth]
         public ActionResult ServerError()
         {
             return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Simple test that this service is up and connected to the database
+        /// </summary>
+        /// <returns></returns>
+        [Route("/ping")]
+        [ExemptFromAcceptTerms]
+        public ActionResult Ping()
+        {
+            return Ok();
         }
     }
 }
