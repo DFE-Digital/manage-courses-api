@@ -124,13 +124,13 @@ namespace GovUk.Education.ManageCourses.ApiClient
             await PostObjects($"invite", null, nameValueCollection);
         }
 
-        public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string instCode)
+        public async Task<bool> Publish_PublishCoursesToSearchAndCompareAsync(string providerCode)
         {
-            return await PostObjects<bool>($"publish/organisation/{instCode}", null);
+            return await PostObjects<bool>($"publish/organisation/{providerCode}", null);
         }
-        public async Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string instCode, string courseCode)
+        public async Task<SearchAndCompare.Domain.Models.Course> Publish_GetSearchAndCompareCourseAsync(string providerCode, string courseCode)
         {
-            return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/searchandcompare/{instCode}/{courseCode}");
+            return await GetObjects<SearchAndCompare.Domain.Models.Course>($"publish/searchandcompare/{providerCode}/{courseCode}");
         }
 
         public async Task AcceptTerms_IndexAsync()
@@ -142,27 +142,27 @@ namespace GovUk.Education.ManageCourses.ApiClient
             await PostObjects($"accessrequest", request);
         }
 
-        public async Task<Domain.Models.Course> Courses_GetAsync(string instCode, string ucasCode)
+        public async Task<Domain.Models.Course> Courses_GetAsync(string providerCode, string ucasCode)
         {
-            return await GetObjects<Domain.Models.Course>($"courses/{instCode}/course/{ucasCode}");
+            return await GetObjects<Domain.Models.Course>($"courses/{providerCode}/course/{ucasCode}");
         }
-        public async Task<List<Domain.Models.Course>> Courses_GetAllAsync(string instCode)
+        public async Task<List<Domain.Models.Course>> Courses_GetAllAsync(string providerCode)
         {
-            return await GetObjects<List<Domain.Models.Course>>($"courses/{instCode}");
+            return await GetObjects<List<Domain.Models.Course>>($"courses/{providerCode}");
         }
 
-        public async Task<ProviderSummary> Organisations_GetAsync(string instCode)
+        public async Task<ProviderSummary> Organisations_GetAsync(string providerCode)
         {
-            return await GetObjects<ProviderSummary>($"organisations/{instCode}");
+            return await GetObjects<ProviderSummary>($"organisations/{providerCode}");
         }
 
         public async Task<IEnumerable<ProviderSummary>> Organisations_GetAllAsync()
         {
             return await GetObjects<IEnumerable<ProviderSummary>>($"organisations");
         }
-        public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string instCode, string courseCode)
+        public async Task<bool> Publish_PublishCourseToSearchAndCompareAsync(string providerCode, string courseCode)
         {
-            return await PostObjects<bool>($"publish/course/{instCode}/{courseCode}", null);
+            return await PostObjects<bool>($"publish/course/{providerCode}/{courseCode}", null);
         }
     }
 }
