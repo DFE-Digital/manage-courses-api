@@ -99,14 +99,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         [Test]
         public void Courses_GetAsync()
         {
-            var instCode ="instCode";
+            var providerCode ="providerCode";
             var ucasCode = "ucasCode";
 
             var controller = "courses";
-            var leaf = $"/{instCode}/course/{ucasCode}";
+            var leaf = $"/{providerCode}/course/{ucasCode}";
             SetupGetUrlVerification<Course>($"{baseurl}/api/{controller}{leaf}");
 
-            var result = manageCoursesApiClient.Courses_GetAsync(instCode, ucasCode).Result;
+            var result = manageCoursesApiClient.Courses_GetAsync(providerCode, ucasCode).Result;
 
             result.Should().BeOfType<Course>();
             mockHttp.VerifyAll();
@@ -115,13 +115,13 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         [Test]
         public void Courses_GetAllAsync()
         {
-            var instCode ="instCode";
+            var providerCode ="providerCode";
 
             var controller = "courses";
-            var leaf = $"/{instCode}";
+            var leaf = $"/{providerCode}";
             SetupGetUrlVerification<List<Domain.Models.Course>>($"{baseurl}/api/{controller}{leaf}");
 
-            var result = manageCoursesApiClient.Courses_GetAllAsync(instCode).Result;
+            var result = manageCoursesApiClient.Courses_GetAllAsync(providerCode).Result;
 
             result.Should().BeOfType<List<Domain.Models.Course>>();
             mockHttp.VerifyAll();
@@ -130,13 +130,13 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
         [Test]
         public void Organisations_GetAsync()
         {
-            var instCode ="instCode";
+            var providerCode ="providerCode";
 
             var controller = "organisations";
-            var leaf = $"/{instCode}";
+            var leaf = $"/{providerCode}";
             SetupGetUrlVerification<ProviderSummary>($"{baseurl}/api/{controller}{leaf}");
 
-            var result = manageCoursesApiClient.Organisations_GetAsync(instCode).Result;
+            var result = manageCoursesApiClient.Organisations_GetAsync(providerCode).Result;
 
             result.Should().BeOfType<ProviderSummary>();
             mockHttp.VerifyAll();
@@ -156,14 +156,14 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Client
 
         public void Publish_PublishCourseToSearchAndCompareAsync()
         {
-            var instCode = "instCode";
+            var providerCode = "providerCode";
             var courseCode = "courseCode";
             var controller = "publish";
-            var leaf = $"/course/{instCode}/{courseCode}";
+            var leaf = $"/course/{providerCode}/{courseCode}";
 
             SetupPostUrlVerification<bool>($"{baseurl}/api/{controller}{leaf}");
 
-            var result = manageCoursesApiClient.Publish_PublishCourseToSearchAndCompareAsync(instCode, courseCode).Result;
+            var result = manageCoursesApiClient.Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode).Result;
 
             result.Should().BeFalse();
             mockHttp.VerifyAll();
