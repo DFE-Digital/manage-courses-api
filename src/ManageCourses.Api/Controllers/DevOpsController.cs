@@ -1,9 +1,11 @@
 ﻿using System;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Middleware;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Linq;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -12,9 +14,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     /// Use the actions in here to verify that various error conditions are correctly logged / alerted etc.
     /// </summary>
     [Route("api/[controller]")]
-    [ApiTokenAuth]
     public class DevOpsController : Controller
     {
+        private readonly IManageCoursesDbContext _context;
+
         /// <summary>
         /// easily searchable string
         /// </summary>
@@ -22,9 +25,10 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
         private readonly ILogger<DevOpsController> _logger;
 
-        public DevOpsController(ILogger<DevOpsController> logger)
+        public DevOpsController(ILogger<DevOpsController> logger, IManageCoursesDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         /// <summary>
@@ -32,6 +36,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// </summary>
         [Route("throw")]
         [ExemptFromAcceptTerms]
+        [ApiTokenAuth]
         public ActionResult Throw()
         {
             throw new Exception($"This is a test exception. {MagicString}");
@@ -42,6 +47,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// </summary>
         [Route("log")]
         [ExemptFromAcceptTerms]
+        [ApiTokenAuth]
         public ActionResult Log()
         {
             _logger.LogCritical($"logtests: Critical. {MagicString}");
@@ -60,9 +66,27 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         /// <returns></returns>
         [Route("error")]
         [ExemptFromAcceptTerms]
+        [ApiTokenAuth]
         public ActionResult ServerError()
         {
             return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Simple test that this service is up and connected to the database
+        /// </summary>
+        /// <returns></returns>
+        [Route("/ping")]
+        [ExemptFromAcceptTerms]
+        public ObjectResult Ping()
+        {
+            var courseCount = _context.Courses.Count();
+            const int minCourses = 10;
+            if (courseCount < minCourses)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Not enough courses found, expected at least {minCourses}. Found {courseCount} courses");
+            }
+            return Ok($"{courseCount} courses");
         }
     }
 }
