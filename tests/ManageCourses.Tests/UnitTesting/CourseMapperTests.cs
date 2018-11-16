@@ -67,7 +67,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.ProgrammeCode.Should().Be("CourseCode");
 
             res.Provider.ProviderCode.Should().Be("ABC");
-            res.Provider.Name.Should().Be("My institution");
+            res.Provider.Name.Should().Be("My provider");
             res.AccreditingProvider.ProviderCode.Should().Be("ACC123");
             res.AccreditingProvider.Name.Should().Be("AccreditingProviderName");
 
@@ -115,7 +115,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.ProgrammeCode.Should().Be("CourseCode");
 
             res.Provider.ProviderCode.Should().Be("ABC");
-            res.Provider.Name.Should().Be("My institution");
+            res.Provider.Name.Should().Be("My provider");
             res.AccreditingProvider.ProviderCode.Should().Be("ACC123");
             res.AccreditingProvider.Name.Should().Be("AccreditingProviderName");
 
@@ -153,23 +153,23 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void MapToSearchAndCompareCourse_EnrichmentContactDetailsPreferred()
         {
-            var instEnrichment = GenerateProviderEnrichmentWithoutContactDetails();
+            var providerEnrichment = GenerateProviderEnrichmentWithoutContactDetails();
 
-            instEnrichment.Email = "overridden@email.com";
+            providerEnrichment.Email = "overridden@email.com";
 
-            instEnrichment.Website = "https://overridden.com";
+            providerEnrichment.Website = "https://overridden.com";
 
-            instEnrichment.Address1 = "Overridden1";
+            providerEnrichment.Address1 = "Overridden1";
             //nb Address2 is optional
-            instEnrichment.Address3 = "Overridden3";
-            instEnrichment.Address4 = "Overridden4";
+            providerEnrichment.Address3 = "Overridden3";
+            providerEnrichment.Address4 = "Overridden4";
 
-            instEnrichment.Postcode = "OverriddenPostcode";
+            providerEnrichment.Postcode = "OverriddenPostcode";
 
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
                 GenearteUcasCourse(),
-                instEnrichment,
+                providerEnrichment,
                 GenerateCourseEnrichmentModel()
             );
 
@@ -295,7 +295,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 Url = "http://www.example.com",
 
                 ProviderCode = "ABC",
-                ProviderName = "My institution"
+                ProviderName = "My provider"
             };
         }
 

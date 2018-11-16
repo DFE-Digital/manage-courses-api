@@ -9,22 +9,22 @@ namespace GovUk.Education.ManageCourses.Domain.Models
             Courses = new List<Course>();
         }
 
-        public void UpdateWith(Provider inst)
+        public void UpdateWith(Provider provider)
         {
-            ProviderName = inst.ProviderName;
-            ProviderType = inst.ProviderType;
-            Address1 = inst.Address1;
-            Address2 = inst.Address2;
-            Address3 = inst.Address3;
-            Address4 = inst.Address4;
-            Postcode = inst.Postcode;
-            ContactName = inst.ContactName;
-            Email = inst.Email;
-            Telephone = inst.Telephone;
-            Url = inst.Url;
-            YearCode = inst.YearCode;
-            Scitt = inst.Scitt;
-            SchemeMember = inst.SchemeMember;
+            ProviderName = provider.ProviderName;
+            ProviderType = provider.ProviderType;
+            Address1 = provider.Address1;
+            Address2 = provider.Address2;
+            Address3 = provider.Address3;
+            Address4 = provider.Address4;
+            Postcode = provider.Postcode;
+            ContactName = provider.ContactName;
+            Email = provider.Email;
+            Telephone = provider.Telephone;
+            Url = provider.Url;
+            YearCode = provider.YearCode;
+            Scitt = provider.Scitt;
+            SchemeMember = provider.SchemeMember;
         }
 
         public int Id { get; set; }

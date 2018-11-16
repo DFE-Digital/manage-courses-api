@@ -222,9 +222,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase("123", null, null)]
         [TestCase(null, "234", null)]
         [TestCase(null, null, "email@qwe.com")]
-        public void PublishCourseWithEmailInvalidParametersTest(string instCode, string courseCode, string email)
+        public void PublishCourseWithEmailInvalidParametersTest(string providerCode, string courseCode, string email)
         {
-            var result = _searchAndCompareService.SaveCourse(instCode, courseCode, email).Result;
+            var result = _searchAndCompareService.SaveCourse(providerCode, courseCode, email).Result;
 
             result.Should().BeFalse();
         }
@@ -237,9 +237,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase(null, null)]
         [TestCase("123", null)]
         [TestCase(null, "email@qwe.com")]
-        public void PublishCoursesWithEmailInvalidParametersTest(string instCode, string email)
+        public void PublishCoursesWithEmailInvalidParametersTest(string providerCode, string email)
         {
-            var result = _searchAndCompareService.SaveCourses(instCode, email).Result;
+            var result = _searchAndCompareService.SaveCourses(providerCode, email).Result;
 
             result.Should().BeFalse();
         }
