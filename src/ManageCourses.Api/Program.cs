@@ -39,6 +39,8 @@ namespace GovUk.Education.ManageCourses.Api
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .CaptureStartupErrors(true)
+                .UseSetting(WebHostDefaults.DetailedErrorsKey, "true")
                 .UseKestrel(options =>
                 {
                     options.AddServerHeader = false;
