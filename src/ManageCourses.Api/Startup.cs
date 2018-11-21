@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
@@ -51,9 +53,15 @@ namespace GovUk.Education.ManageCourses.Api
                 .AddDbContext<ManageCoursesDbContext>(
                     options =>
                     {
+                        const int maxRetryCount = 3;
+                        const int maxRetryDelaySeconds = 5;
+
+                        var postgresErrorCodesToConsiderTransient = new List<string>(); // ref: https://github.com/npgsql/Npgsql.EntityFrameworkCore.PostgreSQL/blob/16c8d07368cb92e10010b646098b562ecd5815d6/src/EFCore.PG/NpgsqlRetryingExecutionStrategy.cs#L99
+
+                        // Note that the retry will only retry for TimeoutExceptions and transient postgres exceptions. ref: https://github.com/npgsql/Npgsql.EntityFrameworkCore.PostgreSQL/blob/8e97e4195b197ae3d16763704352acfffa95c73f/src/EFCore.PG/Storage/Internal/NpgsqlTransientExceptionDetector.cs#L12
                         options.UseNpgsql(connectionString,
                             b => b.MigrationsAssembly((typeof(ManageCoursesDbContext).Assembly).ToString())
-                        );
+                                .EnableRetryOnFailure(maxRetryCount, TimeSpan.FromSeconds(maxRetryDelaySeconds), postgresErrorCodesToConsiderTransient));
                     });
 
             services.AddScoped<IManageCoursesDbContext>(provider => provider.GetService<ManageCoursesDbContext>());
