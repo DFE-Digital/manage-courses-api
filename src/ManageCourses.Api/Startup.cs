@@ -27,13 +27,17 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Serilog;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.Api
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+
+        public Startup(IConfiguration configuration, ILoggerFactory logFactory)
         {
+            _logger = logFactory.CreateLogger<Startup>();
             Configuration = configuration;
         }
 
@@ -157,24 +161,25 @@ namespace GovUk.Education.ManageCourses.Api
         /// Migrate with inifinte retry.
         /// </summary>
         /// <param name="dbContext"></param>
-        private static void Migrate(ManageCoursesDbContext dbContext)
+        private void Migrate(ManageCoursesDbContext dbContext)
         {
             // If the migration fails and throws then the app ends up in a broken state so don't let that happen.
             // If the migrations failed and the exception was swallowed then the code could make assumptions that result in corrupt data so don't let execution continue till this has worked.
             int migrationAttempt = 1;
             while (true)
             {
-
                 try
                 {
+                    _logger.LogInformation($"Applying EF migrations. Attempt {migrationAttempt} of ∞");
                     dbContext.Database.Migrate();
+                    _logger.LogInformation($"Applying EF migrations succeeded. Attempt {migrationAttempt} of ∞");
                     break; // success!
                 }
                 catch (Exception ex)
                 {
-                    // todo: log, don't let this pass PR mkay?
-                    // failed. log & loop
-                    Thread.Sleep(1000 * migrationAttempt);
+                    int delayMs = 1000 * migrationAttempt;
+                    _logger.LogError($"Failed to apply EF migrations. Attempt {migrationAttempt} of ∞. Waiting for {delayMs}ms before trying again.", ex);
+                    Thread.Sleep(delayMs);
                     migrationAttempt++;
                 }
             }
