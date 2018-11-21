@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
+using System;
 using System.Reflection;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
 using GovUk.Education.ManageCourses.Api.Data;
@@ -25,6 +26,7 @@ using NSwag;
 using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Serilog;
+using System.Threading;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -69,7 +71,7 @@ namespace GovUk.Education.ManageCourses.Api
                 {
                     options.ApiKey = mcConfig.ApiKey;
                 });
-            
+
             services.AddScoped<ISearchAndCompareService, SearchAndCompareService>();
             services.AddScoped<ICourseMapper, CourseMapper>();
             services.AddScoped<IDataService, DataService>();
@@ -103,8 +105,9 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddMvc(options =>
                 options.Filters.Add(typeof(AcceptTermsFilter))
-            ).AddJsonOptions(x => {
-                x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;     
+            ).AddJsonOptions(x =>
+            {
+                x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize;
                 x.SerializerSettings.PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects;
             });
         }
@@ -112,7 +115,7 @@ namespace GovUk.Education.ManageCourses.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ManageCoursesDbContext dbContext)
         {
-            dbContext.Database.Migrate();
+            Migrate(dbContext);
 
             if (env.IsDevelopment())
             {
@@ -148,6 +151,33 @@ namespace GovUk.Education.ManageCourses.Api
 
             app.UseAuthentication();
             app.UseMvc();
+        }
+
+        /// <summary>
+        /// Migrate with inifinte retry.
+        /// </summary>
+        /// <param name="dbContext"></param>
+        private static void Migrate(ManageCoursesDbContext dbContext)
+        {
+            // If the migration fails and throws then the app ends up in a broken state so don't let that happen.
+            // If the migrations failed and the exception was swallowed then the code could make assumptions that result in corrupt data so don't let execution continue till this has worked.
+            int migrationAttempt = 1;
+            while (true)
+            {
+
+                try
+                {
+                    dbContext.Database.Migrate();
+                    break; // success!
+                }
+                catch (Exception ex)
+                {
+                    // todo: log, don't let this pass PR mkay?
+                    // failed. log & loop
+                    Thread.Sleep(1000 * migrationAttempt);
+                    migrationAttempt++;
+                }
+            }
         }
     }
 }
