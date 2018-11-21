@@ -177,7 +177,12 @@ namespace GovUk.Education.ManageCourses.Api
                 }
                 catch (Exception ex)
                 {
+                    const int maxDelayMs = 60 * 1000;
                     int delayMs = 1000 * migrationAttempt;
+                    if (delayMs > maxDelayMs)
+                    {
+                        delayMs = maxDelayMs;
+                    }
                     _logger.LogError($"Failed to apply EF migrations. Attempt {migrationAttempt} of ∞. Waiting for {delayMs}ms before trying again.", ex);
                     Thread.Sleep(delayMs);
                     migrationAttempt++;
