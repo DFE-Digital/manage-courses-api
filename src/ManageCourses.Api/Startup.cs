@@ -191,7 +191,8 @@ namespace GovUk.Education.ManageCourses.Api
                     {
                         delayMs = maxDelayMs;
                     }
-                    _logger.LogError($"Failed to apply EF migrations. Attempt {migrationAttempt} of ∞. Waiting for {delayMs}ms before trying again.", ex);
+                    // exception included in message string because app insights isn't showing the messages and kudo log stream only shows the message string.
+                    _logger.LogError($"Failed to apply EF migrations. Attempt {migrationAttempt} of ∞. Waiting for {delayMs}ms before trying again.\n{ex}", ex);
                     Thread.Sleep(delayMs);
                     migrationAttempt++;
                 }
