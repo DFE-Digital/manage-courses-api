@@ -30,6 +30,7 @@ using NSwag.SwaggerGeneration.Processors.Security;
 using Serilog;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Microsoft.ApplicationInsights;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -193,6 +194,7 @@ namespace GovUk.Education.ManageCourses.Api
                     }
                     // exception included in message string because app insights isn't showing the messages and kudo log stream only shows the message string.
                     _logger.LogError($"Failed to apply EF migrations. Attempt {migrationAttempt} of ∞. Waiting for {delayMs}ms before trying again.\n{ex}", ex);
+                    new TelemetryClient().TrackException(ex);
                     Thread.Sleep(delayMs);
                     migrationAttempt++;
                 }
