@@ -25,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string Name { get; set; }
 
         public string Subjects => CourseSubjects != null && CourseSubjects.Any() ? string.Join(", ", CourseSubjects.Select(x => x.Subject.SubjectName)) : string.Empty;
-
+        public bool IsSen => CourseSubjects != null && CourseSubjects.Any(x => "U3".Equals(x.Subject.SubjectCode, StringComparison.InvariantCultureIgnoreCase));
         public string StudyMode { get; set; }
         public string AgeRange { get; set; }
         public CourseQualification Qualification { get; set; }
