@@ -79,6 +79,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 ProgrammeCode = ucasCourseData.CourseCode,
                 Provider = provider,
                 AccreditingProvider = accreditingProvider,
+                IsSen = ucasCourseData.IsSen,
                 Route = new Route
                 {
                     Name = routeName,

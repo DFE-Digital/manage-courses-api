@@ -31,6 +31,26 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.ProviderLocation.Address.Should().NotBeNull();
             res.ContactDetails.Address.Should().NotBeNull();
             res.ProviderLocation.Address.Should().Be(res.ContactDetails.Address);
+            res.IsSen.Should().BeFalse();
+        }
+
+        [Test]
+        public void MapToSearchAndCompareCourse_IsSen()
+        {
+            var ucasCourse = GenearteUcasCourse();
+            ucasCourse.CourseSubjects = new Collection<CourseSubject>{new CourseSubject{ Subject = new Subject{SubjectCode = "u3", SubjectName ="special educational needs"}}};
+            var res = mapper.MapToSearchAndCompareCourse(
+                GenerateUcasProvider(),
+                ucasCourse,
+                GenerateProviderEnrichmentWithoutContactDetails(),
+                GenerateCourseEnrichmentModel()
+            );
+
+            res.ProviderLocation.Should().NotBeNull();
+            res.ProviderLocation.Address.Should().NotBeNull();
+            res.ContactDetails.Address.Should().NotBeNull();
+            res.ProviderLocation.Address.Should().Be(res.ContactDetails.Address);
+            res.IsSen.Should().BeTrue();
         }
 
         [Test]
@@ -50,6 +70,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.Fees.Eu.Should().Be(0);
             res.Fees.International.Should().Be(0);
             res.Fees.Uk.Should().Be(0);
+            res.IsSen.Should().BeFalse();
         }
 
         [Test]
@@ -98,6 +119,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.FullTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
             res.PartTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
+            res.IsSen.Should().BeFalse();
         }
 
         [Test]
@@ -142,6 +164,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.FullTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
             res.PartTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
+            res.IsSen.Should().BeFalse();
         }
 
         [Test]
@@ -176,6 +199,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.ContactDetails.Address.Should().Be("Overridden1\nOverridden3\nOverridden4\nOverriddenPostcode");
             res.ContactDetails.Email.Should().Be("overridden@email.com");
             res.ContactDetails.Website.Should().Be("https://overridden.com");
+            res.IsSen.Should().BeFalse();
 
         }
         [Test]
@@ -190,6 +214,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.Campuses.Any(c => c.VacStatus == "F").Should().BeTrue();
             res.HasVacancies.Should().BeTrue();
+            res.IsSen.Should().BeFalse();
         }
 
         private static CourseEnrichmentModel GenerateCourseEnrichmentModel()
@@ -241,11 +266,11 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     new CourseSubject { Subject = new Subject { SubjectName = "Mathematics"}},
                     new CourseSubject { Subject = new Subject { SubjectName = "Physics"}}
                 },
-                
+
                 StudyMode = "B",
                 CourseSites = new List<CourseSite>
                     {
-                        
+
                         new CourseSite { Site = new Site
                         {
                             LocationName = "School.Name",
@@ -262,7 +287,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                         VacStatus="F"
                         },
 
-                        new CourseSite { 
+                        new CourseSite {
                             Site = new Site
                             {
                                 LocationName = "NotIncludedSchool.Name",
@@ -272,7 +297,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                                 Address4 = "NotIncludedSchool.Address4",
                                 Postcode = "NotIncludedSchool.PostCode",
                                 Code = "SCHNI"
-                            },                            
+                            },
                             ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
                             Status = "d",
                             Publish = publishedCampus ? "Y" : "n",
