@@ -9,7 +9,7 @@
     <DocumentationFile>bin\Debug\$(TargetFramework)\$(MSBuildProjectName).xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GovUk.Education.SearchAndCompare.ApiClient" Version="0.11.1-search-by-send-courses.2" />
+    <PackageReference Include="GovUk.Education.SearchAndCompare.ApiClient" Version="0.11.1.*" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
     <PackageReference Include="Notify" Version="2.0.1" />

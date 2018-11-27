@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GovUk.Education.SearchAndCompare.ApiClient" Version="0.11.1-search-by-send-courses.2" />
+    <PackageReference Include="GovUk.Education.SearchAndCompare.ApiClient" Version="0.11.1.*" />
     <PackageReference Include="GitInfo" Version="2.0.11">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -27,7 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ManageCourses.Api\ManageCourses.Api.csproj" Private="true" PrivateAssets="all" />
   </ItemGroup>
-  <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion" >
+  <Target Name="SemanticVersioning" DependsOnTargets="GitVersion" AfterTargets="GitVersion">
     <PropertyGroup Condition="'$(GitBranch)'=='master'">
       <Version>$(GitBaseVersion).$(GitSemVerPatch)</Version>
       <PackageVersion>$(GitBaseVersion).$(GitSemVerPatch)</PackageVersion>
@@ -39,11 +39,11 @@
   </Target>
     <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
       <Message Importance="high" Text="Project File Name = $(MSBuildProjectFile)" />
-      <Message Importance="high" Text="These will also be packaged to nuget: @(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+      <Message Importance="high" Text="These will also be packaged to nuget: @(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     <ItemGroup>
 
 
-      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
     </ItemGroup>
   </Target>
   <PropertyGroup>
