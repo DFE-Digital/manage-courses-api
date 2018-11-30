@@ -21,11 +21,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected Mock<IClock> MockClock;
         protected TestConfigReader TestConfig;
 
+        protected virtual bool EnableRetryOnFailure => true;
+
         [OneTimeSetUp]
         public virtual void BaseOneTimeSetUp()
         {
             Config = TestConfigBuilder.BuildTestConfig();
-            Context = ContextLoader.GetDbContext(Config);
+            Context = ContextLoader.GetDbContext(Config, EnableRetryOnFailure);
             TestConfig = new TestConfigReader(Config);
             Context.Database.EnsureDeleted();
             Context.Database.Migrate();
@@ -44,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         public void BaseSetup()
         {
             // get a fresh context every time to avoid stale in-memory data contaminating subsequent tests
-            Context = ContextLoader.GetDbContext(Config);
+            Context = ContextLoader.GetDbContext(Config, EnableRetryOnFailure);
             // Truncate (delete all data from) all tables, following FK constraints by virtue of CASCADE
             // https://stackoverflow.com/questions/2829158/truncating-all-tables-in-a-postgres-database/12082038#12082038
             Context.Database.ExecuteSqlCommandAsync(@"
