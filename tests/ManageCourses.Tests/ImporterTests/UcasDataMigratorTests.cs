@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Castle.Core.Logging;
+using FluentAssertions;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.DbIntegration;
@@ -36,10 +37,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             foreach (var expected in payload.Courses)
             {
-                var count = Context.Courses
-                    .Count(o => o.CourseCode == expected.CrseCode);
-
-                Assert.AreEqual(1, count);
+                Context.Courses.Count(o => o.CourseCode == expected.CrseCode).Should().Be(1, $"course code '{expected.CrseCode}' was in the payload");
             }
         }
 
@@ -57,17 +55,17 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             }).ToList();
 
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
-            
-            Assert.AreEqual(1, Context.Courses.Count(), "valid courses should be imported anyway");
+
+            Context.Courses.Should().HaveCount(1, "valid courses should be imported anyway");
 
             //make an update and change import order
             import.Courses.First().CrseTitle = "The best title";
             import.Courses = import.Courses.Reverse();
 
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
-            
-            Assert.AreEqual(1, Context.Courses.Count(), "valid courses should be re-imported anyway");
-            Assert.AreEqual("The best title", Context.Courses.Single().Name);
+
+            Context.Courses.Should().HaveCount(1, "valid courses should be re-imported anyway");
+            Context.Courses.Single().Name.Should().Be("The best title");
         }
         private static void SaveReferenceDataPayload(ManageCoursesDbContext context)
         {
@@ -164,7 +162,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                     {
                         CampusCode = "CMP",
                         InstCode = InstCode1
-                    }   
+                    }
                 }
             };
         }
