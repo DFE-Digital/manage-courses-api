@@ -20,48 +20,54 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
             _emailService = emailService;
         }
 
+        public DbContext RawContext => (DbContext)_context;
+
         public void LogAccessRequest(AccessRequest request, string requesterEmail)
         {
-            using (var transaction = ((DbContext)_context).Database.BeginTransaction())
+            var strategy = RawContext.Database.CreateExecutionStrategy();
+            strategy.Execute(() =>
             {
-                try
+                using (var transaction = RawContext.Database.BeginTransaction())
                 {
-                    var requester = _context
-                        .GetUsers(requesterEmail)
-                        .Include(x => x.OrganisationUsers)
-                        .ThenInclude(x => x.Organisation)
-                        .Single();
-
-                    var requestedIfExists = _context
-                        .GetUsers(request.EmailAddress)
-                        .Include(x => x.OrganisationUsers)
-                        .ThenInclude(x => x.Organisation)
-                        .SingleOrDefault();
-
-                    var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest()
+                    try
                     {
-                        RequestDateUtc = DateTime.UtcNow,
-                        Requester = requester,
-                        RequesterEmail = requester.Email,
-                        FirstName = request.FirstName,
-                        LastName = request.LastName,
-                        EmailAddress = request.EmailAddress,
-                        Organisation = request.Organisation,
-                        Reason = request.Reason,
-                        Status = Domain.Models.AccessRequest.RequestStatus.Requested
-                    });
-                    _context.Save();
+                        var requester = _context
+                            .GetUsers(requesterEmail)
+                            .Include(x => x.OrganisationUsers)
+                            .ThenInclude(x => x.Organisation)
+                            .Single();
 
-                    _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
+                        var requestedIfExists = _context
+                            .GetUsers(request.EmailAddress)
+                            .Include(x => x.OrganisationUsers)
+                            .ThenInclude(x => x.Organisation)
+                            .SingleOrDefault();
 
-                    transaction.Commit();
+                        var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest()
+                        {
+                            RequestDateUtc = DateTime.UtcNow,
+                            Requester = requester,
+                            RequesterEmail = requester.Email,
+                            FirstName = request.FirstName,
+                            LastName = request.LastName,
+                            EmailAddress = request.EmailAddress,
+                            Organisation = request.Organisation,
+                            Reason = request.Reason,
+                            Status = Domain.Models.AccessRequest.RequestStatus.Requested
+                        });
+                        _context.Save();
+
+                        _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
+
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+            });
         }
     }
 }
