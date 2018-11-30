@@ -24,6 +24,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
 
         public void LogAccessRequest(AccessRequest request, string requesterEmail)
         {
+            // Strategy is required for compatibility with EnableRetryOnFailure in Startup. Ref https://docs.microsoft.com/en-gb/azure/architecture/best-practices/retry-service-specific#sql-database-using-entity-framework-core
             var strategy = RawContext.Database.CreateExecutionStrategy();
             strategy.Execute(() =>
             {
