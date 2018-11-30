@@ -55,7 +55,16 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
 
             try
             {
-                string accessToken = JObject.Parse(json)["access_token"].Value<string>();
+                var response = JObject.Parse(json);
+                if (response["error"] != null)
+                {
+                    throw new Exception("Error response from sign-in service: " + response["error"]);
+                }
+                if (response["access_token"] == null)
+                {
+                    throw new Exception("access_token missing from sign-in response. Response was:\n" + json);
+                }
+                string accessToken = response["access_token"].Value<string>();
                 if (string.IsNullOrEmpty(accessToken))
                 {
                     throw new Exception($"could not get access_token with settings: {_clientId}, {config.SignInUsername}, {_clientSecret.Substring(0, 3)}, {config.SignInPassword.Substring(0, 3)}");
