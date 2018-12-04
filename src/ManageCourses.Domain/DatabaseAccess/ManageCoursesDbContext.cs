@@ -132,6 +132,35 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             return Regex.Replace(value, @"([a-z\d])([A-Z])", "$1_$2").ToLower();
         }
 
+        /// <summary>
+        /// Run a set of commands (and any other code) in a database transaction
+        /// in a manner compatible with the database retry system.
+        /// The supplied action will be rolled back and retried according to the
+        /// retry strategy defined in startup if there are database errors.
+        /// </summary>
+        /// <param name="action">A block of code to run</param>
+        public void RunInRetryableTransaction(Action action)
+        {
+            // Strategy is required for compatibility with EnableRetryOnFailure in Startup. Ref https://docs.microsoft.com/en-gb/azure/architecture/best-practices/retry-service-specific#sql-database-using-entity-framework-core
+            var exe = Database.CreateExecutionStrategy();
+            exe.Execute(() =>
+            {
+                using (var transaction = Database.BeginTransaction())
+                {
+                    try
+                    {
+                        action();
+                        transaction.Commit();
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            });
+        }
+
         public DbSet<Course> Courses { get; set; }
         public DbSet<Provider> Providers { get; set; }
         public DbSet<CourseSubject> CourseSubjects { get; set; }

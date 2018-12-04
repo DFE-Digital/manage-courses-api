@@ -23,6 +23,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<Session> Sessions { get; set; }
         DbSet<PgdeCourse> PgdeCourses { get; set; }
 
+        void RunInRetryableTransaction (Action action);
+
         List<Course> GetCourse(string providerCode, string courseCode, string email);
         List<Course> GetCoursesByProviderCode(string providerCode, string email);
         IQueryable<OrganisationProvider> GetOrganisationProviders(string email);

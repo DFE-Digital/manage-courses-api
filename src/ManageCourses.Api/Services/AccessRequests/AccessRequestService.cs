@@ -20,54 +20,37 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
             _emailService = emailService;
         }
 
-        public DbContext RawContext => (DbContext)_context;
-
         public void LogAccessRequest(AccessRequest request, string requesterEmail)
         {
-            // Strategy is required for compatibility with EnableRetryOnFailure in Startup. Ref https://docs.microsoft.com/en-gb/azure/architecture/best-practices/retry-service-specific#sql-database-using-entity-framework-core
-            var strategy = RawContext.Database.CreateExecutionStrategy();
-            strategy.Execute(() =>
+            _context.RunInRetryableTransaction(() =>
             {
-                using (var transaction = RawContext.Database.BeginTransaction())
+                var requester = _context
+                    .GetUsers(requesterEmail)
+                    .Include(x => x.OrganisationUsers)
+                    .ThenInclude(x => x.Organisation)
+                    .Single();
+
+                var requestedIfExists = _context
+                    .GetUsers(request.EmailAddress)
+                    .Include(x => x.OrganisationUsers)
+                    .ThenInclude(x => x.Organisation)
+                    .SingleOrDefault();
+
+                var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest()
                 {
-                    try
-                    {
-                        var requester = _context
-                            .GetUsers(requesterEmail)
-                            .Include(x => x.OrganisationUsers)
-                            .ThenInclude(x => x.Organisation)
-                            .Single();
+                    RequestDateUtc = DateTime.UtcNow,
+                    Requester = requester,
+                    RequesterEmail = requester.Email,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    EmailAddress = request.EmailAddress,
+                    Organisation = request.Organisation,
+                    Reason = request.Reason,
+                    Status = Domain.Models.AccessRequest.RequestStatus.Requested
+                });
+                _context.Save();
 
-                        var requestedIfExists = _context
-                            .GetUsers(request.EmailAddress)
-                            .Include(x => x.OrganisationUsers)
-                            .ThenInclude(x => x.Organisation)
-                            .SingleOrDefault();
-
-                        var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest()
-                        {
-                            RequestDateUtc = DateTime.UtcNow,
-                            Requester = requester,
-                            RequesterEmail = requester.Email,
-                            FirstName = request.FirstName,
-                            LastName = request.LastName,
-                            EmailAddress = request.EmailAddress,
-                            Organisation = request.Organisation,
-                            Reason = request.Reason,
-                            Status = Domain.Models.AccessRequest.RequestStatus.Requested
-                        });
-                        _context.Save();
-
-                        _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
-
-                        transaction.Commit();
-                    }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-                        throw;
-                    }
-                }
+                _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
             });
         }
     }
