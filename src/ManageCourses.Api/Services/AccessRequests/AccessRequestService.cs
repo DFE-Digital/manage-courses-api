@@ -22,46 +22,36 @@ namespace GovUk.Education.ManageCourses.Api.Services.AccessRequests
 
         public void LogAccessRequest(AccessRequest request, string requesterEmail)
         {
-            using (var transaction = ((DbContext)_context).Database.BeginTransaction())
+            _context.RunInRetryableTransaction(() =>
             {
-                try
+                var requester = _context
+                    .GetUsers(requesterEmail)
+                    .Include(x => x.OrganisationUsers)
+                    .ThenInclude(x => x.Organisation)
+                    .Single();
+
+                var requestedIfExists = _context
+                    .GetUsers(request.EmailAddress)
+                    .Include(x => x.OrganisationUsers)
+                    .ThenInclude(x => x.Organisation)
+                    .SingleOrDefault();
+
+                var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest()
                 {
-                    var requester = _context
-                        .GetUsers(requesterEmail)
-                        .Include(x => x.OrganisationUsers)
-                        .ThenInclude(x => x.Organisation)
-                        .Single();
+                    RequestDateUtc = DateTime.UtcNow,
+                    Requester = requester,
+                    RequesterEmail = requester.Email,
+                    FirstName = request.FirstName,
+                    LastName = request.LastName,
+                    EmailAddress = request.EmailAddress,
+                    Organisation = request.Organisation,
+                    Reason = request.Reason,
+                    Status = Domain.Models.AccessRequest.RequestStatus.Requested
+                });
+                _context.Save();
 
-                    var requestedIfExists = _context
-                        .GetUsers(request.EmailAddress)
-                        .Include(x => x.OrganisationUsers)
-                        .ThenInclude(x => x.Organisation)
-                        .SingleOrDefault();
-
-                    var entity = _context.AccessRequests.Add(new Domain.Models.AccessRequest()
-                    {
-                        RequestDateUtc = DateTime.UtcNow,
-                        Requester = requester,
-                        RequesterEmail = requester.Email,
-                        FirstName = request.FirstName,
-                        LastName = request.LastName,
-                        EmailAddress = request.EmailAddress,
-                        Organisation = request.Organisation,
-                        Reason = request.Reason,
-                        Status = Domain.Models.AccessRequest.RequestStatus.Requested
-                    });
-                    _context.Save();
-
-                    _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
-
-                    transaction.Commit();
-                }
-                catch (Exception)
-                {
-                    transaction.Rollback();
-                    throw;
-                }
-            }
+                _emailService.SendAccessRequestEmailToSupport(entity.Entity, requester, requestedIfExists);
+            });
         }
     }
 }

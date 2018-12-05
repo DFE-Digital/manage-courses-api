@@ -25,6 +25,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
         private const string TestUserEmail3 = "email_3@test-manage-courses.gov.uk";
         private const string OrgId1 = "OrgId_1";
 
+        /// <summary>
+        /// Turn off retry as per console app configuration
+        /// </summary>
+        protected override bool EnableRetryOnFailure => false;
+
         [Test]
         public void RepeatImportsArePossible()
         {

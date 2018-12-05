@@ -188,10 +188,13 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
         private void SetupSmokeTestData()
         {
-            Context.AddTestReferenceData(TestConfig.SignInUsername);
-            Context.Save();
+            // don't use the retrying context because the migrator hasn't been updated to use the retry strategy
+            var migratorContext = ContextLoader.GetDbContext(Config, false);
 
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object,TestPayloadBuilder.MakeSimpleUcasPayload()).UpdateUcasData();
+            migratorContext.AddTestReferenceData(TestConfig.SignInUsername);
+            migratorContext.Save();
+
+            new UcasDataMigrator(migratorContext, new Mock<Serilog.ILogger>().Object,TestPayloadBuilder.MakeSimpleUcasPayload()).UpdateUcasData();
         }
 
         private async Task<ManageCoursesApiClient> BuildSigninAwareClient()
