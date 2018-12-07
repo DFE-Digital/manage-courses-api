@@ -18,13 +18,13 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         private readonly ILogger _logger;
         private readonly UcasPayload payload;
 
-        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger,UcasPayload payload)
+        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger, UcasPayload payload)
         {
             _context = manageCoursesDbContext;
             _logger = logger;
             this.payload = payload;
         }
-        
+
         /// <summary>
         /// Processes data in the payload object into the database as an upsert/delta
         /// </summary>
@@ -41,10 +41,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             _logger.Information($"Upserting {payload.Institutions.Count()} institutions");
 
             var allSubjects = new Dictionary<string, Subject>();
-            MigrateOnce("upsert subjects", () => {
-                foreach(var s in payload.Subjects)
+            MigrateOnce("upsert subjects", () =>
+            {
+                foreach (var s in payload.Subjects)
                 {
-                    var savedSubject = UpsertSubject(new Subject {
+                    var savedSubject = UpsertSubject(new Subject
+                    {
                         SubjectName = s.SubjectDescription,
                         SubjectCode = s.SubjectCode
                     });
@@ -53,7 +55,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             });
 
             var allProviders = new Dictionary<string, Provider>();
-            MigratePerProvider("upsert providers", inst => {
+            MigratePerProvider("upsert providers", inst =>
+            {
                 var savedProvider = UpsertProvider(ToProvider(inst));
                 _context.Save();
                 allProviders[savedProvider.ProviderCode] = savedProvider;
@@ -62,7 +65,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             var courseLoader = new CourseLoader(allProviders, allSubjects, pgdeCourses);
 
 
-            MigratePerProvider("drop-and-create sites and courses", ucasInst => {
+            MigratePerProvider("drop-and-create sites and courses", ucasInst =>
+            {
                 var inst = allProviders[ucasInst.InstCode];
 
                 DeleteForProvider(inst.ProviderCode);
@@ -74,24 +78,24 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 {
                     inst.Sites = inst.Sites ?? new Collection<Site>();
                     sites = campuses.Select(x => ToSite(x)).ToList();
-                    foreach(var site in (IEnumerable<Site>) sites)
+                    foreach (var site in (IEnumerable<Site>)sites)
                     {
-                        inst.Sites.Add(site);                                
+                        inst.Sites.Add(site);
                         site.Provider = inst;
                     }
                     _context.Save();
-                }                
+                }
 
                 var allCoursesForThisProvider = courseLoader.LoadCourses(
                     inst,
-                    ucasCourseGroupings.GetValueOrDefault(inst.ProviderCode).AsEnumerable() ?? new List<UcasCourse>(), 
+                    ucasCourseGroupings.GetValueOrDefault(inst.ProviderCode).AsEnumerable() ?? new List<UcasCourse>(),
                     ucasCourseSubjectGroupings.GetValueOrDefault(inst.ProviderCode).AsEnumerable() ?? new List<UcasCourseSubject>(),
                     sites);
 
-                inst.Courses = new Collection<Course>(allCoursesForThisProvider.ToList());       
+                inst.Courses = new Collection<Course>(allCoursesForThisProvider.ToList());
                 _context.Save();
             });
-            
+
             _logger.Warning("Completed UCAS import");
         }
 
@@ -111,8 +115,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         }
 
         private void MigratePerProvider(string operationName, Action<UcasInstitution> action)
-        {            
-            int processed = 0;   
+        {
+            int processed = 0;
 
             _logger.Information($"Begin operation \"{operationName}\" on {payload.Institutions.Count()} institutions");
 
@@ -120,17 +124,17 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             {
                 using (var transaction = (_context as DbContext).Database.BeginTransaction())
                 {
-                    try 
+                    try
                     {
                         action(inst);
                         transaction.Commit();
-                    }                    
+                    }
                     catch (Exception e)
                     {
                         transaction.Rollback();
                         _logger.Error(e, $"UCAS import operation \"{operationName}\"failed to update provider {inst.InstName} [{inst.InstCode}]");
                     }
-                }                
+                }
                 if (++processed % 100 == 0)
                 {
                     _logger.Information($"Ran operation \"{operationName}\" on {processed} providers so far");
@@ -140,22 +144,22 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         }
 
         private void MigrateOnce(string operationName, Action action)
-        {            
+        {
             _logger.Information($"Begin operation \"{operationName}\"");
 
             using (var transaction = (_context as DbContext).Database.BeginTransaction())
             {
-                try 
+                try
                 {
                     action();
                     transaction.Commit();
-                }                    
+                }
                 catch (Exception e)
                 {
                     transaction.Rollback();
                     _logger.Error(e, $"UCAS import operation \"{operationName}\"failed");
                 }
-            }       
+            }
             _logger.Information($"Finished operation \"{operationName}\"");
         }
 
@@ -163,10 +167,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         {
             return new Site
             {
-                Address1 = x.Addr1, 
-                Address2 = x.Addr2, 
-                Address3 = x.Addr3, 
-                Address4 = x.Addr4, 
+                Address1 = x.Addr1,
+                Address2 = x.Addr2,
+                Address3 = x.Addr3,
+                Address4 = x.Addr4,
                 Postcode = x.Postcode,
                 Code = x.CampusCode,
                 LocationName = x.CampusName

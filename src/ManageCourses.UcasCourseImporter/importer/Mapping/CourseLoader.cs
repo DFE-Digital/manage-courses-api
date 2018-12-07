@@ -35,11 +35,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         /// <param name="courseRecords">UcasCourse records</param>
         /// <param name="enrichmentMetadata"></param>
         /// <param name="pgdeCourses"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
         public List<Course> LoadCourses(Provider provider, IEnumerable<UcasCourse> courseRecords, IEnumerable<UcasCourseSubject> courseSubjects, IEnumerable<Site> allSites)
         {
             var returnCourses = new List<Course>();
-            
+
             // nb - this separator uses characters that are never used in inst codes - thus avoiding ambiguity
             var campusGroupings = courseRecords.GroupBy(x => x.InstCode + "_@@_" + x.CampusCode);
             var courseRecordGroupings = courseRecords.GroupBy(x => x.InstCode + "_@@_" + x.CrseCode);
@@ -52,7 +52,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                     grouping.ToList(),
                     courseSubjectGroupings.GetValueOrDefault(grouping.Key).AsEnumerable() ?? new List<UcasCourseSubject>(),
                     allSites));
-            }            
+            }
 
             return returnCourses;
         }
@@ -95,15 +95,15 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 returnCourse.ProfpostFlag = organisationCourseRecord.ProfpostFlag;
                 returnCourse.StudyMode = organisationCourseRecord.Studymode;
                 returnCourse.StartDate = DateTime.TryParse($"{organisationCourseRecord.StartYear} {organisationCourseRecord.StartMonth}", out DateTime startDate) ? (DateTime?) startDate : null;
-                
+
                 returnCourse.CourseSubjects = new Collection<CourseSubject>(courseSubjects.Select(x => new CourseSubject {
                     Subject = allSubjects[x.SubjectCode],
                     Course = returnCourse
                 }).ToList());
 
                 returnCourse.CourseSites = new Collection<CourseSite>(courseRecords.Select(x => new CourseSite
-                { 
-                    Site = allSites.Single(y => y.Provider?.ProviderCode == x.InstCode && y.Code == x.CampusCode),                    
+                {
+                    Site = allSites.Single(y => y.Provider?.ProviderCode == x.InstCode && y.Code == x.CampusCode),
                     ApplicationsAcceptedFrom = x.CrseOpenDate,
                     Status = x.Status,
                     Publish = x.Publish,
