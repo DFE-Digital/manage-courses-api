@@ -19,5 +19,6 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
         public string HasBeenPublished { get; set; }
         public string StartYear { get; set; }
         public string StartMonth { get; set; }
+        public string Modular { get; set; }
     }
 }

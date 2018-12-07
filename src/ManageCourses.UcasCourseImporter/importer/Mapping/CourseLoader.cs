@@ -94,6 +94,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 returnCourse.ProgramType = organisationCourseRecord.ProgramType;
                 returnCourse.ProfpostFlag = organisationCourseRecord.ProfpostFlag;
                 returnCourse.StudyMode = organisationCourseRecord.Studymode;
+                returnCourse.Modular = organisationCourseRecord.Modular;
                 returnCourse.StartDate = DateTime.TryParse($"{organisationCourseRecord.StartYear} {organisationCourseRecord.StartMonth}", out DateTime startDate) ? (DateTime?) startDate : null;
 
                 returnCourse.CourseSubjects = new Collection<CourseSubject>(courseSubjects.Select(x => new CourseSubject {
