@@ -38,8 +38,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         
         [TestCase("Mfl", "languages", "Modern languages (other)")]
         [TestCase("Latin", "latin", "Classics")] // latin and classics have been merged
-        [TestCase("Primary (geo)", "primary, geography", "Primary, Primary with history and geography")] // Primary with hist/geo have beeen merged
-        [TestCase("Primary (history)", "primary, history", "Primary, Primary with history and geography")] // Primary with hist/geo have beeen merged
+        [TestCase("Primary (geo)", "primary, geography", "Primary, Primary with geography and history")] // Primary with hist/geo have beeen merged
+        [TestCase("Primary (history)", "primary, history", "Primary, Primary with geography and history")] // Primary with hist/geo have beeen merged
 
         [TestCase("Computing", "secondary, computer studies, information communication technology", "Computing")] // no ICT
 

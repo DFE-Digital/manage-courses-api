@@ -268,7 +268,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 .Concat(ucasPhysics)
                 .Concat(ucasScienceFields);
 
-            var ucasPrimaryHistGeoSpecialisation = new string[] {"geography", "history"};
+            var ucasPrimaryGeoHistSpecialisation = new string[] {"geography", "history"};
 
             // Does the subject list mention English?
             if(ucasSubjects.Intersect(ucasEnglish).Any())
@@ -277,9 +277,9 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             }
 
             // Does the subject list mention geography or history?
-            if(ucasSubjects.Intersect(ucasPrimaryHistGeoSpecialisation).Any())
+            if(ucasSubjects.Intersect(ucasPrimaryGeoHistSpecialisation).Any())
             {
-                primarySubjects.Add("Primary with history and geography");
+                primarySubjects.Add("Primary with geography and history");
             }
 
             // Does the subject list mention maths?
