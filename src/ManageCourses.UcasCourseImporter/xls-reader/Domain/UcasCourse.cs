@@ -5,7 +5,7 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
         public int Id { get; set; }
         public string InstCode { get; set; }
         public string CrseCode { get; set; }
-        public string CrseTitle { get; set; }                
+        public string CrseTitle { get; set; }
         public string Studymode { get; set; }
         public string Age { get; set; }
         public string CampusCode { get; set; }
@@ -19,5 +19,6 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
         public string HasBeenPublished { get; set; }
         public string StartYear { get; set; }
         public string StartMonth { get; set; }
+        public string Modular { get; set; }
     }
 }
