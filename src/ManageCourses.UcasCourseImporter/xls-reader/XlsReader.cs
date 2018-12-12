@@ -47,6 +47,7 @@ namespace GovUk.Education.ManageCourses.Xls
 
                     var row = sheet.GetRow(dataRowIndex);
                     var accreditingProvider = row.GetCell(columnMap["ACCREDITING_PROVIDER"]).StringCellValue.Trim();
+                    var hasBeenPublished = row.GetCell(columnMap["HAS_BEEN_PUBLISHED"]).StringCellValue.Trim();
                     var ucasCourse = new UcasCourse
                     {
                         InstCode = row.GetCell(columnMap["INST_CODE"]).StringCellValue.Trim(),
@@ -62,10 +63,13 @@ namespace GovUk.Education.ManageCourses.Xls
                         Publish = row.GetCell(columnMap["PUBLISH"]).StringCellValue.Trim(),
                         Status = row.GetCell(columnMap["STATUS"]).StringCellValue.Trim(),
                         VacStatus = row.GetCell(columnMap["VAC_STATUS"]).StringCellValue.Trim(),
-                        HasBeenPublished = row.GetCell(columnMap["HAS_BEEN_PUBLISHED"]).StringCellValue.Trim(),
+                        HasBeenPublished = hasBeenPublished.Equals('Y'),
                         StartYear = row.GetCell(columnMap["YEAR_CODE"]).StringCellValue.Trim(),
                         StartMonth = row.GetCell(columnMap["CRSE_MONTH"]).StringCellValue.Trim(),
-                        Modular = row.GetCell(columnMap["MODULAR"]).StringCellValue.Trim()
+                        Modular = row.GetCell(columnMap["MODULAR"]).StringCellValue.Trim(),
+                        English = ParseIntCell(row.GetCell(columnMap["ENGLISH"]).StringCellValue.Trim()),
+                        Maths = ParseIntCell(row.GetCell(columnMap["MATHS"]).StringCellValue.Trim()),
+                        Science = ParseIntCell(row.GetCell(columnMap["SCIENCE"]).StringCellValue.Trim())
                     };
                     if (!campuses.Any(c => c.InstCode == ucasCourse.InstCode && c.CampusCode == ucasCourse.CampusCode))
                     {
@@ -213,7 +217,7 @@ namespace GovUk.Education.ManageCourses.Xls
         {
             var file = new FileInfo(Path.Combine(folder, CampusFilename));
             _logger.Information("Reading campus xls file from: " + file.FullName);
-            
+
             var skipCount = 0;
             var campuses = new List<UcasCampus>();
             using (var stream = new FileStream(file.FullName, FileMode.Open))
@@ -327,6 +331,20 @@ namespace GovUk.Education.ManageCourses.Xls
             }
             _logger.Information(noteTexts.Count + " note texts loaded from xls");
             return noteTexts;
+        }
+
+        private int? ParseIntCell(string cellValue)
+        {
+            int parsedCell = 0;
+            bool success = int.TryParse(cellValue, out parsedCell);
+
+            int? result = null;
+            if (success)
+            {
+                result = parsedCell;
+            }
+
+            return result;
         }
     }
 }
