@@ -16,9 +16,12 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
         public string Publish { get; set; }
         public string Status { get; set; }
         public string VacStatus { get; set; }
-        public string HasBeenPublished { get; set; }
+        public bool HasBeenPublished { get; set; }
         public string StartYear { get; set; }
         public string StartMonth { get; set; }
         public string Modular { get; set; }
+        public int? English { get; set; }
+        public int? Maths { get; set; }
+        public int? Science { get; set; }
     }
 }
