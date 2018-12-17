@@ -63,7 +63,7 @@ namespace GovUk.Education.ManageCourses.Xls
                         Publish = row.GetCell(columnMap["PUBLISH"]).StringCellValue.Trim(),
                         Status = row.GetCell(columnMap["STATUS"]).StringCellValue.Trim(),
                         VacStatus = row.GetCell(columnMap["VAC_STATUS"]).StringCellValue.Trim(),
-                        HasBeenPublished = hasBeenPublished.Equals('Y'),
+                        HasBeenPublished = hasBeenPublished.Equals("Y"),
                         StartYear = row.GetCell(columnMap["YEAR_CODE"]).StringCellValue.Trim(),
                         StartMonth = row.GetCell(columnMap["CRSE_MONTH"]).StringCellValue.Trim(),
                         Modular = row.GetCell(columnMap["MODULAR"]).StringCellValue.Trim(),
