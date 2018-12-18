@@ -98,7 +98,6 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 returnCourse.English = organisationCourseRecord.English;
                 returnCourse.Maths = organisationCourseRecord.Maths;
                 returnCourse.Science = organisationCourseRecord.Science;
-                returnCourse.HasBeenPublished = organisationCourseRecord.HasBeenPublished;
                 returnCourse.StartDate = DateTime.TryParse($"{organisationCourseRecord.StartYear} {organisationCourseRecord.StartMonth}", out DateTime startDate) ? (DateTime?) startDate : null;
 
                 returnCourse.CourseSubjects = new Collection<CourseSubject>(courseSubjects.Select(x => new CourseSubject {

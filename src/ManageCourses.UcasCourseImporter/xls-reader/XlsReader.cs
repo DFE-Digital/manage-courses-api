@@ -47,7 +47,6 @@ namespace GovUk.Education.ManageCourses.Xls
 
                     var row = sheet.GetRow(dataRowIndex);
                     var accreditingProvider = row.GetCell(columnMap["ACCREDITING_PROVIDER"]).StringCellValue.Trim();
-                    var hasBeenPublished = row.GetCell(columnMap["HAS_BEEN_PUBLISHED"]).StringCellValue.Trim();
                     var ucasCourse = new UcasCourse
                     {
                         InstCode = row.GetCell(columnMap["INST_CODE"]).StringCellValue.Trim(),
@@ -63,7 +62,6 @@ namespace GovUk.Education.ManageCourses.Xls
                         Publish = row.GetCell(columnMap["PUBLISH"]).StringCellValue.Trim(),
                         Status = row.GetCell(columnMap["STATUS"]).StringCellValue.Trim(),
                         VacStatus = row.GetCell(columnMap["VAC_STATUS"]).StringCellValue.Trim(),
-                        HasBeenPublished = hasBeenPublished.Equals("Y"),
                         StartYear = row.GetCell(columnMap["YEAR_CODE"]).StringCellValue.Trim(),
                         StartMonth = row.GetCell(columnMap["CRSE_MONTH"]).StringCellValue.Trim(),
                         Modular = row.GetCell(columnMap["MODULAR"]).StringCellValue.Trim(),
