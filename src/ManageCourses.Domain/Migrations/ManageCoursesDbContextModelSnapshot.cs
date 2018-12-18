@@ -74,13 +74,13 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("CourseCode")
                         .HasColumnName("course_code");
 
-                    b.Property<int>("English")
+                    b.Property<int?>("English")
                         .HasColumnName("english");
 
                     b.Property<string>("HasBeenPublished")
                         .HasColumnName("has_been_published");
 
-                    b.Property<int>("Maths")
+                    b.Property<int?>("Maths")
                         .HasColumnName("maths");
 
                     b.Property<string>("Modular")
@@ -101,7 +101,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<int>("Qualification")
                         .HasColumnName("qualification");
 
-                    b.Property<int>("Science")
+                    b.Property<int?>("Science")
                         .HasColumnName("science");
 
                     b.Property<DateTime?>("StartDate")
