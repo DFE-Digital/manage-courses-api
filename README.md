@@ -201,6 +201,15 @@ See: https://github.com/RSuter/NSwag/wiki#ways-to-use-the-toolchain
 
 ## Database Migrations
 
+Watch out for `\` vs `/` in windows / mac / linux. The below are windows-style.
+
+Otherwise you'll get (using windows backslash on linux that expects forwardslash):
+
+    $ dotnet ef --startup-project ..\ManageCourses.Api migrations add wibble
+    MSBUILD : error MSB1009: Project file does not exist.
+    Switch: ..ManageCourses.Api
+    Unable to retrieve project metadata. Ensure it's an MSBuild-based .NET Core project. If you're using custom BaseIntermediateOutputPath or MSBuildProjectExtensionsPath values, Use the --msbuildprojectextensionspath option.
+
 ### Add a migration
 
 Make your changes to the model, then from command prompt:
