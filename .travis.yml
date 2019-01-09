@@ -39,9 +39,8 @@ deploy:
     HEAD:refs/heads/master
   on: staging
 - provider: script
-  script: 
-  - git fetch --unshallow && git push --force https://govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD@bat-prod-manage-courses-api-app.scm.azurewebsites.net:443/bat-prod-manage-courses-api-app.git HEAD:refs/heads/master
-  - git fetch --unshallow && git push --force https://govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD@bat-prod3-manage-courses-api-app.scm.azurewebsites.net:443/bat-prod3-manage-courses-api-app.git HEAD:refs/heads/master
+  script: git fetch --unshallow && git push --force https://govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD@bat-prod-manage-courses-api-app.scm.azurewebsites.net:443/bat-prod-manage-courses-api-app.git
+    HEAD:refs/heads/master
   on: production
 - provider: script
   script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
@@ -52,9 +51,8 @@ deploy:
     bat-staging-manage-courses-api-app"
   on: staging
 - provider: script
-  script: 
-  - "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-prod-manage-courses-api-app"
-  - "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-prod3-manage-courses-api-app"
+  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+    bat-prod-manage-courses-api-app"
   on: production
 - provider: script
   script: "./travis-deploy-ucas-importer.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
@@ -65,9 +63,8 @@ deploy:
     bat-staging-manage-courses-api-app"
   on: staging
 - provider: script
-  script: 
-  - "./travis-deploy-ucas-importer.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-prod-manage-courses-api-app"
-  - "./travis-deploy-ucas-importer.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD bat-prod3-manage-courses-api-app"
+  script: "./travis-deploy-ucas-importer.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+    bat-prod-manage-courses-api-app"
   on: production
 - provider: script
   skip_cleanup: true
