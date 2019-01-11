@@ -44,6 +44,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             {
                 Context.Courses.Count(o => o.CourseCode == expected.CrseCode).Should().Be(1, $"course code '{expected.CrseCode}' was in the payload");
             }
+            foreach(var expected in payload.Campuses){
+                Context.Sites.Count(o => o.RegionCode == expected.RegionCode).Should().Be(1, $"site region code '{expected.RegionCode}' was in the payload");
+            }
         }
 
         [Test]
@@ -166,7 +169,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                     new UcasCampus
                     {
                         CampusCode = "CMP",
-                        InstCode = InstCode1
+                        InstCode = InstCode1,
+                        RegionCode = "RegionCode"
                     }
                 }
             };
