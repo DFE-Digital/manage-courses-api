@@ -16,6 +16,6 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
         public string Postcode { get; set; }
         public string TelNo { get; set; }
         public string Email { get; set; }
-        public string RegionCode { get; set; }
+        public int? RegionCode { get; set; }
     }
 }

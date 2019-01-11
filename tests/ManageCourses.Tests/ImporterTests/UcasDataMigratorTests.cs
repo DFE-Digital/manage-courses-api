@@ -170,7 +170,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                     {
                         CampusCode = "CMP",
                         InstCode = InstCode1,
-                        RegionCode = "RegionCode"
+                        RegionCode = 100
                     }
                 }
             };

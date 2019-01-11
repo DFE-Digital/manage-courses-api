@@ -6,7 +6,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
+            migrationBuilder.AddColumn<int>(
                 name: "region_code",
                 table: "site",
                 nullable: true);

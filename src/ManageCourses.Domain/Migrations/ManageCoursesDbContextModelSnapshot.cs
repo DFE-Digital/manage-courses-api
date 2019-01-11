@@ -476,7 +476,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<int>("ProviderId")
                         .HasColumnName("provider_id");
 
-                    b.Property<string>("RegionCode")
+                    b.Property<int?>("RegionCode")
                         .HasColumnName("region_code");
 
                     b.HasKey("Id");

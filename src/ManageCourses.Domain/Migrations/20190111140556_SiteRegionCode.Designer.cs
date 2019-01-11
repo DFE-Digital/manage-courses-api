@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    [Migration("20190111121656_SiteRegionCode")]
+    [Migration("20190111140556_SiteRegionCode")]
     partial class SiteRegionCode
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -478,7 +478,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<int>("ProviderId")
                         .HasColumnName("provider_id");
 
-                    b.Property<string>("RegionCode")
+                    b.Property<int?>("RegionCode")
                         .HasColumnName("region_code");
 
                     b.HasKey("Id");
