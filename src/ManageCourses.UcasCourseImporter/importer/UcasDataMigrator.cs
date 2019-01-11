@@ -173,7 +173,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Address4 = x.Addr4,
                 Postcode = x.Postcode,
                 Code = x.CampusCode,
-                LocationName = x.CampusName
+                LocationName = x.CampusName,
                 RegionCode = x.RegionCode
             };
         }

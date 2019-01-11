@@ -22,7 +22,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
-                GenearteUcasCourse(),
+                GenerateUcasCourse(),
                 GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
@@ -37,7 +37,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [Test]
         public void MapToSearchAndCompareCourse_IsSen()
         {
-            var ucasCourse = GenearteUcasCourse();
+            var ucasCourse = GenerateUcasCourse();
             ucasCourse.CourseSubjects = new Collection<CourseSubject>{new CourseSubject{ Subject = new Subject{SubjectCode = "u3", SubjectName ="special educational needs"}}};
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
@@ -61,7 +61,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
-                GenearteUcasCourse(),
+                GenerateUcasCourse(),
                 GenerateProviderEnrichmentWithoutContactDetails(),
                 courseEnrichmentModel
             );
@@ -78,7 +78,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
-                GenearteUcasCourse(true),
+                GenerateUcasCourse(true),
                 GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
@@ -127,7 +127,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
-                GenearteUcasCourse(),
+                GenerateUcasCourse(),
                 GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
@@ -191,7 +191,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
-                GenearteUcasCourse(),
+                GenerateUcasCourse(),
                 providerEnrichment,
                 GenerateCourseEnrichmentModel()
             );
@@ -207,7 +207,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
-                GenearteUcasCourse(true),
+                GenerateUcasCourse(true),
                 GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
@@ -252,7 +252,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static Course GenearteUcasCourse(bool publishedCampus = false)
+        private static Course GenerateUcasCourse(bool publishedCampus = false)
         {
             return new Course
             {
