@@ -78,14 +78,14 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 DateTime? lastPublishedDate = null;
                 if (enrichmentPublishRecord != null)
                 {
-                    lastPublishedDate = enrichmentPublishRecord.LastPublishedTimestampUtc;
+                    lastPublishedDate = enrichmentPublishRecord.LastPublishedAt;
                 }
                 var enrichment = new ProviderEnrichment
                 {
                     ProviderCode = userProvider.UcasProviderCode,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
-                    LastPublishedTimestampUtc = lastPublishedDate,
+                    LastPublishedAt = lastPublishedDate,
                     CreatedByUser = userProvider.User,
                     UpdatedByUser = userProvider.User,
                     Status = EnumStatus.Draft,
@@ -118,7 +118,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             {
                 enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
                 enrichmentDraftRecord.UpdatedByUser = userOrg.User;
-                enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.LastPublishedAt = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
                 _context.Save();
                 returnBool = true;

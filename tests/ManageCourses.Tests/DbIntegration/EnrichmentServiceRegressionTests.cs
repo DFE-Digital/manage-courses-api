@@ -125,7 +125,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 ProviderCode = ProviderInstCode,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                LastPublishedTimestampUtc = null,
+                LastPublishedAt = null,
                 CreatedByUser = user,
                 UpdatedByUser = user,
                 Status = EnumStatus.Draft,

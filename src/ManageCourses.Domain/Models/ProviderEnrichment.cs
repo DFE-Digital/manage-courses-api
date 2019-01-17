@@ -13,7 +13,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string ProviderCode { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public DateTime? LastPublishedTimestampUtc { get; set; }
+        public DateTime? LastPublishedAt { get; set; }
         public User CreatedByUser { get; set; }
         public User UpdatedByUser { get; set; }
         [Column(TypeName = "jsonb")]

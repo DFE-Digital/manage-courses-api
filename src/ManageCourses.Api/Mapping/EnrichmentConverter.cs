@@ -68,7 +68,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedAt;
             enrichmentToReturn.CreatedByUserId = source.CreatedByUser.Id;
             enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser.Id;
-            enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;
+            enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedAt;
             enrichmentToReturn.Status = source.Status;
             return enrichmentToReturn;
         }
