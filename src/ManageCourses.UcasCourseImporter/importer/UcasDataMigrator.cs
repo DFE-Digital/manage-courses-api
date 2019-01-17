@@ -174,7 +174,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Postcode = x.Postcode,
                 Code = x.CampusCode,
                 LocationName = x.CampusName,
-                RegionCode = x.RegionCode
+                RegionCode = x.RegionCode,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
             };
         }
 
@@ -210,12 +212,15 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             {
                 // insert
                 _context.Providers.Add(newValues);
+                entity.CreatedAt = DateTime.UtcNow;
+                entity.UpdatedAt = DateTime.UtcNow;
                 return newValues;
             }
             else
             {
                 // update
                 entity.UpdateWith(newValues);
+                entity.UpdatedAt = DateTime.UtcNow;
                 return entity;
             }
         }
