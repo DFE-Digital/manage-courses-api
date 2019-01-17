@@ -207,11 +207,13 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     $"join organisation_user ou on ou.organisation_id = o.id " +
                     $"join \"user\" u on ou.user_id = u.id " +
                     $"where lower(i.provider_code)=lower(@providerCode) " +
-                    $"and lower(u.email)=lower(@email) order by c.name", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("email", email))
+                    $"and lower(u.email)=lower(@email)", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
+                .OrderBy(x => x.Name)//order by doesn't work as part of the sql string
+                                     //it's an ef issue caused by the includes
                 .ToList();
 
             return ucasCourses;
