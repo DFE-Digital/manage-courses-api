@@ -123,8 +123,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var enrichment = new ProviderEnrichment
             {
                 ProviderCode = ProviderInstCode,
-                CreatedTimestampUtc = DateTime.UtcNow,
-                UpdatedTimestampUtc = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
                 LastPublishedTimestampUtc = null,
                 CreatedByUser = user,
                 UpdatedByUser = user,

@@ -64,8 +64,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             var enrichmentModel = source.JsonData != null ? JsonConvert.DeserializeObject<ProviderEnrichmentModel>(source.JsonData, _jsonSerializerSettings) : null;
 
             enrichmentToReturn.EnrichmentModel = enrichmentModel;
-            enrichmentToReturn.CreatedTimestampUtc = source.CreatedTimestampUtc;
-            enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedTimestampUtc;
+            enrichmentToReturn.CreatedTimestampUtc = source.CreatedAt;
+            enrichmentToReturn.UpdatedTimestampUtc = source.UpdatedAt;
             enrichmentToReturn.CreatedByUserId = source.CreatedByUser.Id;
             enrichmentToReturn.UpdatedByUserId = source.UpdatedByUser.Id;
             enrichmentToReturn.LastPublishedTimestampUtc = source.LastPublishedTimestampUtc;

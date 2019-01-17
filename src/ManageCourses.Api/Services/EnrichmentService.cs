@@ -63,7 +63,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             if (enrichmentDraftRecord != null)
             {
                 //update
-                enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
                 enrichmentDraftRecord.UpdatedByUser = userProvider.User;
                 enrichmentDraftRecord.JsonData = content;
             }
@@ -83,8 +83,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 var enrichment = new ProviderEnrichment
                 {
                     ProviderCode = userProvider.UcasProviderCode,
-                    CreatedTimestampUtc = DateTime.UtcNow,
-                    UpdatedTimestampUtc = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
                     CreatedByUser = userProvider.User,
                     UpdatedByUser = userProvider.User,
@@ -116,7 +116,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             if (enrichmentDraftRecord != null)
             {
-                enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
                 enrichmentDraftRecord.UpdatedByUser = userOrg.User;
                 enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
