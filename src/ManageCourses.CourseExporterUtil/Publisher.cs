@@ -104,7 +104,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.ProviderCode)
-                .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
+                .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedAt).First());
             _logger.Information($" - {orgEnrichments.Count()} orgEnrichments");
 
             var pgdeCourses = context.PgdeCourses.ToList();

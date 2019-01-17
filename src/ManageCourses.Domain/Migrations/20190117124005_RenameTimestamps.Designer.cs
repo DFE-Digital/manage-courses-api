@@ -3,15 +3,17 @@ using System;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190117124005_RenameTimestamps")]
+    partial class RenameTimestamps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -395,8 +397,8 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                         .HasColumnName("json_data")
                         .HasColumnType("jsonb");
 
-                    b.Property<DateTime?>("LastPublishedAt")
-                        .HasColumnName("last_published_at");
+                    b.Property<DateTime?>("LastPublishedTimestampUtc")
+                        .HasColumnName("last_published_timestamp_utc");
 
                     b.Property<string>("ProviderCode")
                         .IsRequired()
