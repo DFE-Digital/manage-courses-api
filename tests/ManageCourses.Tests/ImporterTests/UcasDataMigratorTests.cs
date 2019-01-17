@@ -19,6 +19,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
     [Explicit]
     public class UcasDataMigratorTests : DbIntegrationTestBase
     {
+        private const string InstPostCode1 = "AB12CD";
         private const string InstCode1 = "INSTCODE_1";
         private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
@@ -74,6 +75,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             Context.Courses.Should().HaveCount(1, "valid courses should be re-imported anyway");
             Context.Courses.Single().Name.Should().Be("The best title");
+            Context.Courses.Single().Provider.Postcode.Should().Be(InstPostCode1);
         }
         private static void SaveReferenceDataPayload(ManageCoursesDbContext context)
         {
@@ -152,7 +154,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             {
                 Institutions = new List<UcasInstitution>
                 {
-                    new UcasInstitution { InstCode = InstCode1 }
+                    new UcasInstitution { InstCode = InstCode1, Postcode = InstPostCode1}
                 },
 
                 Courses = new List<UcasCourse>{
