@@ -11,25 +11,25 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 name: "created_at",
                 table: "site",
                 nullable: false,
-                defaultValueSql: "CURRENT_TIMESTAMP");
+                defaultValueSql: "now() at time zone 'utc'"); // https://stackoverflow.com/questions/16609724/using-current-time-in-utc-as-default-value-in-postgresql/16610360#16610360
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "updated_at",
                 table: "site",
                 nullable: false,
-                defaultValueSql: "CURRENT_TIMESTAMP");
+                defaultValueSql: "now() at time zone 'utc'");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "created_at",
                 table: "provider",
                 nullable: false,
-                defaultValueSql: "CURRENT_TIMESTAMP");
+                defaultValueSql: "now() at time zone 'utc'");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "updated_at",
                 table: "provider",
                 nullable: false,
-                defaultValueSql: "CURRENT_TIMESTAMP");
+                defaultValueSql: "now() at time zone 'utc'");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
