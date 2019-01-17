@@ -22,6 +22,7 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
             YearCode = inst.YearCode;
             Scitt = inst.Scitt;
             SchemeMember = inst.SchemeMember;
+            RegionCode = inst.RegionCode;
         }
 
         public int Id { get; set; }
@@ -43,5 +44,6 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
         public string Scitt { get; set; }
         public string AccreditingProvider { get; set; }
         public string SchemeMember { get; set; }
+        public string RegionCode { get; set; }
     }
 }

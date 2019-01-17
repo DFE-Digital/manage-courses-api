@@ -25,6 +25,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
             YearCode = provider.YearCode;
             Scitt = provider.Scitt;
             SchemeMember = provider.SchemeMember;
+            RegionCode = provider.RegionCode;
         }
 
         public int Id { get; set; }
@@ -43,6 +44,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string YearCode { get; set; }
         public string Scitt { get; set; }
         public string SchemeMember { get; set; }
+        public string RegionCode { get; set; }
 
         public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
         public ICollection<Course> Courses { get; set; }

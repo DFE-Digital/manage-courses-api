@@ -187,6 +187,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Address3 = x.Addr3,
                 Address4 = x.Addr4,
                 Postcode = x.Postcode,
+                RegionCode = x.RegionCode,
 
                 ContactName = x.ContactName,
                 Email = x.Email,
