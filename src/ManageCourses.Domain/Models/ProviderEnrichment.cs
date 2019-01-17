@@ -21,4 +21,3 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public EnumStatus Status { get; set; }
     }
 }
- 

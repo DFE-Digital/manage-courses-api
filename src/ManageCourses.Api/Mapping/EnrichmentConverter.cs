@@ -15,18 +15,18 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 MissingMemberHandling = MissingMemberHandling.Ignore,
                 NullValueHandling = NullValueHandling.Ignore
             };
-        }        
+        }
 
         public string ConvertToJson(UcasProviderEnrichmentPostModel model)
         {
             return JsonConvert.SerializeObject(model.EnrichmentModel, _jsonSerializerSettings);
         }
-        
+
         public string ConvertToJson(CourseEnrichmentModel model)
         {
             return JsonConvert.SerializeObject(model, _jsonSerializerSettings);
         }
-        
+
         /// <summary>
         /// maps enrichment data from the data object to the returned enrichment model
         /// </summary>

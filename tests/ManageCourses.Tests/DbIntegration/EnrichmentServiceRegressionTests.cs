@@ -132,7 +132,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 JsonData = content,
             };
             Context.ProviderEnrichments.Add(enrichment);
-            Context.SaveChanges();            
+            Context.SaveChanges();
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         public void TestGetInstitutionEnrichmentWithDifferentUserFromSavedUser()
         {
             Context = ContextLoader.GetDbContext(Config);//refresh the context
-            
+
             var enrichmentService = new EnrichmentService(Context);
             //test get the enrichment using user2
             var result = enrichmentService.GetProviderEnrichment(ProviderInstCode, Email2);
