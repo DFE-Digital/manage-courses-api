@@ -11,25 +11,25 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 name: "created_at",
                 table: "site",
                 nullable: false,
-                defaultValueSql: "CURRENT_DATE");
+                defaultValueSql: "CURRENT_TIMESTAMP");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "updated_at",
                 table: "site",
                 nullable: false,
-                defaultValueSql: "CURRENT_DATE");
+                defaultValueSql: "CURRENT_TIMESTAMP");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "created_at",
                 table: "provider",
                 nullable: false,
-                defaultValueSql: "CURRENT_DATE");
+                defaultValueSql: "CURRENT_TIMESTAMP");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "updated_at",
                 table: "provider",
                 nullable: false,
-                defaultValueSql: "CURRENT_DATE");
+                defaultValueSql: "CURRENT_TIMESTAMP");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
