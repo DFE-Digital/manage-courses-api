@@ -121,7 +121,6 @@ namespace GovUk.Education.ManageCourses.Xls
                         Scitt = row.GetCell(columnMap["SCITT"]).StringCellValue.Trim(),
                         AccreditingProvider = row.GetCell(columnMap["ACCREDITING_PROVIDER"]).StringCellValue.Trim(),
                         SchemeMember = row.GetCell(columnMap["SCHEME_MEMBER"]).StringCellValue.Trim(),
-                        RegionCode = ParseIntCell(row.GetCell(columnMap["REGION_CODE"]).StringCellValue.Trim())
                     }
                     );
                 }
