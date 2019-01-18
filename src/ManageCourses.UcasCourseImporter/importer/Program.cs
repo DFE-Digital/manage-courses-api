@@ -152,6 +152,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     inst.Email = profile.email.Trim();
                     inst.Telephone = profile.inst_tel.Trim();
                     inst.Url = profile.web_addr.Trim();
+                    inst.RegionCode = profile.region_code;
                 }
             }
         }

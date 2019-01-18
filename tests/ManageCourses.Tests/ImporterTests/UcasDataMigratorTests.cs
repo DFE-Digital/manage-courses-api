@@ -21,6 +21,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
     {
         private const string InstPostCode1 = "AB12CD";
         private const string InstCode1 = "INSTCODE_1";
+        private const string InstCode2 = "InstCode_2";
+
         private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
         private const string TestUserEmail3 = "email_3@test-manage-courses.gov.uk";
@@ -48,6 +50,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             foreach(var expected in payload.Campuses){
                 Context.Sites.Count(o => o.RegionCode == expected.RegionCode).Should().Be(1, $"site region code '{expected.RegionCode}' was in the payload");
             }
+
+            Context.Providers.Single(x => x.ProviderCode == InstCode1).RegionCode.Should().Be(1);
+            Context.Providers.Single(x => x.ProviderCode == InstCode2).RegionCode.Should().BeNull();
         }
 
         [Test]
@@ -111,14 +116,13 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             };
 
-            const string instCode2 = "InstCode_2";
             var institutions = new List<Provider>
             {
                 new Provider {
-                    ProviderCode = InstCode1
+                    ProviderCode = InstCode1,
                 },
                 new Provider {
-                    ProviderCode = instCode2
+                    ProviderCode = InstCode2
                 }
             };
 
@@ -154,7 +158,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             {
                 Institutions = new List<UcasInstitution>
                 {
-                    new UcasInstitution { InstCode = InstCode1, Postcode = InstPostCode1}
+                    new UcasInstitution { InstCode = InstCode1, RegionCode = 1, Postcode = InstPostCode1},
+                    new UcasInstitution { InstCode = InstCode2 }
                 },
 
                 Courses = new List<UcasCourse>{

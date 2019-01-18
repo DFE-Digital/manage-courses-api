@@ -120,7 +120,8 @@ namespace GovUk.Education.ManageCourses.Xls
                         Url = row.GetCell(columnMap["URL"]).StringCellValue.Trim(),
                         Scitt = row.GetCell(columnMap["SCITT"]).StringCellValue.Trim(),
                         AccreditingProvider = row.GetCell(columnMap["ACCREDITING_PROVIDER"]).StringCellValue.Trim(),
-                        SchemeMember = row.GetCell(columnMap["SCHEME_MEMBER"]).StringCellValue.Trim()
+                        SchemeMember = row.GetCell(columnMap["SCHEME_MEMBER"]).StringCellValue.Trim(),
+                        RegionCode = ParseIntCell(row.GetCell(columnMap["REGION_CODE"]).StringCellValue.Trim())
                     }
                     );
                 }
@@ -246,7 +247,7 @@ namespace GovUk.Education.ManageCourses.Xls
                         TelNo = row.GetCell(columnMap["TEL_NO"]).StringCellValue.Trim(),
                         Email = row.GetCell(columnMap["EMAIL"]).StringCellValue.Trim(),
 
-                        RegionCode = ParseIntCell(row.GetCell(columnMap["REGION_CODE"]).StringCellValue.Trim())
+
                     };
                     if (!institutions.Any(i => i.InstCode == ucasCampus.InstCode))
                     {
