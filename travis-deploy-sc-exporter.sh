@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo "Deploying sc-exporter..."
 
 deployZip=deploy.zip
 

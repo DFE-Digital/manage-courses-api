@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+echo "Deploying ucas-importer..."
 
 deployZip=deploy.zip
 

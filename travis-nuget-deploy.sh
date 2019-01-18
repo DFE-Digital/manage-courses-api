@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+echo "Deploying ucas-importer..."
+
 ApiKey=$1
 Source=$2
 
