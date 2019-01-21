@@ -1,5 +1,6 @@
 using System;
 using GovUk.Education.ManageCourses.Api.Services;
+using GovUk.Education.ManageCourses.Domain;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.EntityFrameworkCore;

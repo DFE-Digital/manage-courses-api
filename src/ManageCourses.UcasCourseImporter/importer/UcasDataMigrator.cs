@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GovUk.Education.ManageCourses.Domain;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.UcasCourseImporter.Mapping;
@@ -17,12 +18,18 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
         private readonly ILogger _logger;
         private readonly UcasPayload payload;
+        private readonly IClock _clock;
 
-        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger, UcasPayload payload)
+        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger, UcasPayload payload, IClock clock = null)
         {
             _context = manageCoursesDbContext;
             _logger = logger;
+            if (clock == null)
+            {
+                clock = new Clock();
+            }
             this.payload = payload;
+            _clock = clock;
         }
 
         /// <summary>
@@ -174,7 +181,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Postcode = x.Postcode,
                 Code = x.CampusCode,
                 LocationName = x.CampusName,
-                RegionCode = x.RegionCode
+                RegionCode = x.RegionCode,
+                CreatedAt = _clock.UtcNow,
+                UpdatedAt = _clock.UtcNow,
             };
         }
 
@@ -213,12 +222,15 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             {
                 // insert
                 _context.Providers.Add(newValues);
+                newValues.CreatedAt = _clock.UtcNow;
+                newValues.UpdatedAt = _clock.UtcNow;
                 return newValues;
             }
             else
             {
                 // update
                 entity.UpdateWith(newValues);
+                entity.UpdatedAt = _clock.UtcNow;
                 return entity;
             }
         }

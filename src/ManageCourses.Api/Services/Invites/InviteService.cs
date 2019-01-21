@@ -2,6 +2,7 @@
 using GovUk.Education.ManageCourses.Api.Exceptions;
 using GovUk.Education.ManageCourses.Api.Services.Email;
 using GovUk.Education.ManageCourses.Api.Services.Email.Model;
+using GovUk.Education.ManageCourses.Domain;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Invites

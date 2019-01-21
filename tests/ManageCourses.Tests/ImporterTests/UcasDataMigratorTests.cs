@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Castle.Core.Logging;
@@ -21,7 +22,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
     {
         private const string InstPostCode1 = "AB12CD";
         private const string InstCode1 = "INSTCODE_1";
-        private const string InstCode2 = "InstCode_2";
+        private const string InstCode2 = "INSTCODE_2";
+        private const string InstCode3 = "INSTCODE_3";
 
         private const string TestUserEmail1 = "email_1@test-manage-courses.gov.uk";
         private const string TestUserEmail2 = "email_2@test-manage-courses.gov.uk";
@@ -39,15 +41,47 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             SaveReferenceDataPayload(Context);
             var payload = GetUcasCoursesPayload();
 
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload).UpdateUcasData();
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload).UpdateUcasData();
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload).UpdateUcasData();
+            var creationTime = new DateTime(2019, 1, 2, 3, 4, 5, 7);
+            MockTime = creationTime;
+
+            // first import
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
+
+            // assert
+            var provider = Context.Providers.Single(x => x.ProviderCode == InstCode3);
+            provider.CreatedAt.Should().Be(creationTime, InstCode3 + " is a new record");
+            provider.UpdatedAt.Should().Be(creationTime);
+            foreach (var site in Context.Sites)
+            {
+                site.CreatedAt.Should().Be(creationTime);
+                site.UpdatedAt.Should().Be(creationTime);
+            }
+
+            // re-import #1
+            MockTime = new DateTime(2019, 2, 2, 3, 4, 5, 7);
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
+
+
+            // re-import #2
+            var updateTime = new DateTime(2019, 3, 2, 3, 4, 5, 7);
+            MockTime = updateTime;
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
+
+            // assert
+            Context.Providers.Single(x => x.ProviderCode == InstCode3).CreatedAt.Should().Be(creationTime);
+            Context.Providers.Single(x => x.ProviderCode == InstCode3).UpdatedAt.Should().Be(updateTime);
+            foreach (var site in Context.Sites)
+            {
+                // not testing creation time because sites are dropped and created every time
+                site.UpdatedAt.Should().Be(updateTime);
+            }
 
             foreach (var expected in payload.Courses)
             {
                 Context.Courses.Count(o => o.CourseCode == expected.CrseCode).Should().Be(1, $"course code '{expected.CrseCode}' was in the payload");
             }
-            foreach(var expected in payload.Campuses){
+            foreach (var expected in payload.Campuses)
+            {
                 Context.Sites.Count(o => o.RegionCode == expected.RegionCode).Should().Be(1, $"site region code '{expected.RegionCode}' was in the payload");
             }
 
@@ -159,7 +193,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                 Institutions = new List<UcasInstitution>
                 {
                     new UcasInstitution { InstCode = InstCode1, RegionCode = 1, Postcode = InstPostCode1},
-                    new UcasInstitution { InstCode = InstCode2 }
+                    new UcasInstitution { InstCode = InstCode2 },
+                    new UcasInstitution { InstCode = InstCode3 },
                 },
 
                 Courses = new List<UcasCourse>{
