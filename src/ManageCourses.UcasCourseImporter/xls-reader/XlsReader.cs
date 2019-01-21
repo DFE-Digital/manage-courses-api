@@ -246,7 +246,7 @@ namespace GovUk.Education.ManageCourses.Xls
                         TelNo = row.GetCell(columnMap["TEL_NO"]).StringCellValue.Trim(),
                         Email = row.GetCell(columnMap["EMAIL"]).StringCellValue.Trim(),
 
-
+                        RegionCode = ParseIntCell(row.GetCell(columnMap["REGION_CODE"]).StringCellValue.Trim())
                     };
                     if (!institutions.Any(i => i.InstCode == ucasCampus.InstCode))
                     {
