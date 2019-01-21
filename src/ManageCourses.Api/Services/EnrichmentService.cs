@@ -58,6 +58,14 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
+            // when saving enforce the region code is being saved.
+            if(!model.EnrichmentModel.RegionCode.HasValue)
+            {
+                var ucasProvider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
+
+                model.EnrichmentModel.RegionCode = ucasProvider.RegionCode;
+            }
+
             string content = _converter.ConvertToJson(model);
 
             if (enrichmentDraftRecord != null)
@@ -308,7 +316,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                 string.IsNullOrWhiteSpace(enrichmentModel.Address2) &&
                 string.IsNullOrWhiteSpace(enrichmentModel.Address4) &&
                 string.IsNullOrWhiteSpace(enrichmentModel.Address3) &&
-                string.IsNullOrWhiteSpace(enrichmentModel.Postcode);
+                string.IsNullOrWhiteSpace(enrichmentModel.Postcode) &&
+                !enrichmentModel.RegionCode.HasValue;
 
             if (useUcasContact)
             {
@@ -323,6 +332,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                     enrichmentModel.Address3 = ucasProvider.Address3;
                     enrichmentModel.Address4 = ucasProvider.Address4;
                     enrichmentModel.Postcode = ucasProvider.Postcode;
+                    // When first getting enrichment, seed the region code.
+                    enrichmentModel.RegionCode = ucasProvider.RegionCode;
                 }
             }
 
