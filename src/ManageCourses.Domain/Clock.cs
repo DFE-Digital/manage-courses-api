@@ -1,6 +1,6 @@
 using System;
 
-namespace GovUk.Education.ManageCourses.Api.Services
+namespace GovUk.Education.ManageCourses.Domain
 {
     public class Clock : IClock
     {

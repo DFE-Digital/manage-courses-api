@@ -28,6 +28,7 @@ using NSwag.AspNetCore;
 using NSwag.SwaggerGeneration.Processors.Security;
 using Serilog;
 using System.Threading;
+using GovUk.Education.ManageCourses.Domain;
 using Microsoft.Extensions.Logging;
 using Microsoft.ApplicationInsights;
 
