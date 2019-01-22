@@ -28,5 +28,6 @@ namespace GovUk.Education.ManageCourses.Api.Model
         public string Address3 { get; set; }
         public string Address4 { get; set; }
         public string Postcode { get; set; }
+        public int? RegionCode { get; set; }
     }
 }

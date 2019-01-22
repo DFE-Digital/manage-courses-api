@@ -24,8 +24,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private Provider _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
-
         private const string Email = "12345@example.org";
+        private const int RegionCode = 666;
 
         protected override void Setup()
         {
@@ -50,7 +50,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         Name = "Conscious control of telekenisis",
                         AccreditingProvider = accreditingInstitution,
                     }
-                }
+                },
+                RegionCode = RegionCode
             };
             Context.Add(_ucasInstitution);
 
@@ -129,6 +130,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             result.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
             result.LastPublishedTimestampUtc.Should().BeNull();
             result.Status.Should().BeEquivalentTo(EnumStatus.Draft);
+            result.EnrichmentModel.RegionCode.Should().Be(RegionCode);
 
             //test update
             var updatedmodel = new UcasProviderEnrichmentPostModel
@@ -153,19 +155,42 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             updateResult.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityUpdatedText);
             updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
             updateResult.LastPublishedTimestampUtc.Should().BeNull();
+            updateResult.EnrichmentModel.RegionCode.Should().Be(RegionCode);
             //publish
             var publishResults = enrichmentService.PublishProviderEnrichment(ProviderInstCode.ToLower(), Email);
             publishResults.Should().BeTrue();
             var publishRecord = enrichmentService.GetProviderEnrichment(ProviderInstCode.ToLower(), Email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
+            publishRecord.EnrichmentModel.RegionCode.Should().Be(RegionCode);
             //test save again after publish
-            enrichmentService.SaveProviderEnrichment(model, ProviderInstCode.ToLower(), Email);
+
+            var afterPublishedModel = new UcasProviderEnrichmentPostModel
+            {
+                EnrichmentModel = new ProviderEnrichmentModel
+                {
+                    TrainWithDisability = trainWithDisabilityText,
+                    TrainWithUs = trainWithUsText,
+                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
+                    {
+                        new AccreditingProviderEnrichment
+                        {
+                            UcasProviderCode = AccreditingInstCode,
+                            Description = instDesc,
+                        }
+                    },
+                    RegionCode = 909
+                }
+            };
+
+            enrichmentService.SaveProviderEnrichment(afterPublishedModel, ProviderInstCode.ToLower(), Email);
             var updateResult2 = enrichmentService.GetProviderEnrichment(ProviderInstCode, Email);
             updateResult2.EnrichmentModel.TrainWithDisability.Should().BeEquivalentTo(trainWithDisabilityText);
             updateResult2.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsText);
             updateResult2.Status.Should().BeEquivalentTo(EnumStatus.Draft);
             updateResult2.LastPublishedTimestampUtc.ToString().Should().BeEquivalentTo(publishRecord.LastPublishedTimestampUtc.ToString());
+            updateResult2.EnrichmentModel.RegionCode.Should().NotBe(RegionCode);
+
             //check number of records generated from this
             var draftCount = Context.ProviderEnrichments.Count(x => x.Status == EnumStatus.Draft);
             var publishedCount = Context.ProviderEnrichments.Count(x => x.Status == EnumStatus.Published);
