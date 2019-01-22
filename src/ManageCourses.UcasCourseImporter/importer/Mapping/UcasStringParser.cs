@@ -4,7 +4,7 @@ using System.Text;
 
 namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 {
-    public static class DataHelper
+    public static class UcasStringParser
     {
         public static DateTime? GetDateTimeFromString(string dateToConvert)
         {

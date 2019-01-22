@@ -108,7 +108,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 returnCourse.CourseSites = new Collection<CourseSite>(courseRecords.Select(x => new CourseSite
                 {
                     Site = allSites.Single(y => y.Provider?.ProviderCode == x.InstCode && y.Code == x.CampusCode),
-                    ApplicationsAcceptedFrom = DataHelper.GetDateTimeFromString(x.CrseOpenDate),
+                    ApplicationsAcceptedFrom = UcasStringParser.GetDateTimeFromString(x.CrseOpenDate),
                     Status = x.Status,
                     Publish = x.Publish,
                     VacStatus = x.VacStatus

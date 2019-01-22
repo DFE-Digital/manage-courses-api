@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace GovUk.Education.ManageCourses.Tests.ImporterTests.Mapping
 {
     [TestFixture]
-    public class DataHelperTests
+    public class UcasStringParserTests
     {
         [Test]
         [TestCase("")]
@@ -17,7 +17,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.Mapping
         [TestCase(null)]
         public void TestGetDateFromStringReturnsNull(string dateToConvert)
         {
-            var result = DataHelper.GetDateTimeFromString(dateToConvert);
+            var result = UcasStringParser.GetDateTimeFromString(dateToConvert);
             result.Should().BeNull();
         }
         [Test]
@@ -27,7 +27,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.Mapping
         [TestCase("2018/10/16")]
         public void TestGetDateFromStringReturnsDate(string dateToConvert)
         {
-            var result = DataHelper.GetDateTimeFromString(dateToConvert);
+            var result = UcasStringParser.GetDateTimeFromString(dateToConvert);
             //assert
             result.Should().NotBeNull();
             var date = (DateTime) result;
