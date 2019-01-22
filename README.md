@@ -38,49 +38,22 @@ https://dfedigital.atlassian.net/wiki/spaces/BaT/pages/389349377/Manage+Courses+
 
 ### Database setup
 
+#### Mac/linux
+
 ```bash
-# from .\src\ManageCourses.Api>
-dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_HOST the-host (ie localhost)
-
-dotnet user-secrets set MANAGE_COURSES_POSTGRESQL_SERVICE_PORT the-port (ie 5432)
-
-dotnet user-secrets set PG_DATABASE the-database (will be created if missing and sufficient rights, e.g. 'manage')
-
-dotnet user-secrets set PG_USERNAME the-user-you-created
-
-dotnet user-secrets set PG_PASSWORD the-password-you-set
+./setup-pg-user.sh
 ```
-
-#### Create blank database via psql
-```bash
-# Connect to database server using
-# [MANAGE_COURSES_POSTGRESQL_SERVICE_HOST]
-# [MANAGE_COURSES_POSTGRESQL_SERVICE_PORT]
-# [PG_USERNAME]
-
-psql -h MANAGE_COURSES_POSTGRESQL_SERVICE_HOST -p [MANAGE_COURSES_POSTGRESQL_SERVICE_PORT]  -U [PG_USERNAME]
-
-# Enter password using
-# [PG_PASSWORD]
-
-# Execute sql command using
-# [PG_DATABASE]
-CREATE DATABASE PG_DATABASE;
-```
-
-There's a script for setting up a postgres user and database: `setup-pg-user.sh`
-
 
 ### Setup Email functionality
 
 ```bash
-# from .\src\ManageCourses.Api>
+cd src/ManageCourses.Api/
 dotnet user-secrets set email:user the-user-email-address
 ```
 
 Values available from [GOV.​UK Notify](https://www.notifications.service.gov.uk/)
 ```bash
-# from .\src\ManageCourses.Api>
+cd src/ManageCourses.Api/
 dotnet user-secrets set email:template_id the-template-id
 dotnet user-secrets set email:api_key the-email-api-key
 dotnet user-secrets set email:welcome_template_id the-welcome-template-id
@@ -111,7 +84,7 @@ dotnet user-secrets set snc:api:url the-search-and-compare-api-url
 ## Running the API locally
 
 ```bash
-# from .\src\ManageCourses.Api>
+cd src/ManageCourses.Api/
 dotnet run
 ```
 
@@ -236,4 +209,3 @@ If this doesn't work try running the sln in Visual Studio.
 
 ## Shutting down the service and showing the off line page.
 Rename the file "app_offline.htm.example" in the root folder to "app_offline.htm"
-
