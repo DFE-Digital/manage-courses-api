@@ -16,10 +16,7 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            var sql = $"ALTER TABLE \"course_site\" " +
-                      "ALTER COLUMN \"applications_accepted_from\" TYPE text;";
-
-            migrationBuilder.Sql(sql);
+            //There no point of down as when you do go down you need code change therefore another migration
         }
     }
 }
