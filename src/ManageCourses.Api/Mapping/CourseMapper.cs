@@ -114,11 +114,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     Address = address
                 },
 
-                ApplicationsAcceptedFrom = sites.Select(x =>
-                {
-                    DateTime parsed;
-                    return DateTime.TryParse(x.ApplicationsAcceptedFrom, out parsed) ? (DateTime?)parsed : null;
-                }).Where(x => x != null && x.HasValue)
+                ApplicationsAcceptedFrom = sites.Select(x => x.ApplicationsAcceptedFrom).Where(x => x.HasValue)
                     .OrderBy(x => x.Value)
                     .FirstOrDefault(),
 

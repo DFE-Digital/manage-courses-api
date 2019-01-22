@@ -281,7 +281,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                             Postcode = "School.PostCode",
                             Code = "SCH"
                         },
-                        ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
+                        ApplicationsAcceptedFrom = DateTime.Parse("2018-10-16 00:00:00"),
                         Status = "r",
                         Publish = publishedCampus ? "Y" : "n",
                         VacStatus="F"
@@ -298,7 +298,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                                 Postcode = "NotIncludedSchool.PostCode",
                                 Code = "SCHNI"
                             },
-                            ApplicationsAcceptedFrom = "2018-10-16 00:00:00",
+                            ApplicationsAcceptedFrom = DateTime.Parse("2018-10-16 00:00:00"),
                             Status = "d",
                             Publish = publishedCampus ? "Y" : "n",
                             VacStatus="F"
