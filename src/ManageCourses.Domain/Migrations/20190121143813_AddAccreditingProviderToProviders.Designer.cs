@@ -3,15 +3,17 @@ using System;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190121143813_AddAccreditingProviderToProviders")]
+    partial class AddAccreditingProviderToProviders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -344,9 +346,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("ContactName")
                         .HasColumnName("contact_name");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnName("created_at");
-
                     b.Property<string>("Email")
                         .HasColumnName("email");
 
@@ -373,9 +372,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.Property<string>("Telephone")
                         .HasColumnName("telephone");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnName("updated_at");
 
                     b.Property<string>("Url")
                         .HasColumnName("url");
@@ -479,9 +475,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("Code")
                         .HasColumnName("code");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnName("created_at");
-
                     b.Property<string>("LocationName")
                         .HasColumnName("location_name");
 
@@ -493,9 +486,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.Property<int?>("RegionCode")
                         .HasColumnName("region_code");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 

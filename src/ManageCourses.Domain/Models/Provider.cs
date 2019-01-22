@@ -27,6 +27,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
             Scitt = provider.Scitt;
             SchemeMember = provider.SchemeMember;
             RegionCode = provider.RegionCode;
+            AccreditingProvider = provider.AccreditingProvider;
         }
 
         public int Id { get; set; }
@@ -48,6 +49,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string SchemeMember { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public string AccreditingProvider { get; set; }
 
         public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
         public ICollection<Course> Courses { get; set; }
