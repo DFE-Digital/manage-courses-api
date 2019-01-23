@@ -11,6 +11,9 @@ case "$(uname -s)" in # https://stackoverflow.com/questions/3466166/how-to-check
    Linux)
      sudo -u postgres psql -c "$sql"
      ;;
+  CYGWIN*|MINGW*|MSYS*)
+     PGPASSWORD=postgres psql -U postgres -c "$sql"
+     ;;
    *)
      echo 'unsupported OS'
      ;;
