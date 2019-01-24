@@ -1,19 +1,20 @@
 #!/bin/sh
-if [ $# -lt 3 ]
-then
-  echo "Params: username, password, database"
-  exit 1
-fi
-usr=$1
-pass=$2
-db=$3
-echo "removing old $db db"
-dropdb $db
-dropuser $usr
-createuser $usr
-createdb $db
-psql -q -c "alter user $usr with password '$pass'";
-psql -q -c "alter database $db owner to $usr";
-# use psql -e to echo sql along with errors while debugging
-psql -d $db -q -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $usr;";
-echo "postgres db $db and user $usr created"
+
+sql="CREATE USER manage_courses WITH SUPERUSER CREATEDB PASSWORD 'manage_courses';"
+
+# different variations of the call to psql that should work out of the box on vanilla installs of postgres
+
+case "$(uname -s)" in # https://stackoverflow.com/questions/3466166/how-to-check-if-running-in-cygwin-mac-or-linux/27776822#27776822
+   Darwin)
+     psql -U postgres -c "$sql"
+     ;;
+   Linux)
+     sudo -u postgres psql -c "$sql"
+     ;;
+  CYGWIN*|MINGW*|MSYS*)
+     PGPASSWORD=postgres psql -U postgres -c "$sql"
+     ;;
+   *)
+     echo 'unsupported OS'
+     ;;
+esac
