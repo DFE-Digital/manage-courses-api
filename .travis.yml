@@ -25,45 +25,48 @@ env:
   - secure: Kbs8hBsqPgHvrYUfqdf4XgCRgEasWfFd63tqB/aM/BIti/sEEoDJigjjTlrGFTb46prrRRv0lv8amNPQzY2CZtCqlGI2ZoZtdpEJhbR53Lu3NBbSIoMTe2BvFEU9s31IwzXIa/7hnIpdLWaDFgR5qeeCD5X4B8oEAIeRY5RgyzB0Zna2j/PRwy/0YcRjSWhI1rSYtmJaN+UmsDqvWM5qiL7Ax9Y4ybfz74I8IfOrPbieMC5qpu40go/iPxnaaq3noCboUKMtI9EilOkicHpxzSXpDlPU2bSjOKl3UC4GzvDnN/gue0A16LA0RJMXsV2YuVZln3ZXH7WyW2VeNZxOiPcfYeuYO93Dd3hel071OcHvyzaRaGB3h2Z6T9wryc+Gdkhntb2PtFLacwWZOy6mLZNmlQiCD2t4pYmMbl+YjZ1TcvL8Y4h53Ve16xfs6yb9qwFTN6bJvdQ2kQZb7TuEbvMMwjPOwyRewJZwyQ5SbDtpd7QmD8kBnhzvpjjm70kdEUFsQZlX0Gefe/0DOb7HnPXwi/nYvhVuPHaGitIRAPvubuXXEtJlWagl4PVIN8p+GVrZ0CL+JKRUg4nS0Cvt7c3qIu6DLF1cVLgwEDeN5yJ7v4rim3y0vCCaD2wkiFQVBz2cr4ibfiZLzQA5PTyU2yO1g/OIPNu//0c7qkYnRhk=
   - secure: onaQkKScuNE6VrORV+rutfscHZGqMJqSrJJzKGTej/YnNS55mZUUNQA3WdlaOsTkUInWEcIqa9APGOWoONoTTOtzHIw82kHxkazKZnYd1cJoPHiWZgFNNMxHfsSvHunyhszOa5C+zHdGE1telyi2VhHDeSLbc0JbCkyiwGMXnb3pi9Pu9ZgcIFEt72XE0g7m88DZaFIH8DFoeVpSTDXOMosNZayntYxeyeR5DM8uXqQ4dVmF4e2ku14P5QA1V2jrNqLzio9SsWgnWUrMJvoekaAA4oPY9Hie/VIW0EB48B6owVVye9T+c+DaPkI9zm3q/74fa3Hb9yj9qqgmZTgF1k6qg4HrT8WCKOtccW9pP7uOY0spzo015FfO0+qI7VbP5DQk8xMMdkevx+VBFz6+dmZHaptnXkv335Jx79Al7PYTtVBmOfqk1zO24Wnt7cV1hXPGjHI2mAAccSNY5bitoQbxjK8HF8IGQ70a7zS2gV9gQJE13Xo0OcCw81Xobhe2AOMwX1YMzTcv+nFh9gYPwKijQyuHAccUItm6GBXm1cL49ZBmagEG1UHePG+02bAAfxTXKTl5XZJLq6ofMs6r47UhcgMGfo4oGiLYMqxjJH9smuVEP+8FK8nzRBPYgUhJtedvzOjqI2hC424x/SMUUN3qGRErzY2vgPuZegesQvE=
   - secure: boWFNvBj8dcFTzFxHN54kQ3D/6tYXuvp94nWE6cFtfVqdVp5vuuhYpPMlDlZ5be5S239IMW+CjaY2xwZbVds90m0BPuVmbC6Y1GdZC4jxAN1XyjlUeQUQrSv+7nBhsVOeAzWl7jF89zFoonRpcVaXLUIwagl0odkL6dQC1nQACkmJMgg4CApVNFvDJ/H3R+lk4xBk89qGshwqImZuavsp/X7qsipkYROHukkjMokVD1trDLO22L9KLD68PkPkERmvEJt2ai4NzUnyG18+470fCBXA1n3u0+EOWR3QSEnba3dOoKS1hDkOxLwi5uX3rr53R5Hnhar7QN6lOaykEc0TXIqn2qE5w+SQcrxJ3hjzJn9Ak9DWs0z1LQKrZKc5/gM9WFXiTQcL531qdp1KR5RxqzYHNNbUR8vSUP5hOwo9wZQYuqmwfGhDor6qsP2/H7OC2T6LnQfi1FGaZHiRSI6WMDf9SU7mVCFEBhBkgze58KazC88UgrTdVSnj2mcr2s14eKDE84yYBBrFgeSWM7fHVIPRO5Fgje1oCctBySSd79nDObUVBd+1Mr+MFAwpfBcuWvW09XNBXemlrw4bnDsJO6L33Q+20ka3Cy9J4m3YgMvZipVCaFzll9i672bH7j30nb/3rcde86jS35Z1RI0zSPICLbsL0wbEvrI7hzBkVY=
+  # APP_CREDENTIALS_DEV_PWD
+  - secure: I5byCavryC/kUPGBlqrojG3NKlylb6MQD3amkfIOaZzrYaUhW36fcbRQt1Ir01qlX+A7jpixUvxk65d8tKns1JvzDmzDh/OyhiuR3mmrOLcreZSaOyQBexmvgP89ootlIixMyDGxI5VbsQiTyUMbkmQVFML4X2KlddtdazVhd+BteLbjdD8j9sFjoL8l0kfj7te5Msj27Thn1NHmB/WFCNjrPFlAgZxnLGkwKdmD1BLbScXR8QyHcuMYOzwxVA0KSkNTyZWIwG9NfwomOe3G0AtIb7SlEaxxY/yiE1fM1nZ+ig8VfzP5iTA/+8hC9fD4KhJNLlkZ0LZEk05rOWB1VinV95GkA3fMjQ2FSurI0iM34YAnCjairM1yuWyzmtZg27QUEhAnEvzgjhXsxYnpye8yii+qfyMlzfGm7FarAcM2D/bn/1a256gMQb6yIxZreADFphBUV5WsGW03BR/EYXk4mx3w65wfg8hsd6zJoL9mUOekE8s/wiDBQ3rQ1KFPp/FZD/5cACi8d9Z7ynif2UlOaMMIFLsbR1zWoXTU7taRtxAYOVBKfJBFOw2fCiUZn5qsmG/FLKD2iPRFBRkTYB1L6D/KHKQ85AYR2IrxYpO2PIKCISyLxxN/PbSvNyikn2rLFYScfFRUNgJhfG/aibuavURXPRQcKTzRTnJcbJw=
+  # APP_CREDENTIALS_STAGING_PWD
+  - secure: LMuxrulQKDgLkUa26eZ8oP8nNxEsWUFUdmbqCxpkAmgfhQknxGMsk58ecDKlCNu7bWnAZZl0ZjWVP/VyVA7kpMNEEMFo/kOScOVsOL5mydqXmOYZa//hpiqZj/ip7JUDCQvreOPHnwBh9Be7f+BOeVdw5Go3kmKUWTrgS/5FpYuVAzbw9koMPC2RFEZTtqIFYwnnOkq/FwvpYDzPx9JlkKFkowg2P6XYPI4VCLhlQu8A3x9pM8ZWuxIkmojzdJOtxhKwtVQYQCwmD5YxXHhmOdP0FkTZoPs1kEPn1CC67uHObQaAPoW4FXO+Leb20ctc7TZZxOSMvU678PC/8uveg+vgh6KixzRIB4wT906etEj0Y6f1nE9QojUVpbWCQY1iOx3OnuseGo0amAR+4Cqe+NwAMNPIKR9HcDYodMDh3TcX/AlNT/f2FOzkI+DP6L2eTBuOvg/g88THrYj26WIk8r177Sav1xznCLxK8dUxZJqDHhhtGLZ8nQA3p2VpFewmNzj6OZZ8T60z0UOuXtXCSferZIBcQuVURLklfQCRmz6YG/c4BLkP8Qnw9PpcFera7UpJr1j+vRYq9m/srmlPjxNZBSymdIM//eXZPedmElxzMrNfCysYI09nbMP5YOegd4VmE4DqSIGdVYWoLAFcAEF6Fw5besWxGJneA3O+63s=
+  # APP_CREDENTIALS_PROD_PWD
+  - secure: DFlr4hQAz/btOkHAW+04VSfLIPPxrw6VVsu0OcFc+AhexkeUZEUg72/duUxGgr/b7Nd66tbJWYpPL/LChmsd9xTE2D2H3nVrLYLBy5QFuTIy63aGdELgJujxiSNzSEHjy7yFqSmutCw7SRV/7IW2UmOjc3Be8tBbpcOaUAHOseH2fMRlEmHSH3YRfV6L53IvP/ApHl7ZnWTa6JM7u8IXEpKrJrvWwq7duST5+HY7s+dZKZ6UIEL59z8T5mcEf9fXexjwghIZVimCxRNG5aGIXGi6yifjF7H2KTy3vkhFqthZZ74oseDY4A3p+XL9uW/SY8sE4wupNvnaHwpKTIi9luRa/LrVMZN6jTfQ85HlfkVXHT/AxC0AWQGF+vqo4uGVCs+8PTm5t+xbsqKvJjAbyfVyQqkaqSTTwd4Sbj85cnE09LnEm1tIk78/T8EliHckkkaJKbVyH0gghK5fOw3AdHJ5rkOJ5W+NM1UAexHjF0gcOsR4fWL49zy2UGIirNyQV/t8e/IZS/n9eednNuE4TrxU3Dk4OsXHs4RfSHqXFfmvF4Pi35W8XCMPgCurMOMH7uORlZH9iqIhEtGW4DYhnlePPq/asCBOiiEQkqD6rQC1saY28uTGdRxrIjNUKsvPPqdwvJSoEugnF7v9ikdxIhTsep1yRKKlEd2RT4gMiIM=
 before_script:
 - psql -c 'create database travis_ci_test;' -U postgres
 script:
 - "./travis-build.sh --quiet verify"
 deploy:
 - provider: script
-  script: git fetch --unshallow && git push --force https://govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD@bat-dev-manage-courses-api-app.scm.azurewebsites.net:443/bat-dev-manage-courses-api-app.git
-    HEAD:refs/heads/master
+  script: "./deploy.sh dev"
   on: master
 - provider: script
-  script: git fetch --unshallow && git push --force https://govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD@bat-staging-manage-courses-api-app.scm.azurewebsites.net:443/bat-staging-manage-courses-api-app.git
-    HEAD:refs/heads/master
+  script: "./deploy.sh staging"
   on: staging
 - provider: script
-  script: git fetch --unshallow && git push --force https://govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD@bat-prod-manage-courses-api-app.scm.azurewebsites.net:443/bat-prod-manage-courses-api-app.git
-    HEAD:refs/heads/master
+  script: "./deploy.sh prod"
   on: production
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+  script: "./travis-deploy-sc-exporter.sh $bat-dev-manage-courses-api-app:$APP_CREDENTIALS_DEV_PWD
     bat-dev-manage-courses-api-app"
   on: master
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+  script: "./travis-deploy-sc-exporter.sh $bat-staging-manage-courses-api-app:$APP_CREDENTIALS_STAGING_PWD
     bat-staging-manage-courses-api-app"
   on: staging
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+  script: "./travis-deploy-sc-exporter.sh $bat-prod-manage-courses-api-app:$APP_CREDENTIALS_PROD_PWD
     bat-prod-manage-courses-api-app"
   on: production
 - provider: script
-  script: "./travis-deploy-ucas-importer.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+  script: "./travis-deploy-ucas-importer.sh $bat-dev-manage-courses-api-app:$APP_CREDENTIALS_DEV_PWD
     bat-dev-manage-courses-api-app"
   on: master
 - provider: script
-  script: "./travis-deploy-ucas-importer.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+  script: "./travis-deploy-ucas-importer.sh $bat-prod-staging-courses-api-app:$APP_CREDENTIALS_STAGING_PWD
     bat-staging-manage-courses-api-app"
   on: staging
 - provider: script
-  script: "./travis-deploy-ucas-importer.sh govuk-dfe-bat-deployment-user:$AZURE_WA_PASSWORD
+  script: "./travis-deploy-ucas-importer.sh $bat-prod-manage-courses-api-app:$APP_CREDENTIALS_PROD_PWD
     bat-prod-manage-courses-api-app"
   on: production
 - provider: script
