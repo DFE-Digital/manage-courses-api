@@ -46,28 +46,22 @@ deploy:
   script: "./deploy.sh prod"
   on: production
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh $bat-dev-manage-courses-api-app:$APP_CREDENTIALS_DEV_PWD
-    bat-dev-manage-courses-api-app"
+  script: "./travis-deploy-sc-exporter.sh dev"
   on: master
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh $bat-staging-manage-courses-api-app:$APP_CREDENTIALS_STAGING_PWD
-    bat-staging-manage-courses-api-app"
+  script: "./travis-deploy-sc-exporter.sh staging"
   on: staging
 - provider: script
-  script: "./travis-deploy-sc-exporter.sh $bat-prod-manage-courses-api-app:$APP_CREDENTIALS_PROD_PWD
-    bat-prod-manage-courses-api-app"
+  script: "./travis-deploy-sc-exporter.sh prod"
   on: production
 - provider: script
-  script: "./travis-deploy-ucas-importer.sh $bat-dev-manage-courses-api-app:$APP_CREDENTIALS_DEV_PWD
-    bat-dev-manage-courses-api-app"
+  script: "./travis-deploy-ucas-importer.sh dev"
   on: master
 - provider: script
-  script: "./travis-deploy-ucas-importer.sh $bat-prod-staging-courses-api-app:$APP_CREDENTIALS_STAGING_PWD
-    bat-staging-manage-courses-api-app"
+  script: "./travis-deploy-ucas-importer.sh staging"
   on: staging
 - provider: script
-  script: "./travis-deploy-ucas-importer.sh $bat-prod-manage-courses-api-app:$APP_CREDENTIALS_PROD_PWD
-    bat-prod-manage-courses-api-app"
+  script: "./travis-deploy-ucas-importer.sh prod"
   on: production
 - provider: script
   skip_cleanup: true
