@@ -39,13 +39,13 @@ script:
 - "./travis-build.sh --quiet verify"
 deploy:
 - provider: script
-  script: bash deploy.sh dev
+  script: "./deploy.sh dev"
   on: master
 - provider: script
-  script: bash deploy.sh staging
+  script: "./deploy.sh staging"
   on: staging
 - provider: script
-  script: bash deploy.sh prod
+  script: "./deploy.sh prod"
   on: production
 - provider: script
   script: "./travis-deploy-sc-exporter.sh $bat-dev-manage-courses-api-app:$APP_CREDENTIALS_DEV_PWD
