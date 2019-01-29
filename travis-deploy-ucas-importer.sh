@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Deploying sc-exporter..."
+echo "Deploying ucas-importer..."
 
 # script for deploying webjobs to any environment, choosing the matching deploy password environment variable
 
