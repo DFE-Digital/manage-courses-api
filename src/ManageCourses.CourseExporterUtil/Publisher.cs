@@ -79,7 +79,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var courses = context.Courses.Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingProvider)
-                .Include(x => x.CourseSites).ThenInclude(x => x.Site)                
+                .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 
             foreach(var course in courses)
@@ -96,7 +96,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.UpdatedByUser)
                 .Where(x => x.Status == EnumStatus.Published)
                 .ToLookup(x => x.ProviderCode + "_@@_" + x.UcasCourseCode)
-                .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedTimestampUtc).First());
+                .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedAt).First());
             _logger.Information($" - {courseEnrichments.Count()} courseEnrichments");
 
             var orgEnrichments = context.ProviderEnrichments

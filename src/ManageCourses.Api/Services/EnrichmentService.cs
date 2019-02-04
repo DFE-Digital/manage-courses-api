@@ -142,7 +142,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             providerCode = providerCode.ToUpperInvariant();
 
             var enrichments = _context.CourseEnrichments.FromSql(@"
-SELECT b.id, b.created_by_user_id, b.created_timestamp_utc, b.provider_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_timestamp_utc
+SELECT b.id, b.created_by_user_id, b.created_at, b.provider_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_at
 FROM (SELECT provider_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY provider_code, ucas_course_code) top_id
 INNER JOIN course_enrichment b on top_id.id = b.id")
                 .Where(e => e.ProviderCode == providerCode);
@@ -178,7 +178,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             if (enrichmentDraftRecord != null)
             {
                 //update
-                enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
                 enrichmentDraftRecord.UpdatedByUser = userOrg.User;
                 enrichmentDraftRecord.JsonData = content;
             }
@@ -199,8 +199,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                 {
                     ProviderCode = userOrg.UcasProviderCode,
                     UcasCourseCode = ucasCourseCode,
-                    CreatedTimestampUtc = DateTime.UtcNow,
-                    UpdatedTimestampUtc = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
                     LastPublishedTimestampUtc = lastPublishedDate,
                     CreatedByUser = userOrg.User,
                     UpdatedByUser = userOrg.User,
@@ -233,7 +233,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             if (enrichmentDraftRecord != null)
             {
-                enrichmentDraftRecord.UpdatedTimestampUtc = DateTime.UtcNow;
+                enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
                 enrichmentDraftRecord.UpdatedByUser = userOrg.User;
                 enrichmentDraftRecord.LastPublishedTimestampUtc = DateTime.UtcNow;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
