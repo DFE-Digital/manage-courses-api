@@ -50,8 +50,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         [NotMapped]
         public IEnumerable<Site> Sites { get => CourseSites != null && CourseSites.Any() ? CourseSites.Select(x => x.Site) : null; }
-        [NotMapped]
 
+        [NotMapped]
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
 
         public ICollection<CourseSubject> CourseSubjects { get; set; }
