@@ -46,6 +46,9 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public DateTime? StartDate { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
         public ICollection<CourseSite> CourseSites { get; set; }
 
         [NotMapped]
