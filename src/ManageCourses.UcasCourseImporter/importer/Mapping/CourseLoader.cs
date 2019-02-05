@@ -29,7 +29,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 
         /// <summary>
         /// Takes the UcasCourse records which are actually de-normalised course-campus info and turns them into
-        /// proper British Courses that have the campus info re-normalised into the .Schools list property.
+        /// actual courses that have the campus info re-normalised into the .Schools list property.
         /// </summary>
         /// <param name="provider">Provider</param>
         /// <param name="courseRecords">UcasCourse records</param>
