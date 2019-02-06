@@ -24,12 +24,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         {
             _context = manageCoursesDbContext;
             _logger = logger;
-            if (clock == null)
-            {
-                clock = new Clock();
-            }
+            _clock = clock ?? new Clock();
             this.payload = payload;
-            _clock = clock;
         }
 
         /// <summary>
@@ -69,7 +65,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 allProviders[savedProvider.ProviderCode] = savedProvider;
             });
 
-            var courseLoader = new CourseLoader(allProviders, allSubjects, pgdeCourses);
+            var courseLoader = new CourseLoader(allProviders, allSubjects, pgdeCourses, _clock);
 
 
             MigratePerProvider("drop-and-create sites and courses", ucasInst =>
