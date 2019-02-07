@@ -21,6 +21,7 @@ namespace GovUk.Education.ManageCourses.Xls.Domain
             Url = inst.Url;
             YearCode = inst.YearCode;
             Scitt = inst.Scitt;
+            AccreditingProvider = inst.AccreditingProvider;
             SchemeMember = inst.SchemeMember;
         }
 
