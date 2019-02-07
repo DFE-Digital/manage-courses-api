@@ -204,7 +204,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 ProviderType = x.InstType,
                 YearCode = x.YearCode,
                 Scitt = x.Scitt,
-                SchemeMember = x.SchemeMember
+                SchemeMember = x.SchemeMember,
+                AccreditingProvider = x.AccreditingProvider,
             };
         }
 
