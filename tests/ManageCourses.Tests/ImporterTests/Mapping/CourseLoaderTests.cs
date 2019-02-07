@@ -1,8 +1,10 @@
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.ManageCourses.Domain;
 using GovUk.Education.ManageCourses.UcasCourseImporter.Mapping;
 using GovUk.Education.ManageCourses.Xls.Domain;
+using Moq;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,18 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
     [TestFixture]
     public class CourseLoaderTests
     {
+        protected Mock<IClock> MockClock;
+        protected DateTime MockTime;
+
+        [SetUp]
+        public void SetUp()
+        {
+            MockClock = new Mock<IClock>();
+            MockClock.SetupGet(c => c.UtcNow).Returns(() => MockTime);
+            // reset clock to something unlikely to pass by coincidence
+            MockTime = new DateTime(1967, 1, 2, 3, 4, 5, 7);
+        }
+
         [Test]
         public void LoadCourseTest()
         {
@@ -26,7 +40,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             };
             var subjects = new Dictionary<string, Subject>();
             var pgdeCourses = new List<PgdeCourse>();
-            var courseLoader = new CourseLoader(providers, subjects, pgdeCourses);
+            var courseLoader = new CourseLoader(providers, subjects, pgdeCourses, MockClock.Object);
 
             var courseRecords = new List<UcasCourse>
             {
@@ -58,10 +72,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             res.StartDate.Should().Be(new DateTime(2019, 9, 1));
         }
 
-        private static CourseLoader GetCourseLoader(List<Provider> providers = null)
+        private CourseLoader GetCourseLoader(List<Provider> providers = null)
         {
             var p = (providers ?? new List<Provider>()).ToDictionary(x => x.ProviderCode ?? "");
-            return new CourseLoader(p, new Dictionary<string, Subject>(), new List<PgdeCourse>());
+            return new CourseLoader(p, new Dictionary<string, Subject>(), new List<PgdeCourse>(), MockClock.Object);
         }
 
         [Test]
@@ -70,6 +84,23 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             var res = LoadCourse(GetBlankUcasCourse());
 
             res.StartDate.Should().BeNull();
+        }
+
+        [Test]
+        public void SetsTimestamps()
+        {
+            // arrange
+            var courseRecords = new List<UcasCourse> { GetBlankUcasCourse() };
+
+            // act
+            var manageApiCourse = GetCourseLoader().LoadCourses(new Provider(), courseRecords, new List<UcasCourseSubject>(), new List<Site> { new Site() }).Single();
+
+            // assert
+            manageApiCourse.CreatedAt.Should().Be(MockTime);
+            manageApiCourse.UpdatedAt.Should().Be(MockTime);
+
+            // We aren't testing UpdatedAt being changed for modifications because
+            // the importer always drops and re-creates all courses.
         }
 
         [Test]
@@ -83,8 +114,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             // act
             var courseRecords = new List<UcasCourse> { blankUcasCourse };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            var foo = new List<Subject>();
-            var manageApiCourse = GetCourseLoader().LoadCourses(new Provider(), courseRecords, new List<UcasCourseSubject>(), new List<Site>{new Site()}).Single();
+            var manageApiCourse = GetCourseLoader().LoadCourses(new Provider(), courseRecords, new List<UcasCourseSubject>(), new List<Site> { new Site() }).Single();
 
             // assert
             manageApiCourse.HasVacancies.Should().Be(false, "because there is only one course and it has no vacancies");
@@ -102,8 +132,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             // act
             var courseRecords = new List<UcasCourse> { ucasCourseWithoutVacancy, ucasCourseWithVacancy };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            var foo = new List<Subject>();
-            var manageApiCourse = GetCourseLoader().LoadCourses(new Provider(), courseRecords, new List<UcasCourseSubject>(), new List<Site>{new Site()}).Single();
+            var manageApiCourse = GetCourseLoader().LoadCourses(new Provider(), courseRecords, new List<UcasCourseSubject>(), new List<Site> { new Site() }).Single();
 
             // assert
             manageApiCourse.HasVacancies.Should().Be(true, "because there's one full time course");
@@ -120,8 +149,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             // act
             var courseRecords = new List<UcasCourse> { blankUcasCourse };
             var enrichmentMetadata = new List<UcasCourseEnrichmentGetModel>();
-            var foo = new List<Subject>();
-            var manageApiCourse = GetCourseLoader().LoadCourses(new Provider(), courseRecords, new List<UcasCourseSubject>(), new List<Site>{new Site()}).Single();
+            var manageApiCourse = GetCourseLoader().LoadCourses(new Provider(), courseRecords, new List<UcasCourseSubject>(), new List<Site> { new Site() }).Single();
 
             // assert
             manageApiCourse.Sites.Should().HaveCount(1, "There's one campus");
@@ -155,8 +183,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                 new Site { Provider = provider }
             };
 
-            List<Subject> foo = new List<Subject>();
-            var res = GetCourseLoader(providers).LoadCourses(provider, new List<UcasCourse> { loc1, loc2}, new List<UcasCourseSubject>(), sites).Single();
+            var res = GetCourseLoader(providers).LoadCourses(provider, new List<UcasCourse> { loc1, loc2 }, new List<UcasCourseSubject>(), sites).Single();
 
             res.AccreditingProvider.ProviderCode.Should().Be("RIGHT_ACC");
             res.Provider.ProviderCode.Should().Be("RIGHT_INST");
@@ -176,7 +203,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             res.Provider.ProviderCode.Should().Be("RIGHT_INST");
         }
 
-        private static Course LoadCourse(UcasCourse course)
+        private Course LoadCourse(UcasCourse course)
         {
             Provider provider = new Provider { ProviderCode = course.InstCode };
             var providers = new List<Provider> { provider };
@@ -184,8 +211,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             {
                 providers.Add(new Provider { ProviderCode = course.AccreditingProvider });
             }
-            List<Subject> foo = new List<Subject>();
-            return GetCourseLoader(providers).LoadCourses(provider, new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<Site> { new Site { Provider = provider, Code = course.CampusCode}}).Single();
+            return GetCourseLoader(providers).LoadCourses(provider, new List<UcasCourse> { course }, new List<UcasCourseSubject>(), new List<Site> { new Site { Provider = provider, Code = course.CampusCode } }).Single();
         }
 
         private static UcasCourse GetBlankUcasCourse()

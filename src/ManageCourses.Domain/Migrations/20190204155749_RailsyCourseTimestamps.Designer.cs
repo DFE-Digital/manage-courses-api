@@ -3,15 +3,17 @@ using System;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace GovUk.Education.ManageCourses.Domain.Migrations
 {
     [DbContext(typeof(ManageCoursesDbContext))]
-    partial class ManageCoursesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190204155749_RailsyCourseTimestamps")]
+    partial class RailsyCourseTimestamps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -74,9 +76,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                     b.Property<string>("CourseCode")
                         .HasColumnName("course_code");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnName("created_at");
-
                     b.Property<int?>("English")
                         .HasColumnName("english");
 
@@ -109,9 +108,6 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
 
                     b.Property<string>("StudyMode")
                         .HasColumnName("study_mode");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnName("updated_at");
 
                     b.HasKey("Id");
 

@@ -46,12 +46,15 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public DateTime? StartDate { get; set; }
 
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
         public ICollection<CourseSite> CourseSites { get; set; }
 
         [NotMapped]
         public IEnumerable<Site> Sites { get => CourseSites != null && CourseSites.Any() ? CourseSites.Select(x => x.Site) : null; }
-        [NotMapped]
 
+        [NotMapped]
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
 
         public ICollection<CourseSubject> CourseSubjects { get; set; }

@@ -5,6 +5,7 @@ using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
+using GovUk.Education.ManageCourses.Domain;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Xls.Domain;
@@ -19,17 +20,19 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
         private Dictionary<string, Provider> allProviders;
         private readonly List<string> pgdeCourses;
         private readonly Dictionary<string, Subject> allSubjects;
+        private readonly IClock _clock;
 
-        public CourseLoader(Dictionary<string, Provider> allProviders, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses)
+        public CourseLoader(Dictionary<string, Provider> allProviders, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses, IClock clock)
         {
             this.allProviders = allProviders;
             this.pgdeCourses = pgdeCourses.Select(x => x.ProviderCode + "_@@_" + x.CourseCode).ToList();
             this.allSubjects = allSubjects;
+            _clock = clock;
         }
 
         /// <summary>
         /// Takes the UcasCourse records which are actually de-normalised course-campus info and turns them into
-        /// proper British Courses that have the campus info re-normalised into the .Schools list property.
+        /// actual courses that have the campus info re-normalised into the .Schools list property.
         /// </summary>
         /// <param name="provider">Provider</param>
         /// <param name="courseRecords">UcasCourse records</param>
@@ -99,6 +102,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
                 returnCourse.Maths = organisationCourseRecord.Maths;
                 returnCourse.Science = organisationCourseRecord.Science;
                 returnCourse.StartDate = DateTime.TryParse($"{organisationCourseRecord.StartYear} {organisationCourseRecord.StartMonth}", out DateTime startDate) ? (DateTime?) startDate : null;
+                returnCourse.CreatedAt = _clock.UtcNow;
+                returnCourse.UpdatedAt = _clock.UtcNow;
 
                 returnCourse.CourseSubjects = new Collection<CourseSubject>(courseSubjects.Select(x => new CourseSubject {
                     Subject = allSubjects[x.SubjectCode],
