@@ -51,6 +51,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             var provider = Context.Providers.Single(x => x.ProviderCode == InstCode3);
             provider.CreatedAt.Should().Be(creationTime, InstCode3 + " is a new record");
             provider.UpdatedAt.Should().Be(creationTime);
+            provider.ChangedAt.Should().Be(creationTime);
             foreach (var site in Context.Sites)
             {
                 site.CreatedAt.Should().Be(creationTime);
@@ -68,8 +69,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
 
             // assert
-            Context.Providers.Single(x => x.ProviderCode == InstCode3).CreatedAt.Should().Be(creationTime);
-            Context.Providers.Single(x => x.ProviderCode == InstCode3).UpdatedAt.Should().Be(updateTime);
+            var updatedProvider = Context.Providers.Single(x => x.ProviderCode == InstCode3);
+            updatedProvider.CreatedAt.Should().Be(creationTime);
+            updatedProvider.UpdatedAt.Should().Be(updateTime);
+            updatedProvider.ChangedAt.Should().Be(updateTime);
             foreach (var site in Context.Sites)
             {
                 // not testing creation time because sites are dropped and created every time

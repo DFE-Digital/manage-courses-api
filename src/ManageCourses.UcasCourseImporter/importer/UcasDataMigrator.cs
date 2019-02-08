@@ -221,6 +221,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 _context.Providers.Add(newValues);
                 newValues.CreatedAt = _clock.UtcNow;
                 newValues.UpdatedAt = _clock.UtcNow;
+                newValues.ChangedAt = _clock.UtcNow;
                 return newValues;
             }
             else
@@ -228,6 +229,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 // update
                 entity.UpdateWith(newValues);
                 entity.UpdatedAt = _clock.UtcNow;
+                entity.ChangedAt = _clock.UtcNow;
                 return entity;
             }
         }
