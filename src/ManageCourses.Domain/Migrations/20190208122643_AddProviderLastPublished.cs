@@ -11,6 +11,9 @@ namespace GovUk.Education.ManageCourses.Domain.Migrations
                 name: "last_published_at",
                 table: "provider",
                 nullable: true);
+            migrationBuilder.Sql(@"
+                update provider set last_published_at = now() at time zone 'utc';
+            ");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
