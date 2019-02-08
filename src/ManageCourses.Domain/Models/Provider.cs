@@ -49,6 +49,13 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string SchemeMember { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+
+        /// <summary>
+        /// Modified when this provider would need to be re-exported to the
+        /// "Apply" system. This saves querying across multiple entities.
+        /// </summary>
+        public DateTime ChangedAt { get; set; }
+
         public string AccreditingProvider { get; set; }
 
         public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
