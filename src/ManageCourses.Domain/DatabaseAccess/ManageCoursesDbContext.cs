@@ -43,6 +43,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
             modelBuilder.Entity<Provider>()
                 .HasIndex(ui => ui.ProviderCode)
                 .IsUnique();
+            modelBuilder.Entity<Provider>()
+                .HasIndex(p => p.LastPublishedAt);
 
             modelBuilder.Entity<Subject>()
                 .HasIndex(s => s.SubjectCode)
