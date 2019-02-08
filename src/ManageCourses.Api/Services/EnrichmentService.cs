@@ -122,15 +122,18 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
+            var provider = _context.Providers.Single(p => p.ProviderCode == providerCode);
+            var publishTimestamp = DateTime.UtcNow;
+            provider.LastPublishedAt = publishTimestamp;
             if (enrichmentDraftRecord != null)
             {
                 enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
                 enrichmentDraftRecord.UpdatedByUser = userOrg.User;
-                enrichmentDraftRecord.LastPublishedAt = DateTime.UtcNow;
+                enrichmentDraftRecord.LastPublishedAt = publishTimestamp;
                 enrichmentDraftRecord.Status = EnumStatus.Published;
-                _context.Save();
                 returnBool = true;
             }
+            _context.Save();
 
             return returnBool;
         }

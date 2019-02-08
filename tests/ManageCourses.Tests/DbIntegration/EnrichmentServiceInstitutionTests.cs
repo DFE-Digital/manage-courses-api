@@ -163,6 +163,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
             publishRecord.EnrichmentModel.RegionCode.Should().Be(RegionCode);
+            var publishedProvider = Context.Providers.Single(p => p.ProviderCode == ProviderInstCode);
+            publishedProvider.LastPublishedAt.Should().BeCloseTo(publishRecord.UpdatedTimestampUtc.Value, 5000);
+
             //test save again after publish
 
             var afterPublishedModel = new UcasProviderEnrichmentPostModel
