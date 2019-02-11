@@ -33,30 +33,12 @@ steps:
     arguments: '--configuration $(buildConfiguration)  --no-restore'
 
 - task: DotNetCoreCLI@2
-  displayName: Execute Tests
+  displayName: Execute Unit Tests
   inputs:
     command: test
     projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration)'
-  enabled: false
-
-- task: DotNetCoreCLI@2
-  displayName: Execute Integration Tests
-  inputs:
-    command: test
-    projects: 'tests/**/*.Tests.csproj'
-    arguments: '--configuration $(buildConfiguration) --filter TestCategory="Integration"'
-  enabled: false
-
-
-- task: DotNetCoreCLI@2
-  displayName: Execute Smoke Tests
-  inputs:
-    command: test
-    projects: 'tests/**/*.Tests.csproj'
-    arguments: '--configuration $(buildConfiguration) --filter TestCategory="Smoke"'
-  enabled: false
-
+  enabled: true
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish API'
