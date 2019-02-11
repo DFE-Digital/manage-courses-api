@@ -14,6 +14,18 @@
                 "description": "The name of the app service plan."
             }
         },
+        "workerAppServiceName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the app service used for job."
+            }
+        },
+        "workerAppServicePlanName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the app service plan used for job."
+            }
+        },
         "databaseName": {
             "type": "string",
             "metadata": {
@@ -23,7 +35,7 @@
         "databaseServerName": {
             "type": "string",
             "metadata": {
-                "description": "The fqdn of the psql server hosting the database."
+                "description": "The name of the psql server hosting the database."
             }
         },
         "databasePort": {
@@ -39,7 +51,7 @@
             }
         },
         "databasePassword": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "The password used to connect to the database."
             }
@@ -57,7 +69,7 @@
             }
         },
         "manageAPIKey": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "The api key for the manage courses api."
             }
@@ -94,7 +106,7 @@
             }
         },
         "govNotifyApiKey": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Gov Notify api key."
             }
@@ -124,13 +136,13 @@
             }
         },
         "searchAndCompareAPIKey": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Search and Compare API key."
             }
         },
         "searchAndCompareAPIUrl": {
-            "type": "string",
+            "type": "securestring",
             "metadata": {
                 "description": "Search and Compare API Url."
             }
@@ -233,6 +245,26 @@
             }
         },
         {
+            "name": "worker-app-service-plan",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('templateBaseUrl'), 'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServicePlanName": {
+                        "value": "[parameters('workerAppServicePlanName')]"
+                    },
+                    "appServicePlanOS": {
+                        "value": "Windows"
+                    }
+                }
+            }
+        },
+        {
             "name": "app-service",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
@@ -307,10 +339,6 @@
                                 "value": "[parameters('manageAPIUrl')]"
                             },
                             {
-                                "name": "manage_api_url",
-                                "value": "[parameters('manageAPIUrl')]"
-                            },
-                            {
                                 "name": "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST",
                                 "value": "[reference('postgresql-server').outputs.fullyQualifiedDomainName.value]"
                             },
@@ -351,6 +379,138 @@
             ]
         },
         {
+            "name": "worker-app-service",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('templateBaseUrl'), 'app-service-windows.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServiceName": {
+                        "value": "[parameters('workerAppServiceName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[parameters('workerAppServicePlanName')]"
+                    },
+                    "appServiceAppSettings": {
+                        "value": [
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference('worker-app-insights').outputs.instrumentationKey.value]"
+                            },
+                            {
+                                "name": "api__key",
+                                "value": "[parameters('manageAPIKey')]"
+                            },
+                            {
+                                "name": "ASPNETCORE_ENVIRONMENT",
+                                "value": "[parameters('aspNetCoreEnvironment')]"
+                            },
+                            {
+                                "name": "auth__oidc__userinfo_endpoint",
+                                "value": "[parameters('signinOidcUserInfoEndpoint')]"
+                            },
+                            {
+                                "name": "azure_signature",
+                                "value": "[parameters('ucasStorageAccountSharedAccessSignature')]"
+                            },
+                            {
+                                "name": "azure_url",
+                                "value": "[parameters('ucasStorageAccountUrl')]"
+                            },
+                            {
+                                "name": "email__api_key",
+                                "value": "[parameters('govNotifyApiKey')]"
+                            },
+                            {
+                                "name": "email__template_id",
+                                "value": "[parameters('govNotifyEmailTemplateId')]"
+                            },
+                            {
+                                "name": "email__user",
+                                "value": "[parameters('govNotifyEmailUser')]"
+                            },
+                            {
+                                "name": "manage_api_key",
+                                "value": "[parameters('manageAPIKey')]"
+                            },
+                            {
+                                "name": "manage_api_url",
+                                "value": "[parameters('manageAPIUrl')]"
+                            },
+                            {
+                                "name": "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST",
+                                "value": "[reference('postgresql-server').outputs.fullyQualifiedDomainName.value]"
+                            },
+                            {
+                                "name": "PG_DATABASE",
+                                "value": "[parameters('databaseName')]"
+                            },
+                            {
+                                "name": "PG_PASSWORD",
+                                "value": "[parameters('databasePassword')]"
+                            },
+                            {
+                                "name": "PG_USERNAME",
+                                "value": "[parameters('databaseUsername')]"
+                            },
+                            {
+                                "name": "snc__api__key",
+                                "value": "[parameters('searchAndCompareAPIKey')]"
+                            },
+                            {
+                                "name": "snc__api__url",
+                                "value": "[parameters('searchAndCompareAPIUrl')]"
+                            }
+                        ]
+                    },
+                    "appServiceConnectionStrings": {
+                        "value": [
+                            {
+                                "name": "AzureWebJobsDashboard",
+                                "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',reference(parameters('storageAccountName')).outputs.storageKey.value)]",
+                                "type": "Custom"
+                            },
+                            {
+                                "name": "AzureWebJobsStorage",
+                                "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',reference(parameters('storageAccountName')).outputs.storageKey.value)]",
+                                "type": "Custom"
+                            }
+                        ]
+                    },
+                    "appServiceVirtualApplications": {
+                        "value": [
+                            {
+                                "virtualPath": "/",
+                                "physicalPath": "site\\wwwroot"
+                            },
+                            {
+                                "virtualPath": "/ManageCourses.CourseExporterUtil",
+                                "physicalPath": "site\\wwwroot\\app_data\\jobs\\timed\\ManageCourses.CourseExporterUtil"
+                            },
+                            {
+                                "virtualPath": "/ManageCourses.UcasCourseImporter",
+                                "physicalPath": "site\\wwwroot\\app_data\\jobs\\timed\\ManageCourses.UcasCourseImporter"
+                            }
+                        ]
+                    },
+                    "deployStagingSlot": {
+                        "value": false
+                    }
+                }
+            },
+            "dependsOn": [
+                "storage-account",
+                "app-service-plan"
+            ]
+        },
+        {
             "apiVersion": "2017-05-10",
             "name": "app-insights",
             "type": "Microsoft.Resources/deployments",
@@ -366,6 +526,26 @@
                     },
                     "attachedService": {
                         "value": "[parameters('appServiceName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "worker-app-insights",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('templateBaseUrl'), 'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[parameters('workerAppServiceName')]"
+                    },
+                    "attachedService": {
+                        "value": "[parameters('workerAppServiceName')]"
                     }
                 }
             }
