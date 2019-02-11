@@ -474,12 +474,12 @@
                         "value": [
                             {
                                 "name": "AzureWebJobsDashboard",
-                                "connectionString": "[reference(parameters('storageAccountName')).outputs.storageConnectionString.value]",
+                                "connectionString": "[reference('storage-account').outputs.storageConnectionString.value]",
                                 "type": "Custom"
                             },
                             {
                                 "name": "AzureWebJobsStorage",
-                                "connectionString": "[reference(parameters('storageAccountName')).outputs.storageConnectionString.value]",
+                                "connectionString": "[reference('storage-account').outputs.storageConnectionString.value]",
                                 "type": "Custom"
                             }
                         ]
