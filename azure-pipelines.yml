@@ -57,7 +57,7 @@ steps:
   displayName: 'Publish API'
   inputs:
     command: publish
-    publishWebProjects: true
+    publishWebProjects: false
     projects: 'src/ManageCourses.Api/ManageCourses.Api.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
 
