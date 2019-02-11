@@ -507,7 +507,7 @@
             },
             "dependsOn": [
                 "storage-account",
-                "app-service-plan"
+                "worker-app-service-plan"
             ]
         },
         {
