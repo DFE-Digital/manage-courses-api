@@ -474,12 +474,12 @@
                         "value": [
                             {
                                 "name": "AzureWebJobsDashboard",
-                                "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',reference(parameters('storageAccountName')).outputs.storageKey.value)]",
+                                "connectionString": "[reference(parameters('storageAccountName')).outputs.storageConnectionString.value]",
                                 "type": "Custom"
                             },
                             {
                                 "name": "AzureWebJobsStorage",
-                                "connectionString": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storageAccountName'),';AccountKey=',reference(parameters('storageAccountName')).outputs.storageKey.value)]",
+                                "connectionString": "[reference(parameters('storageAccountName')).outputs.storageConnectionString.value]",
                                 "type": "Custom"
                             }
                         ]
