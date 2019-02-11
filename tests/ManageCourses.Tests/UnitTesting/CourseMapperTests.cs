@@ -13,6 +13,7 @@ using Provider = GovUk.Education.ManageCourses.Domain.Models.Provider;
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
+    [Category("Unit")]
     public class CourseMapperTests
     {
         private ICourseMapper mapper = new CourseMapper();
