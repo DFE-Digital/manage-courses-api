@@ -49,6 +49,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string SchemeMember { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public DateTime? LastPublishedAt { get; set; }
         public string AccreditingProvider { get; set; }
 
         public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
