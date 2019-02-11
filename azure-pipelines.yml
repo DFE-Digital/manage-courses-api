@@ -38,7 +38,7 @@ steps:
     command: test
     projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration)'
-  enabled: true
+  enabled: false
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish API'
