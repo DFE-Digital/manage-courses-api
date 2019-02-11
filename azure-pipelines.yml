@@ -1,0 +1,91 @@
+trigger:
+  batch: true
+  branches:
+    include:
+      - vsts_build_and_deploy
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+variables:
+  buildConfiguration: 'release'
+  buildPlatform: 'anycpu'
+
+steps:
+- script: |
+    GIT_SHORT_SHA=$(echo $(Build.SourceVersion) | cut -c 1-7)
+    tag=$(dockerHubUsername)/$(imageName):$GIT_SHORT_SHA
+    echo "##vso[build.updatebuildnumber]$GIT_SHORT_SHA"
+    echo "##vso[task.setvariable variable=tag;]$tag"
+  displayName: 'Set version number'
+
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: 'src/**/*.csproj'
+    noCache: true
+
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    projects: 'src/**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)  --no-restore'
+    
+- task: DotNetCoreCLI@2
+  displayName: Execute Tests
+  inputs:
+    command: test
+    projects: 'test/**/*.Tests.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: Execute Tests
+  inputs:
+    command: test
+    projects: 'test/**/*.Tests.csproj'
+    arguments: '--configuration $(buildConfiguration) --filter TestCategory="Integration"'
+
+- task: DotNetCoreCLI@2
+  displayName: Execute Tests
+  inputs:
+    command: test
+    projects: 'test/**/*.Tests.csproj'
+    arguments: '--configuration $(buildConfiguration) --filter TestCategory="Smoike"'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish API'
+  inputs:
+    command: publish
+    publishWebProjects: true
+    projects: 'src/ManageCourses.Api/ManageCourses.Api.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Course Exporter Utility'
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: 'src/ManageCourses.CourseExporterUtil/ManageCourses.CourseExporterUtil.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Course UCAS Importer'
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: 'src/ManageCourses.UcasCourseImporter/importer/UcasCourseImporter.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
+
+- task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
+  inputs:
+    Contents: |
+     azure/**
+    TargetFolder: '$(build.artifactstagingdirectory)/publish'
+    OverWrite: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)/publish'
