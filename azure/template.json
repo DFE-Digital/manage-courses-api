@@ -458,7 +458,7 @@
                             },
                             {
                                 "name": "PG_USERNAME",
-                                "value": "[parameters('databaseUsername')]"
+                                "value": "[concat(parameters('databaseUsername'), '@', parameters('databaseServerName'))]"
                             },
                             {
                                 "name": "snc__api__key",
