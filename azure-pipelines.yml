@@ -38,20 +38,25 @@ steps:
     command: test
     projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration)'
+  enabled: false
 
 - task: DotNetCoreCLI@2
-  displayName: Execute Tests
+  displayName: Execute Integration Tests
   inputs:
     command: test
     projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration) --filter TestCategory="Integration"'
+  enabled: false
+
 
 - task: DotNetCoreCLI@2
-  displayName: Execute Tests
+  displayName: Execute Smoke Tests
   inputs:
     command: test
     projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration) --filter TestCategory="Smoke"'
+  enabled: false
+
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish API'
