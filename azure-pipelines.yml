@@ -36,21 +36,21 @@ steps:
   displayName: Execute Tests
   inputs:
     command: test
-    projects: 'test/**/*.Tests.csproj'
+    projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: Execute Tests
   inputs:
     command: test
-    projects: 'test/**/*.Tests.csproj'
+    projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration) --filter TestCategory="Integration"'
 
 - task: DotNetCoreCLI@2
   displayName: Execute Tests
   inputs:
     command: test
-    projects: 'test/**/*.Tests.csproj'
+    projects: 'tests/**/*.Tests.csproj'
     arguments: '--configuration $(buildConfiguration) --filter TestCategory="Smoke"'
 
 - task: DotNetCoreCLI@2
