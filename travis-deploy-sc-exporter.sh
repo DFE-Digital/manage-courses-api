@@ -22,7 +22,7 @@ echo "running dotnet publish..."
 dotnet publish src/ManageCourses.CourseExporterUtil --configuration Release
 
 echo "creating zip..."
-zip $deployZip -qr src/ManageCourses.CourseExporterUtil/bin/Release/netcoreapp2.1/publish
+zip $deployZip -qr src/ManageCourses.CourseExporterUtil/bin/Release/netcoreapp2.2/publish
 
 echo "uploading to azure WebJob..."
 curl -X PUT -u "\$bat-$env-manage-courses-api-app:$password" --data-binary @$deployZip --header "Content-Type: application/zip" --header "Content-Disposition: attachment; filename=$deployZip" "https://bat-$env-manage-courses-api-app.scm.azurewebsites.net/api/triggeredwebjobs/sc-exporter/"

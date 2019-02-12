@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTargets="Build">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>GovUk.Education.ManageCourses.Tests</RootNamespace>
     <UserSecretsId>manage-courses-api-tests</UserSecretsId>
     <NoWarn>1591</NoWarn>

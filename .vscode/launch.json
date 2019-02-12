@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/ManageCourses.Api/bin/Debug/netcoreapp2.1/ManageCourses.Api.dll",
+            "program": "${workspaceFolder}/src/ManageCourses.Api/bin/Debug/netcoreapp2.2/ManageCourses.Api.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/ManageCourses.Api",
             "stopAtEntry": false,
@@ -43,7 +43,7 @@
             "request": "launch",
             "preLaunchTask": "build-importer",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/ManageCourses.UcasCourseImporter/importer/bin/Debug/netcoreapp2.1/UcasCourseImporter.dll",
+            "program": "${workspaceFolder}/src/ManageCourses.UcasCourseImporter/importer/bin/Debug/netcoreapp2.2/UcasCourseImporter.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/ManageCourses.UcasCourseImporter/importer",
             "stopAtEntry": false,
