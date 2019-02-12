@@ -356,7 +356,7 @@
                             },
                             {
                                 "name": "PG_USERNAME",
-                                "value": "[parameters('databaseUsername')]"
+                                "value": "[concat(parameters('databaseUsername'), '@', parameters('databaseServerName'))]"
                             },
                             {
                                 "name": "POSTGRESQL_SERVICE_PORT",
