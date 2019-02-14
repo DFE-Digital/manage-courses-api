@@ -71,6 +71,7 @@ steps:
      azure/**
      src/**
      tests/**
+     nuget.config
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
 
