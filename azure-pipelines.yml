@@ -21,7 +21,7 @@ steps:
   displayName: Restore
   inputs:
     command: restore
-    projects: 'src/**/*.csproj'
+    projects: '**/**/*.csproj'
     noCache: true
     feedsToUse: config
     nugetConfigPath: nuget.config
