@@ -33,6 +33,12 @@ steps:
     arguments: '--configuration $(buildConfiguration)  --no-restore'
 
 - task: DotNetCoreCLI@2
+  displayName: Build Tests
+  inputs:
+    projects: 'tests/**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)  --no-restore'
+
+- task: DotNetCoreCLI@2
   displayName: Execute Unit Tests
   inputs:
     command: test
@@ -70,7 +76,7 @@ steps:
     Contents: |
      azure/**
      src/**
-     tests/**
+     tests/**/bin/Release/netcoreapp2.1/*.dll
      nuget.config
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
