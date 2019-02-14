@@ -69,6 +69,7 @@ steps:
   inputs:
     Contents: |
      azure/**
+     tests/**
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
 
