@@ -76,7 +76,7 @@ steps:
     Contents: |
      azure/**
      src/**
-     tests/ManageCourses.Tests/bin/release/netcoreapp2.1/ManageCourses.Tests.dll
+     tests/ManageCourses.Tests/bin/release/netcoreapp2.1/*.*
      nuget.config
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
