@@ -70,13 +70,21 @@ steps:
     projects: 'src/ManageCourses.UcasCourseImporter/importer/UcasCourseImporter.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
 
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Integration Tests'
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: 'tests/ManageCourses.Tests/ManageCourses.Tests.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore --no-build'
+
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
     Contents: |
      azure/**
      src/**
-     tests/ManageCourses.Tests/bin/release/netcoreapp2.1/*.*
+     tests/ManageCourses.Tests/bin/release/netcoreapp2.1/publish/*.*
      nuget.config
     TargetFolder: '$(build.artifactstagingdirectory)/publish'
     OverWrite: true
