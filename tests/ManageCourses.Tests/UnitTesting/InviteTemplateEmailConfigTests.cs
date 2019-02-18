@@ -7,7 +7,6 @@ using NUnit.Framework;
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
-    [Category("Unit")]
     public class InviteTemplateEmailConfigTests
     {
         private readonly string _configId = "email:invite_template_id";

@@ -14,7 +14,6 @@ using NUnit.Framework;
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
-    [Category("Unit")]
     public class SubjectMapperTests
     {
         [TestCase("",                       "primary, english", "Primary, Primary with English")] // an example of a primary specialisation

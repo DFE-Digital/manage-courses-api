@@ -9,7 +9,6 @@ using NUnit.Framework;
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
-    [Category("Unit")]
     public class WelcomeEmailServiceTests
     {
         private IWelcomeEmailService _service;
