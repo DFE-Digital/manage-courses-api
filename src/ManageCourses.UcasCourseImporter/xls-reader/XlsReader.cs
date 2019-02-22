@@ -236,7 +236,7 @@ namespace GovUk.Education.ManageCourses.Xls
                     var ucasCampus = new UcasCampus
                     {
                         InstCode = row.GetCell(columnMap["INST_CODE"]).StringCellValue.Trim(),
-                        CampusCode = row.GetCell(columnMap["CAMPUS_CODE"]).StringCellValue.Replace(" ", "-").Trim(),
+                        CampusCode = row.GetCell(columnMap["CAMPUS_CODE"]).StringCellValue.Trim(),
                         CampusName = row.GetCell(columnMap["CAMPUS_NAME"]).StringCellValue.Trim(),
                         Addr1 = row.GetCell(columnMap["ADDR_1"]).StringCellValue.Trim(),
                         Addr2 = row.GetCell(columnMap["ADDR_2"]).StringCellValue.Trim(),
