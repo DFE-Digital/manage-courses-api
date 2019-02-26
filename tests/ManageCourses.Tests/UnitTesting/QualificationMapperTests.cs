@@ -8,7 +8,6 @@ using NUnit.Framework;
 
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
-    [TestFixture]
     public class QualificationMapperTests
     {
         private const string ProfpostFlagPg = "PG";
