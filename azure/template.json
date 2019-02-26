@@ -2,40 +2,22 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "appServiceName": {
+        "resourceEnvironmentName": {
             "type": "string",
             "metadata": {
-                "description": "The name of the app service."
+                "description": "The environment of the resource."
             }
         },
-        "appServicePlanName": {
+        "serviceName": {
             "type": "string",
             "metadata": {
-                "description": "The name of the app service plan."
-            }
-        },
-        "workerAppServiceName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the app service used for job."
-            }
-        },
-        "workerAppServicePlanName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the app service plan used for job."
+                "description": "The abbreviation of the service name to be used when naming a resource."
             }
         },
         "databaseName": {
             "type": "string",
             "metadata": {
                 "description": "The name of the database that the app will connect to."
-            }
-        },
-        "databaseServerName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the psql server hosting the database."
             }
         },
         "databasePort": {
@@ -54,12 +36,6 @@
             "type": "securestring",
             "metadata": {
                 "description": "The password used to connect to the database."
-            }
-        },
-        "storageAccountName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the storage account to be used with psql."
             }
         },
         "securityAlertEmail": {
@@ -177,8 +153,15 @@
         }
     },
     "variables": {
-        "templateBaseUrl": "https://raw.githubusercontent.com/DFE-Digital/bat-platform-building-blocks/master/templates/",
-        "keyvaultCertificateName": "[if(greater(length(parameters('certificateName')),0), parameters('certificateName'), replace(parameters('customHostName'), '.', '-'))]"
+        "deploymentUrlBase": "https://raw.githubusercontent.com/DFE-Digital/bat-platform-building-blocks/master/templates/",
+        "keyvaultCertificateName": "[if(greater(length(parameters('certificateName')),0), parameters('certificateName'), replace(parameters('customHostName'), '.', '-'))]",
+        "resourceNamePrefix": "[toLower(concat('bat-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+        "appServiceName": "[concat(variables('resourceNamePrefix'), '-as')]",
+        "workerAppServiceName": "[concat(variables('resourceNamePrefix'), 'wkr-as')]",
+        "appServicePlanName": "[concat(variables('resourceNamePrefix'), '-asp')]",
+        "workerAppServicePlanName": "[concat(variables('resourceNamePrefix'), 'wkr-asp')]",
+        "storageAccountName": "[replace(concat(variables('resourceNamePrefix'), 'str'), '-', '')]",
+        "databaseServerName": "[concat(variables('resourceNamePrefix'), '-psql')]"
     },
     "resources": [
         {
@@ -189,7 +172,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'app-service-certificate.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'app-service-certificate.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -212,12 +195,12 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'storage-account.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'storage-account.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "storageAccountName": {
-                        "value": "[parameters('storageAccountName')]"
+                        "value": "[variables('storageAccountName')]"
                     }
                 }
             }
@@ -229,12 +212,12 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'),'postgresql-server.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'postgresql-server.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "postgresServerName": {
-                        "value": "[parameters('databaseServerName')]"
+                        "value": "[variables('databaseServerName')]"
                     },
                     "postgresAdminLogin": {
                         "value": "[parameters('databaseUsername')]"
@@ -246,7 +229,7 @@
                         "value": "[parameters('securityAlertEmail')]"
                     },
                     "storageAccountName": {
-                        "value": "[parameters('storageAccountName')]"
+                        "value": "[variables('storageAccountName')]"
                     }
                 }
             },
@@ -261,12 +244,12 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'),'postgresql-database.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'postgresql-database.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "serverName": {
-                        "value": "[parameters('databaseServerName')]"
+                        "value": "[variables('databaseServerName')]"
                     },
                     "databaseName": {
                         "value": "[parameters('databaseName')]"
@@ -284,12 +267,12 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'app-service-plan.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'app-service-plan.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "appServicePlanName": {
-                        "value": "[parameters('appServicePlanName')]"
+                        "value": "[variables('appServicePlanName')]"
                     },
                     "appServicePlanOS": {
                         "value": "Windows"
@@ -304,12 +287,12 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'app-service-plan.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'app-service-plan.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "appServicePlanName": {
-                        "value": "[parameters('workerAppServicePlanName')]"
+                        "value": "[variables('workerAppServicePlanName')]"
                     },
                     "appServicePlanOS": {
                         "value": "Windows"
@@ -324,18 +307,18 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'app-service-windows.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'app-service-windows.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[parameters('appServiceName')]"
+                        "value": "[variables('appServiceName')]"
                     },
                     "appServicePlanResourceGroup": {
                         "value": "[resourceGroup().name]"
                     },
                     "appServicePlanName": {
-                        "value": "[parameters('appServicePlanName')]"
+                        "value": "[variables('appServicePlanName')]"
                     },
                     "appServiceAppSettings": {
                         "value": [
@@ -409,7 +392,7 @@
                             },
                             {
                                 "name": "PG_USERNAME",
-                                "value": "[concat(parameters('databaseUsername'), '@', parameters('databaseServerName'))]"
+                                "value": "[concat(parameters('databaseUsername'), '@', variables('databaseServerName'))]"
                             },
                             {
                                 "name": "POSTGRESQL_SERVICE_PORT",
@@ -444,18 +427,18 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'app-service-windows.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'app-service-windows.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "appServiceName": {
-                        "value": "[parameters('workerAppServiceName')]"
+                        "value": "[variables('workerAppServiceName')]"
                     },
                     "appServicePlanResourceGroup": {
                         "value": "[resourceGroup().name]"
                     },
                     "appServicePlanName": {
-                        "value": "[parameters('workerAppServicePlanName')]"
+                        "value": "[variables('workerAppServicePlanName')]"
                     },
                     "appServiceAppSettings": {
                         "value": [
@@ -517,7 +500,7 @@
                             },
                             {
                                 "name": "PG_USERNAME",
-                                "value": "[concat(parameters('databaseUsername'), '@', parameters('databaseServerName'))]"
+                                "value": "[concat(parameters('databaseUsername'), '@', variables('databaseServerName'))]"
                             },
                             {
                                 "name": "snc__api__key",
@@ -576,15 +559,15 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'application-insights.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'application-insights.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[parameters('appServiceName')]"
+                        "value": "[variables('appServiceName')]"
                     },
                     "attachedService": {
-                        "value": "[parameters('appServiceName')]"
+                        "value": "[variables('appServiceName')]"
                     }
                 }
             }
@@ -596,19 +579,28 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('templateBaseUrl'), 'application-insights.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'), 'application-insights.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
                     "appInsightsName": {
-                        "value": "[parameters('workerAppServiceName')]"
+                        "value": "[variables('workerAppServiceName')]"
                     },
                     "attachedService": {
-                        "value": "[parameters('workerAppServiceName')]"
+                        "value": "[variables('workerAppServiceName')]"
                     }
                 }
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "AppServiceName": {
+            "type": "string",
+            "value": "[variables('appServiceName')]"
+        },
+        "WorkerAppServiceName": {
+            "type": "string",
+            "value": "[variables('workerAppServiceName')]"
+        }
+    }
 }
