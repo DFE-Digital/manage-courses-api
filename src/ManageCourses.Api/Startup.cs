@@ -179,9 +179,9 @@ namespace GovUk.Education.ManageCourses.Api
             {
                 try
                 {
-                    _logger.LogInformation($"Applying EF migrations. Attempt {migrationAttempt} of ∞");
-                    dbContext.Database.Migrate();
-                    _logger.LogInformation($"Applying EF migrations succeeded. Attempt {migrationAttempt} of ∞");
+                    _logger.LogInformation($"Running Database.EnsureCreated. Attempt {migrationAttempt} of ∞");
+                    dbContext.Database.EnsureCreated();
+                    _logger.LogInformation($"Running Database.EnsureCreated succeeded. Attempt {migrationAttempt} of ∞");
                     break; // success!
                 }
                 catch (Exception ex)
