@@ -174,38 +174,7 @@ See: https://github.com/RSuter/NSwag/wiki#ways-to-use-the-toolchain
 
 ## Database Migrations
 
-Watch out for `\` vs `/` in windows / mac / linux. The below are windows-style.
-
-Otherwise you'll get (using windows backslash on linux that expects forwardslash):
-
-    $ dotnet ef --startup-project ..\ManageCourses.Api migrations add wibble
-    MSBUILD : error MSB1009: Project file does not exist.
-    Switch: ..ManageCourses.Api
-    Unable to retrieve project metadata. Ensure it's an MSBuild-based .NET Core project. If you're using custom BaseIntermediateOutputPath or MSBuildProjectExtensionsPath values, Use the --msbuildprojectextensionspath option.
-
-### Add a migration
-
-Make your changes to the model, then from command prompt:
-
-    cd src\ManageCourses.Domain\
-    dotnet ef --startup-project ..\ManageCourses.Api migrations add [migration name]
-
-### Drop the database
-
-    cd src\ManageCourses.Domain\
-    dotnet ef --startup-project ..\ManageCourses.Api database drop
-
-### Run the migrations
-
-    cd src\ManageCourses.Domain\
-    dotnet ef --startup-project ..\ManageCourses.Api database update
-
-If this doesn't work try running the sln in Visual Studio.
-
-### Rollback / down migration
-
-    cd src\ManageCourses.Domain\
-    dotnet ef --startup-project ..\ManageCourses.Api database update [previous migration name]
+These are now managed by the sister project https://github.com/DFE-Digital/manage-courses-backend/
 
 ## Shutting down the service and showing the off line page.
 Rename the file "app_offline.htm.example" in the root folder to "app_offline.htm"
