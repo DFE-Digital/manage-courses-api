@@ -156,6 +156,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             updateResult.EnrichmentModel.TrainWithUs.Should().BeEquivalentTo(trainWithUsUpdatedText);
             updateResult.LastPublishedTimestampUtc.Should().BeNull();
             updateResult.EnrichmentModel.RegionCode.Should().Be(RegionCode);
+
             //publish
             var publishResults = enrichmentService.PublishProviderEnrichment(ProviderInstCode.ToLower(), Email);
             publishResults.Should().BeTrue();
@@ -165,6 +166,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             publishRecord.EnrichmentModel.RegionCode.Should().Be(RegionCode);
             var publishedProvider = Context.Providers.Single(p => p.ProviderCode == ProviderInstCode);
             publishedProvider.LastPublishedAt.Should().BeCloseTo(publishRecord.UpdatedTimestampUtc.Value, 5000);
+            publishedProvider.ChangedAt.Should().BeCloseTo(publishRecord.UpdatedTimestampUtc.Value, 5000);
 
             //test save again after publish
 

@@ -31,7 +31,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context = ContextLoader.GetDbContext(Config, EnableRetryOnFailure);
             TestConfig = new TestConfigReader(Config);
             Context.Database.EnsureDeleted();
-            Context.Database.Migrate();
+            Context.Database.EnsureCreated();
             MockClock = new Mock<IClock>();
             MockClock.SetupGet(c => c.UtcNow).Returns(() => MockTime);
             OneTimeSetup();

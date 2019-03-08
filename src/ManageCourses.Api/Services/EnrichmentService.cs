@@ -125,6 +125,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var provider = _context.Providers.Single(p => p.ProviderCode == providerCode);
             var publishTimestamp = DateTime.UtcNow;
             provider.LastPublishedAt = publishTimestamp;
+            provider.ChangedAt = publishTimestamp; // make sure change shows in incremental fetch api
             if (enrichmentDraftRecord != null)
             {
                 enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
