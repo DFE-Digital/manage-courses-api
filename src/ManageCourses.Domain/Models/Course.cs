@@ -48,6 +48,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public DateTime ChangedAt { get; set; }
 
         public ICollection<CourseSite> CourseSites { get; set; }
 

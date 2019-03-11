@@ -235,6 +235,9 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             var enrichmentDraftRecord = _context.CourseEnrichments
                 .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft).OrderByDescending(x => x.Id).FirstOrDefault();
 
+            var course = _context.Courses.Single(c => c.CourseCode == ucasCourseCode && c.Provider.ProviderCode == providerCode);
+            course.ChangedAt = DateTime.UtcNow; // make sure change shows in incremental fetch api
+
             if (enrichmentDraftRecord != null)
             {
                 enrichmentDraftRecord.UpdatedAt = DateTime.UtcNow;
