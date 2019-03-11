@@ -103,6 +103,9 @@ namespace GovUk.Education.ManageCourses.Xls
                     }
 
                     var row = sheet.GetRow(dataRowIndex);
+                    var accreditingProvider = row.GetCell(columnMap["ACCREDITING_PROVIDER"]).StringCellValue.Trim();
+                    accreditingProvider = string.IsNullOrEmpty(accreditingProvider) ? "N" : accreditingProvider;
+
                     institutions.Add(new UcasInstitution
                     {
                         InstCode = row.GetCell(columnMap["INST_CODE"]).StringCellValue.Trim(),
@@ -119,7 +122,7 @@ namespace GovUk.Education.ManageCourses.Xls
                         YearCode = row.GetCell(columnMap["YEAR_CODE"]).StringCellValue.Trim(),
                         Url = row.GetCell(columnMap["URL"]).StringCellValue.Trim(),
                         Scitt = row.GetCell(columnMap["SCITT"]).StringCellValue.Trim(),
-                        AccreditingProvider = row.GetCell(columnMap["ACCREDITING_PROVIDER"]).StringCellValue.Trim(),
+                        AccreditingProvider = accreditingProvider,
                         SchemeMember = row.GetCell(columnMap["SCHEME_MEMBER"]).StringCellValue.Trim(),
                     }
                     );
