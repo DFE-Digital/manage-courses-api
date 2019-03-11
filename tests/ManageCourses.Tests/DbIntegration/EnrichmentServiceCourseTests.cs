@@ -24,7 +24,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private Provider _ucasInstitution;
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
-        private const string UcasCourseCode = "451F";
+        private const string UcasCourseCode = "TK101";
 
         private const string Email = "12345@example.org";
 
@@ -38,7 +38,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             Context.Add(accreditingInstitution);
 
             const string providerInstCode = "HNY1";
-            const string crseCode = "TK101";
             _ucasInstitution = new Provider
             {
                 ProviderName = "Honey Lane School", // This is a school so has to have a university accredit the courses it offers
@@ -47,7 +46,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 {
                     new Course
                     {
-                        CourseCode = crseCode,
+                        CourseCode = UcasCourseCode,
                         Name = "Conscious control of telekenisis",
                         AccreditingProvider = accreditingInstitution,
                     }
@@ -158,6 +157,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var publishRecord = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), UcasCourseCode, Email);
             publishRecord.Status.Should().BeEquivalentTo(EnumStatus.Published);
             publishRecord.LastPublishedTimestampUtc.Should().NotBeNull();
+            var publishedRecord = Context.Courses.Single(c => c.CourseCode == UcasCourseCode && c.Provider.ProviderCode == ProviderInstCode);
+            publishedRecord.ChangedAt.Should().BeCloseTo(publishRecord.UpdatedTimestampUtc.Value, 5000);
 
             //test save again after publish
             enrichmentService.SaveCourseEnrichment(sourceModel, ProviderInstCode.ToLower(), UcasCourseCode, Email);
@@ -246,7 +247,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             const string aboutCourseText = "About Course Text";
             // Arrange
-            var enrichmentService = new EnrichmentService(Context);            
+            var enrichmentService = new EnrichmentService(Context);
             var dataService = new DataService(Context, enrichmentService, new Mock<ILogger<DataService>>().Object);
             var sourceModel = new CourseEnrichmentModel
             {
