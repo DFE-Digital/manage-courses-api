@@ -57,20 +57,20 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 }
             });
 
-            var allProviders = new Dictionary<string, Provider>();
+            var upsertedProviders = new Dictionary<string, Provider>();
             MigratePerProvider("upsert providers", inst =>
             {
                 var savedProvider = UpsertProvider(ToProvider(inst));
                 _context.Save();
-                allProviders[savedProvider.ProviderCode] = savedProvider;
+                upsertedProviders[savedProvider.ProviderCode] = savedProvider;
             });
 
-            var courseLoader = new CourseLoader(allProviders, allSubjects, pgdeCourses, _clock);
+            var courseLoader = new CourseLoader(upsertedProviders, allSubjects, pgdeCourses, _clock);
 
 
             MigratePerProvider("drop-and-create sites and courses", ucasInst =>
             {
-                var inst = allProviders[ucasInst.InstCode];
+                var inst = upsertedProviders[ucasInst.InstCode];
 
                 DeleteForProvider(inst.ProviderCode);
                 _context.Save();

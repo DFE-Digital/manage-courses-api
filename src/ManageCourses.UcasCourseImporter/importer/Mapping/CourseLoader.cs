@@ -17,14 +17,14 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
     public class CourseLoader
     {
         private readonly QualificationMapper qualificationMapper = new QualificationMapper();
-        private Dictionary<string, Provider> allProviders;
+        private readonly IReadOnlyDictionary<string, Provider> _upsertedProviders;
         private readonly List<string> pgdeCourses;
         private readonly Dictionary<string, Subject> allSubjects;
         private readonly IClock _clock;
 
-        public CourseLoader(Dictionary<string, Provider> allProviders, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses, IClock clock)
+        public CourseLoader(IReadOnlyDictionary<string, Provider> upsertedProviders, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses, IClock clock)
         {
-            this.allProviders = allProviders;
+            this._upsertedProviders = upsertedProviders;
             this.pgdeCourses = pgdeCourses.Select(x => x.ProviderCode + "_@@_" + x.CourseCode).ToList();
             this.allSubjects = allSubjects;
             _clock = clock;
@@ -84,12 +84,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.AccreditingProvider))
                 {
-                    returnCourse.AccreditingProvider = allProviders[organisationCourseRecord.AccreditingProvider];
+                    returnCourse.AccreditingProvider = _upsertedProviders[organisationCourseRecord.AccreditingProvider];
                 }
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.InstCode))
                 {
-                    returnCourse.Provider = allProviders[organisationCourseRecord.InstCode];
+                    returnCourse.Provider = _upsertedProviders[organisationCourseRecord.InstCode];
                 }
                 returnCourse.CourseCode = organisationCourseRecord.CrseCode;
                 returnCourse.AgeRange = organisationCourseRecord.Age;
