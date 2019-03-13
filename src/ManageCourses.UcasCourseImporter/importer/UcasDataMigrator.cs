@@ -57,10 +57,14 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 }
             });
 
+            var providerCache = _context.Providers
+                .Include(x => x.Sites)
+                .Include(x => x.Courses)
+                .ToDictionary(p => p.ProviderCode);
             var upsertedProviders = new Dictionary<string, Provider>();
-            MigratePerProvider("upsert providers", inst =>
+            MigratePerProvider("upsert providers", providerCache, inst =>
             {
-                var savedProvider = UpsertProvider(ToProvider(inst));
+                var savedProvider = UpsertProvider(ToProvider(inst), providerCache);
                 _context.Save();
                 upsertedProviders[savedProvider.ProviderCode] = savedProvider;
             });
@@ -68,7 +72,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             var courseLoader = new CourseLoader(upsertedProviders, allSubjects, pgdeCourses, _clock);
 
 
-            MigratePerProvider("drop-and-create sites and courses", ucasInst =>
+            MigratePerProvider("drop-and-create sites and courses", providerCache, ucasInst =>
             {
                 var inst = upsertedProviders[ucasInst.InstCode];
 
@@ -117,7 +121,8 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             }
         }
 
-        private void MigratePerProvider(string operationName, Action<UcasInstitution> action)
+        private void MigratePerProvider(string operationName, Dictionary<string, Provider> providerCache,
+            Action<UcasInstitution> action)
         {
             int processed = 0;
 
@@ -129,6 +134,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 {
                     try
                     {
+                        if (providerCache.GetValueOrDefault(inst.InstCode)?.OptedIn == true)
+                        {
+                            _logger.Debug($"Skipped OptedIn provider {inst.InstCode}");
+                            continue;
+                        }
                         action(inst);
                         transaction.Commit();
                     }
@@ -209,12 +219,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             };
         }
 
-        private Provider UpsertProvider(Provider newValues)
+        private Provider UpsertProvider(Provider newValues, IReadOnlyDictionary<string, Provider> providerCache)
         {
             newValues.ProviderCode = newValues.ProviderCode.ToUpperInvariant();
-            var entity = _context.Providers
-                .Include(x => x.Sites).Include(x => x.Courses)
-                .FirstOrDefault(x => x.ProviderCode == newValues.ProviderCode);
+            var entity = providerCache.GetValueOrDefault(newValues.ProviderCode);
             if (entity == null)
             {
                 // insert

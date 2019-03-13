@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Castle.Core.Logging;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.DbIntegration;
@@ -116,6 +117,85 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             Context.Courses.Single().Name.Should().Be("The best title");
             Context.Courses.Single().Provider.Postcode.Should().Be(InstPostCode1);
         }
+
+        [Test]
+        public void DoesntImportOptedInProviders()
+        {
+            // arrange: set up a provider that's opted in to the transition to full management of provider/course
+            // data by DfE instead of UCAS (course + provider)
+            const string instCode4 = "INSTCODE_OPT4";
+            const string inst4Name = "OptedIn Inst 4 - DfE controlled name";
+            const string crseCode4 = "COURSECODE_4";
+            const string crseCode6 = "COURSECODE_6";
+            const string course4DfeName = "Course4 - DfE Controlled name";
+            Context.Providers.Add(new Provider
+            {
+                ProviderName =  inst4Name,
+                ProviderCode = instCode4,
+                OptedIn = true, // set this to false to see the failure mode of this test
+                Courses = new List<Course>
+                {
+                    new Course
+                    {
+                        CourseCode = crseCode4,
+                        Name = course4DfeName,
+                    },
+                    new Course
+                    {
+                        CourseCode = crseCode6,
+                        Name = "course 6",
+                    },
+                }
+            });
+            Context.Save();
+
+            // set up payload for same provider with noticeably different data
+            const string crseCode5 = "COURSECODE_5";
+            const string campusCode4 = "CMP4";
+            var payload = new UcasPayload
+            {
+                Institutions = new List<UcasInstitution>
+                {
+                    new UcasInstitution { InstCode = instCode4, InstFull = "unwanted modification from ucas import for inst4" },
+                },
+                Courses = new List<UcasCourse>{
+                    new UcasCourse
+                    {
+                        InstCode = instCode4,
+                        CrseCode = crseCode4,
+                        CampusCode = campusCode4,
+                        CrseTitle = "unwanted course title from import",
+                    },
+                    new UcasCourse
+                    {
+                        InstCode = instCode4,
+                        CrseCode = crseCode5,
+                        CampusCode = campusCode4,
+                    },
+                },
+                Campuses = new List<UcasCampus>
+                {
+                    new UcasCampus
+                    {
+                        InstCode = instCode4,
+                        CampusCode = campusCode4,
+                    },
+                }
+            };
+
+            // act: do import
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
+
+            // assert: check data in course / provider didn't change
+            using (new AssertionScope())
+            {
+                Context.Providers.Single(p => p.ProviderCode == instCode4).ProviderName.Should().Be(inst4Name);
+                Context.Courses.Single(c => c.CourseCode == crseCode4).Name.Should().Be(course4DfeName);
+                Context.Courses.Count(c => c.CourseCode == crseCode5).Should().Be(0, "shouldn't have imported new course for OptedIn provider");
+                Context.Courses.Count(c => c.CourseCode == crseCode6).Should().Be(1, "shouldn't have deleted course for OptedIn provider");
+            }
+        }
+
         private static void SaveReferenceDataPayload(ManageCoursesDbContext context)
         {
             var users = new List<User>
@@ -204,7 +284,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                         CrseCode = "COURSECODE_1",
                         Status = "N",
                         CampusCode = "CMP"
-                    }
+                    },
                 },
                 Campuses = new List<UcasCampus>
                 {
