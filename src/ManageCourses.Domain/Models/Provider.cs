@@ -8,6 +8,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public Provider()
         {
             Courses = new List<Course>();
+            ChangedAt = DateTime.UtcNow;
         }
 
         public void UpdateWith(Provider provider)

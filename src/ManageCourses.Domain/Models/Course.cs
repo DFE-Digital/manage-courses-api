@@ -12,6 +12,11 @@ namespace GovUk.Education.ManageCourses.Domain.Models
     /// </summary>
     public class Course
     {
+        public Course()
+        {
+          ChangedAt = DateTime.UtcNow;
+        }
+
         public int Id { get; set; }
 
         public int ProviderId { get; set; }
