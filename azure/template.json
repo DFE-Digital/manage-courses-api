@@ -150,6 +150,12 @@
             "metadata": {
                 "description": "The name of the certificate in key vault."
             }
+        },
+        "sentryDSN": {
+            "type": "string",
+            "metadata": {
+                "description": "Connection string for Sentry monitoring."
+            }
         }
     },
     "variables": {
@@ -405,6 +411,10 @@
                             {
                                 "name": "snc__api__url",
                                 "value": "[parameters('searchAndCompareAPIUrl')]"
+                            },
+                            {
+                                "name": "SENTRY_DSN",
+                                "value": "[parameters('sentryDSN')]"
                             }
                         ]
                     },

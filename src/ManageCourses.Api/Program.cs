@@ -47,6 +47,12 @@ namespace GovUk.Education.ManageCourses.Api
                 })
                 .UseApplicationInsights()
                 .UseStartup<Startup>()
+                .UseSentry(o =>
+                {
+                    o.MaxBreadcrumbs = 200;
+                    o.MaxQueueItems = 100;
+                    o.ShutdownTimeout = TimeSpan.FromSeconds(5);
+                })
                 .Build();
 
         private static IConfiguration GetConfiguration()
