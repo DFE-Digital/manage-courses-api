@@ -125,6 +125,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             Action<UcasInstitution> action)
         {
             int processed = 0;
+            int skipped = 0;
 
             _logger.Information($"Begin operation \"{operationName}\" on {payload.Institutions.Count()} institutions");
 
@@ -137,6 +138,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                         if (providerCache.GetValueOrDefault(inst.InstCode)?.OptedIn == true)
                         {
                             _logger.Debug($"Skipped OptedIn provider {inst.InstCode}");
+                            skipped++;
                             continue;
                         }
                         action(inst);
@@ -153,7 +155,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     _logger.Information($"Ran operation \"{operationName}\" on {processed} providers so far");
                 }
             }
-            _logger.Information($"Finished operation \"{operationName}\"");
+            _logger.Information($"Finished operation \"{operationName}\". Skipped {skipped} opted-in providers.");
         }
 
         private void MigrateOnce(string operationName, Action action)
