@@ -103,7 +103,6 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                 new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "FOO"}
             }).ToList();
 
-
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
 
             Context.Courses.Should().HaveCount(1, "valid courses should be imported anyway");
