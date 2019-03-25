@@ -123,21 +123,22 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
         {
             // Arrange
             SaveReferenceDataPayload(Context);
-
-            var optedInProvider = Context.Providers.Add(new Provider{ProviderCode = "optedInProvider", OptedIn = true });
+            var optedInProvider = Context.Providers.Add(new Provider{ProviderCode = "optedInProvider", OptedIn = true }).Entity;
             Context.Save();
 
             var import = GetUcasCoursesPayload();
-
             var courseWithOptedInAccreditingProvider = import.Courses.First();
-            courseWithOptedInAccreditingProvider.AccreditingProvider = "optedInProvider";
+            courseWithOptedInAccreditingProvider.AccreditingProvider = optedInProvider.ProviderCode;
+            var providerWithOptedInAccreditingProvider = import.Institutions.First();
+            providerWithOptedInAccreditingProvider.AccreditingProvider = optedInProvider.ProviderCode;
 
             //Act
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
 
             // Assert
             Context.Providers.Where(x => x.OptedIn).Should().HaveCount(1);
-            Context.Courses.Should().HaveCount(1, "valid courses should be re-imported anyway");
+            Context.Courses.Should().HaveCount(1, "course with opted-in accrediting provider should be imported");
+            Context.Providers.Where(p => p.ProviderCode == providerWithOptedInAccreditingProvider.InstCode).Should().HaveCount(1, "provider with opted-in accrediting provider should be imported");
         }
 
         [Test]
