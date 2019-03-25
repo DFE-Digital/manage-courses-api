@@ -17,14 +17,14 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
     public class CourseLoader
     {
         private readonly QualificationMapper qualificationMapper = new QualificationMapper();
-        private readonly IReadOnlyDictionary<string, Provider> _upsertedProviders;
+        private readonly IReadOnlyDictionary<string, Provider> _providerCache;
         private readonly List<string> pgdeCourses;
         private readonly Dictionary<string, Subject> allSubjects;
         private readonly IClock _clock;
 
-        public CourseLoader(IReadOnlyDictionary<string, Provider> upsertedProviders, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses, IClock clock)
+        public CourseLoader(IReadOnlyDictionary<string, Provider> providerCache, Dictionary<string, Subject> allSubjects, List<PgdeCourse> pgdeCourses, IClock clock)
         {
-            this._upsertedProviders = upsertedProviders;
+            _providerCache = providerCache;
             this.pgdeCourses = pgdeCourses.Select(x => x.ProviderCode + "_@@_" + x.CourseCode).ToList();
             this.allSubjects = allSubjects;
             _clock = clock;
@@ -84,12 +84,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.AccreditingProvider))
                 {
-                    returnCourse.AccreditingProvider = _upsertedProviders[organisationCourseRecord.AccreditingProvider];
+                    returnCourse.AccreditingProvider = _providerCache[organisationCourseRecord.AccreditingProvider];
                 }
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.InstCode))
                 {
-                    returnCourse.Provider = _upsertedProviders[organisationCourseRecord.InstCode];
+                    returnCourse.Provider = _providerCache[organisationCourseRecord.InstCode];
                 }
                 returnCourse.CourseCode = organisationCourseRecord.CrseCode;
                 returnCourse.AgeRange = organisationCourseRecord.Age;
