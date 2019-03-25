@@ -61,20 +61,20 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 .Include(x => x.Sites)
                 .Include(x => x.Courses)
                 .ToDictionary(p => p.ProviderCode);
-            var upsertedProviders = new Dictionary<string, Provider>();
             MigratePerProvider("upsert providers", providerCache, inst =>
             {
                 var savedProvider = UpsertProvider(ToProvider(inst), providerCache);
                 _context.Save();
-                upsertedProviders[savedProvider.ProviderCode] = savedProvider;
+                // update/add cached copy
+                providerCache[savedProvider.ProviderCode] = savedProvider;
             });
 
-            var courseLoader = new CourseLoader(upsertedProviders, allSubjects, pgdeCourses, _clock);
+            var courseLoader = new CourseLoader(providerCache, allSubjects, pgdeCourses, _clock);
 
 
             MigratePerProvider("drop-and-create sites and courses", providerCache, ucasInst =>
             {
-                var inst = upsertedProviders[ucasInst.InstCode];
+                var inst = providerCache[ucasInst.InstCode];
 
                 DeleteForProvider(inst.ProviderCode);
                 _context.Save();
