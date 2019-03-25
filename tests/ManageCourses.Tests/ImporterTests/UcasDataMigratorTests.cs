@@ -8,10 +8,13 @@ using FluentAssertions.Execution;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.DbIntegration;
+using GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders;
+using GovUk.Education.ManageCourses.Tests.ImporterTests.PayloadBuilders;
 using GovUk.Education.ManageCourses.UcasCourseImporter;
 using GovUk.Education.ManageCourses.Xls.Domain;
 using Moq;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
 
 namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 {
@@ -253,20 +256,16 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             };
 
-            var institutions = new List<Provider>
+            var providers = new List<Provider>
             {
-                new Provider {
-                    ProviderCode = InstCode1,
-                },
-                new Provider {
-                    ProviderCode = InstCode2
-                }
+                new ProviderBuilder().WithCode(InstCode1),
+                new ProviderBuilder().WithCode(InstCode2),
             };
 
-            var organisationInstitutions = new List<OrganisationProvider>
+            var organisationProviders = new List<OrganisationProvider>
             {
                 new OrganisationProvider {
-                    Provider = institutions[1],
+                    Provider = providers[1],
                     Organisation = organisations[1],
                 }
             };
@@ -283,42 +282,41 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             context.Users.AddRange(users);
             context.Organisations.AddRange(organisations);
-            context.Providers.AddRange(institutions);
+            context.Providers.AddRange(providers);
             context.OrganisationUsers.AddRange(organisationUsers);
-            context.OrganisationProviders.AddRange(organisationInstitutions);
+            context.OrganisationProviders.AddRange(organisationProviders);
             context.Save();
         }
 
         private static UcasPayload GetUcasCoursesPayload()
         {
-            return new UcasPayload
-            {
-                Institutions = new List<UcasInstitution>
+            const string campusCode = "CMP";
+            return new PayloadBuilder()
+                .WithInstitutions(new List<UcasInstitution>{
+                    new PayloadInstitutionBuilder()
+                        .WithInstCode(InstCode1)
+                        .WithRegionCode(1)
+                        .WithPostcode(InstPostCode1),
+                    new PayloadInstitutionBuilder()
+                        .WithInstCode(InstCode2),
+                    new PayloadInstitutionBuilder()
+                        .WithInstCode(InstCode3),
+                })
+                .WithCourses(new List<UcasCourse>
                 {
-                    new UcasInstitution { InstCode = InstCode1, RegionCode = 1, Postcode = InstPostCode1},
-                    new UcasInstitution { InstCode = InstCode2 },
-                    new UcasInstitution { InstCode = InstCode3 },
-                },
-
-                Courses = new List<UcasCourse>{
-                    new UcasCourse
-                    {
-                        InstCode = InstCode1,
-                        CrseCode = "COURSECODE_1",
-                        Status = "N",
-                        CampusCode = "CMP"
-                    },
-                },
-                Campuses = new List<UcasCampus>
+                    new PayloadCourseBuilder()
+                        .WithInstCode(InstCode1)
+                        .WithCrseCode("COURSECODE_1")
+                        .WithStatus("N")
+                        .WithCampusCode(campusCode),
+                })
+                .WithCampus(new List<UcasCampus>
                 {
-                    new UcasCampus
-                    {
-                        CampusCode = "CMP",
-                        InstCode = InstCode1,
-                        RegionCode = 100
-                    }
-                }
-            };
+                    new PayloadCampusBuilder()
+                        .WithInstCode(InstCode1)
+                        .WithCampusCode(campusCode)
+                        .WithRegionCode(100),
+                });
         }
     }
 }
