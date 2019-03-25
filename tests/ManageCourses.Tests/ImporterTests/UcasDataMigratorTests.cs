@@ -103,6 +103,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
                 new UcasCourse {InstCode = "DOESNOTEXIST", CrseCode = "FOO"}
             }).ToList();
 
+
             new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
 
             Context.Courses.Should().HaveCount(1, "valid courses should be imported anyway");
@@ -116,6 +117,28 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             Context.Courses.Should().HaveCount(1, "valid courses should be re-imported anyway");
             Context.Courses.Single().Name.Should().Be("The best title");
             Context.Courses.Single().Provider.Postcode.Should().Be(InstPostCode1);
+        }
+
+        [Test]
+        public void OptedInAccreditingProvider()
+        {
+            // Arrange
+            SaveReferenceDataPayload(Context);
+
+            var optedInProvider = Context.Providers.Add(new Provider{ProviderCode = "optedInProvider", OptedIn = true });
+            Context.Save();
+
+            var import = GetUcasCoursesPayload();
+
+            var courseWithOptedInAccreditingProvider = import.Courses.First();
+            courseWithOptedInAccreditingProvider.AccreditingProvider = "optedInProvider";
+
+            //Act
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, import).UpdateUcasData();
+
+            // Assert
+            Context.Providers.Where(x => x.OptedIn).Should().HaveCount(1);
+            Context.Courses.Should().HaveCount(1, "valid courses should be re-imported anyway");
         }
 
         [Test]
