@@ -83,6 +83,10 @@ namespace GovUk.Education.ManageCourses.Api
                 .AddBearerTokenApiKey(options =>
                 {
                     options.ApiKey = mcConfig.ApiKey;
+                })
+                .AddBackendBearerTokenApiKey(options =>
+                {
+                    options.ApiKey = mcConfig.BackendApiKey;
                 });
 
             services.AddScoped<ISearchAndCompareService, SearchAndCompareService>();

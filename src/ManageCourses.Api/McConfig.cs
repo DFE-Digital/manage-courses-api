@@ -12,6 +12,7 @@ namespace GovUk.Education.ManageCourses.Api
         private const string ConfigKeyForPgServer = "MANAGE_COURSES_POSTGRESQL_SERVICE_HOST";
         private const string ConfigKeyForSignInUserInfoEndpoint = "auth:oidc:userinfo_endpoint";
         private const string ConfigKeyForApiKey = "api:key";
+        private const string ConfigKeyForBackendApiKey = "manage_courses_backend:key";
         private const string ConfigKeyForEmailApiKey = "email:api_key";
         private const string ConfigKeyForEmailTemplateId = "email:template_id";
         private const string ConfigKeyForEmailUser = "email:user";
@@ -38,6 +39,7 @@ namespace GovUk.Education.ManageCourses.Api
                 ConfigKeyForPgUsername,
                 ConfigKeyForSignInUserInfoEndpoint,
                 ConfigKeyForApiKey,
+                ConfigKeyForBackendApiKey,
                 ConfigKeyForSearchAndCompareApiKey,
                 ConfigKeyForSearchAndCompareApiUrl,
             };
@@ -77,6 +79,7 @@ namespace GovUk.Education.ManageCourses.Api
 
         public string SignInUserInfoEndpoint => _configuration[ConfigKeyForSignInUserInfoEndpoint];
         public string ApiKey => _configuration[ConfigKeyForApiKey];
+        public string BackendApiKey => _configuration[ConfigKeyForBackendApiKey];
         public string EmailApiKey => _configuration[ConfigKeyForEmailApiKey];
         public string EmailTemplateId => _configuration[ConfigKeyForEmailTemplateId];
         public string EmailUser => _configuration[ConfigKeyForEmailUser];

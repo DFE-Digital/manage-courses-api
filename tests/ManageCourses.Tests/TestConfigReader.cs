@@ -15,6 +15,7 @@ namespace GovUk.Education.ManageCourses.Tests
         }
 
         public string ApiKey => GetRequired("api:key");
+        public string BackendApiKey => GetRequired("manage_courses_backend:key");
 
         public string SignInHost => GetRequired(SignInPrefix + "host");
         public string SignInRedirectHost => GetRequired(SignInPrefix + "redirect_host");
