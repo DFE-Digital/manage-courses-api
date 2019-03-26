@@ -156,6 +156,12 @@
             "metadata": {
                 "description": "Connection string for Sentry monitoring."
             }
+        },
+        "manageCoursesBackendKey": {
+            "type": "string",
+            "metadata": {
+                "description": "The secret shared between manage courses backend and manage courses API to authorize requests."
+            }
         }
     },
     "variables": {
@@ -415,6 +421,10 @@
                             {
                                 "name": "SENTRY_DSN",
                                 "value": "[parameters('sentryDSN')]"
+                            },
+                            {
+                                "name": "manage_courses_backend__key",
+                                "value": "[parameters('manageCoursesBackendKey')]"
                             }
                         ]
                     },
