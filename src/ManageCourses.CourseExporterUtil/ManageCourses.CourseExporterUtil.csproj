@@ -35,4 +35,14 @@
     <ProjectReference Include="..\ManageCourses.ApiClient\ManageCourses.ApiClient.csproj" />
     <ProjectReference Include="..\ManageCourses.Domain\ManageCourses.Domain.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="appsettings.Development.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="appsettings.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
