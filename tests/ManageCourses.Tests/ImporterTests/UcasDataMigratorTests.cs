@@ -45,7 +45,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
             MockTime = creationTime;
 
             // first import
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
+            DoImport(payload);
 
             // assert
             var provider = Context.Providers.Single(x => x.ProviderCode == InstCode3);
@@ -59,13 +59,13 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
 
             // re-import #1
             MockTime = new DateTime(2019, 2, 2, 3, 4, 5, 7);
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
+            DoImport(payload);
 
 
             // re-import #2
             var updateTime = new DateTime(2019, 3, 2, 3, 4, 5, 7);
             MockTime = updateTime;
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, payload, MockClock.Object).UpdateUcasData();
+            DoImport(payload);
 
             // assert
             Context.Providers.Single(x => x.ProviderCode == InstCode3).CreatedAt.Should().Be(creationTime);
@@ -119,7 +119,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
 
         private void DoImport(UcasPayload ucasPayload)
         {
-            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, ucasPayload).UpdateUcasData();
+            new UcasDataMigrator(Context, new Mock<Serilog.ILogger>().Object, ucasPayload, MockClock.Object).UpdateUcasData();
         }
 
         private static void SaveReferenceDataPayload(ManageCoursesDbContext context)
