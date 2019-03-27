@@ -74,7 +74,8 @@ namespace GovUk.Education.ManageCourses.Api
             services.AddScoped<IManageCoursesDbContext>(provider => provider.GetService<ManageCoursesDbContext>());
 
             // No default auth method has been set here because each action must explictly be decorated with
-            // either BearerTokenAuthAttribute or ApiTokenAuthAttribute to avoid unwanted calls to the wrong one.
+            // either BearerTokenAuthAttribute or ApiTokenAuthAttribute or BackendApiTokenAuthAttribute
+            // to avoid unwanted calls to the wrong one.
             services.AddAuthentication()
                 .AddBearerToken(options =>
                 {

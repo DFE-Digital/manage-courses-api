@@ -44,7 +44,7 @@ namespace GovUk.Education.ManageCourses.ApiClient
             await PostObjects(uri, payload);
         }
 
-        private async Task<T> PostObjects<T>(string apiPath, object payload, NameValueCollection nameValueCollection = null)
+        protected async Task<T> PostObjects<T>(string apiPath, object payload, NameValueCollection nameValueCollection = null)
         {
             T objects = default(T);
             var uri = GetUri($"{apiPath}", nameValueCollection);

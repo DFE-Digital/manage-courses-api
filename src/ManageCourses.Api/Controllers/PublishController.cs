@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
+using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Api.Middleware;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
+using GovUk.Education.ManageCourses.Api.ActionFilters;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -42,6 +44,25 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             return Ok(enrichmentResult);
         }
+
+        /// <summary>
+        /// Publishes a single course
+        /// </summary>
+        /// <returns>boolean indicating success/failure</returns>
+        [HttpPost]
+        [Route("internal/course/{providerCode}/{courseCode}")]
+        [ProducesResponseType(typeof(bool), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ExemptFromAcceptTerms]
+        [BackendApiTokenAuth]
+        public async Task<ActionResult> InternalPublishCourseToSearchAndCompare(string providerCode, string courseCode, [FromBody]BackendRequest request)
+        {
+            var result = await _searchAndCompareService.SaveCourse(providerCode, courseCode, request.Email);
+
+            return Ok(new{result});
+        }
+
         /// <summary>
         /// Publishes all courses for an organisation
         /// </summary>
@@ -62,6 +83,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             return Ok(enrichmentResult);
         }
+
         /// <summary>
         /// Gets a generated Search and Compare course object used for Publish (to Search and Compare) and Preview
         /// This will return and unpublished (draft) record when called from Preview
