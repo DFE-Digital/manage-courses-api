@@ -27,6 +27,9 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 .ReadFrom.Configuration(configuration)
                 .WriteTo
                 .ApplicationInsightsTraces(configuration["APPINSIGHTS_INSTRUMENTATIONKEY"])
+                .Enrich.WithProperty("WebJob", "UcasCourseImporter")
+                .Enrich.WithProperty("WebJob_Identifer", Guid.NewGuid())
+                .Enrich.WithProperty("WebJob_Triggered_Date", DateTime.UtcNow)
                 .CreateLogger();
 
             var folder = Path.Combine(Path.GetTempPath(), "ucasfiles", Guid.NewGuid().ToString());
