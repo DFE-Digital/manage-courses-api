@@ -30,7 +30,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.PayloadBuilders
             return this;
         }
 
-        public PayloadBuilder WithCampus(IEnumerable<UcasCampus> campuses)
+        public PayloadBuilder WithCampuses(IEnumerable<UcasCampus> campuses)
         {
             _payload.Campuses = campuses;
             return this;

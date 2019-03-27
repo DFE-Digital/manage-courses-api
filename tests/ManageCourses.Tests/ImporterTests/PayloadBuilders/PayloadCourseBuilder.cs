@@ -39,5 +39,17 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.PayloadBuilders
             _course.CampusCode = campusCode;
             return this;
         }
+
+        public PayloadCourseBuilder WithName(string courseTitle)
+        {
+            _course.CrseTitle = courseTitle;
+            return this;
+        }
+
+        public PayloadCourseBuilder WithAccreditingProvider(string accreditingProviderCode)
+        {
+            _course.AccreditingProvider = accreditingProviderCode;
+            return this;
+        }
     }
 }
