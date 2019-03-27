@@ -57,20 +57,24 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 }
             });
 
-            var allProviders = new Dictionary<string, Provider>();
-            MigratePerProvider("upsert providers", inst =>
+            var providerCache = _context.Providers
+                .Include(x => x.Sites)
+                .Include(x => x.Courses)
+                .ToDictionary(p => p.ProviderCode);
+            MigratePerProvider("upsert providers", providerCache, inst =>
             {
-                var savedProvider = UpsertProvider(ToProvider(inst));
+                var savedProvider = UpsertProvider(ToProvider(inst), providerCache);
                 _context.Save();
-                allProviders[savedProvider.ProviderCode] = savedProvider;
+                // update/add cached copy
+                providerCache[savedProvider.ProviderCode] = savedProvider;
             });
 
-            var courseLoader = new CourseLoader(allProviders, allSubjects, pgdeCourses, _clock);
+            var courseLoader = new CourseLoader(providerCache, allSubjects, pgdeCourses, _clock);
 
 
-            MigratePerProvider("drop-and-create sites and courses", ucasInst =>
+            MigratePerProvider("drop-and-create sites and courses", providerCache, ucasInst =>
             {
-                var inst = allProviders[ucasInst.InstCode];
+                var inst = providerCache[ucasInst.InstCode];
 
                 DeleteForProvider(inst.ProviderCode);
                 _context.Save();
@@ -117,9 +121,11 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             }
         }
 
-        private void MigratePerProvider(string operationName, Action<UcasInstitution> action)
+        private void MigratePerProvider(string operationName, Dictionary<string, Provider> providerCache,
+            Action<UcasInstitution> action)
         {
             int processed = 0;
+            int skipped = 0;
 
             _logger.Information($"Begin operation \"{operationName}\" on {payload.Institutions.Count()} institutions");
 
@@ -129,6 +135,12 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 {
                     try
                     {
+                        if (providerCache.GetValueOrDefault(inst.InstCode)?.OptedIn == true)
+                        {
+                            _logger.Debug($"Skipped OptedIn provider {inst.InstCode}");
+                            skipped++;
+                            continue;
+                        }
                         action(inst);
                         transaction.Commit();
                     }
@@ -143,7 +155,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                     _logger.Information($"Ran operation \"{operationName}\" on {processed} providers so far");
                 }
             }
-            _logger.Information($"Finished operation \"{operationName}\"");
+            _logger.Information($"Finished operation \"{operationName}\". Skipped {skipped} opted-in providers.");
         }
 
         private void MigrateOnce(string operationName, Action action)
@@ -209,12 +221,10 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
             };
         }
 
-        private Provider UpsertProvider(Provider newValues)
+        private Provider UpsertProvider(Provider newValues, IReadOnlyDictionary<string, Provider> providerCache)
         {
             newValues.ProviderCode = newValues.ProviderCode.ToUpperInvariant();
-            var entity = _context.Providers
-                .Include(x => x.Sites).Include(x => x.Courses)
-                .FirstOrDefault(x => x.ProviderCode == newValues.ProviderCode);
+            var entity = providerCache.GetValueOrDefault(newValues.ProviderCode);
             if (entity == null)
             {
                 // insert

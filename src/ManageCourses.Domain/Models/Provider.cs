@@ -53,6 +53,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public DateTime? LastPublishedAt { get; set; }
         public DateTime ChangedAt { get; set; }
         public string AccreditingProvider { get; set; }
+        public bool OptedIn { get; set; }
 
         public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
         public ICollection<Course> Courses { get; set; }
