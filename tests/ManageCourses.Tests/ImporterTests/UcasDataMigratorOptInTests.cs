@@ -24,7 +24,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
         protected override bool EnableRetryOnFailure => false;
 
         [Test]
-        public void Provider()
+        public void ProviderOptedOut()
         {
             const string instCode = "AA1";
             const string instName = "Armadillo 1";
@@ -78,7 +78,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
         }
 
         [Test]
-        public void Course()
+        public void CourseOptedOut_NoAccreditingProvider()
         {
             const string instCode = "INST101";
             const string campusCode = "CAMP101";
@@ -123,7 +123,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
         }
 
         [Test]
-        public void CourseOptedIn()
+        public void CourseOptedIn_NoAccreditingProvider()
         {
             // note: we can't test an import of a new provider's course where they are opted in because
             // they have to be in our database already to be opted in
@@ -176,7 +176,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
 
 
         [Test]
-        public void Course_AccreditingProvider()
+        public void CourseOptedOut_AccreditingProviderOptedOut()
         {
             const string instCode = "INST101";
             const string accreditingProviderCode = "AINST201";
@@ -227,7 +227,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
         }
 
         [Test]
-        public void CourseOptedIn_AccreditingProvider()
+        public void CourseOptedIn_AccreditingProviderOptedOut()
         {
             // note: we can't test an import of a new provider's course where they are opted in because
             // they have to be in our database already to be opted in
@@ -285,7 +285,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
         }
 
         [Test]
-        public void Course_AccreditingProviderOptedIn()
+        public void CourseOptedOut_AccreditingProviderOptedIn()
         {
             const string instCode = "INST101";
             const string accreditingProviderCode = "AINST201";
