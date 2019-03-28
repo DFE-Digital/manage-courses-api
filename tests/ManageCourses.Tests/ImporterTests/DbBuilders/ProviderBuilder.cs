@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Domain.Models;
 
 namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
@@ -10,15 +11,34 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
         {
             _provider = new Provider();
         }
-        public Provider WithCode(string providerCode)
+
+        public ProviderBuilder WithCode(string providerCode)
         {
             _provider.ProviderCode = providerCode;
-            return _provider;
+            return this;
+        }
+
+        public ProviderBuilder WithName(string providerName)
+        {
+            _provider.ProviderName = providerName;
+            return this;
         }
 
         public static implicit operator Provider(ProviderBuilder builder)
         {
             return builder._provider;
+        }
+
+        public ProviderBuilder WithOptedIn()
+        {
+            _provider.OptedIn = true;
+            return this;
+        }
+
+        public ProviderBuilder WithCourses(IList<Course> courses)
+        {
+            _provider.Courses = courses;
+            return this;
         }
     }
 }

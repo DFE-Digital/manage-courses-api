@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Xls.Domain;
 
 namespace GovUk.Education.ManageCourses.Tests.ImporterTests.PayloadBuilders
@@ -31,6 +32,12 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.PayloadBuilders
         public PayloadInstitutionBuilder WithPostcode(string postCode)
         {
             _institution.Postcode = postCode;
+            return this;
+        }
+
+        public PayloadInstitutionBuilder WithFullName(string instName)
+        {
+            _institution.InstFull = instName;
             return this;
         }
     }
