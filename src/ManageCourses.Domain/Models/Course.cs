@@ -61,7 +61,8 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public IEnumerable<Site> Sites { get => CourseSites != null && CourseSites.Any() ? CourseSites.Select(x => x.Site) : null; }
 
         [NotMapped]
-        public EnumStatus? EnrichmentWorkflowStatus { get; set; }
+        // If this is null, then it's not been set by DataService.
+        public WorkflowStatus? EnrichmentWorkflowStatus { get; set; }
 
         public ICollection<CourseSubject> CourseSubjects { get; set; }
 

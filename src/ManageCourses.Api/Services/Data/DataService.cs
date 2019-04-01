@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
@@ -74,8 +75,32 @@ namespace GovUk.Education.ManageCourses.Api.Services.Data
 
             foreach (var course in courseRecords)
             {
-                var bestEnrichment = enrichmentMetadata.Where(x => x.CourseCode == course.CourseCode).OrderByDescending(x => x.CreatedTimestampUtc).FirstOrDefault();
-                course.EnrichmentWorkflowStatus = bestEnrichment?.Status;
+                var enrichments = enrichmentMetadata.Where(x => x.CourseCode == course.CourseCode).OrderByDescending(x => x.CreatedTimestampUtc);
+
+                if (enrichments.Count() == 0)
+                {
+                    course.EnrichmentWorkflowStatus = WorkflowStatus.Blank;
+                }
+
+                var newestEnrichment = enrichments.FirstOrDefault();
+
+                switch(newestEnrichment?.Status)
+                {
+                    case EnumStatus.Published:
+                        course.EnrichmentWorkflowStatus = WorkflowStatus.Published;
+                        break;
+                    case EnumStatus.Draft:
+                        var courseHasBeenPublishedBefore = newestEnrichment.LastPublishedTimestampUtc.HasValue && newestEnrichment.LastPublishedTimestampUtc > DateTime.MinValue;
+                        if (courseHasBeenPublishedBefore)
+                        {
+                            course.EnrichmentWorkflowStatus = WorkflowStatus.SubsequentDraft;
+                        }
+                        else
+                        {
+                            course.EnrichmentWorkflowStatus = WorkflowStatus.InitialDraft;
+                        }
+                        break;
+                }
             }
             return courseRecords;
         }
