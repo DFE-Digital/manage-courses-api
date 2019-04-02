@@ -5,4 +5,12 @@
         Draft,
         Published
     }
+
+    public enum WorkflowStatus
+    {
+        Blank,
+        InitialDraft,
+        Published,
+        SubsequentDraft
+    }
 }
