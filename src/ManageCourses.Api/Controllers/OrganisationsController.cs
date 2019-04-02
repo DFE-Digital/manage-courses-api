@@ -72,6 +72,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 {
                     ProviderName = providerSummary.Provider.ProviderName,
                     ProviderCode = providerSummary.Provider.ProviderCode,
+                    OptedIn = providerSummary.Provider.OptedIn,
                     TotalCourses = providerSummary.Provider.Courses.Select(c => c.CourseCode).Distinct().Count()
                 }).OrderBy(x => x.ProviderName).ToList();
 
@@ -88,6 +89,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 {
                     ProviderName = organisationProvider.Provider.ProviderName,
                     ProviderCode = organisationProvider.Provider.ProviderCode,
+                    OptedIn = organisationProvider.Provider.OptedIn,
                     TotalCourses = organisationProvider.Provider.Courses.Select(c => c.CourseCode).Distinct()
                         .Count(),
                     EnrichmentWorkflowStatus = enrichment?.Status
