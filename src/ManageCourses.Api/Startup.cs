@@ -102,6 +102,7 @@ namespace GovUk.Education.ManageCourses.Api
 
             services.AddScoped<IInviteTemplateEmailConfig, InviteTemplateEmailConfig>();
             services.AddScoped<IInviteEmailService, InviteEmailService>();
+            services.AddScoped<ITransitionService, TransitionService>();
 
             services.AddScoped<IAccessRequestService>(provider =>
             {

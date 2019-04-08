@@ -40,5 +40,16 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
             _provider.Courses = courses;
             return this;
         }
+
+        public ProviderBuilder AddCourse(Course course)
+        {
+            if(_provider.Courses == null)
+            {
+                _provider.Courses = new List<Course>();
+            }
+            course.Provider = _provider;
+            _provider.Courses.Add(course);
+            return this;
+        }
     }
 }

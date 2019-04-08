@@ -16,12 +16,14 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         private readonly IDataService _dataService;
         private readonly ISearchAndCompareService _searchAndCompareService;
         private readonly IEnrichmentService _enrichmentservice;
+        private readonly ITransitionService _transitionService;
 
-        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ISearchAndCompareService searchAndCompareService)
+        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ITransitionService transitionService,ISearchAndCompareService searchAndCompareService)
         {
             _dataService = dataService;
             _searchAndCompareService = searchAndCompareService;
             _enrichmentservice = enrichmentservice;
+            _transitionService = transitionService;
         }
 
         /// <summary>
@@ -37,6 +39,9 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         public async Task<ActionResult> PublishCourseToSearchAndCompare(string providerCode, string courseCode)
         {
             var name = this.User.Identity.Name;
+
+            // update course status from new to running only if provider is opted in
+            _transitionService.UpdateNewCourse(providerCode, courseCode, name);
 
             var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(providerCode, courseCode, name);
 
