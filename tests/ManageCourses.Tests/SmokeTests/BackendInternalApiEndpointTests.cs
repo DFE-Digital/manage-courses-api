@@ -24,9 +24,11 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     [TestFixture]
     [Category("Smoke")]
     [Explicit]
-    public partial class BackendInternalApiEndpointTests : ApiSmokeTestBase
+    public class BackendInternalApiEndpointTests : ApiSmokeTestBase
     {
         private const string Email = "feddie.krueger@example.org";
+        private const string ProviderCode = "providerCode";
+        private const string CourseCode = "courseCode";
 
         /// <summary>
         ///     Tests a valid http status 200 with result as false, true cannot be tested in this form as it will also make an external call.
@@ -34,13 +36,10 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public async Task Internal_Publish_PublishCourseToSearchAndCompareAsync()
         {
-            var accessToken = TestConfig.BackendApiKey;
+            var client = BuildClient(TestConfig.BackendApiKey);
 
-            var client = BuildClient(accessToken);
-
-            var providerCode = "providerCode";
-            var courseCode = "courseCode";
-            var result = await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode, new BackendRequest{Email = ""});
+            var result = await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(
+                ProviderCode, CourseCode, new BackendRequest());
 
             result.Result.Should().Be(false);
         }
@@ -48,45 +47,43 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         [Test]
         public void Internal_Publish_PublishCourseToSearchAndCompareAsync_internalServerError_500()
         {
-            var accessToken = TestConfig.BackendApiKey;
+            var client = BuildClient(TestConfig.BackendApiKey);
 
-            var client = BuildClient(accessToken);
+            Func<Task> act = async () =>
+                await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(
+                    ProviderCode, CourseCode, new BackendRequest{Email = Email});
 
-            var providerCode = "providerCode";
-            var courseCode = "courseCode";
-            Func<Task> act = async () => await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode, new BackendRequest{Email = Email});
-
-            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{providerCode}/{courseCode}";
-            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            act.Should().Throw<ManageCoursesApiException>()
+                .WithMessage($"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{ProviderCode}/{CourseCode}")
+                .Which.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
+
         [Test]
         public void Internal_Publish_PublishCourseToSearchAndCompareAsync_badAccesCode_404()
         {
-            var accessToken = "badAccesCode";
+            var client = BuildClient("badAccesCode");
 
-            var client = BuildClient(accessToken);
+            Func<Task> act = async () =>
+                await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(
+                    ProviderCode, CourseCode, new BackendRequest{Email = Email});
 
-            var providerCode = "providerCode";
-            var courseCode = "courseCode";
-            Func<Task> act = async () => await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode, new BackendRequest{Email = Email});
-
-            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{providerCode}/{courseCode}";
-            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Should().Be(HttpStatusCode.NotFound);
+            act.Should().Throw<ManageCoursesApiException>()
+                .WithMessage($"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{ProviderCode}/{CourseCode}")
+                .Which.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Test]
         public void Internal_Publish_PublishCourseToSearchAndCompareAsync_noAccesCode_401()
         {
-            const string accessToken = "";
+            var client = BuildClient("");
 
-            var client = BuildClient(accessToken);
+            Func<Task> act = async () =>
+                await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(
+                    ProviderCode, CourseCode, new BackendRequest{Email = Email});
 
-            var providerCode = "providerCode";
-            var courseCode = "courseCode";
-            Func<Task> act = async () => await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode, new BackendRequest{Email = Email});
-
-            var msg = $"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{providerCode}/{courseCode}";
-            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            act.Should().Throw<ManageCoursesApiException>()
+                .WithMessage($"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{ProviderCode}/{CourseCode}")
+                .Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
     }
 }
