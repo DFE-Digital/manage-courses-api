@@ -37,6 +37,11 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             {
                 return await PostObjects<ResponseResult>($"publish/internal/course/{providerCode}/{courseCode}", request);
             }
+
+            internal async Task<ResponseResult> Internal_Publish_PublishCoursesToSearchAndCompareAsync(string providerCode, BackendRequest request)
+            {
+                return await PostObjects<ResponseResult>($"publish/internal/courses/{providerCode}", request);
+            }
         }
 
         protected BackendManageCoursesApiClient BuildClient(string accessToken)
