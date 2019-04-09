@@ -85,27 +85,28 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             return courses.Where(courseToSave => courseToSave.IsValid(false)).ToList();
         }
 
-        private async Task<bool> SaveImplementation(List<Course> courses, string providerCode)
+        private async Task<bool> SaveImplementation(IList<Course> courses, string providerCode)
         {
-            var returnBool = false;
             try
             {
-                if (courses.Count > 0)
+                if (courses.Count == 0)
                 {
-                    returnBool = await _api.UpdateCoursesAsync(courses);
+                    _logger.LogInformation($"Save courses to search and compare; no courses for provider: {providerCode}");
+                    return false;
                 }
 
-                if (!returnBool)
+                if (!await _api.UpdateCoursesAsync(courses))
                 {
                     _logger.LogError($"Save courses to search and compare failed for provider: {providerCode}");
+                    return false;
                 }
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"An unexpected error occured. Save courses to search and compare failed for provider: {providerCode}");
+                return false;
             }
-
-            return returnBool;
+            return true;
         }
 
         private Course GetCourse(string providerCode, string courseCode, string email, Provider ucasProviderData, UcasProviderEnrichmentGetModel orgEnrichmentData)
