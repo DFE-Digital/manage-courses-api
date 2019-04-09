@@ -57,7 +57,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Func<Task> act = async () => await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode, new BackendRequest{Email = Email});
 
             var msg = $"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{providerCode}/{courseCode}";
-            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.InternalServerError);
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
         }
         [Test]
         public void Internal_Publish_PublishCourseToSearchAndCompareAsync_badAccesCode_404()
@@ -71,7 +71,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Func<Task> act = async () => await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode, new BackendRequest{Email = Email});
 
             var msg = $"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{providerCode}/{courseCode}";
-            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.NotFound);
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
         [Test]
@@ -86,7 +86,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Func<Task> act = async () => await client.Internal_Publish_PublishCourseToSearchAndCompareAsync(providerCode, courseCode, new BackendRequest{Email = Email});
 
             var msg = $"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{providerCode}/{courseCode}";
-            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.Unauthorized);
+            act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         }
     }
 }
