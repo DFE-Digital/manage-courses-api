@@ -69,6 +69,24 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
+        /// Publishes all of a provider's courses
+        /// </summary>
+        /// <returns>boolean indicating success/failure</returns>
+        [HttpPost]
+        [Route("internal/courses/{providerCode}")]
+        [ProducesResponseType(typeof(bool), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        [ExemptFromAcceptTerms]
+        [BackendApiTokenAuth]
+        public async Task<ActionResult> InternalPublishCoursesToSearchAndCompare(string providerCode, [FromBody]BackendRequest request)
+        {
+            var result = await _searchAndCompareService.SaveCourses(providerCode, request.Email);
+
+            return Ok(new{result});
+        }
+
+        /// <summary>
         /// Publishes all courses for an organisation
         /// </summary>
         /// <returns>boolean indicating success/failure</returns>

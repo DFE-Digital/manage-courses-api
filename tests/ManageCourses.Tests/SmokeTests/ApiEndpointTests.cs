@@ -1,14 +1,12 @@
 using FluentAssertions;
 using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.ApiClient;
-using GovUk.Education.ManageCourses.Tests.UnitTesting.Client;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using GovUk.Education.ManageCourses.UcasCourseImporter;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -135,10 +133,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             var accessToken = TestConfig.ApiKey;
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             Context.AddTestReferenceData(Email);
             Context.Save();
@@ -152,10 +147,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             var accessToken = "badAccesCode";
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
@@ -172,10 +164,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             const string accessToken = "";
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             Func<Task> act = async () => await client.Invite_IndexAsync(Email);
 
@@ -202,20 +191,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var communicator = new DfeSignInCommunicator(TestConfig);
             var accessToken = await communicator.GetAccessToken(TestConfig);
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
-
-            return client;
-        }
-
-        private ManageCoursesApiClient BuildApiKeyClient(string apiKey = null)
-        {
-            var accessToken = apiKey ?? TestConfig.ApiKey;
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-            var client = new ManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             return client;
         }
