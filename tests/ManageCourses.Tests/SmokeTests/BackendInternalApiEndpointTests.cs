@@ -36,10 +36,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             var accessToken = TestConfig.BackendApiKey;
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new BackendManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             var providerCode = "providerCode";
             var courseCode = "courseCode";
@@ -53,10 +50,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             var accessToken = TestConfig.BackendApiKey;
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new BackendManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             var providerCode = "providerCode";
             var courseCode = "courseCode";
@@ -70,10 +64,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             var accessToken = "badAccesCode";
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new BackendManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             var providerCode = "providerCode";
             var courseCode = "courseCode";
@@ -88,10 +79,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
         {
             const string accessToken = "";
 
-            var httpClient = new HttpClient();
-            var httpClientWrapper = new FakeHttpClientWrapper(accessToken, httpClient);
-
-            var client = new BackendManageCoursesApiClient(LocalWebHost.Address, httpClientWrapper);
+            var client = BuildClient(accessToken);
 
             var providerCode = "providerCode";
             var courseCode = "courseCode";
@@ -99,23 +87,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var msg = $"API POST Failed uri {LocalWebHost.Address}/api/publish/internal/course/{providerCode}/{courseCode}";
             act.Should().Throw<ManageCoursesApiException>().WithMessage(msg).Which.StatusCode.Equals(HttpStatusCode.Unauthorized);
-        }
-
-        private class BackendManageCoursesApiClient : ManageCoursesApiClient
-        {
-            public BackendManageCoursesApiClient(string apiUrl, IHttpClient httpClient) :base(apiUrl, httpClient)
-            {
-            }
-
-            internal async Task<ResponseResult> Internal_Publish_PublishCourseToSearchAndCompareAsync(string providerCode, string courseCode, BackendRequest request)
-            {
-                return await PostObjects<ResponseResult>($"publish/internal/course/{providerCode}/{courseCode}", request);
-            }
-        }
-
-        internal class ResponseResult
-        {
-            public bool Result {get; set;}
         }
     }
 }
