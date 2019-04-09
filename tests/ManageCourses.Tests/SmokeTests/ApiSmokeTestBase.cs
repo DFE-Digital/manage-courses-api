@@ -24,9 +24,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             LocalWebHost?.Stop();
         }
 
-        /// <summary>
-        /// Backend doesn't use the api client, but it's useful for testing so this class extends the client with methods called backend.
-        /// </summary>
         protected class BackendManageCoursesApiClient : ManageCoursesApiClient
         {
             public BackendManageCoursesApiClient(string apiUrl, IHttpClient httpClient) :base(apiUrl, httpClient)

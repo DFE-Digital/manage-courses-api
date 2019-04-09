@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GovUk.Education.ManageCourses.Api.Data;
 using GovUk.Education.ManageCourses.Api.Mapping;
 using GovUk.Education.ManageCourses.Api.Model;
@@ -70,7 +69,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         }
 
         /// <summary>
-        /// Publishes all of a providers courses
+        /// Publishes all of a provider's courses
         /// </summary>
         /// <returns>boolean indicating success/failure</returns>
         [HttpPost]
