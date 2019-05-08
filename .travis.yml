@@ -56,15 +56,6 @@ deploy:
   script: "./travis-deploy-sc-exporter.sh prod"
   on: production
 - provider: script
-  script: "./travis-deploy-ucas-importer.sh dev"
-  on: master
-- provider: script
-  script: "./travis-deploy-ucas-importer.sh staging"
-  on: staging
-- provider: script
-  script: "./travis-deploy-ucas-importer.sh prod"
-  on: production
-- provider: script
   skip_cleanup: true
   script: chmod +x ./travis-nuget-deploy.sh && ./travis-nuget-deploy.sh $NUGET_API_KEY
     $NUGET_SOURCE

@@ -555,10 +555,6 @@
                             {
                                 "virtualPath": "/ManageCourses.CourseExporterUtil",
                                 "physicalPath": "site\\wwwroot\\app_data\\jobs\\triggered\\ManageCourses.CourseExporterUtil"
-                            },
-                            {
-                                "virtualPath": "/ManageCourses.UcasCourseImporter",
-                                "physicalPath": "site\\wwwroot\\app_data\\jobs\\triggered\\ManageCourses.UcasCourseImporter"
                             }
                         ]
                     },
