@@ -76,7 +76,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var orgList =((List<ProviderSummary>) ((OkObjectResult)result).Value).ToList();
 
             orgList.All(c => c.TotalCourses == numCourses).Should().BeTrue();
-            orgList.Count(c => c.OptedIn).Should().Be(numOrgs / 2);
 
             foreach (var org in orgList)
             {
@@ -107,7 +106,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             var orgList =((List<ProviderSummary>) ((OkObjectResult)result).Value).ToList();
 
             orgList.All(c => c.TotalCourses == numCourses).Should().BeTrue();
-            orgList.Count(c => c.OptedIn).Should().Be(numOrgs / 2);
 
             organisationsController.SetControllerContext(UnauthorisedUserEmail);
 
@@ -149,8 +147,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "AB1 CD2",
                     ProviderCode = providerCode,
-                    ProviderName = "Intitution " + counter,
-                    OptedIn = counter % 2 == 0, // only even are true
+                    ProviderName = "Intitution " + counter
                 };
                 Context.Providers.Add(provider);
                 LoadCourses(provider, numCourses, Context.Subjects);
