@@ -47,37 +47,6 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
         }
 
         [Test]
-        public void ProviderOptedIn()
-        {
-            // note: we can't test an import of a new provider that's opted in because
-            // they have to be in our database already to be opted in
-
-            // arrange
-            const string instCode = "AA1";
-            const string unmodifiedInstName = "Armadillo 1";
-            Context.Providers.Add(new ProviderBuilder()
-                .WithCode(instCode)
-                .WithName(unmodifiedInstName)
-                .WithOptedIn());
-            Context.Save();
-
-            var ucasPayload = new PayloadBuilder()
-                .WithInstitutions(new List<UcasInstitution>
-                {
-                    new PayloadInstitutionBuilder()
-                        .WithInstCode(instCode)
-                        .WithFullName("Modified " + unmodifiedInstName)
-                });
-
-            // act
-            DoImport(ucasPayload);
-
-            // assert
-            Context.Providers.Single(p => p.ProviderCode == instCode).ProviderName
-                .Should().Be(unmodifiedInstName);
-        }
-
-        [Test]
         public void CourseOptedOut_NoAccreditingProvider()
         {
             const string instCode = "INST101";
@@ -121,59 +90,6 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
             provider.Courses.Single(c => c.CourseCode == courseCode)
                 .Name.Should().Be(modifiedCourseName);
         }
-
-        [Test]
-        public void CourseOptedIn_NoAccreditingProvider()
-        {
-            // note: we can't test an import of a new provider's course where they are opted in because
-            // they have to be in our database already to be opted in
-
-            const string instCode = "AA1";
-            const string courseCode = "CRS101";
-            const string unmodifiedCourseName = "Primary";
-            const string campusCode = "CAMP101";
-
-            // arrange
-            Context.Providers.Add(new ProviderBuilder()
-                .WithCode(instCode)
-                .WithOptedIn()
-                .WithCourses(new List<Course>
-                {
-                    new CourseBuilder()
-                        .WithCode(courseCode)
-                        .WithName(unmodifiedCourseName)
-                }));
-            Context.Save();
-
-            UcasCourse ucasCourse = new PayloadCourseBuilder()
-                .WithInstCode(instCode)
-                .WithCrseCode(courseCode)
-                .WithCampusCode(campusCode)
-                .WithName("Modified " + unmodifiedCourseName);
-            var ucasPayload = new PayloadBuilder()
-                .WithInstitutions(new List<UcasInstitution>
-                {
-                    new PayloadInstitutionBuilder()
-                        .WithInstCode(instCode)
-                })
-                .WithCourses(new List<UcasCourse> {ucasCourse})
-                .WithCampuses(new List<UcasCampus>
-                {
-                    new PayloadCampusBuilder()
-                        .WithCampusCode(campusCode)
-                        .WithInstCode(instCode)
-                });
-
-            // act
-            DoImport(ucasPayload);
-
-            // assert
-            var provider = Context.Providers.Single(p => p.ProviderCode == instCode);
-            provider.Courses.Count.Should().Be(1);
-            provider.Courses.Single(c => c.CourseCode == courseCode)
-                .Name.Should().Be(unmodifiedCourseName);
-        }
-
 
         [Test]
         public void CourseOptedOut_AccreditingProviderOptedOut()
@@ -227,64 +143,6 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
         }
 
         [Test]
-        public void CourseOptedIn_AccreditingProviderOptedOut()
-        {
-            // note: we can't test an import of a new provider's course where they are opted in because
-            // they have to be in our database already to be opted in
-
-            const string instCode = "AA1";
-            const string accreditingProviderCode = "AINST201";
-            const string accreditingProviderCode2 = "AINST202";
-            const string courseCode = "CRS101";
-            const string unmodifiedCourseName = "Primary";
-            const string campusCode = "CAMP101";
-
-            // arrange
-            Context.Providers.Add(new ProviderBuilder()
-                .WithCode(instCode)
-                .WithOptedIn()
-                .WithCourses(new List<Course>
-                {
-                    new CourseBuilder()
-                        .WithCode(courseCode)
-                        .WithName(unmodifiedCourseName)
-                        .WithAccreditingProvider(new ProviderBuilder()
-                            .WithCode(accreditingProviderCode))
-                }));
-            Context.Providers.Add(new ProviderBuilder()
-                .WithCode(accreditingProviderCode2));
-            Context.Save();
-
-            UcasCourse ucasCourse = new PayloadCourseBuilder()
-                .WithInstCode(instCode)
-                .WithCrseCode(courseCode)
-                .WithAccreditingProvider(accreditingProviderCode2)
-                .WithCampusCode(campusCode);
-            var ucasPayload = new PayloadBuilder()
-                .WithInstitutions(new List<UcasInstitution>
-                {
-                    new PayloadInstitutionBuilder()
-                        .WithInstCode(instCode)
-                })
-                .WithCourses(new List<UcasCourse> {ucasCourse})
-                .WithCampuses(new List<UcasCampus>
-                {
-                    new PayloadCampusBuilder()
-                        .WithCampusCode(campusCode)
-                        .WithInstCode(instCode)
-                });
-
-            // act
-            DoImport(ucasPayload);
-
-            // assert
-            var provider = Context.Providers.Single(p => p.ProviderCode == instCode);
-            provider.Courses.Count.Should().Be(1);
-            provider.Courses.Single(c => c.CourseCode == courseCode)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode);
-        }
-
-        [Test]
         public void CourseOptedOut_AccreditingProviderOptedIn()
         {
             const string instCode = "INST101";
@@ -335,66 +193,6 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
             updatedProvider.Courses.Count.Should().Be(1);
             updatedProvider.Courses.Single(c => c.CourseCode == courseCode)
                 .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode2);
-        }
-
-        [Test]
-        public void CourseOptedIn_AccreditingProviderOptedIn()
-        {
-            // note: we can't test an import of a new provider's course where they are opted in because
-            // they have to be in our database already to be opted in
-
-            const string instCode = "AA1";
-            const string accreditingProviderCode = "AINST201";
-            const string accreditingProviderCode2 = "AINST202";
-            const string courseCode = "CRS101";
-            const string unmodifiedCourseName = "Primary";
-            const string campusCode = "CAMP101";
-
-            // arrange
-            Context.Providers.Add(new ProviderBuilder()
-                .WithCode(instCode)
-                .WithOptedIn()
-                .WithCourses(new List<Course>
-                {
-                    new CourseBuilder()
-                        .WithCode(courseCode)
-                        .WithName(unmodifiedCourseName)
-                        .WithAccreditingProvider(new ProviderBuilder()
-                            .WithOptedIn()
-                            .WithCode(accreditingProviderCode))
-                }));
-            Context.Providers.Add(new ProviderBuilder()
-                .WithOptedIn()
-                .WithCode(accreditingProviderCode2));
-            Context.Save();
-
-            UcasCourse ucasCourse = new PayloadCourseBuilder()
-                .WithInstCode(instCode)
-                .WithCrseCode(courseCode)
-                .WithAccreditingProvider(accreditingProviderCode2)
-                .WithCampusCode(campusCode);
-            var ucasPayload = new PayloadBuilder()
-                .WithInstitutions(new List<UcasInstitution>
-                {
-                    new PayloadInstitutionBuilder()
-                        .WithInstCode(instCode)
-                })
-                .WithCourses(new List<UcasCourse> {ucasCourse})
-                .WithCampuses(new List<UcasCampus>
-                {
-                    new PayloadCampusBuilder()
-                        .WithCampusCode(campusCode)
-                        .WithInstCode(instCode)
-                });
-
-            // act
-            DoImport(ucasPayload);
-
-            // assert
-            var provider = Context.Providers.Single(p => p.ProviderCode == instCode);
-            provider.Courses.Count.Should().Be(1);
-            provider.Courses.Single(c => c.CourseCode == courseCode)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode);
         }
 
         private void DoImport(UcasPayload ucasPayload)
