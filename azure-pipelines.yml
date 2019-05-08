@@ -65,14 +65,6 @@ steps:
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish Course UCAS Importer'
-  inputs:
-    command: publish
-    publishWebProjects: false
-    projects: 'src/ManageCourses.UcasCourseImporter/importer/UcasCourseImporter.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/publish --no-restore'
-
-- task: DotNetCoreCLI@2
   displayName: 'Publish Integration Tests'
   inputs:
     command: publish

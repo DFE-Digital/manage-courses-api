@@ -13,7 +13,6 @@ This repo provides a dotnet core solution containing:
 
 The main clients for this API and library are
 * https://github.com/DFE-Digital/manage-courses-ui
-* https://github.com/DFE-Digital/manage-courses-ucas-importer
 
 ## Coding
 
@@ -66,20 +65,12 @@ dotnet user-secrets set email:welcome_template_id the-welcome-template-id
 dotnet user-secrets set auth:oidc:userinfo_endpoint the-oidc-userinfo-endpoint
 ```
 
-#### [Importer](https://github.com/DFE-Digital/manage-courses-ucas-importer) related
-```bash
-# from .\src\ManageCourses.Api>
-dotnet user-secrets set api:key the-api-key
-```
-
 #### [Search And Compare Api](https://github.com/DFE-Digital/search-and-compare-api) related
 ```bash
 # from .\src\ManageCourses.Api>
 dotnet user-secrets set snc:api:key the-search-and-compare-api-key
 dotnet user-secrets set snc:api:url the-search-and-compare-api-url
 ```
-
-
 
 ## Running the API locally
 
