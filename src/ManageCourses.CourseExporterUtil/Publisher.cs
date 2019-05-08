@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -17,6 +18,8 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Core;
 using SearchCourse = GovUk.Education.SearchAndCompare.Domain.Models.Course;
+ using Newtonsoft.Json;
+
 
 namespace GovUk.Education.ManageCourses.CourseExporterUtil
 {
@@ -44,6 +47,15 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var mappedCourses = ReadAllCourseData(context);
             try
             {
+
+                var one = new List<SearchCourse> { mappedCourses.First()};
+                File.WriteAllText(@"manage_sanitizer_one_course.json", JsonConvert.SerializeObject(one));
+
+                // using (StreamWriter file = File.CreateText(@"manage_sanitizer.json"))
+                // {
+                //     JsonSerializer serializer = new JsonSerializer();
+                //     serializer.Serialize(file, movie);
+                // }
 
                 PublishToSearch(mappedCourses).Wait();
                 _logger.Information("Bulk publish to search completed");
@@ -176,7 +188,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
         private static McConfig GetMcConfig(IConfiguration configurationRoot)
         {
             var mcConfig = new McConfig(configurationRoot);
-            mcConfig.Validate();
+            //mcConfig.Validate();
             return mcConfig;
         }
     }

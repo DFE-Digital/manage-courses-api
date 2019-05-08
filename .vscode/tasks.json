@@ -20,6 +20,16 @@
                 "${workspaceFolder}/src/ManageCourses.UcasCourseImporter/importer/UcasCourseImporter.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build-exporter",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/src/ManageCourses.CourseExporterUtil/ManageCourses.CourseExporterUtil.csproj"
+            ],
+            "problemMatcher": "$msCompile"
         }
     ]
 }

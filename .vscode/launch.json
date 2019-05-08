@@ -50,6 +50,18 @@
             "internalConsoleOptions": "openOnSessionStart"
         },
         {
+            "name": ".NET Core Launch (exporter)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-exporter",
+            // If you have changed target frameworks, make sure to update the program path.
+            "program": "${workspaceFolder}/src/ManageCourses.CourseExporterUtil/bin/Debug/netcoreapp2.1/ManageCourses.CourseExporterUtil.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/ManageCourses.CourseExporterUtil",
+            "stopAtEntry": false,
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach",

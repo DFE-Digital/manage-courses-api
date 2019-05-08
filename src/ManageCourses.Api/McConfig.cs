@@ -72,7 +72,7 @@ namespace GovUk.Education.ManageCourses.Api
         /// </summary>
         public string BuildConnectionString()
         {
-            Validate();
+            // Validate();
             var connectionString = $"Server={PgServer};Port={PgPort};Database={PgDatabase};User Id={PgUser};Password={PgPassword};{PgSsl}";
             return connectionString;
         }
