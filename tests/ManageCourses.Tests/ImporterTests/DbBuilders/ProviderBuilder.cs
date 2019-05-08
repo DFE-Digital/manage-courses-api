@@ -31,7 +31,6 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
 
         public ProviderBuilder WithOptedIn()
         {
-            _provider.OptedIn = true;
             return this;
         }
 
