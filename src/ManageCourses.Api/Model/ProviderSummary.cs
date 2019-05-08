@@ -10,7 +10,6 @@ namespace GovUk.Education.ManageCourses.Api.Model
     {
         public string ProviderName { get; set; }
         public string ProviderCode { get; set; }
-        public bool OptedIn { get; set; }
         public int TotalCourses { get; set; }
         public EnumStatus? EnrichmentWorkflowStatus { get; set; }
     }
