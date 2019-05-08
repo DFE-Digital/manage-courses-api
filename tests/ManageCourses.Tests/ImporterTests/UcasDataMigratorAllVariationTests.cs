@@ -154,16 +154,6 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
                 .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode3);
             provider.Courses.Single(c => c.Provider.ProviderCode == instCode && c.CourseCode == courseCode3)
                 .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode4);
-
-            var providerOptedIn = Context.Providers.Single(p => p.ProviderCode == instCodeOptedIn);
-            providerOptedIn.ProviderName.Should().Be(instNameOptedIn);
-            providerOptedIn.Courses.Count(c => c.Provider.ProviderCode == instCodeOptedIn).Should().Be(3);
-            providerOptedIn.Courses.Single(c => c.Provider.ProviderCode == instCodeOptedIn && c.CourseCode == courseCode)
-                .Name.Should().Be(unmodifiedCourseName);
-            providerOptedIn.Courses.Single(c => c.Provider.ProviderCode == instCodeOptedIn && c.CourseCode == courseCode2)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode);
-            providerOptedIn.Courses.Single(c => c.Provider.ProviderCode == instCodeOptedIn && c.CourseCode == courseCode3)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCodeOptedIn);
         }
 
         private void DoImport(UcasPayload ucasPayload)
