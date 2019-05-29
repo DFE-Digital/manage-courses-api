@@ -273,6 +273,32 @@
             ]
         },
         {
+            "apiVersion": "2017-05-10",
+            "name": "postgresql-server-firewall-rules",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'postgresql-server-firewall-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "firewallRuleNamePrefix": {
+                        "value": "[concat(variables('appServicePlanName'),'-AZURE_IP-')]"
+                    },
+                    "ipAddresses": {
+                        "value": "[reference('app-service').outputs.possibleOutboundIpAddresses.value]"
+                    },
+                    "serverName": {
+                        "value": "[variables('databaseServerName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "postgresql-server"
+            ]
+        },
+        {
             "name": "app-service-plan",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2017-05-10",
@@ -570,6 +596,32 @@
             "dependsOn": [
                 "storage-account",
                 "worker-app-service-plan"
+            ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "wkr-postgresql-server-firewall-rules",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'postgresql-server-firewall-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "firewallRuleNamePrefix": {
+                        "value": "[concat(variables('workerAppServicePlanName'),'-AZURE_IP-')]"
+                    },
+                    "ipAddresses": {
+                        "value": "[reference('worker-app-service').outputs.possibleOutboundIpAddresses.value]"
+                    },
+                    "serverName": {
+                        "value": "[variables('databaseServerName')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "postgresql-server"
             ]
         },
         {
