@@ -64,6 +64,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             return await SaveImplementation(courses, providerCode);
         }
 
+        /// <summary>
+        /// Get all the courses that are ready to publish to find
+        /// </summary>
         private List<Course> GetValidCourses(string providerCode, string email, string courseCode = null)
         {
             var ucasProviderData = _dataService.GetProviderForUser(email, providerCode);
@@ -82,7 +85,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                     .Select(x => GetCourse(providerCode, x.CourseCode, email, ucasProviderData, orgEnrichmentData)));
             }
 
-            return courses.Where(courseToSave => courseToSave.IsValid(false)).ToList();
+            return courses.Where(courseToSave => courseToSave != null && courseToSave.IsValid(false)).ToList();
         }
 
         private async Task<bool> SaveImplementation(IList<Course> courses, string providerCode)
@@ -109,6 +112,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             return true;
         }
 
+        /// <summary>
+        /// Map manage courses course into find course, combining in enrichment data.
+        /// </summary>
         private Course GetCourse(string providerCode, string courseCode, string email, Provider ucasProviderData, UcasProviderEnrichmentGetModel orgEnrichmentData)
         {
             var ucasCourseData = _dataService.GetCourseForUser(email, providerCode, courseCode);
