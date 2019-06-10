@@ -79,19 +79,18 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
 
             var courses = new List<Course> ();
 
-            if (courseCode != null)
-            {
-                courses = new List<Course> { GetCourse(providerCode, courseCode, email, ucasProviderData, orgEnrichmentData) };
-                _logger.LogInformation($"GetValidCourses for provider '{providerCode}' course code '{courseCode}';");
-            }
-            else
-            {
-                _logger.LogInformation($"GetValidCourses for provider '{providerCode}'");
-                courses.AddRange(_dataService.GetCoursesForUser(email, providerCode)
-                    .Select(x => GetCourse(providerCode, x.CourseCode, email, ucasProviderData, orgEnrichmentData)));
-            }
+            _logger.LogInformation($"GetValidCourses for provider '{providerCode}' course code '{courseCode}';");
 
-            return courses.Where(courseToSave => courseToSave != null && courseToSave.IsValid(false)).ToList();
+            var coursesForUser = courseCode != null
+                ? new[] {courseCode}
+                : _dataService.GetCoursesForUser(email, providerCode).Select(c => c.CourseCode);
+
+            _logger.LogInformation($"Loaded course list: [{string.Join(",", coursesForUser)}]");
+            courses.AddRange(coursesForUser.Select(ucasCourse => GetCourse(providerCode, ucasCourse, email, ucasProviderData, orgEnrichmentData)));
+
+            var validCourses = courses.Where(courseToSave => courseToSave != null && courseToSave.IsValid(false)).ToList();
+            _logger.LogInformation($"Valid course list: [{string.Join(",", validCourses.Select(c => c?.ProgrammeCode))}]");
+            return validCourses;
         }
 
         private async Task<bool> SaveImplementation(IList<Course> courses, string providerCode)
