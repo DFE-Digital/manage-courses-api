@@ -18,7 +18,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
         {
             ucasProviderData = ucasProviderData ?? new Domain.Models.Provider();
             ucasCourseData = ucasCourseData ?? new Domain.Models.Course();
-            var sites = ucasCourseData.CourseSites ?? new ObservableCollection<CourseSite>();
+            var courseSites = ucasCourseData.PublishableSites ?? new ObservableCollection<CourseSite>();
             providerEnrichmentModel = providerEnrichmentModel ?? new ProviderEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
 
@@ -87,8 +87,8 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 },
                 IncludesPgce = MapQualification(ucasCourseData.Qualification),
                 HasVacancies = ucasCourseData.HasVacancies,
-                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(sites
-                    .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase) && String.Equals(school.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
+                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(
+                    courseSites
                     .Select(school =>
                         new SearchAndCompare.Domain.Models.Campus
                         {
@@ -114,7 +114,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                     Address = address
                 },
 
-                ApplicationsAcceptedFrom = sites.Select(x => x.ApplicationsAcceptedFrom).Where(x => x.HasValue)
+                ApplicationsAcceptedFrom = courseSites.Select(x => x.ApplicationsAcceptedFrom).Where(x => x.HasValue)
                     .OrderBy(x => x.Value)
                     .FirstOrDefault(),
 
