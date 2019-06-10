@@ -16,11 +16,6 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Domain.Models.Provider ucasProviderData, Domain.Models.Course ucasCourseData, ProviderEnrichmentModel providerEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
-            if (ucasCourseData == null || !ucasCourseData.IsPublished)
-            {
-                return null; // don't allow publishing unpublished courses to find
-            }
-
             ucasProviderData = ucasProviderData ?? new Domain.Models.Provider();
             ucasCourseData = ucasCourseData ?? new Domain.Models.Course();
             var sites = ucasCourseData.CourseSites ?? new ObservableCollection<CourseSite>();

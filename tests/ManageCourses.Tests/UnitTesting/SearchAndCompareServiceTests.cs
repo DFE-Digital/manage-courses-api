@@ -47,19 +47,18 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         public void PublishEnrichedCourseWithEmailHappyPathTest()
         {
             var email = "tester@example.com";
-            var course = MakePublishedCourse();
-
             Provider provider = new Provider
             {
                 ProviderCode = ProviderCode,
-                AccreditedCourses = new List<Course> { course }
+                AccreditedCourses =
+                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
-
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
-            _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode)).Returns(course);
+            _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
+                .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
             _dataServiceMock.Setup(x => x.GetCoursesForUser(email, ProviderCode))
-                .Returns(new List<Course>{ course } );
+                .Returns(new List<Course>{ new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" } } );
 
             _enrichmentServiceMock.Setup(x => x.GetProviderEnrichmentForPublish(ProviderCode, email))
                 .Returns(new UcasProviderEnrichmentGetModel{EnrichmentModel = new ProviderEnrichmentModel()});
@@ -78,50 +77,26 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             result.Should().BeTrue();
             _httpMock.VerifyAll();
         }
-
-        private static Course MakePublishedCourse()
-        {
-            return new Course
-            {
-                CourseCode = CourseCode,
-                ProgramType = "SD",
-                CourseSites = new List<CourseSite>
-                {
-                    new CourseSite
-                    {
-                        Publish = "Y",
-                    },
-                },
-                CourseSubjects = new List<CourseSubject>
-                {
-                    new CourseSubject { Subject = new Subject { SubjectName = "History"}}
-                },
-                Name = "History"
-            };
-        }
-
         [Test]
         public void PublishEnrichedCoursesWithEmailHappyPathTest()
         {
             var email = "tester@example.com";
-            var course = MakePublishedCourse();
             var provider = new Provider
             {
                 ProviderCode = ProviderCode,
                 AccreditedCourses =
-                    new List<Course> {course}
+                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
 
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
-                .Returns(course);
+                .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
 
-            var course1 = new Course { CourseCode = CourseCode + "1", Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "Geography" };
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode + "1"))
-                .Returns(course1);
+                .Returns(new Course { CourseCode = CourseCode + "1", Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "Geography" });
 
             _dataServiceMock.Setup(x => x.GetCoursesForUser(email, ProviderCode))
-                .Returns(new List<Course> { course, new Course { CourseCode = CourseCode + "1", Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "History" } } );
+                .Returns(new List<Course> { new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" }, new Course { CourseCode = CourseCode + "1", Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "History" } } );
 
             _enrichmentServiceMock.Setup(x => x.GetProviderEnrichmentForPublish(ProviderCode, email))
                 .Returns(new UcasProviderEnrichmentGetModel { EnrichmentModel = new ProviderEnrichmentModel() });
