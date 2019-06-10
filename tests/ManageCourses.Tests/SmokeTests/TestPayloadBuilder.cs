@@ -14,7 +14,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     InstFull = "Joe's school @ UCAS",
                     InstCode = "ABC"
                 }),
-
+                            
                 Campuses = ListOfOne(new UcasCampus {
                     InstCode = "ABC",
                     CampusCode = "", // NOTE: EMPTY STRING
@@ -25,12 +25,11 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
                     InstCode = "ABC",
                     CampusCode = "",
                     CrseCode = "XYZ",
-                    CrseTitle = "Joe's course for Primary teachers",
-                    Publish = "Y",
+                    CrseTitle = "Joe's course for Primary teachers"
                 })
             };
-
-
+        
+        
         private static List<T> ListOfOne<T> (T one) {
             return new List<T> { one };
         }
