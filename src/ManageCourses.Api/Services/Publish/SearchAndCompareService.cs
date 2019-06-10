@@ -82,10 +82,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             if (courseCode != null)
             {
                 courses = new List<Course> { GetCourse(providerCode, courseCode, email, ucasProviderData, orgEnrichmentData) };
-
+                _logger.LogInformation($"GetValidCourses for provider '{providerCode}' course code '{courseCode}';");
             }
             else
             {
+                _logger.LogInformation($"GetValidCourses for provider '{providerCode}'");
                 courses.AddRange(_dataService.GetCoursesForUser(email, providerCode)
                     .Select(x => GetCourse(providerCode, x.CourseCode, email, ucasProviderData, orgEnrichmentData)));
             }
@@ -126,7 +127,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             var ucasCourseData = _dataService.GetCourseForUser(email, providerCode, courseCode);
             var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(providerCode, courseCode, email);
 
-            if (!ucasCourseData.IsPublished)
+            if (!ucasCourseData.PublishableSites.Any())
             {
                 return null;
             }

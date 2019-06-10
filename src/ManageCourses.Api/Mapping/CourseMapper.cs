@@ -18,7 +18,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
         {
             ucasProviderData = ucasProviderData ?? new Domain.Models.Provider();
             ucasCourseData = ucasCourseData ?? new Domain.Models.Course();
-            var sites = ucasCourseData.CourseSites ?? new ObservableCollection<CourseSite>();
+            var sites = ucasCourseData.PublishableSites.ToList();
             providerEnrichmentModel = providerEnrichmentModel ?? new ProviderEnrichmentModel();
             courseEnrichmentModel = courseEnrichmentModel ?? new CourseEnrichmentModel();
 
@@ -89,8 +89,6 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 HasVacancies = ucasCourseData.HasVacancies,
                 Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(
                     sites
-                    .Where(courseSite => String.Equals(courseSite.Status, "r", StringComparison.InvariantCultureIgnoreCase)
-                                         && String.Equals(courseSite.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
                         new SearchAndCompare.Domain.Models.Campus
                         {

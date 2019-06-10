@@ -89,7 +89,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                 {
                     new CourseSite
                     {
+                        Status = "R",
                         Publish = "Y",
+                        Site = new Site(),
                     },
                 },
                 CourseSubjects = new List<CourseSubject>

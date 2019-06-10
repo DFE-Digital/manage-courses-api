@@ -160,7 +160,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             res.ContactDetails.Website.Should().Be("http://www.example.com");
             res.ContactDetails.Address.Should().Be("Addr1\nAddr2\nAddr3\nAddr4\nPostcode");
 
-            res.ApplicationsAcceptedFrom.Should().Be(new System.DateTime(2018, 10, 16));
+            res.ApplicationsAcceptedFrom.Should().BeNull();
 
             res.FullTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
             res.PartTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
