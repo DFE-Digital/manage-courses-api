@@ -16,11 +16,6 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Domain.Models.Provider ucasProviderData, Domain.Models.Course ucasCourseData, ProviderEnrichmentModel providerEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
         {
-            if (ucasCourseData == null || !ucasCourseData.IsPublished)
-            {
-                return null; // don't allow publishing unpublished courses to find
-            }
-
             ucasProviderData = ucasProviderData ?? new Domain.Models.Provider();
             ucasCourseData = ucasCourseData ?? new Domain.Models.Course();
             var sites = ucasCourseData.CourseSites ?? new ObservableCollection<CourseSite>();
@@ -92,8 +87,10 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 },
                 IncludesPgce = MapQualification(ucasCourseData.Qualification),
                 HasVacancies = ucasCourseData.HasVacancies,
-                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(sites
-                    .Where(school => String.Equals(school.Status, "r", StringComparison.InvariantCultureIgnoreCase) && String.Equals(school.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
+                Campuses = new Collection<SearchAndCompare.Domain.Models.Campus>(
+                    sites
+                    .Where(courseSite => String.Equals(courseSite.Status, "r", StringComparison.InvariantCultureIgnoreCase)
+                                         && String.Equals(courseSite.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
                     .Select(school =>
                         new SearchAndCompare.Domain.Models.Campus
                         {

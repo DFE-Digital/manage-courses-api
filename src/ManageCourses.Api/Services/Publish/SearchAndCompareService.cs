@@ -60,6 +60,11 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             }
 
             var courses = GetValidCourses(providerCode, email, courseCode);
+            if (!courses.Any())
+            {
+                _logger.LogError($"SearchAndCompareService.SaveCourse() returned false. No valid (published) course found for {providerCode}/{courseCode}");
+                return false;
+            }
 
             return await SaveImplementation(courses, providerCode);
         }
@@ -114,11 +119,17 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
 
         /// <summary>
         /// Map manage courses course into find course, combining in enrichment data.
+        /// Returns null if not a published course.
         /// </summary>
         private Course GetCourse(string providerCode, string courseCode, string email, Provider ucasProviderData, UcasProviderEnrichmentGetModel orgEnrichmentData)
         {
             var ucasCourseData = _dataService.GetCourseForUser(email, providerCode, courseCode);
             var courseEnrichmentData = _enrichmentService.GetCourseEnrichmentForPublish(providerCode, courseCode, email);
+
+            if (!ucasCourseData.IsPublished)
+            {
+                return null;
+            }
 
             var courseToReturn = _courseMapper.MapToSearchAndCompareCourse(
                 ucasProviderData,

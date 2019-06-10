@@ -127,11 +127,44 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         {
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
-                GenerateUcasCourse(publishedCampus: false),
+                GenerateUcasCourse(),
                 GenerateProviderEnrichmentWithoutContactDetails(),
                 GenerateCourseEnrichmentModel()
             );
-            res.Should().BeNull();
+
+            res.Duration.Should().Be("1 year");
+            res.Name.Should().Be("Course.Name");
+            res.ProgrammeCode.Should().Be("CourseCode");
+
+            res.Provider.ProviderCode.Should().Be("ABC");
+            res.Provider.Name.Should().Be("My provider");
+            res.AccreditingProvider.ProviderCode.Should().Be("ACC123");
+            res.AccreditingProvider.Name.Should().Be("AccreditingProviderName");
+
+            res.Route.Name.Should().Be("School Direct (salaried) training programme");
+            res.Route.IsSalaried.Should().Be(true);
+
+            res.IncludesPgce.Should().Be(SearchAndCompare.Domain.Models.Enums.IncludesPgce.Yes);
+            res.IsSalaried.Should().BeTrue();
+
+            res.Campuses.Count.Should().Be(0);
+
+            res.CourseSubjects.Count.Should().Be(2);
+            res.CourseSubjects.Any(x => x.Subject.Name == "Mathematics").Should().BeTrue();
+            res.CourseSubjects.Any(x => x.Subject.Name == "Physics").Should().BeTrue();
+
+            res.Fees.Uk.Should().Be(123);
+            res.Fees.Eu.Should().Be(123);
+            res.Fees.International.Should().Be(123000);
+
+            res.ContactDetails.Website.Should().Be("http://www.example.com");
+            res.ContactDetails.Address.Should().Be("Addr1\nAddr2\nAddr3\nAddr4\nPostcode");
+
+            res.ApplicationsAcceptedFrom.Should().Be(new System.DateTime(2018, 10, 16));
+
+            res.FullTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
+            res.PartTime.Should().Be(SearchAndCompare.Domain.Models.Enums.VacancyStatus.Vacancies);
+            res.IsSen.Should().BeFalse();
         }
 
         [Test]
@@ -219,7 +252,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
         }
 
-        private static Course GenerateUcasCourse(bool publishedCampus = true)
+        private static Course GenerateUcasCourse(bool publishedCampus = false)
         {
             return new Course
             {

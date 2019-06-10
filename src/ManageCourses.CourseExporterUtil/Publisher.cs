@@ -131,7 +131,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                     converter.Convert(courseEnrichments.GetValueOrDefault(c.Provider.ProviderCode + "_@@_" + c.CourseCode))?.EnrichmentModel
                 );
 
-                if (!mappedCourse.Campuses.Any())
+                if (mappedCourse == null || !mappedCourse.Campuses.Any())
                 {
                     // only publish running courses
                     continue;
