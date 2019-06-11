@@ -82,7 +82,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                     .Select(x => GetCourse(providerCode, x.CourseCode, email, ucasProviderData, orgEnrichmentData)));
             }
 
-            return courses.Where(courseToSave => courseToSave.IsValid(false)).ToList();
+            return courses.Where(courseToSave => courseToSave.IsValid(false) && courseToSave.Campuses.Any()).ToList();
         }
 
         private async Task<bool> SaveImplementation(IList<Course> courses, string providerCode)
