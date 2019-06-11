@@ -43,8 +43,6 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                         Name = subject
                     }
                 }).ToList());
-            var isFurtherEducation = subjects.Any(c =>
-                c.Subject.Name.Equals("Further education", StringComparison.InvariantCultureIgnoreCase));
 
             var provider = new SearchAndCompare.Domain.Models.Provider
             {
