@@ -55,7 +55,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             };
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
+                .Returns(BuildCourse(provider));
 
             _dataServiceMock.Setup(x => x.GetCoursesForUser(email, ProviderCode))
                 .Returns(new List<Course>{ new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" } } );
@@ -90,7 +90,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
-                .Returns(new Course { CourseCode = CourseCode, Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "History"}}}, Name = "History" });
+                .Returns(BuildCourse(provider));
 
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode + "1"))
                 .Returns(new Course { CourseCode = CourseCode + "1", Provider = provider, ProgramType = "SD", CourseSubjects = new List<CourseSubject> { new CourseSubject { Subject = new Subject { SubjectName = "Geography"}}}, Name = "Geography" });
@@ -120,6 +120,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             result.Should().BeTrue();
             _httpMock.VerifyAll();
         }
+
         [Test]
         public void PublishEnrichedCourseWithEmailDraftTest()
         {
@@ -242,6 +243,26 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var result = _searchAndCompareService.SaveCourses(providerCode, email).Result;
 
             result.Should().BeFalse();
+        }
+
+        private static Course BuildCourse(Provider provider)
+        {
+            return new Course
+            {
+                CourseCode = CourseCode, Provider = provider, ProgramType = "SD",
+                CourseSubjects = new List<CourseSubject>
+                    {new CourseSubject {Subject = new Subject {SubjectName = "History"}}},
+                Name = "History",
+                CourseSites = new List<CourseSite>
+                {
+                    new CourseSite
+                    {
+                        Status = "R",
+                        Publish = "Y",
+                        Site = new Site(),
+                    }
+                }
+            };
         }
     }
 }

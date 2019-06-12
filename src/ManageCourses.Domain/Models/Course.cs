@@ -73,6 +73,17 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         [NotMapped]
         public bool HasVacancies { get => CourseSites?.Any(s => s.VacStatus == "B" || s.VacStatus == "F" || s.VacStatus == "P") ?? false;}
 
+        [NotMapped]
+        public IEnumerable<CourseSite> PublishableSites
+        {
+            get
+            {
+                return CourseSites?.Where(courseSite =>
+                    string.Equals(courseSite.Status, "r", StringComparison.InvariantCultureIgnoreCase)
+                    && string.Equals(courseSite.Publish, "y", StringComparison.InvariantCultureIgnoreCase))
+                    ?? new List<CourseSite>();
+            }
+        }
 
         private string GetCourseVariantType()
         {

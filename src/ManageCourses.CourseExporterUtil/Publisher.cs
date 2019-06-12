@@ -91,7 +91,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             {
                 course.CourseSites = new Collection<CourseSite>(course.CourseSites.Where(x => x.Publish == "Y").ToList());
             }
-            courses.Where(x => x.CourseSites.Any(y => y.Publish =="Y")).ToList();
 
             _logger.Information($" - {courses.Count()} courses");
 
