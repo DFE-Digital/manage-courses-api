@@ -47,9 +47,10 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var mappedCourses = ReadAllCourseData(context);
             try
             {
+// var mod = mappedCourses.Where(x => x.Salary.Maximum.HasValue  || x.Salary.Minimum.HasValue );
 
-                var one = new List<SearchCourse> { mappedCourses.First()};
-                File.WriteAllText(@"manage_sanitizer_one_course.json", JsonConvert.SerializeObject(one));
+                // var one = new List<SearchCourse> { mappedCourses.First()};
+                // File.WriteAllText(@"manage_sanitizer_mod_course.json", JsonConvert.SerializeObject(mod));
 
                 // using (StreamWriter file = File.CreateText(@"manage_sanitizer.json"))
                 // {
@@ -78,9 +79,9 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
         {
             using (var httpClient = new HttpClient())
             {
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mcConfig.SearchAndCompareApiKey);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "123");//_mcConfig.SearchAndCompareApiKey);
                 httpClient.Timeout = TimeSpan.FromMinutes(120);
-                var client = new SearchAndCompareApi(httpClient, _mcConfig.SearchAndCompareApiUrl);
+                var client = new SearchAndCompareApi(httpClient, "http://localhost:5001/api/");//_mcConfig.SearchAndCompareApiUrl);
                 _logger.Information($"Sending {courses.Count()} courses to Search API...");
                 var success = await client.SaveCoursesAsync(courses);
                 if (!success)
