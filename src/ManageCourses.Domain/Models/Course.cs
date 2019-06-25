@@ -71,7 +71,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         /// </summary>
         /// <value></value>
         [NotMapped]
-        public bool HasVacancies { get => CourseSites?.Any(s => s.VacStatus == "B" || s.VacStatus == "F" || s.VacStatus == "P") ?? false;}
+        public bool HasVacancies { get => PublishableSites?.Any(s => s.VacStatus == "B" || s.VacStatus == "F" || s.VacStatus == "P") ?? false;}
 
         [NotMapped]
         public IEnumerable<CourseSite> PublishableSites
