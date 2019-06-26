@@ -63,5 +63,44 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting.Model
             };
             course.PublishableSites.Should().HaveCount(publishable ? 1 : 0);
         }
+
+        [Test]
+        // single site
+        [TestCase("R", "Y", "B", null, null, null, true)]
+        [TestCase("R", "Y", "F", null, null, null, true)]
+        [TestCase("R", "Y", "P", null, null, null, true)]
+        [TestCase("R", "Y", "",  null, null, null, false)]
+        // other single-site variations do not show on find so vacancy information is intentionally left undefined
+        // multi-site with non-publishable second sites:
+        // https://trello.com/c/ddBrkrtk/1660-failing-to-sync-closed-courses-when-vacancies-turned-off
+        [TestCase("R", "Y", "F", "R", "N", "B",  true)]
+        [TestCase("R", "Y", "F", "R", "N", "",   true)]
+        [TestCase("R", "Y", "F", "S", "Y", "B",  true)]
+        [TestCase("R", "Y", "F", "S", "Y", "",   true)]
+        [TestCase("R", "N", "",  "R", "N", "B",  false)]
+        [TestCase("R", "N", "",  "R", "N", "",   false)]
+        [TestCase("R", "N", "",  "S", "Y", "B",  false)]
+        [TestCase("R", "N", "",  "S", "Y", "",   false)]
+        public void HasVacancies_AllVariations(
+            string site1status, string site1publish, string site1vacstatus,
+            string site2status, string site2publish, string site2vacstatus,
+            bool expectedCourseVacancies)
+        {
+            var course = new Course
+            {
+                CourseSites = new List<CourseSite>
+                {
+                    new CourseSite {Status = site1status, Publish = site1publish, VacStatus = site1vacstatus},
+                },
+            };
+            if (site2status != null)
+            {
+                course.CourseSites.Add(
+                    new CourseSite {Status = site2status, Publish = site2publish, VacStatus = site2vacstatus}
+                );
+            }
+            course.HasVacancies.Should().Be(expectedCourseVacancies);
+        }
+
     }
 }

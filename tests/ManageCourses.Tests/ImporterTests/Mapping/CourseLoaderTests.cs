@@ -120,6 +120,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
             manageApiCourse.HasVacancies.Should().Be(false, "because there is only one course and it has no vacancies");
         }
 
+        [Ignore("The importer no longer in use.")]
         [Test]
         public void CourseWithVacancy()
         {
