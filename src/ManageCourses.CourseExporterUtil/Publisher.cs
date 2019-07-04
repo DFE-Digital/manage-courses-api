@@ -85,6 +85,8 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
+                .Include(x => x.CourseEnrichments).ThenInclude(x => x.CreatedByUser)
+                .Include(x => x.CourseEnrichments).ThenInclude(x => x.UpdatedByUser)
                 .ToList();
 
             foreach(var course in courses)
@@ -95,13 +97,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             _logger.Information($" - {courses.Count()} courses");
 
             _logger.Information("Retrieving enrichments");
-            var courseEnrichments = context.CourseEnrichments
-                .Include(x => x.CreatedByUser)
-                .Include(x => x.UpdatedByUser)
-                .Where(x => x.Status == EnumStatus.Published)
-                .ToLookup(x => x.ProviderCode + "_@@_" + x.UcasCourseCode)
-                .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedAt).First());
-            _logger.Information($" - {courseEnrichments.Count()} courseEnrichments");
 
             var orgEnrichments = context.ProviderEnrichments
                 .Include(x => x.CreatedByUser)
@@ -123,11 +118,15 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
 
             foreach (var c in courses)
             {
+                var courseEnrichment = c.CourseEnrichments
+                    .OrderByDescending(y => y.UpdatedAt)
+                    .FirstOrDefault(x => x.Status == EnumStatus.Published);
+
                 var mappedCourse = courseMapper.MapToSearchAndCompareCourse(
                     c.Provider,
                     c,
                     converter.Convert(orgEnrichments.GetValueOrDefault(c.Provider.ProviderCode))?.EnrichmentModel,
-                    converter.Convert(courseEnrichments.GetValueOrDefault(c.Provider.ProviderCode + "_@@_" + c.CourseCode))?.EnrichmentModel
+                    converter.Convert(courseEnrichment)?.EnrichmentModel
                 );
 
                 if (!mappedCourse.Campuses.Any())
