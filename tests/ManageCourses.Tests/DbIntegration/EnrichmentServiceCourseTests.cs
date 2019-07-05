@@ -25,6 +25,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         private const string ProviderInstCode = "HNY1";
         private const string AccreditingInstCode = "TRILU";
         private const string UcasCourseCode = "TK101";
+        private const string OtherCourseCode = "D0H";
 
         private const string Email = "12345@example.org";
 
@@ -49,7 +50,12 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         CourseCode = UcasCourseCode,
                         Name = "Conscious control of telekenisis",
                         AccreditingProvider = accreditingInstitution,
-                    }
+                    },
+                    new Course
+                    {
+                        CourseCode = OtherCourseCode,
+                        Name = "Daemons and Gremlins",
+                    },
                 }
             };
             Context.Add(_ucasInstitution);
@@ -179,11 +185,10 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             {
                 AboutCourse = "Some other course",
             };
-            const string otherCourseCode = "D0H";
-            enrichmentService.SaveCourseEnrichment(nextCourseModel, ProviderInstCode.ToLower(), otherCourseCode, Email);
+            enrichmentService.SaveCourseEnrichment(nextCourseModel, ProviderInstCode.ToLower(), OtherCourseCode, Email);
             var twoCourseMetadata = enrichmentService.GetCourseEnrichmentMetadata(ProviderInstCode, Email);
             twoCourseMetadata.Count.Should().Be(2, "we have enriched two courses in this institution");
-            var nextCourseGet = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), otherCourseCode, Email);
+            var nextCourseGet = enrichmentService.GetCourseEnrichment(ProviderInstCode.ToLower(), OtherCourseCode, Email);
             nextCourseGet.Should().NotBeNull();
             nextCourseGet.EnrichmentModel.Should().NotBeNull();
             nextCourseGet.EnrichmentModel.AboutCourse.Should().BeEquivalentTo(nextCourseModel.AboutCourse);

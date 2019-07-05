@@ -196,8 +196,19 @@ namespace GovUk.Education.ManageCourses.Api.Services
             providerCode = providerCode.ToUpperInvariant();
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
-            var enrichmentDraftRecord = _context.CourseEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
+            var course = _context.Courses
+                .Include(c => c.CourseEnrichments)
+                .SingleOrDefault(c =>
+                    c.Provider.ProviderCode == providerCode
+                    && c.CourseCode == ucasCourseCode);
+
+            if (course == null)
+            {
+                throw new Exception($"Course not found {providerCode}/{ucasCourseCode}");
+            }
+
+            var enrichmentDraftRecord = course.CourseEnrichments
+                .Where(ce => ce.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
@@ -213,8 +224,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
             else
             {
                 //insert
-                var enrichmentPublishRecord = _context.CourseEnrichments
-                    .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Published)
+                var enrichmentPublishRecord = course.CourseEnrichments
+                    .Where(ce => ce.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -235,7 +246,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
-                _context.CourseEnrichments.Add(enrichment);
+                course.CourseEnrichments.Add(enrichment);
             }
             _context.Save();
         }
