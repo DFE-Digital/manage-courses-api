@@ -120,13 +120,15 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var userOrg = ValidateUserOrg(email, providerCode);
 
             providerCode = providerCode.ToUpperInvariant();
+            var provider = _context.Providers
+                .Include(p => p.ProviderEnrichments)
+                .Single(p => p.ProviderCode == providerCode);
 
-            var enrichmentDraftRecord = _context.ProviderEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Draft)
+            var enrichmentDraftRecord = provider.ProviderEnrichments
+                .Where(ie => ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
-            var provider = _context.Providers.Single(p => p.ProviderCode == providerCode);
             var publishTimestamp = DateTime.UtcNow;
             provider.LastPublishedAt = publishTimestamp;
             provider.ChangedAt = publishTimestamp; // make sure change shows in incremental fetch api
