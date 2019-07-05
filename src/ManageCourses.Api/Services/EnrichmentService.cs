@@ -6,6 +6,7 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
@@ -153,27 +154,28 @@ namespace GovUk.Education.ManageCourses.Api.Services
             providerCode = providerCode.ToUpperInvariant();
 
             var enrichments = _context.CourseEnrichments.FromSql(@"
-                    SELECT b.id,
-                           b.created_by_user_id,
-                           b.created_at,
-                           b.provider_code,
-                           NULL AS json_data,
-                           b.last_published_timestamp_utc,
-                           b.status,
-                           b.ucas_course_code,
-                           b.updated_by_user_id,
-                           b.updated_at,
-                           b.course_id
-                    FROM
-                      (SELECT provider_code,
-                              ucas_course_code,
-                              MAX(id) id
-                       FROM course_enrichment
-                       GROUP BY provider_code,
-                                ucas_course_code) top_id
+                    SELECT
+                        b.id,
+                        b.created_by_user_id,
+                        b.created_at,
+                        b.provider_code,
+                        NULL AS json_data,
+                        b.last_published_timestamp_utc,
+                        b.status,
+                        b.ucas_course_code,
+                        b.updated_by_user_id,
+                        b.updated_at,
+                        b.course_id
+                    FROM (
+                        SELECT MAX(ce.id) id
+                        FROM course_enrichment ce
+                            INNER JOIN course c on c.id = ce.course_id
+                            INNER JOIN provider p on p.id = c.provider_id
+                        GROUP BY p.provider_code, c.course_code
+                        HAVING p.provider_code = @providerCode
+                    ) top_id
                     INNER JOIN course_enrichment b ON top_id.id = b.id
-                    ")
-                .Where(e => e.ProviderCode == providerCode);
+                ", new NpgsqlParameter("providerCode", providerCode));
 
             return enrichments.Select(x => _converter.Convert(x)).ToList();
         }
