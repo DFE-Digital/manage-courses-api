@@ -259,6 +259,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
         /// <param name="ucasCourseCode">course code of the enrichemnt to be published</param>
         /// <param name="email">email of the user</param>
         /// <returns>true if successful</returns>
+        [Obsolete("This has been reimplemented in Rails.")]
         public bool PublishCourseEnrichment(string providerCode, string ucasCourseCode, string email)
         {
             var returnBool = false;
