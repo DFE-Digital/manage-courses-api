@@ -53,17 +53,21 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             providerCode = providerCode.ToUpperInvariant();
 
-            var enrichmentDraftRecord = _context.ProviderEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Draft)
+            var provider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
+            if (provider == null)
+            {
+                throw new Exception($"Provider {providerCode} not found");
+            }
+
+            var enrichmentDraftRecord = provider.ProviderEnrichments
+                .Where(ie => ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
             // when saving enforce the region code is being saved.
             if(!model.EnrichmentModel.RegionCode.HasValue)
             {
-                var ucasProvider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
-
-                model.EnrichmentModel.RegionCode = ucasProvider.RegionCode;
+                model.EnrichmentModel.RegionCode = provider.RegionCode;
             }
 
             string content = _converter.ConvertToJson(model);
@@ -78,8 +82,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
             else
             {
                 //insert
-                var enrichmentPublishRecord = _context.ProviderEnrichments
-                    .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Published)
+                var enrichmentPublishRecord = provider.ProviderEnrichments
+                    .Where(ie => ie.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -99,7 +103,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
-                _context.ProviderEnrichments.Add(enrichment);
+                provider.ProviderEnrichments.Add(enrichment);
             }
             _context.Save();
         }
