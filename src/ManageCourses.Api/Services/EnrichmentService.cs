@@ -52,8 +52,9 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var userProvider = ValidateUserOrg(email, providerCode);
 
             providerCode = providerCode.ToUpperInvariant();
-
-            var provider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
+            var provider = _context.Providers
+                .Include(p => p.ProviderEnrichments)
+                .SingleOrDefault(x => x.ProviderCode == providerCode);
             if (provider == null)
             {
                 throw new Exception($"Provider {providerCode} not found");
@@ -256,6 +257,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             return returnBool;
         }
+
         /// <summary>
         /// gets the latest enrichment record regardless of the status
         /// </summary>
@@ -304,17 +306,24 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             providerCode = providerCode.ToUpperInvariant();
 
-            var enrichmentsQuery = _context.ProviderEnrichments
-                .Where(ie => ie.ProviderCode == providerCode);
+            var provider = _context.Providers
+                .Include(p => p.ProviderEnrichments).ThenInclude(e => e.CreatedByUser)
+                .Include(p => p.ProviderEnrichments).ThenInclude(e => e.CreatedByUser)
+                .SingleOrDefault(x => x.ProviderCode == providerCode);
+            if (provider == null)
+            {
+                throw new Exception($"Provider {providerCode} not found");
+            }
+
+            var enrichmentsQuery = provider.ProviderEnrichments.AsQueryable();
 
             if (publishableOnly)
             {
                 enrichmentsQuery = enrichmentsQuery.Where(ie => ie.Status == EnumStatus.Published);
             }
 
-            var enrichment = enrichmentsQuery.OrderByDescending(x => x.Id)
-                .Include(e => e.CreatedByUser)
-                .Include(e => e.UpdatedByUser)
+            var enrichment = enrichmentsQuery
+                .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
             var enrichmentGetModel = _converter.Convert(enrichment) ?? new UcasProviderEnrichmentGetModel();
@@ -334,20 +343,16 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             if (useUcasContact)
             {
-                var ucasProvider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
-                if (ucasProvider != null)
-                {
-                    enrichmentModel.Email = ucasProvider.Email;
-                    enrichmentModel.Telephone = ucasProvider.Telephone;
-                    enrichmentModel.Website = ucasProvider.Url;
-                    enrichmentModel.Address1 = ucasProvider.Address1;
-                    enrichmentModel.Address2 = ucasProvider.Address2;
-                    enrichmentModel.Address3 = ucasProvider.Address3;
-                    enrichmentModel.Address4 = ucasProvider.Address4;
-                    enrichmentModel.Postcode = ucasProvider.Postcode;
-                    // When first getting enrichment, seed the region code.
-                    enrichmentModel.RegionCode = ucasProvider.RegionCode;
-                }
+                enrichmentModel.Email = provider.Email;
+                enrichmentModel.Telephone = provider.Telephone;
+                enrichmentModel.Website = provider.Url;
+                enrichmentModel.Address1 = provider.Address1;
+                enrichmentModel.Address2 = provider.Address2;
+                enrichmentModel.Address3 = provider.Address3;
+                enrichmentModel.Address4 = provider.Address4;
+                enrichmentModel.Postcode = provider.Postcode;
+                // When first getting enrichment, seed the region code.
+                enrichmentModel.RegionCode = provider.RegionCode;
             }
 
             return enrichmentGetModel;
