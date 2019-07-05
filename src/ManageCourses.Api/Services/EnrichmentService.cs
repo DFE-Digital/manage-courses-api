@@ -302,7 +302,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentsQuery = _context.CourseEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode);
+                .Where(ce => ce.Course.Provider.ProviderCode == providerCode
+                             && ce.Course.CourseCode == ucasCourseCode);
 
             if (publishableOnly)
             {
