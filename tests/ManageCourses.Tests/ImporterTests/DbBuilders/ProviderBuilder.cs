@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.Manages.Tests.ImporterTests.DbBuilders;
 
 namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
 {
@@ -9,7 +10,13 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
 
         public ProviderBuilder()
         {
-            _provider = new Provider();
+            _provider = new Provider
+            {
+                Sites = new List<Site>
+                {
+                    new SiteBuilder(),
+                }
+            };
         }
 
         public ProviderBuilder WithCode(string providerCode)

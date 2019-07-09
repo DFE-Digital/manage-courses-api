@@ -78,7 +78,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             }
         }
 
-        private List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
+        public List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
         {
             _logger.Information("Retrieving courses");
             var courses = context.Courses.Include(x => x.Provider)
