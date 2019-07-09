@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Domain;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
+using GovUk.Education.ManageCourses.Domain.Models;
 using GovUk.Education.ManageCourses.Tests.TestUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -21,6 +24,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected DateTime MockTime;
         protected Mock<IClock> MockClock;
         protected TestConfigReader TestConfig;
+
+        private protected RecruitmentCycle CurrentRecruitmentCycle => Context.RecruitmentCycles.Single(rc => rc.Year == RecruitmentCycle.CurrentYear);
 
         protected virtual bool EnableRetryOnFailure => true;
 
@@ -65,6 +70,14 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             // reset clock
             MockTime = new DateTime(1977, 1, 2, 3, 4, 5, 7);
+
+            Context.RecruitmentCycles.AddRange(
+                new List<RecruitmentCycle>
+                {
+                    new RecruitmentCycle {Year = RecruitmentCycle.CurrentYear},
+                    new RecruitmentCycle {Year = "2020"},
+                });
+            Context.SaveChanges();
 
             // allow derived tests to do their own setup
             Setup();

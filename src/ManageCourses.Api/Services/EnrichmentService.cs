@@ -55,10 +55,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
             providerCode = providerCode.ToUpperInvariant();
             var provider = _context.Providers
                 .Include(p => p.ProviderEnrichments)
-                .SingleOrDefault(x => x.ProviderCode == providerCode);
+                .SingleOrDefault(p => p.ProviderCode == providerCode
+                                      && p.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear);
+
             if (provider == null)
             {
-                throw new Exception($"Provider {providerCode} not found");
+                throw new Exception($"Provider {RecruitmentCycle.CurrentYear}/{providerCode} not found");
             }
 
             var enrichmentDraftRecord = provider.ProviderEnrichments
@@ -124,7 +126,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
             providerCode = providerCode.ToUpperInvariant();
             var provider = _context.Providers
                 .Include(p => p.ProviderEnrichments)
-                .Single(p => p.ProviderCode == providerCode);
+                .Single(p => p.ProviderCode == providerCode
+                             && p.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear);
 
             var enrichmentDraftRecord = provider.ProviderEnrichments
                 .Where(ie => ie.Status == EnumStatus.Draft)
@@ -171,11 +174,14 @@ namespace GovUk.Education.ManageCourses.Api.Services
                         FROM course_enrichment ce
                             INNER JOIN course c on c.id = ce.course_id
                             INNER JOIN provider p on p.id = c.provider_id
+                            INNER JOIN recruitment_cycle rc on rc.id = p.recruitment_cycle_id
+                        WHERE rc.year = @currentRecruitmentCycleYear
                         GROUP BY p.provider_code, c.course_code
                         HAVING p.provider_code = @providerCode
                     ) top_id
                     INNER JOIN course_enrichment b ON top_id.id = b.id
-                ", new NpgsqlParameter("providerCode", providerCode));
+                ", new NpgsqlParameter("providerCode", providerCode),
+                new NpgsqlParameter("currentRecruitmentCycleYear", RecruitmentCycle.CurrentYear));
 
             return enrichments.Select(x => _converter.Convert(x)).ToList();
         }
@@ -202,11 +208,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
                 .Include(c => c.CourseEnrichments)
                 .SingleOrDefault(c =>
                     c.Provider.ProviderCode == providerCode
+                    && c.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear
                     && c.CourseCode == ucasCourseCode);
 
             if (course == null)
             {
-                throw new Exception($"Course not found {providerCode}/{ucasCourseCode}");
+                throw new Exception($"Course not found {RecruitmentCycle.CurrentYear}/{providerCode}/{ucasCourseCode}");
             }
 
             var enrichmentDraftRecord = course.CourseEnrichments
@@ -305,6 +312,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
 
             var enrichmentsQuery = _context.CourseEnrichments
                 .Where(ce => ce.Course.Provider.ProviderCode == providerCode
+                             && ce.Course.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear
                              && ce.Course.CourseCode == ucasCourseCode);
 
             if (publishableOnly)
@@ -341,10 +349,12 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var provider = _context.Providers
                 .Include(p => p.ProviderEnrichments).ThenInclude(e => e.CreatedByUser)
                 .Include(p => p.ProviderEnrichments).ThenInclude(e => e.CreatedByUser)
-                .SingleOrDefault(x => x.ProviderCode == providerCode);
+                .SingleOrDefault(p => p.ProviderCode == providerCode
+                             && p.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear);
+
             if (provider == null)
             {
-                throw new Exception($"Provider {providerCode} not found");
+                throw new Exception($"Provider {RecruitmentCycle.CurrentYear}/{providerCode} not found");
             }
 
             var enrichmentsQuery = provider.ProviderEnrichments.AsQueryable();
@@ -397,13 +407,21 @@ namespace GovUk.Education.ManageCourses.Api.Services
             providerCode = providerCode.ToUpperInvariant();
             email = email.ToLowerInvariant();
 
-            var provider = _context.OrganisationProviders.Include(x => x.Organisation).Single(x => x.Provider.ProviderCode == providerCode); //should throw an error if  the provider doesn't exist
+            var provider = _context.OrganisationProviders
+                .Include(x => x.Organisation)
+                .SingleOrDefault(op => op.Provider.ProviderCode == providerCode
+                             && op.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear);
+
+            if (provider == null)
+            {
+                throw new ArgumentException($"Provider {RecruitmentCycle.CurrentYear}/{providerCode} not found");
+            }
 
             var orgUser = _context.OrganisationUsers
                 .Where(x => x.User.Email == email && x.Organisation.OrgId == provider.Organisation.OrgId)
                 .Include(x => x.User)
                 .Include(x => x.Organisation)
-                .Single(); //should throw an error if the user doesn't have acces to the provider
+                .Single(); //should throw an error if the user doesn't have access to the provider
 
             var returnUserProvider = new UserProvider
             {

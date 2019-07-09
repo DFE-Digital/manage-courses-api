@@ -18,14 +18,17 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
 
         private readonly ILogger _logger;
         private readonly UcasPayload payload;
+        private readonly RecruitmentCycle _recruitmentCycle;
         private readonly IClock _clock;
 
-        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger, UcasPayload payload, IClock clock = null)
+        public UcasDataMigrator(ManageCoursesDbContext manageCoursesDbContext, ILogger logger, UcasPayload payload,
+            IClock clock = null, RecruitmentCycle recruitmentCycle = null)
         {
             _context = manageCoursesDbContext;
             _logger = logger;
             _clock = clock ?? new Clock();
             this.payload = payload;
+            _recruitmentCycle = recruitmentCycle;
         }
 
         /// <summary>
@@ -211,6 +214,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 Scitt = x.Scitt,
                 SchemeMember = x.SchemeMember,
                 AccreditingProvider = x.AccreditingProvider,
+                RecruitmentCycle = _recruitmentCycle
             };
         }
 

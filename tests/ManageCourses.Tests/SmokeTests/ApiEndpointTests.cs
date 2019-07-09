@@ -6,9 +6,12 @@ using GovUk.Education.ManageCourses.UcasCourseImporter;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Web;
+using GovUk.Education.ManageCourses.Domain.Models;
 
 namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
@@ -135,7 +138,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 
             var client = BuildClient(accessToken);
 
-            Context.AddTestReferenceData(Email);
+            Context.AddTestReferenceData(Email, CurrentRecruitmentCycle);
             Context.Save();
 
             // does not throw... nb. Assert.DoesNotThrow does not support async voids
@@ -180,10 +183,20 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             // don't use the retrying context because the migrator hasn't been updated to use the retry strategy
             var migratorContext = ContextLoader.GetDbContext(Config, false);
 
-            migratorContext.AddTestReferenceData(TestConfig.SignInUsername);
+            // Not using CurrentRecruitmentCycle from base class because it doesn't share this context
+            var currentRecruitmentCycle = migratorContext
+                .RecruitmentCycles
+                .Single(rc => rc.Year == RecruitmentCycle.CurrentYear);
+            migratorContext.AddTestReferenceData(TestConfig.SignInUsername, currentRecruitmentCycle);
             migratorContext.Save();
 
-            new UcasDataMigrator(migratorContext, new Mock<Serilog.ILogger>().Object,TestPayloadBuilder.MakeSimpleUcasPayload()).UpdateUcasData();
+            var ucasDataMigrator = new UcasDataMigrator(migratorContext,
+                new Mock<Serilog.ILogger>().Object,
+                TestPayloadBuilder.MakeSimpleUcasPayload(),
+                null,
+                currentRecruitmentCycle);
+
+            ucasDataMigrator.UpdateUcasData();
         }
 
         private async Task<ManageCoursesApiClient> BuildSigninAwareClient()

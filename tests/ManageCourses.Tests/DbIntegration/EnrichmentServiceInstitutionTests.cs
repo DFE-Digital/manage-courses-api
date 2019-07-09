@@ -33,6 +33,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             {
                 ProviderName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
                 ProviderCode = AccreditingInstCode,
+                RecruitmentCycle = CurrentRecruitmentCycle,
             };
             Context.Add(accreditingInstitution);
 
@@ -51,7 +52,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         AccreditingProvider = accreditingInstitution,
                     }
                 },
-                RegionCode = RegionCode
+                RegionCode = RegionCode,
+                RecruitmentCycle = CurrentRecruitmentCycle,
             };
             Context.Add(_ucasInstitution);
 
@@ -202,37 +204,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             publishedCount.Should().Be(1);
             draftCount.Should().Be(1);
         }
-        [Test]
-        [TestCase("eqweqw", "qweqweq")]
-        public void Test_SaveInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
-        {
-            const string trainWithDisabilityText = "TrainWithDisabilily Text";
-            const string trainWithUsText = "TrainWithUs Text";
-            const string instDesc = "school1 description enrichement";
 
-            var enrichmentService = new EnrichmentService(Context);
-            var model = new UcasProviderEnrichmentPostModel
-            {
-                EnrichmentModel = new ProviderEnrichmentModel
-                {
-                    TrainWithDisability = trainWithDisabilityText,
-                    TrainWithUs = trainWithUsText,
-                    AccreditingProviderEnrichments = new List<AccreditingProviderEnrichment>
-                    {
-                        new AccreditingProviderEnrichment
-                        {
-                            UcasProviderCode = AccreditingInstCode,
-                            Description = instDesc,
-                        }
-                    }
-                }
-            };
-
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.SaveProviderEnrichment(model, instCode, email));
-        }
         [Test]
         [TestCase("", "")]
         [TestCase(null, null)]
+        [TestCase("eqweqw", "qweqweq")]
         public void Test_SaveInstitutionEnrichment_should__argument_exception(string instCode, string email)
         {
             const string trainWithDisabilityText = "TrainWithDisabilily Text";
@@ -259,30 +235,26 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             Assert.Throws<ArgumentException>(() => enrichmentService.SaveProviderEnrichment(model, instCode, email));
         }
+
         [Test]
         [TestCase("eqweqw", "qweqweq")]
         public void Test_GetInstitutionEnrichment_should_error(string instCode, string email)
         {
             var enrichmentService = new EnrichmentService(Context);
 
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetProviderEnrichment(instCode, email));
+            Assert.Throws<ArgumentException>(() => enrichmentService.GetProviderEnrichment(instCode, email));
         }
-        [Test]
-        [TestCase("eqweqw", "qweqweq")]
-        public void Test_PublishInstitutionEnrichment_should_return_invalid_operation_exception(string instCode, string email)
-        {
-            var enrichmentService = new EnrichmentService(Context);
 
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.PublishProviderEnrichment(instCode, email));
-        }
         [Test]
         [TestCase("", "")]
         [TestCase(null, null)]
+        [TestCase("eqweqw", "qweqweq")]
         public void Test_PublishInstitutionEnrichment_should_argument_exception(string instCode, string email)
         {
             var enrichmentService = new EnrichmentService(Context);
             Assert.Throws<ArgumentException>(() => enrichmentService.PublishProviderEnrichment(instCode, email));
         }
+
         [Test]
         public void Test_PublishInstitutionEnrichment_should_return_false()
         {
