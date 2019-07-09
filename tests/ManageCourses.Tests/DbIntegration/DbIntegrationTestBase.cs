@@ -25,7 +25,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         protected Mock<IClock> MockClock;
         protected TestConfigReader TestConfig;
 
-        private protected RecruitmentCycle CurrentRecruitmentCycle => Context.RecruitmentCycles.Single(rc => rc.Year == RecruitmentCycle.CurrentYear);
+        protected RecruitmentCycle CurrentRecruitmentCycle => Context.RecruitmentCycles.Single(rc => rc.Year == RecruitmentCycle.CurrentYear);
 
         protected virtual bool EnableRetryOnFailure => true;
 

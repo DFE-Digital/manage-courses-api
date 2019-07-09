@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(u => u.OrganisationUsers);
 
             modelBuilder.Entity<Provider>()
-                .HasIndex(ui => ui.ProviderCode)
+                .HasIndex(p => new { p.RecruitmentCycleId, p.ProviderCode })
                 .IsUnique();
             modelBuilder.Entity<Provider>()
                 .HasIndex(p => p.LastPublishedAt);

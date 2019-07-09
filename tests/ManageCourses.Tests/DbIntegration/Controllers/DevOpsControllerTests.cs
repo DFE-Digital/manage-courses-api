@@ -38,7 +38,11 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.Controllers
         {
             // arrange
             var courses = new List<Course>();
-            var provider = new Provider { ProviderName = "billy goat school" };
+            var provider = new Provider {
+                ProviderName = "billy goat school" ,
+                RecruitmentCycle = new RecruitmentCycle {Year = RecruitmentCycle.CurrentYear}
+            };
+
             for (var i = 0; i < 20; i++)
             {
                 courses.Add(new Course { Name = "course" + i, Provider = provider });

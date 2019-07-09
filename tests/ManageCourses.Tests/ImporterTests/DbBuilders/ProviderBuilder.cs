@@ -57,5 +57,21 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
             _provider.Courses.Add(course);
             return this;
         }
+
+        public ProviderBuilder WithCycle(string year)
+        {
+            _provider.RecruitmentCycle = new RecruitmentCycle
+            {
+                Year = year,
+            };
+            return this;
+        }
+
+        public ProviderBuilder WithCycle(RecruitmentCycle recruitmentCycle)
+        {
+            _provider.RecruitmentCycle = recruitmentCycle;
+
+            return this;
+        }
     }
 }

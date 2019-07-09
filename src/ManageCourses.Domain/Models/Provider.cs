@@ -55,6 +55,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public DateTime ChangedAt { get; set; }
         public string AccreditingProvider { get; set; }
         public bool OptedIn => true;
+        public int RecruitmentCycleId { get; set; }
         public RecruitmentCycle RecruitmentCycle { get; set; }
 
         public ICollection<OrganisationProvider> OrganisationProviders { get; set; }

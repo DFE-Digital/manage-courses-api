@@ -32,11 +32,19 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             Service = new TransitionService(Context);
 
+
             var providers = SetupProviders
                 .Select(x => new OrganisationProvider
                     {
                         Provider = x,
                     }).ToList();
+
+            var currentRecruitmentCycle = new RecruitmentCycle{ Year = RecruitmentCycle.CurrentYear};
+
+            foreach (var item in providers)
+            {
+                item.Provider.RecruitmentCycle = currentRecruitmentCycle;
+            }
 
             var user = new User
             {
