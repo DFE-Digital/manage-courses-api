@@ -42,6 +42,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             {
                 ProviderName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
                 ProviderCode = AccreditingInstCode,
+                RecruitmentCycle = CurrentRecruitmentCycle,
             };
             Context.Add(accreditingInstitution);
 
@@ -59,7 +60,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         Name = "Conscious control of telekenisis",
                         AccreditingProvider = accreditingInstitution,
                     }
-                }
+                },
+                RecruitmentCycle = CurrentRecruitmentCycle,
             };
             Context.Add(_ucasInstitution);
 

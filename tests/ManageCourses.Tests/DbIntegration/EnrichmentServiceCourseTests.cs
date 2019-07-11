@@ -35,6 +35,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             {
                 ProviderName = "Trilby University", // Universities can accredit courses provided by schools / SCITTs
                 ProviderCode = AccreditingInstCode,
+                RecruitmentCycle = CurrentRecruitmentCycle,
             };
             Context.Add(accreditingInstitution);
 
@@ -56,7 +57,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                         CourseCode = OtherCourseCode,
                         Name = "Daemons and Gremlins",
                     },
-                }
+                },
+                RecruitmentCycle = CurrentRecruitmentCycle,
             };
             Context.Add(_ucasInstitution);
 
@@ -195,21 +197,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         }
 
         [Test]
-        [TestCase("eqweqw", "qweqweq")]
-        public void Test_SaveCourseEnrichment_should_return_invalid_operation_exception(string instCode, string email)
-        {
-            const string aboutCourseText = "About Course Text";
-
-            var enrichmentService = new EnrichmentService(Context);
-            var model = new CourseEnrichmentModel
-            {
-                AboutCourse = aboutCourseText,
-            };
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.SaveCourseEnrichment(model, instCode, UcasCourseCode, email));
-        }
-        [Test]
         [TestCase("", "")]
         [TestCase(null, null)]
+        [TestCase("eqweqw", "qweqweq")]
         public void Test_SaveCourseEnrichment_should__argument_exception(string instCode, string email)
         {
             const string aboutCourseText = "About Course Text";
@@ -228,19 +218,13 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
         {
             var enrichmentService = new EnrichmentService(Context);
 
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.GetCourseEnrichment(instCode, UcasCourseCode, email));
+            Assert.Throws<ArgumentException>(() => enrichmentService.GetCourseEnrichment(instCode, UcasCourseCode, email));
         }
-        [Test]
-        [TestCase("eqweqw", "qweqweq")]
-        public void Test_PublishCourseEnrichment_should_return_invalid_operation_exception(string instCode, string email)
-        {
-            var enrichmentService = new EnrichmentService(Context);
 
-            Assert.Throws<InvalidOperationException>(() => enrichmentService.PublishCourseEnrichment(instCode, UcasCourseCode, email));
-        }
         [Test]
         [TestCase("", "")]
         [TestCase(null, null)]
+        [TestCase("eqweqw", "qweqweq")]
         public void Test_PublishCourseEnrichment_should_argument_exception(string instCode, string email)
         {
             var enrichmentService = new EnrichmentService(Context);

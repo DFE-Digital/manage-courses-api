@@ -16,6 +16,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
     [Category("Integration")]
     [Category("Integration_DB")]
     [Explicit]
+    [Ignore("Ucas importer is no longer in use.")]
     public class UcasDataMigratorOptInTests : DbIntegrationTestBase
     {
         /// <summary>

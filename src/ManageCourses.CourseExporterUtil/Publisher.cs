@@ -78,10 +78,12 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             }
         }
 
-        private List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
+        public List<SearchCourse> ReadAllCourseData(IManageCoursesDbContext context)
         {
             _logger.Information("Retrieving courses");
-            var courses = context.Courses.Include(x => x.Provider)
+            var courses = context.Courses
+                .Where(x => x.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
+                .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
@@ -101,7 +103,7 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var orgEnrichments = context.ProviderEnrichments
                 .Include(x => x.CreatedByUser)
                 .Include(x => x.UpdatedByUser)
-                .Where(x => x.Status == EnumStatus.Published)
+                .Where(x => x.Status == EnumStatus.Published && x.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
                 .ToLookup(x => x.ProviderCode)
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedAt).First());
             _logger.Information($" - {orgEnrichments.Count()} orgEnrichments");

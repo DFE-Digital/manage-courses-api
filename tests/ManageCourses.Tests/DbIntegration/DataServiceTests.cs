@@ -117,7 +117,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "AB1 CD2",
                     ProviderCode = providerCode,
-                    ProviderName = "Provider " + counter
+                    ProviderName = "Provider " + counter,
+                    RecruitmentCycle = new RecruitmentCycle{ Year = RecruitmentCycle.CurrentYear}
                 };
                 Context.Providers.Add(provider);
                 LoadCourses(provider, numCourses, Context.Subjects, reverseCourseOrder);

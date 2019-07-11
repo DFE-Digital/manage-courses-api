@@ -7,7 +7,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
 {
     public static class ReferenceDataExtensions
     {
-        public static void AddTestReferenceData(this ManageCoursesDbContext context, string username)
+        public static void AddTestReferenceData(this ManageCoursesDbContext context, string username, RecruitmentCycle recruitmentCycle)
         {
             User user = new User
             {
@@ -28,20 +28,21 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             Provider provider = new Provider
             {
                 ProviderName = "Joe's school @ UCAS",
-                ProviderCode = "ABC"
+                ProviderCode = "ABC",
+                RecruitmentCycle = recruitmentCycle,
             };
             context.Providers.Add(provider);
-            
+
             context.OrganisationUsers.Add(new OrganisationUser {
                     User = user,
                     Organisation = organisation
                 });
-            
+
             context.OrganisationProviders.Add(new OrganisationProvider {
                     Provider = provider,
                     Organisation = organisation
                 });
-            
+
         }
     }
 }

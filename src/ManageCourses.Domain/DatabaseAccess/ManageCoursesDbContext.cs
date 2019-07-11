@@ -41,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(u => u.OrganisationUsers);
 
             modelBuilder.Entity<Provider>()
-                .HasIndex(ui => ui.ProviderCode)
+                .HasIndex(p => new { p.RecruitmentCycleId, p.ProviderCode })
                 .IsUnique();
             modelBuilder.Entity<Provider>()
                 .HasIndex(p => p.LastPublishedAt);
@@ -178,6 +178,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
         public DbSet<Session> Sessions { get; set; }
         public DbSet<PgdeCourse> PgdeCourses { get; set; }
+        public DbSet<RecruitmentCycle> RecruitmentCycles { get; set; }
 
         public List<Course> GetCourse(string providerCode, string courseCode, string email)
         {

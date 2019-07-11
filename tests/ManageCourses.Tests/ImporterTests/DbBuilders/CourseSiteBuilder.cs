@@ -1,7 +1,6 @@
-using System.Collections.Generic;
-using System;
 using System.Linq;
 using GovUk.Education.ManageCourses.Domain.Models;
+using GovUk.Education.Manages.Tests.ImporterTests.DbBuilders;
 
 namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
 {
@@ -11,11 +10,13 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
 
         public CourseSiteBuilder()
         {
-            _courseSite = new CourseSite();
-            _courseSite.Publish = "N";
+            _courseSite = new CourseSite
+            {
+                Publish = "N",
+            };
         }
 
-        public static CourseSiteBuilder Build(CourseType courseType)
+        public static CourseSiteBuilder Build(CourseType courseType, Course course = null)
         {
             var result = new CourseSiteBuilder();
 
@@ -62,6 +63,9 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
                     break;
                 }
             }
+
+            result._courseSite.Site = course?.Provider?.Sites?.FirstOrDefault();
+
             return result;
         }
 

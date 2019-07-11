@@ -132,6 +132,9 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
             int numSubjects = 3;
             User user = new User { FirstName = "fname", LastName = "lname", Email = email };
             Context.Users.Add(user);
+
+            var recruitmentCycle = new RecruitmentCycle {Year = RecruitmentCycle.CurrentYear};
+
             LoadSubjects(numSubjects);
             for (var counter = 1; counter <= numOrgs; counter++)
             {
@@ -147,7 +150,8 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     Address4 = "add4",
                     Postcode = "AB1 CD2",
                     ProviderCode = providerCode,
-                    ProviderName = "Intitution " + counter
+                    ProviderName = "Intitution " + counter,
+                    RecruitmentCycle = recruitmentCycle
                 };
                 Context.Providers.Add(provider);
                 LoadCourses(provider, numCourses, Context.Subjects);
