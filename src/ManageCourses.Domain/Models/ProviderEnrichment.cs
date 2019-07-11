@@ -37,5 +37,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
         public string JsonData { get; set; }
 
         public EnumStatus Status { get; set; }
+
+        public Provider Provider { get; set; }
     }
 }

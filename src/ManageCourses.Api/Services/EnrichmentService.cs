@@ -6,6 +6,7 @@ using GovUk.Education.ManageCourses.Api.Model;
 using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 using GovUk.Education.ManageCourses.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace GovUk.Education.ManageCourses.Api.Services
 {
@@ -52,18 +53,23 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var userProvider = ValidateUserOrg(email, providerCode);
 
             providerCode = providerCode.ToUpperInvariant();
+            var provider = _context.Providers
+                .Include(p => p.ProviderEnrichments)
+                .SingleOrDefault(x => x.ProviderCode == providerCode);
+            if (provider == null)
+            {
+                throw new Exception($"Provider {providerCode} not found");
+            }
 
-            var enrichmentDraftRecord = _context.ProviderEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Draft)
+            var enrichmentDraftRecord = provider.ProviderEnrichments
+                .Where(ie => ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
             // when saving enforce the region code is being saved.
             if(!model.EnrichmentModel.RegionCode.HasValue)
             {
-                var ucasProvider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
-
-                model.EnrichmentModel.RegionCode = ucasProvider.RegionCode;
+                model.EnrichmentModel.RegionCode = provider.RegionCode;
             }
 
             string content = _converter.ConvertToJson(model);
@@ -78,8 +84,8 @@ namespace GovUk.Education.ManageCourses.Api.Services
             else
             {
                 //insert
-                var enrichmentPublishRecord = _context.ProviderEnrichments
-                    .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Published)
+                var enrichmentPublishRecord = provider.ProviderEnrichments
+                    .Where(ie => ie.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -99,7 +105,7 @@ namespace GovUk.Education.ManageCourses.Api.Services
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
-                _context.ProviderEnrichments.Add(enrichment);
+                provider.ProviderEnrichments.Add(enrichment);
             }
             _context.Save();
         }
@@ -116,13 +122,15 @@ namespace GovUk.Education.ManageCourses.Api.Services
             var userOrg = ValidateUserOrg(email, providerCode);
 
             providerCode = providerCode.ToUpperInvariant();
+            var provider = _context.Providers
+                .Include(p => p.ProviderEnrichments)
+                .Single(p => p.ProviderCode == providerCode);
 
-            var enrichmentDraftRecord = _context.ProviderEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.Status == EnumStatus.Draft)
+            var enrichmentDraftRecord = provider.ProviderEnrichments
+                .Where(ie => ie.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
-            var provider = _context.Providers.Single(p => p.ProviderCode == providerCode);
             var publishTimestamp = DateTime.UtcNow;
             provider.LastPublishedAt = publishTimestamp;
             provider.ChangedAt = publishTimestamp; // make sure change shows in incremental fetch api
@@ -146,10 +154,28 @@ namespace GovUk.Education.ManageCourses.Api.Services
             providerCode = providerCode.ToUpperInvariant();
 
             var enrichments = _context.CourseEnrichments.FromSql(@"
-SELECT b.id, b.created_by_user_id, b.created_at, b.provider_code, null as json_data, b.last_published_timestamp_utc, b.status, b.ucas_course_code, b.updated_by_user_id, b.updated_at, b.course_id
-FROM (SELECT provider_code, ucas_course_code, MAX(id) id FROM course_enrichment GROUP BY provider_code, ucas_course_code) top_id
-INNER JOIN course_enrichment b on top_id.id = b.id")
-                .Where(e => e.ProviderCode == providerCode);
+                    SELECT
+                        b.id,
+                        b.created_by_user_id,
+                        b.created_at,
+                        b.provider_code,
+                        NULL AS json_data,
+                        b.last_published_timestamp_utc,
+                        b.status,
+                        b.ucas_course_code,
+                        b.updated_by_user_id,
+                        b.updated_at,
+                        b.course_id
+                    FROM (
+                        SELECT MAX(ce.id) id
+                        FROM course_enrichment ce
+                            INNER JOIN course c on c.id = ce.course_id
+                            INNER JOIN provider p on p.id = c.provider_id
+                        GROUP BY p.provider_code, c.course_code
+                        HAVING p.provider_code = @providerCode
+                    ) top_id
+                    INNER JOIN course_enrichment b ON top_id.id = b.id
+                ", new NpgsqlParameter("providerCode", providerCode));
 
             return enrichments.Select(x => _converter.Convert(x)).ToList();
         }
@@ -172,8 +198,19 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             providerCode = providerCode.ToUpperInvariant();
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
-            var enrichmentDraftRecord = _context.CourseEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Draft)
+            var course = _context.Courses
+                .Include(c => c.CourseEnrichments)
+                .SingleOrDefault(c =>
+                    c.Provider.ProviderCode == providerCode
+                    && c.CourseCode == ucasCourseCode);
+
+            if (course == null)
+            {
+                throw new Exception($"Course not found {providerCode}/{ucasCourseCode}");
+            }
+
+            var enrichmentDraftRecord = course.CourseEnrichments
+                .Where(ce => ce.Status == EnumStatus.Draft)
                 .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
@@ -189,8 +226,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             else
             {
                 //insert
-                var enrichmentPublishRecord = _context.CourseEnrichments
-                    .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode && ie.Status == EnumStatus.Published)
+                var enrichmentPublishRecord = course.CourseEnrichments
+                    .Where(ce => ce.Status == EnumStatus.Published)
                     .OrderByDescending(x => x.Id)
                     .FirstOrDefault();
 
@@ -211,7 +248,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
                     Status = EnumStatus.Draft,
                     JsonData = content,
                 };
-                _context.CourseEnrichments.Add(enrichment);
+                course.CourseEnrichments.Add(enrichment);
             }
             _context.Save();
         }
@@ -224,6 +261,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
         /// <param name="ucasCourseCode">course code of the enrichemnt to be published</param>
         /// <param name="email">email of the user</param>
         /// <returns>true if successful</returns>
+        [Obsolete("This has been reimplemented in Rails.")]
         public bool PublishCourseEnrichment(string providerCode, string ucasCourseCode, string email)
         {
             var returnBool = false;
@@ -250,6 +288,7 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             return returnBool;
         }
+
         /// <summary>
         /// gets the latest enrichment record regardless of the status
         /// </summary>
@@ -265,7 +304,8 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
             ucasCourseCode = ucasCourseCode.ToUpperInvariant();
 
             var enrichmentsQuery = _context.CourseEnrichments
-                .Where(ie => ie.ProviderCode == providerCode && ie.UcasCourseCode == ucasCourseCode);
+                .Where(ce => ce.Course.Provider.ProviderCode == providerCode
+                             && ce.Course.CourseCode == ucasCourseCode);
 
             if (publishableOnly)
             {
@@ -298,17 +338,24 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             providerCode = providerCode.ToUpperInvariant();
 
-            var enrichmentsQuery = _context.ProviderEnrichments
-                .Where(ie => ie.ProviderCode == providerCode);
+            var provider = _context.Providers
+                .Include(p => p.ProviderEnrichments).ThenInclude(e => e.CreatedByUser)
+                .Include(p => p.ProviderEnrichments).ThenInclude(e => e.CreatedByUser)
+                .SingleOrDefault(x => x.ProviderCode == providerCode);
+            if (provider == null)
+            {
+                throw new Exception($"Provider {providerCode} not found");
+            }
+
+            var enrichmentsQuery = provider.ProviderEnrichments.AsQueryable();
 
             if (publishableOnly)
             {
                 enrichmentsQuery = enrichmentsQuery.Where(ie => ie.Status == EnumStatus.Published);
             }
 
-            var enrichment = enrichmentsQuery.OrderByDescending(x => x.Id)
-                .Include(e => e.CreatedByUser)
-                .Include(e => e.UpdatedByUser)
+            var enrichment = enrichmentsQuery
+                .OrderByDescending(x => x.Id)
                 .FirstOrDefault();
 
             var enrichmentGetModel = _converter.Convert(enrichment) ?? new UcasProviderEnrichmentGetModel();
@@ -328,20 +375,16 @@ INNER JOIN course_enrichment b on top_id.id = b.id")
 
             if (useUcasContact)
             {
-                var ucasProvider = _context.Providers.SingleOrDefault(x => x.ProviderCode == providerCode);
-                if (ucasProvider != null)
-                {
-                    enrichmentModel.Email = ucasProvider.Email;
-                    enrichmentModel.Telephone = ucasProvider.Telephone;
-                    enrichmentModel.Website = ucasProvider.Url;
-                    enrichmentModel.Address1 = ucasProvider.Address1;
-                    enrichmentModel.Address2 = ucasProvider.Address2;
-                    enrichmentModel.Address3 = ucasProvider.Address3;
-                    enrichmentModel.Address4 = ucasProvider.Address4;
-                    enrichmentModel.Postcode = ucasProvider.Postcode;
-                    // When first getting enrichment, seed the region code.
-                    enrichmentModel.RegionCode = ucasProvider.RegionCode;
-                }
+                enrichmentModel.Email = provider.Email;
+                enrichmentModel.Telephone = provider.Telephone;
+                enrichmentModel.Website = provider.Url;
+                enrichmentModel.Address1 = provider.Address1;
+                enrichmentModel.Address2 = provider.Address2;
+                enrichmentModel.Address3 = provider.Address3;
+                enrichmentModel.Address4 = provider.Address4;
+                enrichmentModel.Postcode = provider.Postcode;
+                // When first getting enrichment, seed the region code.
+                enrichmentModel.RegionCode = provider.RegionCode;
             }
 
             return enrichmentGetModel;

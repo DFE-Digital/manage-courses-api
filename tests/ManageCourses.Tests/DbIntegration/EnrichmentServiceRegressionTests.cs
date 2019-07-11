@@ -131,7 +131,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                 Status = EnumStatus.Draft,
                 JsonData = content,
             };
-            Context.ProviderEnrichments.Add(enrichment);
+            _ucasInstitution.ProviderEnrichments.Add(enrichment);
             Context.SaveChanges();
         }
 
