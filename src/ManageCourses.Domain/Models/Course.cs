@@ -181,5 +181,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
             return returnString;
         }
+
+        public ICollection<CourseEnrichment> CourseEnrichments { get; set; }
     }
 }
