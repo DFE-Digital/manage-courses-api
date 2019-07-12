@@ -44,6 +44,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         }
 
         [Test]
+        [Ignore("SaveCourse has been reimplemented in Rails.")]
         public void PublishEnrichedCourseWithEmailHappyPathTest()
         {
             var email = "tester@example.com";
@@ -122,6 +123,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         }
 
         [Test]
+        [Ignore("SaveCourse has been reimplemented in Rails.")]
         public void PublishEnrichedCourseWithEmailDraftTest()
         {
             var email = "tester@example.com";
@@ -223,6 +225,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         [TestCase("123", null, null)]
         [TestCase(null, "234", null)]
         [TestCase(null, null, "email@qwe.com")]
+        [Ignore("SaveCourse has been reimplemented in Rails.")]
         public void PublishCourseWithEmailInvalidParametersTest(string providerCode, string courseCode, string email)
         {
             var result = _searchAndCompareService.SaveCourse(providerCode, courseCode, email).Result;

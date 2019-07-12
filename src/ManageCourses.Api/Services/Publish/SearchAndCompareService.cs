@@ -52,6 +52,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <param name="courseCode">code for the course (if a single course is to be published)</param>
         /// <param name="email">email of the user</param>
         /// <returns></returns>
+        [Obsolete("This has been reimplemented in Rails.")]
         public async Task<bool> SaveCourse(string providerCode, string courseCode, string email)
         {
             if (string.IsNullOrWhiteSpace(providerCode) || string.IsNullOrWhiteSpace(courseCode) || string.IsNullOrWhiteSpace(email))
