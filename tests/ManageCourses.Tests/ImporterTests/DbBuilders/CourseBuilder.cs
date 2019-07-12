@@ -42,9 +42,9 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests.DbBuilders
             return builder._course;
         }
 
-        public CourseBuilder WithAccreditingProvider(Provider accreditingProvider)
+        public CourseBuilder WithAccreditingProviderCode(string accreditingProviderCode)
         {
-            _course.AccreditingProvider = accreditingProvider;
+            _course.AccreditingProviderCode = accreditingProviderCode;
             return this;
         }
 

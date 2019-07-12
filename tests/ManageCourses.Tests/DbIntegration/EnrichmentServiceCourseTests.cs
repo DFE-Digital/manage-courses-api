@@ -50,7 +50,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         CourseCode = UcasCourseCode,
                         Name = "Conscious control of telekenisis",
-                        AccreditingProvider = accreditingInstitution,
+                        AccreditingProviderCode = accreditingInstitution.ProviderCode,
                     },
                     new Course
                     {

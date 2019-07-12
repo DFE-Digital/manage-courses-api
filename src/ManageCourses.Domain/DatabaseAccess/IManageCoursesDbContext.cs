@@ -34,5 +34,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
 
         IQueryable<User> GetUsers(string email);
         void Save();
+        string GetProviderName(string providerCode);
     }
 }

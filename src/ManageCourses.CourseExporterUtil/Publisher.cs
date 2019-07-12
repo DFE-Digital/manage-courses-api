@@ -85,7 +85,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .Where(x => x.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
                 .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .Include(x => x.CourseEnrichments).ThenInclude(x => x.CreatedByUser)
                 .Include(x => x.CourseEnrichments).ThenInclude(x => x.UpdatedByUser)
@@ -111,7 +110,9 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
             var pgdeCourses = context.PgdeCourses.ToList();
             _logger.Information($" - {pgdeCourses.Count()} pgdeCourses");
 
-            var courseMapper = new CourseMapper();
+
+            var courseMapper = new CourseMapper(context.GetProviderName);
+
             var converter = new EnrichmentConverter();
 
             var mappedCourses = new List<SearchAndCompare.Domain.Models.Course>();

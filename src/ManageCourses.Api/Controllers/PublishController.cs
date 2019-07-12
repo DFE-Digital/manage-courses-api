@@ -7,6 +7,7 @@ using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
+using GovUk.Education.ManageCourses.Domain.DatabaseAccess;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -15,13 +16,19 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     {
         private readonly IDataService _dataService;
         private readonly ISearchAndCompareService _searchAndCompareService;
+        private readonly IManageCoursesDbContext _context;
         private readonly IEnrichmentService _enrichmentservice;
         private readonly ITransitionService _transitionService;
 
-        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ITransitionService transitionService,ISearchAndCompareService searchAndCompareService)
+        public PublishController(IDataService dataService,
+            IEnrichmentService enrichmentservice,
+            ITransitionService transitionService,
+            ISearchAndCompareService searchAndCompareService,
+            IManageCoursesDbContext context)
         {
             _dataService = dataService;
             _searchAndCompareService = searchAndCompareService;
+            _context = context;
             _enrichmentservice = enrichmentservice;
             _transitionService = transitionService;
         }
@@ -126,7 +133,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
                 return BadRequest();
             }
 
-            var courseMapper = new CourseMapper();
+            var courseMapper = new CourseMapper(_context.GetProviderName);
 
             var providerData = _dataService.GetProviderForUser(name, providerCode);
             var orgEnrichmentData = _enrichmentservice.GetProviderEnrichment(providerCode, name);

@@ -132,7 +132,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
             var provider = Context.Providers.Single(p => p.ProviderCode == instCode);
             provider.Courses.Count.Should().Be(1);
             provider.Courses.Single(c => c.CourseCode == courseCode)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode);
+                .AccreditingProviderCode.Should().Be(accreditingProviderCode);
 
             // import as modified
             ucasCourse.AccreditingProvider = accreditingProviderCode2;
@@ -140,7 +140,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
             var updatedProvider = Context.Providers.Single(p => p.ProviderCode == instCode);
             updatedProvider.Courses.Count.Should().Be(1);
             updatedProvider.Courses.Single(c => c.CourseCode == courseCode)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode2);
+                .AccreditingProviderCode.Should().Be(accreditingProviderCode2);
         }
 
         [Test]
@@ -185,7 +185,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
             var provider = Context.Providers.Single(p => p.ProviderCode == instCode);
             provider.Courses.Count.Should().Be(1);
             provider.Courses.Single(c => c.CourseCode == courseCode)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode);
+                .AccreditingProviderCode.Should().Be(accreditingProviderCode);
 
             // import as modified
             ucasCourse.AccreditingProvider = accreditingProviderCode2;
@@ -193,7 +193,7 @@ namespace GovUk.Education.ManageCourses.Tests.ImporterTests
             var updatedProvider = Context.Providers.Single(p => p.ProviderCode == instCode);
             updatedProvider.Courses.Count.Should().Be(1);
             updatedProvider.Courses.Single(c => c.CourseCode == courseCode)
-                .AccreditingProvider.ProviderCode.Should().Be(accreditingProviderCode2);
+                .AccreditingProviderCode.Should().Be(accreditingProviderCode2);
         }
 
         private void DoImport(UcasPayload ucasPayload)

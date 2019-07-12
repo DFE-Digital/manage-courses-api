@@ -84,7 +84,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.AccreditingProvider))
                 {
-                    returnCourse.AccreditingProvider = _providerCache[organisationCourseRecord.AccreditingProvider];
+                    returnCourse.AccreditingProviderCode = _providerCache[organisationCourseRecord.AccreditingProvider].ProviderCode;
                 }
 
                 if (!string.IsNullOrWhiteSpace(organisationCourseRecord.InstCode))

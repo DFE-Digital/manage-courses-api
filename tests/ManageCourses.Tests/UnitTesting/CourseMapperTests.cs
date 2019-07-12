@@ -15,7 +15,15 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
     [TestFixture]
     public class CourseMapperTests
     {
-        private ICourseMapper mapper = new CourseMapper();
+        private const string AccreditingProviderCode = "ACC123";
+        private const string AccreditingProviderName = "AccreditingProviderName";
+
+        private ICourseMapper mapper = new CourseMapper(GetProviderNameMock);
+
+        private static string GetProviderNameMock(string providerCode)
+        {
+            return providerCode == AccreditingProviderCode ? AccreditingProviderName : null;
+        }
 
         [Test]
         public void MapToSearchAndCompareCourse_ProviderLocation()
@@ -89,8 +97,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.Provider.ProviderCode.Should().Be("ABC");
             res.Provider.Name.Should().Be("My provider");
-            res.AccreditingProvider.ProviderCode.Should().Be("ACC123");
-            res.AccreditingProvider.Name.Should().Be("AccreditingProviderName");
+            res.AccreditingProvider.Should().NotBeNull();
+            res.AccreditingProvider.ProviderCode.Should().Be(AccreditingProviderCode);
+            res.AccreditingProvider.Name.Should().Be(AccreditingProviderName);
 
             res.Route.Name.Should().Be("School Direct (salaried) training programme");
             res.Route.IsSalaried.Should().Be(true);
@@ -138,8 +147,9 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 
             res.Provider.ProviderCode.Should().Be("ABC");
             res.Provider.Name.Should().Be("My provider");
-            res.AccreditingProvider.ProviderCode.Should().Be("ACC123");
-            res.AccreditingProvider.Name.Should().Be("AccreditingProviderName");
+            res.AccreditingProvider.Should().NotBeNull();
+            res.AccreditingProvider.ProviderCode.Should().Be(AccreditingProviderCode);
+            res.AccreditingProvider.Name.Should().Be(AccreditingProviderName);
 
             res.Route.Name.Should().Be("School Direct (salaried) training programme");
             res.Route.IsSalaried.Should().Be(true);
@@ -245,7 +255,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
                     {
                         new AccreditingProviderEnrichment
                         {
-                            UcasProviderCode = "ACC123",
+                            UcasProviderCode = AccreditingProviderCode,
                             Description = "AccreditingProviderDescription"
                         }
                     }
@@ -257,7 +267,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             return new Course
             {
                 CourseCode = "CourseCode",
-                AccreditingProvider = new Provider {ProviderCode  = "ACC123", ProviderName = "AccreditingProviderName"},
+                AccreditingProviderCode = AccreditingProviderCode,
                 Qualification = CourseQualification.QtsWithPgce,
                 ProgramType = "SS", // school direct salaried
                 Name = "Course.Name",

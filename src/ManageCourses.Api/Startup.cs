@@ -91,7 +91,12 @@ namespace GovUk.Education.ManageCourses.Api
                 });
 
             services.AddScoped<ISearchAndCompareService, SearchAndCompareService>();
-            services.AddScoped<ICourseMapper, CourseMapper>();
+            services.AddScoped<ICourseMapper, CourseMapper>(provider =>
+            {
+
+                var dbContext = provider.GetService<IManageCoursesDbContext>();
+                return new CourseMapper(dbContext.GetProviderName);
+            });
             services.AddScoped<IDataService, DataService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IInviteService, InviteService>();

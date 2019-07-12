@@ -49,7 +49,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
                     {
                         CourseCode = crseCode,
                         Name = "Conscious control of telekenisis",
-                        AccreditingProvider = accreditingInstitution,
+                        AccreditingProviderCode = accreditingInstitution.ProviderCode,
                     }
                 },
                 RegionCode = RegionCode,

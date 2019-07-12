@@ -21,8 +21,7 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public int ProviderId { get; set; }
         public Provider Provider {get; set;}
-        public int? AccreditingProviderId { get; set; }
-        public Provider AccreditingProvider {get; set;}
+        public string AccreditingProviderCode {get; set;}
 
         public string CourseCode { get; set; }
         public string ProgramType { get; set; }

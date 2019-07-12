@@ -60,7 +60,6 @@ namespace GovUk.Education.ManageCourses.Domain.Models
 
         public ICollection<OrganisationProvider> OrganisationProviders { get; set; }
         public ICollection<Course> Courses { get; set; }
-        public ICollection<Course> AccreditedCourses { get; set; }
         public ICollection<Site> Sites { get; set; }
         public ICollection<ProviderEnrichment> ProviderEnrichments { get; set; }
     }

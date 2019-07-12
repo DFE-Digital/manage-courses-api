@@ -23,28 +23,23 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.CourseExporterUtilTe
 
         protected override void Setup()
         {
+            Context.Providers.Add(new ProviderBuilder()
+                .WithCycle("2019")
+                .WithCode(AccreditingProviderCode));
             Course course2019 = CourseBuilder
                 .Build(CourseType.RunningPublished,
                     new ProviderBuilder()
                         .WithCycle("2019")
                         .WithCode(ProviderCode))
                 .WithName(CourseName2019)
-                .WithAccreditingProvider(
-                    new ProviderBuilder()
-                        .WithCycle("2019")
-                        .WithCode(AccreditingProviderCode)
-                );
+                .WithAccreditingProviderCode(AccreditingProviderCode);
             Course course2020 = CourseBuilder
                 .Build(CourseType.RunningPublished,
                     new ProviderBuilder()
                         .WithCycle("2020")
                         .WithCode(ProviderCode))
                 .WithName("Operatics 2020")
-                .WithAccreditingProvider(
-                    new ProviderBuilder()
-                        .WithCycle("2020")
-                        .WithCode(AccreditingProviderCode)
-                );
+                .WithAccreditingProviderCode(AccreditingProviderCode);
 
             Context.Courses.Add(course2019);
             Context.Courses.Add(course2020);

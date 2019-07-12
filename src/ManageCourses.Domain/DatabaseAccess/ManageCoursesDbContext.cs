@@ -75,11 +75,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 .WithMany(ui => ui.Courses)
                 .HasForeignKey(uc => uc.ProviderId);
 
-            modelBuilder.Entity<Course>()
-                .HasOne(uc => uc.AccreditingProvider)
-                .WithMany(ui => ui.AccreditedCourses)
-                .IsRequired(false);
-
             modelBuilder.Entity<CourseSite>()
                 .HasOne(cs => cs.Course)
                 .WithMany(c => c.CourseSites)
@@ -194,7 +189,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     and lower(u.email)=lower(@email)", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .ToList();
 
@@ -213,7 +207,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     $"and lower(u.email)=lower(@email)", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("email", email))
                 .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
-                .Include(x => x.AccreditingProvider)
                 .Include(x => x.CourseSites).ThenInclude(x => x.Site)
                 .OrderBy(x => x.Name)//order by doesn't work as part of the sql string
                                      //it's an ef issue caused by the includes
@@ -287,6 +280,24 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public void Save()
         {
             SaveChanges();
+        }
+
+        public string GetProviderName(string providerCode)
+        {
+            if (string.IsNullOrWhiteSpace(providerCode))
+            {
+                return null;
+            }
+
+            var provider = Providers.SingleOrDefault(p =>
+                p.ProviderCode == providerCode && p.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear);
+
+            if (provider == null)
+            {
+                throw new NotFoundException($"ProviderCode '{providerCode}' not found");
+            }
+
+            return provider.ProviderName;
         }
     }
 }

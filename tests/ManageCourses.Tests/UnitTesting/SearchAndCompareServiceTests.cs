@@ -40,7 +40,7 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             _httpMock = new Mock<IHttpClient>();
             var searchAndCompareApi = new SearchAndCompareApi(_httpMock.Object, sncUrl);
 
-            _searchAndCompareService = new SearchAndCompareService(searchAndCompareApi, new CourseMapper(), _dataServiceMock.Object, _enrichmentServiceMock.Object, _loggerMock.Object);
+            _searchAndCompareService = new SearchAndCompareService(searchAndCompareApi, new CourseMapper((x)=>null), _dataServiceMock.Object, _enrichmentServiceMock.Object, _loggerMock.Object);
         }
 
         [Test]
@@ -50,8 +50,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             Provider provider = new Provider
             {
                 ProviderCode = ProviderCode,
-                AccreditedCourses =
-                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
+//                AccreditedCourses =
+//                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
@@ -84,8 +84,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var provider = new Provider
             {
                 ProviderCode = ProviderCode,
-                AccreditedCourses =
-                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
+//                AccreditedCourses =
+//                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
 
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
@@ -128,8 +128,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             Provider provider = new Provider
             {
                 ProviderCode = ProviderCode,
-                AccreditedCourses =
-                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
+//                AccreditedCourses =
+//                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))
@@ -152,8 +152,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var provider = new Provider
             {
                 ProviderCode = ProviderCode,
-                AccreditedCourses =
-                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" }, new Course { CourseCode = CourseCode + "1", ProgramType = "SD", Name = "Geography" } }
+//                AccreditedCourses =
+//                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" }, new Course { CourseCode = CourseCode + "1", ProgramType = "SD", Name = "Geography" } }
             };
 
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
@@ -188,8 +188,8 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
             var provider = new Provider
             {
                 ProviderCode = ProviderCode,
-                AccreditedCourses =
-                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
+//                AccreditedCourses =
+//                    new List<Course> { new Course { CourseCode = CourseCode, ProgramType = "SD", Name = "History" } }
             };
             _dataServiceMock.Setup(x => x.GetProviderForUser(email, ProviderCode)).Returns(provider);
             _dataServiceMock.Setup(x => x.GetCourseForUser(email, ProviderCode, CourseCode))

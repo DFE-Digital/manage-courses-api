@@ -186,7 +186,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             var res = GetCourseLoader(providers).LoadCourses(provider, new List<UcasCourse> { loc1, loc2 }, new List<UcasCourseSubject>(), sites).Single();
 
-            res.AccreditingProvider.ProviderCode.Should().Be("RIGHT_ACC");
+            res.AccreditingProviderCode.Should().Be("RIGHT_ACC");
             res.Provider.ProviderCode.Should().Be("RIGHT_INST");
         }
 
@@ -200,7 +200,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter.Tests
 
             var res = LoadCourse(loc1);
 
-            res.AccreditingProvider.ProviderCode.Should().Be("RIGHT_ACC");
+            res.AccreditingProviderCode.Should().Be("RIGHT_ACC");
             res.Provider.ProviderCode.Should().Be("RIGHT_INST");
         }
 

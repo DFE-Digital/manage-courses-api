@@ -12,6 +12,13 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
 {
     public class CourseMapper : ICourseMapper
     {
+        private Func<string, string> GetProviderName { get; }
+
+        public CourseMapper(Func<string, string> getProviderName)
+        {
+            GetProviderName = getProviderName;
+        }
+
         private readonly SubjectMapper subjectMapper = new SubjectMapper();
 
         public SearchAndCompare.Domain.Models.Course MapToSearchAndCompareCourse(Domain.Models.Provider ucasProviderData, Domain.Models.Course ucasCourseData, ProviderEnrichmentModel providerEnrichmentModel, CourseEnrichmentModel courseEnrichmentModel)
@@ -50,12 +57,16 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
                 ProviderCode = ucasProviderData.ProviderCode
             };
 
-            var accreditingProvider = ucasCourseData.AccreditingProvider == null ? null :
-                new SearchAndCompare.Domain.Models.Provider
+            GovUk.Education.SearchAndCompare.Domain.Models.Provider accreditingProvider = null;
+            if (!string.IsNullOrWhiteSpace(ucasCourseData.AccreditingProviderCode) && GetProviderName != null)
+            {
+                accreditingProvider = new SearchAndCompare.Domain.Models.Provider
                 {
-                    Name = ucasCourseData.AccreditingProvider.ProviderName,
-                    ProviderCode = ucasCourseData.AccreditingProvider.ProviderCode
+                    Name = GetProviderName(ucasCourseData.AccreditingProviderCode),
+                    ProviderCode = ucasCourseData.AccreditingProviderCode,
                 };
+
+            }
 
             var routeName = ucasCourseData.Route;
             var isSalaried = string.Equals(ucasCourseData?.ProgramType, "ss", StringComparison.InvariantCultureIgnoreCase)
@@ -189,7 +200,7 @@ namespace GovUk.Education.ManageCourses.Api.Mapping
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
             {
                 Name = "about this training provider accrediting",//CourseDetailsSections.AboutTheAccreditingProvider,
-                Text = GetAccreditingProviderEnrichment(ucasCourseData?.AccreditingProvider?.ProviderCode, providerEnrichmentModel)
+                Text = GetAccreditingProviderEnrichment(ucasCourseData?.AccreditingProviderCode, providerEnrichmentModel)
             });
 
             mappedCourse.DescriptionSections.Add(new CourseDescriptionSection
