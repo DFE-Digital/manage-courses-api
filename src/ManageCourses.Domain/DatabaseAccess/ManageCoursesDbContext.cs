@@ -192,6 +192,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     where lower(i.provider_code)=lower(@providerCode)
                     and lower(c.course_code)=lower(@courseCode)
                     and lower(u.email)=lower(@email)", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("courseCode", courseCode), new NpgsqlParameter("email", email))
+                .Where(x => x.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
                 .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingProvider)
@@ -211,6 +212,7 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     $"join \"user\" u on ou.user_id = u.id " +
                     $"where lower(i.provider_code)=lower(@providerCode) " +
                     $"and lower(u.email)=lower(@email)", new NpgsqlParameter("providerCode", providerCode), new NpgsqlParameter("email", email))
+                .Where(x => x.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
                 .Include(x => x.Provider)
                 .Include(x => x.CourseSubjects).ThenInclude(x => x.Subject)
                 .Include(x => x.AccreditingProvider)
@@ -231,7 +233,9 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     $"join \"user\" u on ou.user_id = u.id " +
                     $"where lower(u.email) = lower(@email)",
                     new NpgsqlParameter("email", email)
-                ).Include(x => x.Organisation)
+                )
+                .Where(x => x.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
+                .Include(x => x.Organisation)
                 .Include(x => x.Provider);
 
             return userOrganisations;
@@ -247,7 +251,11 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                 $"join \"user\" u on ou.user_id = u.id " +
                 $"where lower(u.email) = lower(@email) and Lower(i.provider_code) = lower(@providerCode)",
                 new NpgsqlParameter("email", email), new NpgsqlParameter("providerCode", providerCode)
-            ).Include(x => x.Organisation).Include(x => x.Provider).FirstOrDefault();
+            )
+            .Where(x => x.Provider.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
+            .Include(x => x.Organisation)
+            .Include(x => x.Provider)
+            .SingleOrDefault();
 
             return userOrganisations;
         }
@@ -281,7 +289,8 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
                     AND lower(i.provider_code) = lower(@providercode)",
                     new NpgsqlParameter("email", name),
                     new NpgsqlParameter("providercode", providerCode))
-                .FirstOrDefault();
+                .Where(p => p.RecruitmentCycle.Year == RecruitmentCycle.CurrentYear)
+                .SingleOrDefault();
         }
 
         public void Save()
