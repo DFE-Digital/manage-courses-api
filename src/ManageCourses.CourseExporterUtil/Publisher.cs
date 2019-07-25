@@ -108,9 +108,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
                 .ToDictionary(x => x.Key, x => x.OrderByDescending(y => y.UpdatedAt).First());
             _logger.Information($" - {orgEnrichments.Count()} orgEnrichments");
 
-            var pgdeCourses = context.PgdeCourses.ToList();
-            _logger.Information($" - {pgdeCourses.Count()} pgdeCourses");
-
             var courseMapper = new CourseMapper();
             var converter = new EnrichmentConverter();
 

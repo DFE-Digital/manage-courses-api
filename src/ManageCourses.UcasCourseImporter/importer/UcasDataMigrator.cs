@@ -38,7 +38,7 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
         {
             var allCampusesGrouped = payload.Campuses.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
             var ucasSubjects = payload.Subjects.ToList();
-            var pgdeCourses = _context.PgdeCourses.ToList();
+            var pgdeCourses = new List<PgdeCourse>();
 
             var ucasCourseGroupings = payload.Courses.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);
             var ucasCourseSubjectGroupings = payload.CourseSubjects.GroupBy(x => x.InstCode).ToDictionary(x => x.Key);

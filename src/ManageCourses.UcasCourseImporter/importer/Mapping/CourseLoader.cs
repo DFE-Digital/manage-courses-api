@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ManageCourses.UcasCourseImporter.Mapping
 {
+    [Obsolete("Ucas is no longer the source of truth")]
     public class CourseLoader
     {
         private readonly QualificationMapper qualificationMapper = new QualificationMapper();

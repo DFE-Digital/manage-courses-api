@@ -177,7 +177,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         public DbSet<ProviderEnrichment> ProviderEnrichments { get; set; }
         public DbSet<CourseEnrichment> CourseEnrichments { get; set; }
         public DbSet<Session> Sessions { get; set; }
-        public DbSet<PgdeCourse> PgdeCourses { get; set; }
         public DbSet<RecruitmentCycle> RecruitmentCycles { get; set; }
 
         public List<Course> GetCourse(string providerCode, string courseCode, string email)
