@@ -21,7 +21,6 @@ namespace GovUk.Education.ManageCourses.Domain.DatabaseAccess
         DbSet<ProviderEnrichment> ProviderEnrichments { get; set; }
         DbSet<CourseEnrichment> CourseEnrichments { get; set; }
         DbSet<Session> Sessions { get; set; }
-        DbSet<PgdeCourse> PgdeCourses { get; set; }
 
         void RunInRetryableTransaction (Action action);
 
