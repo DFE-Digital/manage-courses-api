@@ -123,6 +123,18 @@
                 "description": "Search and Compare API Url."
             }
         },
+        "manageBackendSecret": {
+            "type": "string",
+            "metadata": {
+                "description": "The secret shared between manage courses backend and manage courses API to authorize requests."
+            }
+        },
+        "manageBackendBaseUrl": {
+            "type": "string",
+            "metadata": {
+                "description": "The manage courses backend base url"
+            }
+        },
         "keyVaultName": {
             "type": "string",
             "defaultValue": "",
@@ -502,6 +514,14 @@
                             {
                                 "name": "manage_courses_backend__key",
                                 "value": "[parameters('manageCoursesBackendKey')]"
+                            },
+                            {
+                                "name": "SETTINGS__MANAGE_BACKEND__SECRET",
+                                "value": "[parameters('manageBackendSecret')]"
+                            },
+                            {
+                                "name": "SETTINGS__MANAGE_BACKEND__BASE_URL",
+                                "value": "[parameters('manageBackendBaseUrl')]"
                             }
                         ]
                     },
@@ -610,6 +630,14 @@
                             {
                                 "name": "manage_courses_backend__key",
                                 "value": "[parameters('manageCoursesBackendKey')]"
+                            },
+                            {
+                                "name": "SETTINGS__MANAGE_BACKEND__SECRET",
+                                "value": "[parameters('manageBackendSecret')]"
+                            },
+                            {
+                                "name": "SETTINGS__MANAGE_BACKEND__BASE_URL",
+                                "value": "[parameters('manageBackendBaseUrl')]"
                             }
                         ]
                     },
