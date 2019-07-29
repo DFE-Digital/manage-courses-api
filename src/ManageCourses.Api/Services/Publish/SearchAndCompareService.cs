@@ -12,6 +12,7 @@ using Course = GovUk.Education.SearchAndCompare.Domain.Models.Course;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Publish
 {
+    [Obsolete("replaced by ManageCoursesBackendService")]
     public class SearchAndCompareService : ISearchAndCompareService
     {
         private readonly ISearchAndCompareApi _api;
