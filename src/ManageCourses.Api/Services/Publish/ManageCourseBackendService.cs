@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using System.Net.Http;
 
 namespace GovUk.Education.ManageCourses.Api.Services.Publish
 {
@@ -9,16 +8,19 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
     {
 
         private readonly HttpClient _httpClient;
-        public ManageCoursesBackendService(HttpClient httpClient)
+
+        public ManageCoursesBackendService(HttpClient httpClient, IManageCoursesBackendJwtService manageCoursesBackendJwtService)
         {
             _httpClient = httpClient;
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", manageCoursesBackendJwtService.GetCurrentUserToken());
         }
         /// <summary>
         /// Publishes a list of courses to Search and Compare
         /// </summary>
         /// <param name="providerCode">provider code for the courses</param>
         /// <param name="email">email of the user</param>
-        /// <returns></returns>
+        /// <returns>true if successful</returns>
         public async Task<bool> SaveCourses(string providerCode, string email)
         {
             var postUrl = $"/api/v2/providers/{providerCode}/publish";
@@ -39,7 +41,7 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
         /// <param name="providerCode">provider code for the courses</param>
         /// <param name="courseCode">code for the course (if a single course is to be published)</param>
         /// <param name="email">email of the user</param>
-        /// <returns></returns>
+        /// <returns>true if successful</returns>
         public async Task<bool> SaveCourse(string providerCode, string courseCode, string email)
         {
             var postUrl = $"/api/v2/providers/{providerCode}/courses/{courseCode}/publish";
