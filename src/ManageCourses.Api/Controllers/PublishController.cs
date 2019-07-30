@@ -20,7 +20,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         private readonly IEnrichmentService _enrichmentservice;
         private readonly ITransitionService _transitionService;
 
-        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ITransitionService transitionService,ISearchAndCompareService searchAndCompareService, IManageCoursesBackendService manageCoursesBackendService)
+        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ITransitionService transitionService, ISearchAndCompareService searchAndCompareService, IManageCoursesBackendService manageCoursesBackendService)
         {
             _dataService = dataService;
             _searchAndCompareService = searchAndCompareService;

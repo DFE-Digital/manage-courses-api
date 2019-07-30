@@ -8,12 +8,12 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
     {
 
         private readonly HttpClient _httpClient;
+        private readonly IManageCoursesBackendJwtService _manageCoursesBackendJwtService;
 
         public ManageCoursesBackendService(HttpClient httpClient, IManageCoursesBackendJwtService manageCoursesBackendJwtService)
         {
             _httpClient = httpClient;
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", manageCoursesBackendJwtService.GetCurrentUserToken());
+            _manageCoursesBackendJwtService = manageCoursesBackendJwtService;
         }
         /// <summary>
         /// Publishes a list of courses to Search and Compare
@@ -30,6 +30,8 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
                 return false;
             }
 
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", _manageCoursesBackendJwtService.GetCurrentUserToken());
 
             var result = await _httpClient.PostAsJsonAsync(postUrl, new {});
 
@@ -50,6 +52,9 @@ namespace GovUk.Education.ManageCourses.Api.Services.Publish
             {
                 return false;
             }
+
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", _manageCoursesBackendJwtService.GetCurrentUserToken());
 
             var result = await _httpClient.PostAsJsonAsync(postUrl, new {});
 
