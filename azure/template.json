@@ -703,7 +703,8 @@
                 }
             },
             "dependsOn": [
-                "postgresql-server"
+                "postgresql-server",
+                "postgresql-server-firewall-rules"
             ]
         },
         {
