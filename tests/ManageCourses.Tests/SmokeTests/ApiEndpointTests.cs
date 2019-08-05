@@ -41,6 +41,8 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             await apiClient.Enrichment_SaveProviderAsync(ucasProviderCode, model);
         }
         [Test]
+        [Ignore("This requires manage courses backend")]
+        [Obsolete("This requires manage courses backend")]
         public async Task EnrichmentPublishTest()
         {
             SetupSmokeTestData();
@@ -57,6 +59,7 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
             var result = await apiClient.Publish_PublishCoursesToSearchAndCompareAsync(ucasProviderCode);
             result.Should().BeTrue();
         }
+
         [Test][Ignore("needs search and compare environment up and running for this test to pass")]
         public async Task CoursePublishTest()
         {

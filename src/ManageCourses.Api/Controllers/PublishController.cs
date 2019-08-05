@@ -7,6 +7,7 @@ using GovUk.Education.ManageCourses.Api.Services;
 using GovUk.Education.ManageCourses.Api.Services.Publish;
 using Microsoft.AspNetCore.Mvc;
 using GovUk.Education.ManageCourses.Api.ActionFilters;
+using System;
 
 namespace GovUk.Education.ManageCourses.Api.Controllers
 {
@@ -14,14 +15,16 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
     public class PublishController : Controller
     {
         private readonly IDataService _dataService;
+        private readonly IManageCoursesBackendService _manageCoursesBackendService;
         private readonly ISearchAndCompareService _searchAndCompareService;
         private readonly IEnrichmentService _enrichmentservice;
         private readonly ITransitionService _transitionService;
 
-        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ITransitionService transitionService,ISearchAndCompareService searchAndCompareService)
+        public PublishController(IDataService dataService, IEnrichmentService enrichmentservice, ITransitionService transitionService, ISearchAndCompareService searchAndCompareService, IManageCoursesBackendService manageCoursesBackendService)
         {
             _dataService = dataService;
             _searchAndCompareService = searchAndCompareService;
+            _manageCoursesBackendService = manageCoursesBackendService;
             _enrichmentservice = enrichmentservice;
             _transitionService = transitionService;
         }
@@ -45,7 +48,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             var enrichmentResult = _enrichmentservice.PublishCourseEnrichment(providerCode, courseCode, name);
 
-            await _searchAndCompareService.SaveCourse(providerCode, courseCode, name);
+            await _manageCoursesBackendService.SaveCourse(providerCode, courseCode, name);
 
             return Ok(enrichmentResult);
         }
@@ -61,6 +64,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(404)]
         [ExemptFromAcceptTerms]
         [BackendApiTokenAuth]
+        [Obsolete("This endpoint should not be used")]
         public async Task<ActionResult> InternalPublishCourseToSearchAndCompare(string providerCode, string courseCode, [FromBody]BackendRequest request)
         {
             var result = await _searchAndCompareService.SaveCourse(providerCode, courseCode, request.Email);
@@ -79,6 +83,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
         [ProducesResponseType(404)]
         [ExemptFromAcceptTerms]
         [BackendApiTokenAuth]
+        [Obsolete("This endpoint should not be used")]
         public async Task<ActionResult> InternalPublishCoursesToSearchAndCompare(string providerCode, [FromBody]BackendRequest request)
         {
             var result = await _searchAndCompareService.SaveCourses(providerCode, request.Email);
@@ -102,7 +107,7 @@ namespace GovUk.Education.ManageCourses.Api.Controllers
 
             var enrichmentResult = _enrichmentservice.PublishProviderEnrichment(providerCode, name);
 
-            await _searchAndCompareService.SaveCourses(providerCode, name);
+            await _manageCoursesBackendService.SaveCourses(providerCode, name);
 
             return Ok(enrichmentResult);
         }

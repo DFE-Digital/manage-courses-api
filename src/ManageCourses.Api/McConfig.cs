@@ -18,6 +18,8 @@ namespace GovUk.Education.ManageCourses.Api
         private const string ConfigKeyForEmailUser = "email:user";
         private const string ConfigKeyForSearchAndCompareApiKey = "snc:api:key";
         private const string ConfigKeyForSearchAndCompareApiUrl = "snc:api:url";
+        private const string ConfigKeyForManageCoursesBackendKey = "SETTINGS:MANAGE_BACKEND:SECRET";
+        private const string ConfigKeyForManageCoursesBackendUrl = "SETTINGS:MANAGE_BACKEND:BASE_URL";
 
         private readonly IConfiguration _configuration;
 
@@ -42,6 +44,8 @@ namespace GovUk.Education.ManageCourses.Api
                 ConfigKeyForBackendApiKey,
                 ConfigKeyForSearchAndCompareApiKey,
                 ConfigKeyForSearchAndCompareApiUrl,
+                ConfigKeyForManageCoursesBackendKey,
+                ConfigKeyForManageCoursesBackendUrl,
             };
 
             var emailKeys = new List<string>
@@ -85,7 +89,8 @@ namespace GovUk.Education.ManageCourses.Api
         public string EmailUser => _configuration[ConfigKeyForEmailUser];
         public string SearchAndCompareApiKey => _configuration[ConfigKeyForSearchAndCompareApiKey];
         public string SearchAndCompareApiUrl => _configuration[ConfigKeyForSearchAndCompareApiUrl];
-
+        public string ManageCoursesBackendKey => _configuration[ConfigKeyForManageCoursesBackendKey];
+        public string ManageCoursesBackendUrl => _configuration[ConfigKeyForManageCoursesBackendUrl];
         private string PgServer => _configuration[ConfigKeyForPgServer];
         private string PgPort => _configuration["MANAGE_COURSES_POSTGRESQL_SERVICE_PORT"] ?? "5432";
         private string PgDatabase => _configuration[ConfigKeyForPgDatabase];

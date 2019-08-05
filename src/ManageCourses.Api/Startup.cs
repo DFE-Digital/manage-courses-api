@@ -31,6 +31,7 @@ using System.Threading;
 using GovUk.Education.ManageCourses.Domain;
 using Microsoft.Extensions.Logging;
 using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Http;
 
 namespace GovUk.Education.ManageCourses.Api
 {
@@ -121,6 +122,15 @@ namespace GovUk.Education.ManageCourses.Api
                 return new SearchAndCompareApi(httpClient, mcConfig.SearchAndCompareApiUrl);
             });
             services.AddScoped<INotificationClientWrapper, NotificationClientWrapper>();
+
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<McConfig>(x => mcConfig);
+
+            services.AddScoped<IManageCoursesBackendJwtService, ManageCoursesBackendJwtService>();
+
+            services.AddHttpClient<IManageCoursesBackendService, ManageCoursesBackendService>((x) => {
+                x.BaseAddress = new Uri(mcConfig.ManageCoursesBackendUrl);
+                } );
 
             services.AddMvc(options =>
                 options.Filters.Add(typeof(AcceptTermsFilter))

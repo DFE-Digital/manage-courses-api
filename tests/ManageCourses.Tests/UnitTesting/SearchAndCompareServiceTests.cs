@@ -17,6 +17,9 @@ using NUnit.Framework;
 namespace GovUk.Education.ManageCourses.Tests.UnitTesting
 {
     [TestFixture]
+    [Ignore("replaced with ManageCoursesBAckendService")]
+    [Obsolete("replaced with ManageCoursesBAckendService")]
+
     public class SearchAndCompareServiceTests
     {
         private Mock<IEnrichmentService> _enrichmentServiceMock;
