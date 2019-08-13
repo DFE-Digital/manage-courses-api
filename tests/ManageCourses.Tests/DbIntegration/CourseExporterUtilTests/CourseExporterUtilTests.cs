@@ -11,7 +11,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration.CourseExporterUtilTe
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
-    [Explicit]
     public class CourseExporterUtilTests : DbIntegrationTestBase
     {
         private const string ProviderCode = "A19";

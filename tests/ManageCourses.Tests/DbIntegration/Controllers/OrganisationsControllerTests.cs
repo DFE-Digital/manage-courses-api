@@ -16,7 +16,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
-    // [Explicit]
     public class OrganisationsControllerTests : DbIntegrationTestBase
     {
         public OrganisationsController organisationsController;

@@ -21,7 +21,6 @@ namespace GovUk.Education.ManageCourses.Tests.SmokeTests
     /// </summary>
     [TestFixture]
     [Category("Smoke")]
-    [Explicit]
     public partial class ApiEndpointTests : ApiSmokeTestBase
     {
         private const string Email = "feddie.krueger@example.org";

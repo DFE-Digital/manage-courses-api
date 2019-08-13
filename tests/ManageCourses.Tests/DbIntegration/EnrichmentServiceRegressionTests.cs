@@ -24,7 +24,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
-    [Explicit]
     public class EnrichmentServiceRegressionTests : DbIntegrationTestBase
     {
         private Provider _ucasInstitution;

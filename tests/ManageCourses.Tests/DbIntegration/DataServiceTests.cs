@@ -18,7 +18,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
-    [Explicit]
     public class DataServiceTests : DbIntegrationTestBase
     {
         public IDataService DataService;
