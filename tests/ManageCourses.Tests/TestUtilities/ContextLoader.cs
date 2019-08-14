@@ -15,7 +15,6 @@ namespace GovUk.Education.ManageCourses.Tests.TestUtilities
         public static ManageCoursesDbContext GetDbContext(IConfiguration config, bool enableRetryOnFailure = true)
         {
             var mcConfig = new McConfig(config);
-            mcConfig.Validate();
             var connectionString = mcConfig.BuildConnectionString();
 
             const int maxRetryCount = 1; // don't actually allow retry for tests

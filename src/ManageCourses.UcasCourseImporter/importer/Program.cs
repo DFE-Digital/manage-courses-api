@@ -40,7 +40,6 @@ namespace GovUk.Education.ManageCourses.UcasCourseImporter
                 var configOptions = new UcasCourseImporterConfigurationOptions(configuration);
                 configOptions.Validate();
                 var mcConfig = new McConfig(configuration);
-                mcConfig.Validate();
 
 
                 Directory.CreateDirectory(folder);

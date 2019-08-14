@@ -22,16 +22,10 @@ The project follows https://semver.org/ version numbering.
 
 ## Configuration
 
-An example of the config keys that are required for Secret Manager are available from:
-
-	src\ManageCourses.Api\appsettings.SecretManager_Example.json
-
-
 For additional details, refer to
 https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-2.1&tabs=windows
 
 https://dfedigital.atlassian.net/wiki/spaces/BaT/pages/389349377/Manage+Courses+API
-
 
 ## Getting started from scratch
 
@@ -110,56 +104,18 @@ set the SENTRY_DSN environment variable.
 
 # Running tests
 
-## Unit tests
-
 ```
 cd tests\ManageCourses.Tests\
 dotnet test
-```
-
-## Integration tests
-
-You will need to provide a postgresql server. A default localhost installation works. For everything else you can set the following overrides as user secrets:
-
-- MANAGE_COURSES_POSTGRESQL_SERVICE_HOST (the host of the PostgreSQL server)
-- MANAGE_COURSES_POSTGRESQL_SERVICE_PORT (its port)
-- PG_USERNAME (the log in user)
-- PG_PASSWORD (...and corresponding password)
-- PG_DATABASE (the database to use)
-
-You can set these by going to `tests\ManageCourses.Tests` and running `dotnet user-secrets set <key> <value>`.
-
-Then run
-```
-cd tests\ManageCourses.Tests
-dotnet test --filter TestCategory=Integration
 ```
 
 ## Smoke tests
 
 These need internet access and the following additional user secrets
 
-- credentials:dfesignin:clientid (Client ID for the dfe signin test oauth server)
-- credentials:dfesignin:clientsecret (...and corresponding secret)
-- credentials:dfesignin:host (... and domain name of the test oath server)
-- credentials:dfesignin:redirect_host (... and domain name:port of the server to be redirected to - needs to be whitelisted by the test oauth server!)
-- auth:oidc:userinfo_endpoint (the user_info endpoint of the dfe signin test oauth server, e.g. https://signin-test-oidc-as.azurewebsites.net/me)
+- credentials:dfesignin:clientsecret
 - credentials:dfesignin:username (User name of an existing account on the Dfe Sign in test server)
 - credentials:dfesignin:password (...and corresponding password)
-- api:key (An arbitrary string to use as a ManageCourses API admin key)
-
-Then run
-```
-cd tests\ManageCourses.Tests
-dotnet test --filter TestCategory=Smoke
-```
-
-## Notes
-
-An example of the config keys that are required for Secret Manager are available from:
-
-	src\ManageCourses.Tests\appsettings.SecretManager_Example.json
-
 
 # Using the API
 
@@ -173,4 +129,5 @@ See: https://github.com/RSuter/NSwag/wiki#ways-to-use-the-toolchain
 These are now managed by the sister project https://github.com/DFE-Digital/manage-courses-backend/
 
 ## Shutting down the service and showing the off line page.
+
 Rename the file "app_offline.htm.example" in the root folder to "app_offline.htm"

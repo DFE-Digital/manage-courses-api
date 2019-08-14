@@ -176,7 +176,6 @@ namespace GovUk.Education.ManageCourses.CourseExporterUtil
         private static McConfig GetMcConfig(IConfiguration configurationRoot)
         {
             var mcConfig = new McConfig(configurationRoot);
-            mcConfig.Validate();
             return mcConfig;
         }
     }

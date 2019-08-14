@@ -54,7 +54,6 @@ namespace GovUk.Education.ManageCourses.Api
                 loggingBuilder.AddSerilog(dispose: true));
 
             var mcConfig = new McConfig(Configuration);
-            mcConfig.Validate();
             var connectionString = mcConfig.BuildConnectionString();
 
             services.AddEntityFrameworkNpgsql()
