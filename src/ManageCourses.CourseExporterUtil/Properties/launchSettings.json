@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CourseExporterUtil": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "APPINSIGHTS_INSTRUMENTATIONKEY": "hello-insights"
+      }
+    }
+  }
+}

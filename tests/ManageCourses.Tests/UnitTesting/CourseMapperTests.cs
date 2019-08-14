@@ -35,10 +35,10 @@ namespace GovUk.Education.ManageCourses.Tests.UnitTesting
         }
 
         [Test]
-        public void MapToSearchAndCompareCourse_IsSen()
+        public void MapToSearchAndCompareCourse_IsSend()
         {
             var ucasCourse = GenerateUcasCourse();
-            ucasCourse.CourseSubjects = new Collection<CourseSubject>{new CourseSubject{ Subject = new Subject{SubjectCode = "u3", SubjectName ="special educational needs"}}};
+            ucasCourse.IsSend = true;
             var res = mapper.MapToSearchAndCompareCourse(
                 GenerateUcasProvider(),
                 ucasCourse,
