@@ -12,8 +12,6 @@ pool:
 variables:
   buildConfiguration: 'release'
   buildPlatform: 'anycpu'
-  pgUsername: 'vsts'
-  pgPassword: 'SKsktzT1yNqCPgFD4kcI'
 
 steps:
 - script: |
