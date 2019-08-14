@@ -12,7 +12,8 @@ pool:
 variables:
   buildConfiguration: 'release'
   buildPlatform: 'anycpu'
-  pgusername: 'vsts'
+  pgUsername: 'vsts'
+  pgPassword: 'SKsktzT1yNqCPgFD4kcI'
 
 steps:
 - script: |
@@ -43,29 +44,28 @@ steps:
 
 - bash: |
    #!/bin/bash
-   echo "##vso[task.setvariable variable=PG_USERNAME;]$pgusername"
-  displayName: Adding environmental variables
-
+   # set environment variables for the tests the Azure DevOps way
+   # https://docs.microsoft.com/en-gb/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch#set-a-job-scoped-variable-from-a-script
+   echo "##vso[task.setvariable variable=PG_USERNAME;]$(pgUsername)"
+   echo "##vso[task.setvariable variable=PG_PASSWORD;]$(pgPassword)"
+   echo "##vso[task.setvariable variable=credentials__dfesignin__username;]$(signinuser)"
+   echo "##vso[task.setvariable variable=credentials__dfesignin__password;]$(signInPassword)"
+   echo "##vso[task.setvariable variable=credentials__dfesignin__clientsecret;]$(signInSecret)"
+  displayName: Setting environmental variables for tests
 
 - bash: |
    #!/bin/bash
-   echo "PG env Username: $(PG_USERNAME)"
-   echo "PG Username: $(pgusername)"
-  displayName: Show environmental variables
-
-- bash: |
-   #!/bin/bash
-
+   echo "Adding postgres apt repository..."
    sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+   echo "Installing postgres 9.6..."
    sudo apt-get update
-   sudo apt-get install postgresql-9.6
-   sudo apt-get install postgresql-client-9.6
-   sudo -u postgres createuser --superuser vsts
-   sudo -u postgres createdb vsts
-  displayName: 'Install PostgresSQL 9.6 Client Commons package'
-
-
+   sudo apt-get install postgresql-9.6 postgresql-client-9.6
+   echo "Creating postgres user $(pgUsername)..."
+   sudo -u postgres createuser --superuser $(pgUsername)
+   echo "Setting password for $(pgUsername)..."
+   sudo -u postgres psql -c "ALTER USER $(pgUsername) WITH PASSWORD '$(pgPassword)';"
+  displayName: 'Installing & configuring PostgresSQL'
 
 - task: DotNetCoreCLI@2
   displayName: Execute Unit Tests
