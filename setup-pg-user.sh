@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sql="CREATE USER manage_courses WITH SUPERUSER CREATEDB PASSWORD 'manage_courses';"
+sql="CREATE USER manage_courses_backend WITH SUPERUSER CREATEDB PASSWORD 'manage_courses_backend';"
 
 # different variations of the call to psql that should work out of the box on vanilla installs of postgres
 

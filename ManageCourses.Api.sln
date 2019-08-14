@@ -1,4 +1,4 @@
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
@@ -22,6 +22,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 		travis-build.sh = travis-build.sh
 		travis-nuget-deploy.sh = travis-nuget-deploy.sh
+		setup-pg-user.sh = setup-pg-user.sh
+		deploy.sh = deploy.sh
+		travis-deploy-sc-exporter.sh = travis-deploy-sc-exporter.sh
+		azure-pipelines.yml = azure-pipelines.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManageCourses.ApiClient", "src\ManageCourses.ApiClient\ManageCourses.ApiClient.csproj", "{0633820A-7391-439C-A8D2-8A2B31A1D6B2}"
@@ -37,6 +41,17 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XlsReader", "src\ManageCourses.UcasCourseImporter\xls-reader\XlsReader.csproj", "{3D6088D7-3EA7-4721-BAC8-A3DFD6708EFF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CourseExporterUtil", "CourseExporterUtil", "{62449293-74FA-42DD-9837-D12C6E8121E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure", "azure", "{63FA96FF-8532-42DA-82D5-95CB41AEB0E9}"
+ProjectSection(SolutionItems) = preProject
+	azure\template.json = azure\template.json
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{E94CEAAD-5C82-4792-944A-E621395ED3E1}"
+ProjectSection(SolutionItems) = preProject
+	azure\scripts\Add-PostgreSQLFirewallRule.ps1 = azure\scripts\Add-PostgreSQLFirewallRule.ps1
+	azure\scripts\Remove-PostgreSQLFirewallRule.ps1 = azure\scripts\Remove-PostgreSQLFirewallRule.ps1
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -159,6 +174,8 @@ Global
 		{8A7DF99E-293A-43A4-B04D-111AEA352F96} = {41053243-7E2F-48EE-BAAC-2663CA17D4FC}
 		{3D6088D7-3EA7-4721-BAC8-A3DFD6708EFF} = {41053243-7E2F-48EE-BAAC-2663CA17D4FC}
 		{62449293-74FA-42DD-9837-D12C6E8121E7} = {97772813-B246-499F-8970-4675EE416422}
+		{63FA96FF-8532-42DA-82D5-95CB41AEB0E9} = {CFA02597-E2C6-4F09-BC95-5DF91FD6ABDA}
+		{E94CEAAD-5C82-4792-944A-E621395ED3E1} = {63FA96FF-8532-42DA-82D5-95CB41AEB0E9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AC887F84-7484-4201-9789-28BAA60494AE}

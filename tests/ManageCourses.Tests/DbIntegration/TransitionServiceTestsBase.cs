@@ -12,7 +12,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
-    [Explicit]
     public abstract class TransitionServiceTestsBase : DbIntegrationTestBase
     {
         internal static string NewUnpublishedCourseCode = CourseBuilder.Build(CourseType.NewUnpublished).GetCode();

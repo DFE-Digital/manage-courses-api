@@ -9,7 +9,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
-    [Explicit]
     public class TransitionService_Optin_Simple_Tests : TransitionServiceTestsBase
     {
         private const string OptedInProviderCode = "OptedIn";

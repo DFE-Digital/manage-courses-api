@@ -12,7 +12,6 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
     [TestFixture]
     [Category("Integration")]
     [Category("Integration_DB")]
-    [Explicit]
     public class AccessRequestServiceTests : DbIntegrationTestBase
     {
         private AccessRequestService _system;
@@ -43,7 +42,7 @@ namespace GovUk.Education.ManageCourses.Tests.DbIntegration
 
             var savedRequest = Context.AccessRequests.Include(x => x.Requester).First();
 
-            // Many, many asserts to cover all fields            
+            // Many, many asserts to cover all fields
             Assert.AreEqual(MakeSomeAccessRequest().FirstName, savedRequest.FirstName);
             Assert.AreEqual(MakeSomeAccessRequest().LastName, savedRequest.LastName);
             Assert.AreEqual(MakeSomeAccessRequest().EmailAddress, savedRequest.EmailAddress);

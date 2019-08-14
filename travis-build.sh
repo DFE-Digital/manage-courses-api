@@ -7,5 +7,3 @@ dotnet restore ./src/ManageCourses.UcasCourseImporter/importer/UcasCourseImporte
 dotnet restore ./tests/ManageCourses.Tests/ManageCourses.Tests.csproj
 
 dotnet test ./tests/ManageCourses.Tests/ManageCourses.Tests.csproj
-dotnet test ./tests/ManageCourses.Tests/ManageCourses.Tests.csproj --filter TestCategory="Integration"
-dotnet test ./tests/ManageCourses.Tests/ManageCourses.Tests.csproj --filter TestCategory="Smoke"

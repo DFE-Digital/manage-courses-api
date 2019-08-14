@@ -53,14 +53,16 @@ namespace GovUk.Education.ManageCourses.Api
                     o.MaxQueueItems = 100;
                     o.ShutdownTimeout = TimeSpan.FromSeconds(5);
                 })
+                .UseConfiguration(GetConfiguration())
                 .Build();
 
         private static IConfiguration GetConfiguration()
         {
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+                .AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"Config/appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development"}.json", optional: true)
+                .AddUserSecrets<Program>()
                 .AddEnvironmentVariables()
                 .Build();
         }
