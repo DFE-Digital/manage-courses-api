@@ -1,7 +1,8 @@
 # Manage Courses API project
 
+[![Build Status](https://dfe-ssp.visualstudio.com/Become-A-Teacher/_apis/build/status/Find/manage-courses-api?branchName=master)](https://dfe-ssp.visualstudio.com/Become-A-Teacher/_build/latest?definitionId=50&branchName=master)
 [<img src="https://img.shields.io/nuget/v/GovUk.Education.ManageCourses.ApiClient.svg">](https://www.nuget.org/packages/GovUk.Education.ManageCourses.ApiClient/)
-[<img src="https://api.travis-ci.org/DFE-Digital/manage-courses-api.svg?branch=master">](https://travis-ci.org/DFE-Digital/manage-courses-api?branch=master)
+
 
 ## About
 
